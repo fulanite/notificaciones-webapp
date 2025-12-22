@@ -70,7 +70,7 @@ const app = {
         document.getElementById('btn-logout')?.addEventListener('click', () => this.handleLogout());
 
         // Mobile menu toggle
-        document.getElementById('mobile-menu-toggle')?.addEventListener('click', () => {
+        document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
             document.getElementById('sidebar')?.classList.toggle('open');
         });
 

@@ -327,13 +327,21 @@ const ujier = {
                 document.getElementById('audio-recording')?.classList.add('hidden');
 
                 // Show transcription field
-                document.getElementById('transcripcion-audio')?.classList.remove('hidden');
+                const transcriptionField = document.getElementById('transcripcion-audio');
+                transcriptionField?.classList.remove('hidden');
+                transcriptionField.placeholder = 'Transcribiendo audio...';
 
                 // Stop all tracks
                 stream.getTracks().forEach(track => track.stop());
+
+                // Try automatic transcription with Speech Recognition
+                this.transcribeAudio();
             };
 
             this.mediaRecorder.start();
+
+            // Start speech recognition in parallel
+            this.startSpeechRecognition();
 
             document.getElementById('btn-record-audio')?.classList.add('hidden');
             document.getElementById('audio-recording')?.classList.remove('hidden');
@@ -349,6 +357,68 @@ const ujier = {
 
         } catch (error) {
             utils.showToast('Error al acceder al micrófono', 'error');
+        }
+    },
+
+    // Start speech recognition for live transcription
+    startSpeechRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            console.log('Speech Recognition no soportado en este navegador');
+            return;
+        }
+
+        this.recognition = new SpeechRecognition();
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+        this.recognition.lang = 'es-AR';
+
+        this.transcriptionText = '';
+
+        this.recognition.onresult = (event) => {
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript + ' ';
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+
+            this.transcriptionText += finalTranscript;
+
+            const field = document.getElementById('transcripcion-audio');
+            if (field) {
+                field.value = this.transcriptionText + interimTranscript;
+            }
+        };
+
+        this.recognition.onerror = (event) => {
+            console.log('Error en reconocimiento de voz:', event.error);
+        };
+
+        try {
+            this.recognition.start();
+        } catch (e) {
+            console.log('No se pudo iniciar reconocimiento de voz');
+        }
+    },
+
+    // Finalize transcription
+    transcribeAudio() {
+        if (this.recognition) {
+            try {
+                this.recognition.stop();
+            } catch (e) { }
+        }
+
+        const field = document.getElementById('transcripcion-audio');
+        if (field && !field.value) {
+            field.placeholder = 'Escribí la transcripción manualmente...';
         }
     },
 
