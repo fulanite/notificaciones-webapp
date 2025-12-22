@@ -392,14 +392,16 @@
 
 .mobile-menu-toggle {
     display: none;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 5px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--primary-600);
     border-radius: var(--radius-md);
+    cursor: pointer;
+    border: none;
 }
 
 .header-title {
