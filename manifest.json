@@ -1,0 +1,55 @@
+{
+    "name": "SGND - Sistema de Gestión de Notificaciones Digitales",
+    "short_name": "SGND",
+    "description": "Sistema de Gestión de Notificaciones Digitales - Provincia de Catamarca",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#1e3a5f",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "es-AR",
+    "categories": ["productivity", "utilities", "government"],
+    "icons": [
+        {
+            "src": "assets/icons/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "maskable any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "assets/screenshots/dashboard.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Panel de Control SGND"
+        },
+        {
+            "src": "assets/screenshots/mobile.png",
+            "sizes": "390x844",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Vista Móvil SGND"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Nueva Notificación",
+            "short_name": "Nueva",
+            "description": "Crear nueva notificación",
+            "url": "/?action=nueva",
+            "icons": [{ "src": "assets/icons/shortcut-new.png", "sizes": "96x96" }]
+        },
+        {
+            "name": "Mi Ruta",
+            "short_name": "Ruta",
+            "description": "Ver mis asignaciones del día",
+            "url": "/?action=ruta",
+            "icons": [{ "src": "assets/icons/shortcut-route.png", "sizes": "96x96" }]
+        }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false
+}

@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description"
+        content="SGND - Sistema de Gestión de Notificaciones Digitales de la Provincia de Catamarca">
+    <meta name="theme-color" content="#1e3a5f">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <title>SGND - Sistema de Gestión de Notificaciones Digitales</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+    <link rel="apple-touch-icon" href="assets/icons/icon.svg">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <svg viewBox="0 0 100 100" class="logo-icon">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2" opacity="0.3" />
+                    <path d="M50 15 L50 50 L75 65" fill="none" stroke="currentColor" stroke-width="3"
+                        stroke-linecap="round" />
+                    <circle cx="50" cy="50" r="8" fill="currentColor" />
+                </svg>
+            </div>
+            <h1 class="loading-title">SGND</h1>
+            <p class="loading-subtitle">Sistema de Gestión de Notificaciones Digitales</p>
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offline Banner -->
+    <div id="offline-banner" class="offline-banner hidden">
+        <span class="offline-icon">📡</span>
+        <span>Modo sin conexión - Los cambios se sincronizarán automáticamente</span>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="app-container hidden">
+
+        <!-- Login Page -->
+        <div id="page-login" class="page page-login active">
+            <div class="login-container">
+                <div class="login-background">
+                    <div class="bg-shape shape-1"></div>
+                    <div class="bg-shape shape-2"></div>
+                    <div class="bg-shape shape-3"></div>
+                </div>
+
+                <div class="login-card glass-card">
+                    <div class="login-header">
+                        <div class="login-logo">
+                            <div class="logo-circle">
+                                <svg viewBox="0 0 100 100" class="logo-svg">
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2" />
+                                    <path d="M30 50 L45 65 L70 35" fill="none" stroke="currentColor" stroke-width="4"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
+                        <h1 class="login-title">SGND</h1>
+                        <p class="login-description">Sistema de Gestión de Notificaciones Digitales</p>
+                        <span class="login-badge">Provincia de Catamarca</span>
+                    </div>
+
+                    <form id="login-form" class="login-form">
+                        <div class="form-group">
+                            <label for="login-email" class="form-label">
+                                <span class="label-icon">📧</span>
+                                Correo Electrónico
+                            </label>
+                            <input type="email" id="login-email" class="form-input" placeholder="usuario@ejemplo.com"
+                                required autocomplete="email">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login-password" class="form-label">
+                                <span class="label-icon">🔒</span>
+                                Contraseña
+                            </label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="login-password" class="form-input" placeholder="••••••••"
+                                    required autocomplete="current-password">
+                                <button type="button" class="password-toggle" aria-label="Mostrar contraseña">
+                                    <span class="eye-icon">👁️</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" id="remember-me">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-label">Recordarme</span>
+                            </label>
+                            <a href="#" class="forgot-password-link">¿Olvidaste tu contraseña?</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-login">
+                            <span class="btn-text">Iniciar Sesión</span>
+                            <span class="btn-loader hidden">
+                                <div class="btn-spinner"></div>
+                            </span>
+                        </button>
+
+                        <div id="login-error" class="error-message hidden"></div>
+                    </form>
+
+                    <div class="login-footer">
+                        <p class="footer-text">© 2024 Poder Judicial - Provincia de Catamarca</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard (After Login) -->
+        <div id="page-dashboard" class="page page-dashboard">
+            <!-- Sidebar Navigation -->
+            <aside id="sidebar" class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">
+                        <div class="logo-mini-circle">
+                            <svg viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="3" />
+                                <path d="M30 50 L45 65 L70 35" fill="none" stroke="currentColor" stroke-width="5"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <span class="logo-text">SGND</span>
+                    </div>
+                    <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                </div>
+
+                <div class="sidebar-user">
+                    <div class="user-avatar" id="user-avatar">
+                        <span class="avatar-initials">US</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name" id="user-name">Usuario</span>
+                        <span class="user-role" id="user-role">Rol</span>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <!-- Admin Menu -->
+                    <div id="menu-admin" class="nav-section hidden">
+                        <span class="nav-section-title">Administración</span>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active" data-view="dashboard-home">
+                                    <span class="nav-icon">📊</span>
+                                    <span class="nav-text">Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="nueva-notificacion">
+                                    <span class="nav-icon">➕</span>
+                                    <span class="nav-text">Nueva Notificación</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="lista-notificaciones">
+                                    <span class="nav-icon">📋</span>
+                                    <span class="nav-text">Notificaciones</span>
+                                    <span class="nav-badge" id="pending-count">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="asignaciones">
+                                    <span class="nav-icon">👤</span>
+                                    <span class="nav-text">Asignaciones</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="usuarios">
+                                    <span class="nav-icon">👥</span>
+                                    <span class="nav-text">Usuarios</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="reportes">
+                                    <span class="nav-icon">📈</span>
+                                    <span class="nav-text">Reportes</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Ujier Menu -->
+                    <div id="menu-ujier" class="nav-section hidden">
+                        <span class="nav-section-title">Mis Tareas</span>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active" data-view="mis-asignaciones">
+                                    <span class="nav-icon">📍</span>
+                                    <span class="nav-text">Mi Ruta</span>
+                                    <span class="nav-badge" id="my-pending-count">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="historial-ujier">
+                                    <span class="nav-icon">📜</span>
+                                    <span class="nav-text">Mi Historial</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="sincronizar">
+                                    <span class="nav-icon">🔄</span>
+                                    <span class="nav-text">Sincronizar</span>
+                                    <span class="nav-badge sync-badge hidden" id="sync-pending">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Auditor Menu -->
+                    <div id="menu-auditor" class="nav-section hidden">
+                        <span class="nav-section-title">Auditoría</span>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link active" data-view="auditoria">
+                                    <span class="nav-icon">🔍</span>
+                                    <span class="nav-text">Panel de Auditoría</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="cargas-diferidas">
+                                    <span class="nav-icon">⚠️</span>
+                                    <span class="nav-text">Cargas Diferidas</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="estadisticas">
+                                    <span class="nav-icon">📊</span>
+                                    <span class="nav-text">Estadísticas</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <button id="btn-logout" class="btn btn-logout">
+                        <span class="nav-icon">🚪</span>
+                        <span class="nav-text">Cerrar Sesión</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Top Header -->
+                <header class="top-header">
+                    <button id="mobile-menu-toggle" class="mobile-menu-toggle">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+
+                    <div class="header-title">
+                        <h1 id="page-title">Dashboard</h1>
+                        <p id="page-subtitle" class="header-subtitle">Panel de control</p>
+                    </div>
+
+                    <div class="header-actions">
+                        <button class="header-btn" id="btn-notifications" aria-label="Notificaciones">
+                            <span class="header-icon">🔔</span>
+                            <span class="notification-dot hidden"></span>
+                        </button>
+                        <button class="header-btn" id="btn-sync" aria-label="Sincronizar">
+                            <span class="header-icon">🔄</span>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Dynamic Content Views -->
+                <div class="content-area">
+                    <!-- Dashboard Home View -->
+                    <section id="view-dashboard-home" class="view active">
+                        <div class="stats-grid">
+                            <div class="stat-card stat-primary">
+                                <div class="stat-icon">📋</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="stat-total">0</span>
+                                    <span class="stat-label">Total Notificaciones</span>
+                                </div>
+                                <div class="stat-trend trend-up">
+                                    <span>+12%</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-warning">
+                                <div class="stat-icon">⏳</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="stat-pending">0</span>
+                                    <span class="stat-label">Pendientes</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-success">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="stat-completed">0</span>
+                                    <span class="stat-label">Diligenciadas</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-info">
+                                <div class="stat-icon">📡</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="stat-deferred">0</span>
+                                    <span class="stat-label">Carga Diferida</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-grid">
+                            <div class="dashboard-card chart-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Notificaciones por Tipo</h3>
+                                    <select class="chart-filter" id="chart-period">
+                                        <option value="week">Esta Semana</option>
+                                        <option value="month">Este Mes</option>
+                                        <option value="year">Este Año</option>
+                                    </select>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="chart-by-type"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-card chart-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Resultados de Diligencias</h3>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="chart-results"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-card recent-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Actividad Reciente</h3>
+                                    <a href="#" class="card-link" data-view="lista-notificaciones">Ver todo →</a>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="activity-list" id="recent-activity">
+                                        <!-- Dynamic content -->
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-card ujier-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Rendimiento por Ujier</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="ujier-list" id="ujier-performance">
+                                        <!-- Dynamic content -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Nueva Notificación View -->
+                    <section id="view-nueva-notificacion" class="view">
+                        <div class="form-container">
+                            <form id="form-nueva-notificacion" class="notification-form">
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <span class="section-icon">📝</span>
+                                        Datos del Expediente
+                                    </h3>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="tipo-notificacion" class="form-label">Tipo de Notificación
+                                                *</label>
+                                            <select id="tipo-notificacion" name="tipo-notificacion" class="form-select"
+                                                required>
+                                                <option value="">Seleccionar tipo...</option>
+                                                <option value="cedulas">Cédulas</option>
+                                                <option value="cedulas_urgente_norte">Cédulas Urgente Norte</option>
+                                                <option value="cedulas_urgente_sur">Cédulas Urgente Sur</option>
+                                                <option value="cedulas_mandamientos_22172">Cédulas o Mandamientos Ley
+                                                    22172</option>
+                                                <option value="cedulas_correspondencia">Cédulas por Correspondencia
+                                                    (Interior)</option>
+                                                <option value="mandamientos">Mandamientos</option>
+                                                <option value="mandamientos_habilitacion_norte">Mandamientos con
+                                                    habilitación Norte</option>
+                                                <option value="mandamientos_habilitacion_sur">Mandamientos con
+                                                    habilitación Sur</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="n-expediente" class="form-label">N° Expediente *</label>
+                                            <input type="text" id="n-expediente" name="n-expediente" class="form-input"
+                                                placeholder="Ej: 12345/2024" required>
+                                        </div>
+
+                                        <div class="form-group form-group-full">
+                                            <label for="caratula" class="form-label">Carátula *</label>
+                                            <input type="text" id="caratula" name="caratula" class="form-input"
+                                                placeholder="Nombre del expediente" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="origen" class="form-label">Origen (Juzgado/Fiscalía) *</label>
+                                            <input type="text" id="origen" name="origen" class="form-input"
+                                                placeholder="Ej: Juzgado Civil N°1" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="letrado" class="form-label">Letrado</label>
+                                            <input type="text" id="letrado" name="letrado" class="form-input"
+                                                placeholder="Nombre del abogado">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <span class="section-icon">👤</span>
+                                        Datos del Destinatario
+                                    </h3>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="destinatario-especial" class="form-label">Destinatario
+                                                Especial</label>
+                                            <select id="destinatario-especial" name="destinatario-especial"
+                                                class="form-select">
+                                                <option value="">No aplica</option>
+                                                <option value="estrados">Estrados</option>
+                                                <option value="arcat">ARCAT</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="destinatario-nombre" class="form-label">Nombre del Destinatario
+                                                *</label>
+                                            <input type="text" id="destinatario-nombre" name="destinatario-nombre"
+                                                class="form-input" placeholder="Nombre completo" required>
+                                        </div>
+
+                                        <div class="form-group form-group-full">
+                                            <label for="domicilio" class="form-label">Domicilio *</label>
+                                            <input type="text" id="domicilio" name="domicilio" class="form-input"
+                                                placeholder="Dirección completa" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="zona" class="form-label">Zona *</label>
+                                            <select id="zona" name="zona" class="form-select" required>
+                                                <option value="">Seleccionar zona...</option>
+                                                <option value="norte">Norte</option>
+                                                <option value="sur">Sur</option>
+                                                <option value="centro">Centro</option>
+                                                <option value="este">Este</option>
+                                                <option value="oeste">Oeste</option>
+                                                <option value="interior">Interior</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <span class="section-icon">🎫</span>
+                                        Troquel y Pago
+                                    </h3>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="tipo-troquel" class="form-label">Tipo de Troquel *</label>
+                                            <select id="tipo-troquel" name="tipo-troquel" class="form-select" required>
+                                                <option value="">Seleccionar...</option>
+                                                <option value="C">C - Cédula</option>
+                                                <option value="M">M - Mandamiento</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                <input type="checkbox" id="sin-troquel" name="sin-troquel"
+                                                    class="form-checkbox">
+                                                Sin Troquel (Juzgados)
+                                            </label>
+                                        </div>
+
+                                        <div class="form-group" id="grupo-n-troquel">
+                                            <label for="n-troquel" class="form-label">N° Troquel *</label>
+                                            <input type="number" id="n-troquel" name="n-troquel" class="form-input"
+                                                placeholder="Número de troquel" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="medio-pago" class="form-label">Medio de Pago *</label>
+                                            <select id="medio-pago" name="medio-pago" class="form-select" required>
+                                                <option value="">Seleccionar...</option>
+                                                <option value="gratuito">Gratuito</option>
+                                                <option value="efectivo">Efectivo</option>
+                                                <option value="transferencia">Transferencia</option>
+                                                <option value="qr">QR</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group" id="grupo-costo">
+                                            <label for="costo" class="form-label">Costo</label>
+                                            <div class="input-with-prefix">
+                                                <span class="input-prefix">$</span>
+                                                <input type="number" id="costo" name="costo" class="form-input"
+                                                    placeholder="0.00" step="0.01">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <h3 class="section-title">
+                                        <span class="section-icon">📎</span>
+                                        Asignación y Observaciones
+                                    </h3>
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="asignado-a" class="form-label">Asignar a Ujier</label>
+                                            <select id="asignado-a" name="asignado-a" class="form-select">
+                                                <option value="">Sin asignar (pendiente)</option>
+                                                <!-- Dynamic options -->
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group form-group-full">
+                                            <label for="observaciones-iniciales" class="form-label">Observaciones
+                                                Iniciales</label>
+                                            <textarea id="observaciones-iniciales" name="observaciones-iniciales"
+                                                class="form-textarea" rows="3"
+                                                placeholder="Ej: Requiere traslado, adjuntar croquis, etc."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" id="btn-limpiar-form">
+                                        <span>🗑️</span> Limpiar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <span>💾</span> Guardar Notificación
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- Lista de Notificaciones View -->
+                    <section id="view-lista-notificaciones" class="view">
+                        <div class="list-header">
+                            <div class="search-bar">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="search-notificaciones" class="search-input"
+                                    placeholder="Buscar por expediente, destinatario...">
+                            </div>
+                            <div class="filter-bar">
+                                <select id="filter-estado" class="filter-select">
+                                    <option value="">Todos los estados</option>
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="diligenciada">Diligenciada</option>
+                                    <option value="diferida">Carga Diferida</option>
+                                </select>
+                                <select id="filter-tipo" class="filter-select">
+                                    <option value="">Todos los tipos</option>
+                                    <option value="cedulas">Cédulas</option>
+                                    <option value="mandamientos">Mandamientos</option>
+                                </select>
+                                <input type="date" id="filter-fecha" class="filter-input">
+                            </div>
+                        </div>
+
+                        <div class="notifications-table-container">
+                            <table class="notifications-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Expediente</th>
+                                        <th>Destinatario</th>
+                                        <th>Estado</th>
+                                        <th>Ujier</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-notificaciones">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pagination">
+                            <button class="pagination-btn" id="btn-prev-page">← Anterior</button>
+                            <span class="pagination-info" id="pagination-info">Página 1 de 1</span>
+                            <button class="pagination-btn" id="btn-next-page">Siguiente →</button>
+                        </div>
+                    </section>
+
+                    <!-- Mis Asignaciones (Ujier) View -->
+                    <section id="view-mis-asignaciones" class="view">
+                        <div class="ujier-header">
+                            <div class="date-info">
+                                <span class="date-icon">📅</span>
+                                <span id="current-date">--</span>
+                            </div>
+                            <div class="route-stats">
+                                <div class="route-stat">
+                                    <span class="stat-number" id="route-pending">0</span>
+                                    <span class="stat-text">Pendientes</span>
+                                </div>
+                                <div class="route-stat">
+                                    <span class="stat-number" id="route-completed">0</span>
+                                    <span class="stat-text">Completadas</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="view-toggle">
+                            <button class="toggle-btn active" data-view-mode="list">📋 Lista</button>
+                            <button class="toggle-btn" data-view-mode="map">🗺️ Mapa</button>
+                        </div>
+
+                        <div id="assignments-list" class="assignments-list">
+                            <!-- Dynamic content -->
+                        </div>
+
+                        <div id="assignments-map" class="assignments-map hidden">
+                            <div id="map-container" class="map-container">
+                                <!-- Map will be rendered here -->
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Historial Ujier View -->
+                    <section id="view-historial-ujier" class="view">
+                        <div class="list-header">
+                            <div class="search-bar">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="search-historial" class="search-input"
+                                    placeholder="Buscar en mi historial...">
+                            </div>
+                        </div>
+                        <div id="historial-list" class="historial-list">
+                            <!-- Dynamic history content -->
+                        </div>
+                    </section>
+
+                    <!-- Reportes View -->
+                    <section id="view-reportes" class="view">
+                        <div class="reports-grid">
+                            <div class="report-card">
+                                <div class="report-icon">📋</div>
+                                <h3 class="report-title">Planilla Diaria</h3>
+                                <p class="report-description">Generar planilla de trabajo del día</p>
+                                <div class="report-actions">
+                                    <input type="date" id="report-date" class="report-date-input">
+                                    <button class="btn btn-primary btn-sm" id="btn-report-daily">
+                                        📥 Descargar CSV
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="report-card">
+                                <div class="report-icon">📊</div>
+                                <h3 class="report-title">Informe Mensual</h3>
+                                <p class="report-description">Estadísticas completas del mes</p>
+                                <div class="report-actions">
+                                    <select id="report-month" class="report-select">
+                                        <option value="01">Enero</option>
+                                        <option value="02">Febrero</option>
+                                        <option value="03">Marzo</option>
+                                        <option value="04">Abril</option>
+                                        <option value="05">Mayo</option>
+                                        <option value="06">Junio</option>
+                                        <option value="07">Julio</option>
+                                        <option value="08">Agosto</option>
+                                        <option value="09">Septiembre</option>
+                                        <option value="10">Octubre</option>
+                                        <option value="11">Noviembre</option>
+                                        <option value="12">Diciembre</option>
+                                    </select>
+                                    <button class="btn btn-primary btn-sm" id="btn-report-monthly">
+                                        📥 Descargar PDF
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="report-card">
+                                <div class="report-icon">👤</div>
+                                <h3 class="report-title">Rendimiento por Ujier</h3>
+                                <p class="report-description">Métricas individuales de rendimiento</p>
+                                <div class="report-actions">
+                                    <select id="report-ujier" class="report-select">
+                                        <option value="all">Todos los ujieres</option>
+                                    </select>
+                                    <button class="btn btn-primary btn-sm" id="btn-report-ujier">
+                                        📥 Generar Reporte
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="report-card">
+                                <div class="report-icon">⚠️</div>
+                                <h3 class="report-title">Cargas Diferidas</h3>
+                                <p class="report-description">Listado de diligencias con carga diferida</p>
+                                <div class="report-actions">
+                                    <button class="btn btn-warning btn-sm" id="btn-report-deferred">
+                                        📥 Descargar Reporte
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Additional views will be added dynamically -->
+                </div>
+            </main>
+        </div>
+
+        <!-- Modal para Diligenciamiento -->
+        <div id="modal-diligenciar" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Registrar Resultado</h2>
+                    <button class="modal-close" id="modal-close">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-diligenciar">
+                        <input type="hidden" id="diligencia-id">
+
+                        <div class="notification-summary" id="notif-summary">
+                            <!-- Dynamic summary -->
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label class="form-label">¿Sin Señal / Carga Diferida?</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="carga-diferida">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <div id="motivo-falla-container" class="form-group hidden">
+                                <label for="motivo-falla" class="form-label">Motivo de Falla *</label>
+                                <select id="motivo-falla" class="form-select">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="sin_senal_domicilio">Falta de señal en domicilio</option>
+                                    <option value="falla_datos">Falla temporal de datos</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="resultado-diligencia" class="form-label">Resultado *</label>
+                                <select id="resultado-diligencia" class="form-select" required>
+                                    <option value="">Seleccionar resultado...</option>
+                                    <option value="atiende">Atiende</option>
+                                    <option value="no_atiende">No atiende</option>
+                                    <option value="pre_aviso">Pre aviso</option>
+                                    <option value="estrados">Estrados</option>
+                                    <option value="domicilio_inexistente">Domicilio inexistente</option>
+                                    <option value="diligenciador_ausente">Diligenciador ausente</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-subtitle">📍 Ubicación GPS</h4>
+                            <div class="gps-container" id="gps-container">
+                                <button type="button" class="btn btn-secondary" id="btn-capture-gps">
+                                    <span>📍</span> Capturar Ubicación
+                                </button>
+                                <div class="gps-info hidden" id="gps-info">
+                                    <span class="gps-coords" id="gps-coords"></span>
+                                    <span class="gps-status">✅ Capturada</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="ubicacion-lat">
+                            <input type="hidden" id="ubicacion-lng">
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-subtitle">📷 Evidencia Fotográfica</h4>
+                            <div class="photo-container">
+                                <input type="file" id="evidencia-foto" accept="image/*" capture="environment"
+                                    class="hidden">
+                                <label for="evidencia-foto" class="photo-upload-btn">
+                                    <span class="upload-icon">📷</span>
+                                    <span class="upload-text">Tomar Foto</span>
+                                </label>
+                                <div id="photo-preview" class="photo-preview hidden">
+                                    <img id="preview-img" src="" alt="Vista previa">
+                                    <button type="button" class="btn-remove-photo" id="btn-remove-photo">×</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-subtitle">🎤 Observación por Audio</h4>
+                            <div class="audio-container">
+                                <button type="button" class="btn btn-audio" id="btn-record-audio">
+                                    <span class="audio-icon">🎤</span>
+                                    <span class="audio-text">Grabar Audio</span>
+                                </button>
+                                <div id="audio-recording" class="audio-recording hidden">
+                                    <div class="recording-indicator">
+                                        <span class="pulse-dot"></span>
+                                        <span>Grabando...</span>
+                                    </div>
+                                    <button type="button" class="btn btn-stop" id="btn-stop-audio">⏹️ Detener</button>
+                                </div>
+                                <audio id="audio-playback" class="audio-playback hidden" controls></audio>
+                            </div>
+                            <textarea id="transcripcion-audio" class="form-textarea hidden" rows="2"
+                                placeholder="Transcripción automática..."></textarea>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="observaciones-resultado" class="form-label">Observaciones
+                                    Adicionales</label>
+                                <textarea id="observaciones-resultado" class="form-textarea" rows="3"
+                                    placeholder="Notas adicionales sobre la diligencia..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-secondary" id="btn-cancel-diligencia">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">
+                                <span>✅</span> Guardar Resultado
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/config.js?v=1.4"></script>
+    <script src="js/supabase.js?v=1.4"></script>
+    <script src="js/auth.js?v=1.4"></script>
+    <script src="js/utils.js?v=1.4"></script>
+    <script src="js/offline.js?v=1.4"></script>
+    <script src="js/notifications.js?v=1.4"></script>
+    <script src="js/ujier.js?v=1.4"></script>
+    <script src="js/dashboard.js?v=1.4"></script>
+    <script src="js/reports.js?v=1.4"></script>
+    <script src="js/app.js?v=1.4"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW registrado:', reg.scope))
+                    .catch(err => console.error('SW error:', err));
+            });
+        }
+    </script>
+</body>
+
+</html>
