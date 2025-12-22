@@ -230,8 +230,68 @@ const notifications = {
     },
 
     // Edit notification
-    edit(id) {
-        utils.showToast('Función de edición en desarrollo', 'info');
+    async edit(id) {
+        const { data, error } = await db.getNotificationById(id);
+
+        if (error || !data) {
+            utils.showToast('Error al cargar notificación', 'error');
+            return;
+        }
+
+        // Store the ID being edited
+        this.editingId = id;
+
+        // Navigate to the form
+        app.navigateTo('nueva-notificacion');
+
+        // Wait for DOM to be ready
+        setTimeout(() => {
+            // Populate form fields
+            document.getElementById('tipo-notificacion').value = data.tipo_notificacion || '';
+            document.getElementById('n-expediente').value = data.n_expediente || '';
+            document.getElementById('caratula').value = data.caratula || '';
+            document.getElementById('origen').value = data.origen || '';
+            document.getElementById('letrado').value = data.letrado || '';
+            document.getElementById('destinatario-especial').value = data.destinatario_especial || '';
+            document.getElementById('destinatario-nombre').value = data.destinatario_nombre || '';
+            document.getElementById('domicilio').value = data.domicilio || '';
+            document.getElementById('zona').value = data.zona || '';
+            document.getElementById('tipo-troquel').value = data.tipo_troquel || '';
+            document.getElementById('n-troquel').value = data.n_troquel || '';
+            document.getElementById('medio-pago').value = data.medio_pago || '';
+            document.getElementById('costo').value = data.costo || '';
+            document.getElementById('asignado-a').value = data.asignado_a || '';
+            document.getElementById('observaciones-iniciales').value = data.observaciones_iniciales || '';
+
+            // Handle checkboxes
+            const sinTroquel = document.getElementById('sin-troquel');
+            if (sinTroquel) {
+                sinTroquel.checked = data.sin_troquel || false;
+                if (data.sin_troquel) {
+                    document.getElementById('grupo-n-troquel')?.classList.add('hidden');
+                }
+            }
+
+            // Update form title to indicate editing
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) pageTitle.textContent = 'Editar Notificación';
+
+            utils.showToast('Editando notificación - Modificá los campos y guardá', 'info');
+        }, 100);
+    },
+
+    // Update existing notification
+    async update(id, notificationData) {
+        const { data, error } = await db.updateNotification(id, notificationData, auth.currentUser?.id);
+
+        if (error) {
+            utils.showToast('Error al actualizar: ' + error.message, 'error');
+            return { success: false, error };
+        }
+
+        utils.showToast('Notificación actualizada exitosamente', 'success');
+        this.editingId = null;
+        return { success: true, data };
     },
 
     // Create new notification

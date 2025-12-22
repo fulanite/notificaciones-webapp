@@ -348,10 +348,18 @@ const app = {
 
         console.log('📤 Enviando datos a Supabase:', notificationData);
 
-        const result = await notifications.create(notificationData);
+        let result;
+
+        // Check if we're editing an existing notification
+        if (notifications.editingId) {
+            result = await notifications.update(notifications.editingId, notificationData);
+        } else {
+            result = await notifications.create(notificationData);
+        }
 
         if (result.success) {
             form.reset();
+            notifications.editingId = null;
 
             // Re-apply required logic for troquel after reset
             document.getElementById('grupo-n-troquel')?.classList.remove('hidden');
