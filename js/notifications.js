@@ -94,13 +94,16 @@ const notifications = {
             ...this.filters
         };
 
+        console.log('📋 Cargando notificaciones con opciones:', options);
         const { data, error, count } = await db.getNotifications(options);
+        console.log('📋 Resultado:', { data: data?.length, error, count });
 
         if (error) {
+            console.error('❌ Error cargando notificaciones:', error);
             tbody.innerHTML = `
                 <tr>
                     <td colspan="8" style="text-align: center; padding: 40px; color: var(--error);">
-                        Error al cargar notificaciones
+                        Error al cargar notificaciones: ${error.message || 'Error desconocido'}
                     </td>
                 </tr>
             `;

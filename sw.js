@@ -2,7 +2,7 @@
  * SGND - Service Worker for PWA
  */
 
-const CACHE_NAME = 'sgnd-cache-v7';
+const CACHE_NAME = 'sgnd-cache-v8';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache
@@ -146,8 +146,8 @@ self.addEventListener('fetch', (event) => {
 
                 return fetch(request)
                     .then((response) => {
-                        // Cache new resources
-                        if (response.ok) {
+                        // Cache new resources (skip chrome-extension URLs)
+                        if (response.ok && !request.url.startsWith('chrome-extension')) {
                             const responseClone = response.clone();
                             caches.open(CACHE_NAME).then((cache) => {
                                 cache.put(request, responseClone);

@@ -276,7 +276,16 @@ const app = {
         document.querySelectorAll('.nav-link[data-view]').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 const view = link.dataset.view;
+                console.log('📱 Navegando a:', view);
+
+                // Close sidebar on mobile
+                const sidebar = document.getElementById('sidebar');
+                if (window.innerWidth <= 1024 && sidebar?.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+
                 this.navigateTo(view);
             });
         });
@@ -500,43 +509,60 @@ const app = {
 
     // Initialize view-specific module
     async initViewModule(viewId) {
+        console.log('🔄 Inicializando vista:', viewId);
         try {
-            // Set a timeout to prevent infinite loading
+            // Set a timeout to prevent infinite loading (30 seconds)
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Timeout')), 10000)
+                setTimeout(() => reject(new Error('Timeout')), 30000)
             );
 
             let loadPromise;
 
             switch (viewId) {
                 case 'dashboard-home':
-                    loadPromise = dashboard.init();
+                    loadPromise = typeof dashboard !== 'undefined' && dashboard.init
+                        ? dashboard.init()
+                        : Promise.resolve();
                     break;
                 case 'lista-notificaciones':
-                    loadPromise = notifications.loadNotifications();
+                    loadPromise = typeof notifications !== 'undefined' && notifications.loadNotifications
+                        ? notifications.loadNotifications()
+                        : Promise.resolve();
                     break;
                 case 'reportes':
-                    loadPromise = Promise.resolve(reports.init());
+                    loadPromise = typeof reports !== 'undefined' && reports.init
+                        ? Promise.resolve(reports.init())
+                        : Promise.resolve();
                     break;
                 case 'mis-asignaciones':
-                    loadPromise = ujier.loadAssignments();
+                    loadPromise = typeof ujier !== 'undefined' && ujier.loadAssignments
+                        ? ujier.loadAssignments()
+                        : Promise.resolve();
                     break;
                 case 'historial-ujier':
-                    loadPromise = ujier.loadHistory();
+                    loadPromise = typeof ujier !== 'undefined' && ujier.loadHistory
+                        ? ujier.loadHistory()
+                        : Promise.resolve();
                     break;
                 case 'asignaciones':
-                    loadPromise = asignaciones.init();
+                    loadPromise = typeof asignaciones !== 'undefined' && asignaciones.init
+                        ? asignaciones.init()
+                        : Promise.resolve();
                     break;
                 case 'usuarios':
-                    loadPromise = usuarios.init();
+                    loadPromise = typeof usuarios !== 'undefined' && usuarios.init
+                        ? usuarios.init()
+                        : Promise.resolve();
                     break;
                 default:
                     loadPromise = Promise.resolve();
             }
 
+            console.log('⏳ Esperando carga de:', viewId);
             await Promise.race([loadPromise, timeoutPromise]);
+            console.log('✅ Vista cargada:', viewId);
         } catch (error) {
-            console.error(`Error loading view ${viewId}:`, error);
+            console.error(`❌ Error loading view ${viewId}:`, error);
             // Don't show error toast for timeout - just silently fail
         }
     },
