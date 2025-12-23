@@ -15,6 +15,9 @@ const app = {
         // Initialize offline support
         offline.init();
 
+        // Initialize theme
+        this.initTheme();
+
         // Check authentication
         await this.checkAuth();
 
@@ -25,6 +28,198 @@ const app = {
         setTimeout(() => {
             this.hideLoading();
         }, 1000);
+    },
+
+    // Initialize theme from localStorage
+    initTheme() {
+        const savedTheme = localStorage.getItem('sgnd-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        this.currentTheme = savedTheme;
+
+        // Update button icon after DOM is ready
+        setTimeout(() => {
+            const btn = document.getElementById('btn-theme-toggle');
+            if (btn) {
+                btn.querySelector('.header-icon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            }
+        }, 100);
+    },
+
+    // Toggle between light and dark theme
+    toggleTheme() {
+        const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('sgnd-theme', newTheme);
+        this.currentTheme = newTheme;
+
+        // Update toggle button icon
+        const btn = document.getElementById('btn-theme-toggle');
+        if (btn) {
+            btn.querySelector('.header-icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        utils.showToast(`Tema ${newTheme === 'dark' ? 'oscuro' : 'claro'} activado`, 'info');
+    },
+
+    // Handle notification type change - show/populate dynamic origin
+    handleTipoNotificacionChange(tipo) {
+        const grupoJuzgado = document.getElementById('origen')?.closest('.form-group');
+        const grupoDinamico = document.getElementById('grupo-origen-dinamico');
+        const input = document.getElementById('origen-dinamico-input');
+        const hidden = document.getElementById('origen-dinamico');
+        const dropdown = document.getElementById('origen-dropdown');
+        const label = document.getElementById('label-origen-dinamico');
+
+        if (!grupoDinamico || !input || !dropdown || !label) return;
+
+        // Clear previous
+        input.value = '';
+        hidden.value = '';
+        dropdown.innerHTML = '';
+
+        // Remove previous listeners
+        input.replaceWith(input.cloneNode(true));
+        const newInput = document.getElementById('origen-dinamico-input');
+
+        let options = [];
+
+        if (tipo === 'cedulas_mandamientos_22172') {
+            // Hide juzgado selector, show province selector
+            grupoJuzgado?.classList.add('hidden');
+            document.getElementById('origen').required = false;
+
+            grupoDinamico.classList.remove('hidden');
+            newInput.required = true;
+            label.textContent = 'Provincia de Origen *';
+            newInput.placeholder = 'Escribí para buscar provincia...';
+            options = SGND_DATA.PROVINCIAS;
+
+        } else if (tipo === 'cedulas_correspondencia') {
+            // Hide juzgado selector, show locality selector
+            grupoJuzgado?.classList.add('hidden');
+            document.getElementById('origen').required = false;
+
+            grupoDinamico.classList.remove('hidden');
+            newInput.required = true;
+            label.textContent = 'Localidad de Origen *';
+            newInput.placeholder = 'Escribí para buscar localidad...';
+            options = SGND_DATA.LOCALIDADES_CATAMARCA;
+
+        } else {
+            // Show juzgado selector, hide dynamic origin
+            grupoJuzgado?.classList.remove('hidden');
+            document.getElementById('origen').required = true;
+
+            grupoDinamico.classList.add('hidden');
+            newInput.required = false;
+            return;
+        }
+
+        // Setup searchable select
+        this.setupSearchableSelect(newInput, hidden, dropdown, options);
+    },
+
+    // Setup searchable select functionality
+    setupSearchableSelect(input, hidden, dropdown, options) {
+        let highlightedIndex = -1;
+
+        const showDropdown = (filtered) => {
+            dropdown.innerHTML = '';
+            highlightedIndex = -1;
+
+            if (filtered.length === 0) {
+                dropdown.innerHTML = '<div class="searchable-select-empty">No se encontraron resultados</div>';
+            } else {
+                // Limit to 50 results for performance
+                const limited = filtered.slice(0, 50);
+                limited.forEach((opt, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'searchable-select-item';
+                    // Highlight matching text
+                    const query = input.value.toLowerCase();
+                    if (query) {
+                        const regex = new RegExp(`(${query})`, 'gi');
+                        item.innerHTML = opt.replace(regex, '<mark>$1</mark>');
+                    } else {
+                        item.textContent = opt;
+                    }
+                    item.dataset.value = opt;
+                    item.dataset.index = index;
+
+                    item.addEventListener('click', () => {
+                        input.value = opt;
+                        hidden.value = opt;
+                        dropdown.classList.remove('show');
+                    });
+
+                    dropdown.appendChild(item);
+                });
+
+                if (filtered.length > 50) {
+                    const more = document.createElement('div');
+                    more.className = 'searchable-select-empty';
+                    more.textContent = `...y ${filtered.length - 50} más. Seguí escribiendo para filtrar.`;
+                    dropdown.appendChild(more);
+                }
+            }
+
+            dropdown.classList.add('show');
+        };
+
+        const filterOptions = () => {
+            const query = input.value.toLowerCase();
+            const filtered = options.filter(opt => opt.toLowerCase().includes(query));
+            showDropdown(filtered);
+        };
+
+        // Input events
+        input.addEventListener('focus', () => {
+            filterOptions();
+        });
+
+        input.addEventListener('input', () => {
+            hidden.value = ''; // Clear hidden until selection
+            filterOptions();
+        });
+
+        input.addEventListener('blur', () => {
+            // Delay to allow click on dropdown
+            setTimeout(() => {
+                dropdown.classList.remove('show');
+                // If nothing was selected but there's text, try to match
+                if (input.value && !hidden.value) {
+                    const match = options.find(opt => opt.toLowerCase() === input.value.toLowerCase());
+                    if (match) {
+                        input.value = match;
+                        hidden.value = match;
+                    }
+                }
+            }, 200);
+        });
+
+        // Keyboard navigation
+        input.addEventListener('keydown', (e) => {
+            const items = dropdown.querySelectorAll('.searchable-select-item');
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1);
+                items.forEach((item, i) => item.classList.toggle('highlighted', i === highlightedIndex));
+                items[highlightedIndex]?.scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                highlightedIndex = Math.max(highlightedIndex - 1, 0);
+                items.forEach((item, i) => item.classList.toggle('highlighted', i === highlightedIndex));
+                items[highlightedIndex]?.scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (highlightedIndex >= 0 && items[highlightedIndex]) {
+                    items[highlightedIndex].click();
+                }
+            } else if (e.key === 'Escape') {
+                dropdown.classList.remove('show');
+            }
+        });
     },
 
     // Check authentication status
@@ -110,6 +305,11 @@ const app = {
                 troquelGroup?.classList.remove('hidden');
                 troquelInput.required = true;
             }
+        });
+
+        // Tipo notificación change - show/hide dynamic destination field
+        document.getElementById('tipo-notificacion')?.addEventListener('change', (e) => {
+            this.handleTipoNotificacionChange(e.target.value);
         });
 
         // Medio pago change
@@ -300,22 +500,38 @@ const app = {
 
     // Initialize view-specific module
     async initViewModule(viewId) {
-        switch (viewId) {
-            case 'dashboard-home':
-                await dashboard.init();
-                break;
-            case 'lista-notificaciones':
-                await notifications.loadNotifications();
-                break;
-            case 'reportes':
-                reports.init();
-                break;
-            case 'mis-asignaciones':
-                await ujier.loadAssignments();
-                break;
-            case 'historial-ujier':
-                await ujier.loadHistory();
-                break;
+        try {
+            // Set a timeout to prevent infinite loading
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Timeout')), 10000)
+            );
+
+            let loadPromise;
+
+            switch (viewId) {
+                case 'dashboard-home':
+                    loadPromise = dashboard.init();
+                    break;
+                case 'lista-notificaciones':
+                    loadPromise = notifications.loadNotifications();
+                    break;
+                case 'reportes':
+                    loadPromise = Promise.resolve(reports.init());
+                    break;
+                case 'mis-asignaciones':
+                    loadPromise = ujier.loadAssignments();
+                    break;
+                case 'historial-ujier':
+                    loadPromise = ujier.loadHistory();
+                    break;
+                default:
+                    loadPromise = Promise.resolve();
+            }
+
+            await Promise.race([loadPromise, timeoutPromise]);
+        } catch (error) {
+            console.error(`Error loading view ${viewId}:`, error);
+            // Don't show error toast for timeout - just silently fail
         }
     },
 
@@ -330,11 +546,15 @@ const app = {
         const getCheck = (id) => document.getElementById(id)?.checked || false;
 
         // Create notification object
+        // Use origen-dinamico if it has a value (for Ley 22.172 or Correspondencia)
+        const origenDinamico = getVal('origen-dinamico');
+        const origenJuzgado = getVal('origen');
+
         const notificationData = {
             tipo_notificacion: getVal('tipo-notificacion'),
             n_expediente: getVal('n-expediente'),
             caratula: getVal('caratula'),
-            origen: getVal('origen'),
+            origen: origenDinamico || origenJuzgado,
             letrado: getVal('letrado'),
             destinatario_especial: getVal('destinatario-especial') || null,
             destinatario_nombre: getVal('destinatario-nombre'),
@@ -351,27 +571,54 @@ const app = {
 
         console.log('📤 Enviando datos a Supabase:', notificationData);
 
+        // Prevent double submission
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn.disabled) {
+            console.log('⚠️ Ya se está procesando, ignorando submit duplicado');
+            return;
+        }
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Guardando...';
+
         let result;
 
-        // Check if we're editing an existing notification
-        if (notifications.editingId) {
-            result = await notifications.update(notifications.editingId, notificationData);
-        } else {
-            result = await notifications.create(notificationData);
-        }
+        try {
+            // Check if we're editing an existing notification
+            if (notifications.editingId) {
+                result = await notifications.update(notifications.editingId, notificationData);
+            } else {
+                result = await notifications.create(notificationData);
+            }
 
-        if (result.success) {
-            form.reset();
-            notifications.editingId = null;
+            console.log('📥 Resultado de Supabase:', result);
 
-            // Re-apply required logic for troquel after reset
-            document.getElementById('grupo-n-troquel')?.classList.remove('hidden');
-            document.getElementById('n-troquel').required = true;
+            if (result.success) {
+                form.reset();
+                notifications.editingId = null;
 
-            // Navigate to list
-            setTimeout(() => {
-                this.navigateTo('lista-notificaciones');
-            }, 1000);
+                // Re-apply required logic for troquel after reset
+                document.getElementById('grupo-n-troquel')?.classList.remove('hidden');
+                document.getElementById('n-troquel').required = true;
+
+                // Reset dynamic origin field
+                document.getElementById('grupo-origen-dinamico')?.classList.add('hidden');
+                document.getElementById('origen')?.closest('.form-group')?.classList.remove('hidden');
+
+                // Navigate to list
+                setTimeout(() => {
+                    this.navigateTo('lista-notificaciones');
+                }, 1000);
+            } else {
+                console.error('❌ Error en resultado:', result);
+                utils.showToast('Error al guardar notificación', 'error');
+            }
+        } catch (error) {
+            console.error('❌ Error en handleNewNotification:', error);
+            utils.showToast('Error al guardar: ' + error.message, 'error');
+        } finally {
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.textContent = '💾 Guardar Notificación';
         }
     },
 

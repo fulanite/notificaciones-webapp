@@ -5,36 +5,36 @@
     --primary-700: #1d4ed8;
     --primary-800: #1e40af;
     --primary-900: #1e3a8a;
-    
+
     /* Secondary Colors */
     --secondary-500: #14b8a6;
     --secondary-600: #0d9488;
-    
+
     /* Background Colors */
     --bg-dark: #0f172a;
     --bg-darker: #0a0f1a;
     --bg-card: #1e293b;
     --bg-card-hover: #273449;
     --bg-glass: rgba(30, 41, 59, 0.8);
-    
+
     /* Text Colors */
     --text-primary: #f8fafc;
     --text-secondary: #cbd5e1;
     --text-muted: #94a3b8;
-    
+
     /* Status Colors */
     --success: #10b981;
     --warning: #f59e0b;
     --error: #ef4444;
     --info: #3b82f6;
-    
+
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
     --gradient-card: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
-    
+
     /* Typography */
     --font-primary: 'Inter', sans-serif;
-    
+
     /* Spacing */
     --space-1: 0.25rem;
     --space-2: 0.5rem;
@@ -42,25 +42,125 @@
     --space-4: 1rem;
     --space-6: 1.5rem;
     --space-8: 2rem;
-    
+
     /* Radius */
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
     --radius-full: 9999px;
-    
+
     /* Shadows */
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
     --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
-    
+
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition-base: 200ms ease;
-    
+
     /* Layout */
     --sidebar-width: 280px;
     --header-height: 70px;
+}
+
+/* Light Theme - UX optimized, anti-fatigue design */
+/* Uses warm cream tones instead of pure white to reduce eye strain */
+[data-theme="light"] {
+    /* Background Colors - Warm cream tones */
+    --bg-dark: #faf8f5;
+    --bg-darker: #f0ebe3;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f7f5f2;
+    --bg-glass: rgba(255, 255, 255, 0.95);
+
+    /* Text Colors - Soft dark for comfortable reading */
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+
+    /* Adjusted primary for light backgrounds */
+    --primary-500: #3182ce;
+    --primary-600: #2b6cb0;
+    --primary-700: #2c5282;
+
+    /* Shadows - Softer for light mode */
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.06), 0 4px 6px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.06);
+    --shadow-xl: 0 10px 25px rgba(0, 0, 0, 0.08);
+    --shadow-glow: 0 0 15px rgba(49, 130, 206, 0.2);
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+    --gradient-card: linear-gradient(145deg, #ffffff 0%, #faf8f5 100%);
+}
+
+/* Light theme element-specific overrides for full coverage */
+[data-theme="light"] .sidebar {
+    background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
+}
+
+[data-theme="light"] .top-header {
+    background: rgba(250, 248, 245, 0.98);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .stat-card,
+[data-theme="light"] .dashboard-card,
+[data-theme="light"] .card-glass {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-select,
+[data-theme="light"] .form-textarea,
+[data-theme="light"] .search-input {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .form-input:focus,
+[data-theme="light"] .form-select:focus,
+[data-theme="light"] .form-textarea:focus {
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.12);
+}
+
+[data-theme="light"] .modal-content {
+    background: #ffffff;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .assignment-card {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .notifications-table th {
+    background: #f7f5f2;
+    color: var(--text-primary);
+    border-bottom: 2px solid #e2e8f0;
+}
+
+[data-theme="light"] .notifications-table td {
+    border-bottom: 1px solid #edf2f7;
+}
+
+[data-theme="light"] .notifications-table tr:hover {
+    background: #f7f5f2;
+}
+
+[data-theme="light"] .btn-secondary {
+    background: #edf2f7;
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .login-card {
+    background: #ffffff;
+    box-shadow: var(--shadow-xl);
 }

@@ -290,6 +290,10 @@
                     </div>
 
                     <div class="header-actions">
+                        <button class="header-btn" id="btn-theme-toggle" aria-label="Cambiar tema"
+                            onclick="app.toggleTheme()">
+                            <span class="header-icon">☀️</span>
+                        </button>
                         <button class="header-btn" id="btn-notifications" aria-label="Notificaciones">
                             <span class="header-icon">🔔</span>
                             <span class="notification-dot hidden"></span>
@@ -418,6 +422,19 @@
                                             </select>
                                         </div>
 
+                                        <!-- Dynamic origen field - appears for Ley 22.172 or Correspondencia -->
+                                        <!-- Replaces the juzgado selector, saves to mismo campo 'origen' -->
+                                        <div class="form-group hidden" id="grupo-origen-dinamico">
+                                            <label for="origen-dinamico-input" class="form-label"
+                                                id="label-origen-dinamico">Origen *</label>
+                                            <div class="searchable-select" id="searchable-origen">
+                                                <input type="text" id="origen-dinamico-input" class="form-input"
+                                                    placeholder="Escribí para buscar..." autocomplete="off">
+                                                <input type="hidden" id="origen-dinamico" name="origen-dinamico">
+                                                <div class="searchable-select-dropdown" id="origen-dropdown"></div>
+                                            </div>
+                                        </div>
+
                                         <div class="form-group">
                                             <label for="n-expediente" class="form-label">N° Expediente *</label>
                                             <input type="text" id="n-expediente" name="n-expediente" class="form-input"
@@ -432,8 +449,153 @@
 
                                         <div class="form-group">
                                             <label for="origen" class="form-label">Origen (Juzgado/Fiscalía) *</label>
-                                            <input type="text" id="origen" name="origen" class="form-input"
-                                                placeholder="Ej: Juzgado Civil N°1" required>
+                                            <select id="origen" name="origen" class="form-select" required>
+                                                <option value="">Seleccionar origen...</option>
+                                                <optgroup label="Asesorías">
+                                                    <option value="Asesoría de Menores e Incapaces">Asesoría de Menores
+                                                        e Incapaces</option>
+                                                </optgroup>
+                                                <optgroup label="Cámaras">
+                                                    <option value="Cámara Civil 1">Cámara Civil 1</option>
+                                                    <option value="Cámara Civil 2">Cámara Civil 2</option>
+                                                    <option value="Cámara Civil 3">Cámara Civil 3</option>
+                                                    <option value="Cámara de Apelaciones Penal y de Exhorto">Cámara de
+                                                        Apelaciones Penal y de Exhorto</option>
+                                                    <option value="Cámara en lo Criminal 1ª Nominación">Cámara en lo
+                                                        Criminal 1ª Nominación</option>
+                                                    <option value="Cámara en lo Criminal 2ª Nominación">Cámara en lo
+                                                        Criminal 2ª Nominación</option>
+                                                    <option value="Cámara en lo Criminal 3ª Nominación">Cámara en lo
+                                                        Criminal 3ª Nominación</option>
+                                                </optgroup>
+                                                <optgroup label="Centro de Mediación">
+                                                    <option value="Centro de Mediación Judicial">Centro de Mediación
+                                                        Judicial</option>
+                                                </optgroup>
+                                                <optgroup label="Corte de Justicia">
+                                                    <option value="Corte de Justicia - Secretaría Contencioso">Corte de
+                                                        Justicia - Secretaría Contencioso</option>
+                                                    <option value="Corte de Justicia - Secretaría de Personal">Corte de
+                                                        Justicia - Secretaría de Personal</option>
+                                                    <option
+                                                        value="Corte de Justicia - Secretaría de Recursos Ordinarios y Extraordinarios">
+                                                        Corte de Justicia - Secretaría de Recursos Ordinarios y
+                                                        Extraordinarios</option>
+                                                    <option value="Corte de Justicia - Secretaría de Sumarios">Corte de
+                                                        Justicia - Secretaría de Sumarios</option>
+                                                    <option value="Corte de Justicia - Secretaría Institucional">Corte
+                                                        de Justicia - Secretaría Institucional</option>
+                                                    <option value="Corte de Justicia - Secretaría Penal">Corte de
+                                                        Justicia - Secretaría Penal</option>
+                                                    <option value="Corte de Justicia - Secretaría Superintendencia">
+                                                        Corte de Justicia - Secretaría Superintendencia</option>
+                                                    <option value="Corte de Justicia - Sala de Recursos y Queja">Corte
+                                                        de Justicia - Sala de Recursos y Queja</option>
+                                                </optgroup>
+                                                <optgroup label="Defensorías">
+                                                    <option value="Defensoría Civil 1">Defensoría Civil 1</option>
+                                                    <option value="Defensoría Civil 2">Defensoría Civil 2</option>
+                                                    <option value="Defensoría Civil 3">Defensoría Civil 3</option>
+                                                    <option value="Defensoría Civil 4">Defensoría Civil 4</option>
+                                                    <option value="Defensoría Civil 5">Defensoría Civil 5</option>
+                                                </optgroup>
+                                                <optgroup label="Ejecución Fiscal">
+                                                    <option value="Ejecución Fiscal">Ejecución Fiscal</option>
+                                                </optgroup>
+                                                <optgroup label="Fiscalías">
+                                                    <option value="Fiscalía de Instrucción 1">Fiscalía de Instrucción 1
+                                                    </option>
+                                                    <option value="Fiscalía de Instrucción 2">Fiscalía de Instrucción 2
+                                                    </option>
+                                                    <option value="Fiscalía de Instrucción 3">Fiscalía de Instrucción 3
+                                                    </option>
+                                                    <option value="Fiscalía de Instrucción 4">Fiscalía de Instrucción 4
+                                                    </option>
+                                                    <option value="Fiscalía de Instrucción 5">Fiscalía de Instrucción 5
+                                                    </option>
+                                                    <option value="Fiscalía de Instrucción 6">Fiscalía de Instrucción 6
+                                                    </option>
+                                                    <option value="Fiscalía de Instrucción 7">Fiscalía de Instrucción 7
+                                                    </option>
+                                                    <option value="Fiscalía de Instrucción 8">Fiscalía de Instrucción 8
+                                                    </option>
+                                                    <option value="Fiscalía de Instrucción 9">Fiscalía de Instrucción 9
+                                                    </option>
+                                                    <option value="Fiscalía de Instrucción 10">Fiscalía de Instrucción
+                                                        10</option>
+                                                    <option value="Fiscalía Penal Juvenil">Fiscalía Penal Juvenil
+                                                    </option>
+                                                </optgroup>
+                                                <optgroup label="Juzgados Civiles">
+                                                    <option value="Juzgado Civil 1">Juzgado Civil 1</option>
+                                                    <option value="Juzgado Civil 2">Juzgado Civil 2</option>
+                                                    <option value="Juzgado Civil 3">Juzgado Civil 3</option>
+                                                    <option value="Juzgado Civil 4">Juzgado Civil 4</option>
+                                                    <option value="Juzgado Civil 5">Juzgado Civil 5</option>
+                                                </optgroup>
+                                                <optgroup label="Juzgados Comerciales">
+                                                    <option value="Juzgado Comercial 1/1">Juzgado Comercial 1/1</option>
+                                                    <option value="Juzgado Comercial 1/2">Juzgado Comercial 1/2</option>
+                                                    <option value="Juzgado Comercial 1/Quiebras">Juzgado Comercial
+                                                        1/Quiebras</option>
+                                                    <option value="Juzgado Comercial 2/1">Juzgado Comercial 2/1</option>
+                                                    <option value="Juzgado Comercial 2/2">Juzgado Comercial 2/2</option>
+                                                    <option value="Juzgado Comercial 2/Quiebras">Juzgado Comercial
+                                                        2/Quiebras</option>
+                                                    <option value="Juzgado Comercial 3">Juzgado Comercial 3</option>
+                                                    <option value="Juzgado Comercial 3/Quiebras">Juzgado Comercial
+                                                        3/Quiebras</option>
+                                                </optgroup>
+                                                <optgroup label="Juzgados Correccionales">
+                                                    <option value="Juzgado Correccional 1">Juzgado Correccional 1
+                                                    </option>
+                                                    <option value="Juzgado Correccional 2">Juzgado Correccional 2
+                                                    </option>
+                                                    <option value="Juzgado Correccional 3">Juzgado Correccional 3
+                                                    </option>
+                                                </optgroup>
+                                                <optgroup label="Juzgados de Ejecución Penal">
+                                                    <option value="Juzgado de Ejecución Penal 1">Juzgado de Ejecución
+                                                        Penal 1</option>
+                                                    <option value="Juzgado de Ejecución Penal 2">Juzgado de Ejecución
+                                                        Penal 2</option>
+                                                </optgroup>
+                                                <optgroup label="Juzgados de Familia">
+                                                    <option value="Juzgado de Familia 1">Juzgado de Familia 1</option>
+                                                    <option value="Juzgado de Familia 2">Juzgado de Familia 2</option>
+                                                    <option value="Juzgado de Familia 3">Juzgado de Familia 3</option>
+                                                </optgroup>
+                                                <optgroup label="Juzgados de Garantías">
+                                                    <option value="Juzgado de Garantías 1">Juzgado de Garantías 1
+                                                    </option>
+                                                    <option value="Juzgado de Garantías 2">Juzgado de Garantías 2
+                                                    </option>
+                                                    <option value="Juzgado de Garantías 3">Juzgado de Garantías 3
+                                                    </option>
+                                                    <option value="Juzgado de Garantías 4">Juzgado de Garantías 4
+                                                    </option>
+                                                </optgroup>
+                                                <optgroup label="Otros Juzgados">
+                                                    <option value="Juzgado Electoral y Minas">Juzgado Electoral y Minas
+                                                    </option>
+                                                </optgroup>
+                                                <optgroup label="Juzgados Laborales">
+                                                    <option value="Juzgado Laboral 1">Juzgado Laboral 1</option>
+                                                    <option value="Juzgado Laboral 2">Juzgado Laboral 2</option>
+                                                    <option value="Juzgado Laboral 3">Juzgado Laboral 3</option>
+                                                    <option value="Juzgado Laboral 4">Juzgado Laboral 4</option>
+                                                </optgroup>
+                                                <optgroup label="Ministerio Público">
+                                                    <option value="Ministerio Público">Ministerio Público</option>
+                                                    <option value="Procuración">Procuración</option>
+                                                </optgroup>
+                                                <optgroup label="Tribunales Penales Juveniles">
+                                                    <option value="Tribunal de Responsabilidad Penal Juvenil 1">Tribunal
+                                                        de Responsabilidad Penal Juvenil 1</option>
+                                                    <option value="Tribunal de Responsabilidad Penal Juvenil 2">Tribunal
+                                                        de Responsabilidad Penal Juvenil 2</option>
+                                                </optgroup>
+                                            </select>
                                         </div>
 
                                         <div class="form-group">
@@ -456,8 +618,18 @@
                                             <select id="destinatario-especial" name="destinatario-especial"
                                                 class="form-select">
                                                 <option value="">No aplica</option>
-                                                <option value="estrados">Estrados</option>
-                                                <option value="arcat">ARCAT</option>
+                                                <option value="ARCAT">ARCAT</option>
+                                                <option value="Juzgado Comercial 1/1">Juzgado Comercial 1/1</option>
+                                                <option value="Juzgado Comercial 1/2">Juzgado Comercial 1/2</option>
+                                                <option value="Juzgado Comercial 1/Quiebras">Juzgado Comercial
+                                                    1/Quiebras</option>
+                                                <option value="Juzgado Comercial 2/1">Juzgado Comercial 2/1</option>
+                                                <option value="Juzgado Comercial 2/2">Juzgado Comercial 2/2</option>
+                                                <option value="Juzgado Comercial 2/Quiebras">Juzgado Comercial
+                                                    2/Quiebras</option>
+                                                <option value="Juzgado Comercial 3">Juzgado Comercial 3</option>
+                                                <option value="Juzgado Comercial 3/Quiebras">Juzgado Comercial
+                                                    3/Quiebras</option>
                                             </select>
                                         </div>
 
@@ -478,12 +650,49 @@
                                             <label for="zona" class="form-label">Zona *</label>
                                             <select id="zona" name="zona" class="form-select" required>
                                                 <option value="">Seleccionar zona...</option>
-                                                <option value="norte">Norte</option>
-                                                <option value="sur">Sur</option>
-                                                <option value="centro">Centro</option>
-                                                <option value="este">Este</option>
-                                                <option value="oeste">Oeste</option>
-                                                <option value="interior">Interior</option>
+                                                <optgroup label="Zona A">
+                                                    <option value="A1 - Cédulas">A1 - Cédulas</option>
+                                                    <option value="A1 - Mandamientos">A1 - Mandamientos</option>
+                                                    <option value="A2 - Cédulas">A2 - Cédulas</option>
+                                                    <option value="A2 - Mandamientos">A2 - Mandamientos</option>
+                                                </optgroup>
+                                                <optgroup label="Zona B">
+                                                    <option value="B1 - Cédulas">B1 - Cédulas</option>
+                                                    <option value="B1 - Mandamientos">B1 - Mandamientos</option>
+                                                    <option value="B2 - Cédulas">B2 - Cédulas</option>
+                                                    <option value="B2 - Mandamientos">B2 - Mandamientos</option>
+                                                </optgroup>
+                                                <optgroup label="Zona C">
+                                                    <option value="C1 - Cédulas">C1 - Cédulas</option>
+                                                    <option value="C1 - Mandamientos">C1 - Mandamientos</option>
+                                                    <option value="C2 - Cédulas">C2 - Cédulas</option>
+                                                    <option value="C2 - Mandamientos">C2 - Mandamientos</option>
+                                                </optgroup>
+                                                <optgroup label="Zona D">
+                                                    <option value="D1 - Cédulas">D1 - Cédulas</option>
+                                                    <option value="D1 - Mandamientos">D1 - Mandamientos</option>
+                                                    <option value="D2 - Cédulas">D2 - Cédulas</option>
+                                                    <option value="D2 - Mandamientos">D2 - Mandamientos</option>
+                                                </optgroup>
+                                                <optgroup label="Urgentes">
+                                                    <option value="Urgente SUR - Cédulas">Urgente SUR - Cédulas</option>
+                                                    <option value="Urgente SUR - Mandamientos">Urgente SUR -
+                                                        Mandamientos</option>
+                                                    <option value="Urgente NORTE - Cédulas">Urgente NORTE - Cédulas
+                                                    </option>
+                                                    <option value="Urgente NORTE - Mandamientos">Urgente NORTE -
+                                                        Mandamientos</option>
+                                                </optgroup>
+                                                <optgroup label="Fuera de Radio">
+                                                    <option value="Fuera de Radio NORTE - Cédula">Fuera de Radio NORTE -
+                                                        Cédula</option>
+                                                    <option value="Fuera de Radio NORTE - Mandamientos">Fuera de Radio
+                                                        NORTE - Mandamientos</option>
+                                                    <option value="Fuera de Radio SUR - Cédula">Fuera de Radio SUR -
+                                                        Cédula</option>
+                                                    <option value="Fuera de Radio SUR - Mandamientos">Fuera de Radio SUR
+                                                        - Mandamientos</option>
+                                                </optgroup>
                                             </select>
                                         </div>
                                     </div>
@@ -883,16 +1092,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
 
     <!-- App Scripts -->
-    <script src="js/config.js?v=1.7"></script>
-    <script src="js/supabase.js?v=1.7"></script>
-    <script src="js/auth.js?v=1.7"></script>
-    <script src="js/utils.js?v=1.7"></script>
-    <script src="js/offline.js?v=1.7"></script>
-    <script src="js/notifications.js?v=1.7"></script>
-    <script src="js/ujier.js?v=1.7"></script>
-    <script src="js/dashboard.js?v=1.7"></script>
-    <script src="js/reports.js?v=1.7"></script>
-    <script src="js/app.js?v=1.7"></script>
+    <script src="js/config.js?v=2.3"></script>
+    <script src="js/data.js?v=2.3"></script>
+    <script src="js/supabase.js?v=2.3"></script>
+    <script src="js/auth.js?v=2.3"></script>
+    <script src="js/utils.js?v=2.3"></script>
+    <script src="js/offline.js?v=2.3"></script>
+    <script src="js/notifications.js?v=2.3"></script>
+    <script src="js/ujier.js?v=2.3"></script>
+    <script src="js/dashboard.js?v=2.3"></script>
+    <script src="js/reports.js?v=2.3"></script>
+    <script src="js/app.js?v=2.3"></script>
 
     <!-- Service Worker Registration -->
     <script>

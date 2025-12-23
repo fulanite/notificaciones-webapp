@@ -248,9 +248,26 @@ const notifications = {
         setTimeout(() => {
             // Populate form fields
             document.getElementById('tipo-notificacion').value = data.tipo_notificacion || '';
+
+            // Trigger tipo change to set up correct origin field
+            if (data.tipo_notificacion === 'cedulas_mandamientos_22172' ||
+                data.tipo_notificacion === 'cedulas_correspondencia') {
+                app.handleTipoNotificacionChange(data.tipo_notificacion);
+                // Wait a bit for the searchable select to be set up, then populate
+                setTimeout(() => {
+                    const input = document.getElementById('origen-dinamico-input');
+                    const hidden = document.getElementById('origen-dinamico');
+                    if (input && hidden) {
+                        input.value = data.origen || '';
+                        hidden.value = data.origen || '';
+                    }
+                }, 150);
+            } else {
+                document.getElementById('origen').value = data.origen || '';
+            }
+
             document.getElementById('n-expediente').value = data.n_expediente || '';
             document.getElementById('caratula').value = data.caratula || '';
-            document.getElementById('origen').value = data.origen || '';
             document.getElementById('letrado').value = data.letrado || '';
             document.getElementById('destinatario-especial').value = data.destinatario_especial || '';
             document.getElementById('destinatario-nombre').value = data.destinatario_nombre || '';

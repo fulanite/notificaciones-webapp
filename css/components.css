@@ -540,3 +540,271 @@
         transform: translateX(0);
     }
 }
+
+/* ========================================
+   MOBILE UX OPTIMIZATIONS
+   Touch targets min 48px, comfortable spacing
+   ======================================== */
+
+/* Larger touch targets for mobile */
+@media (max-width: 768px) {
+
+    /* All buttons minimum 48px height for easy tapping */
+    .btn {
+        min-height: 48px;
+        padding: var(--space-4) var(--space-6);
+        font-size: 1rem;
+    }
+
+    /* Form inputs larger for mobile */
+    .form-input,
+    .form-select,
+    .form-textarea {
+        min-height: 48px;
+        padding: var(--space-4);
+        font-size: 1rem;
+    }
+
+    /* Action buttons for Ujier - extra large and prominent */
+    .btn-action-mobile {
+        width: 100%;
+        min-height: 56px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: var(--radius-xl);
+        margin-bottom: var(--space-3);
+    }
+
+    /* Primary action button (GPS, Photo, Submit) */
+    .btn-action-primary {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: var(--shadow-lg), var(--shadow-glow);
+    }
+
+    .btn-action-primary:active {
+        transform: scale(0.98);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Secondary action button */
+    .btn-action-secondary {
+        background: var(--bg-card);
+        border: 2px solid var(--primary-500);
+        color: var(--primary-500);
+    }
+
+    /* Success action button (Confirm/Save) */
+    .btn-action-success {
+        background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Danger action button */
+    .btn-action-danger {
+        background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+        color: white;
+    }
+
+    /* Assignment cards - larger tap area */
+    .assignment-card {
+        padding: var(--space-5);
+        margin-bottom: var(--space-4);
+        border-radius: var(--radius-xl);
+    }
+
+    /* Status select in diligencia form */
+    .form-select-large {
+        min-height: 56px;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    /* Sticky bottom action bar for mobile */
+    .mobile-action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: var(--space-4);
+        background: var(--bg-darker);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        gap: var(--space-3);
+        z-index: 100;
+        padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+    }
+
+    .mobile-action-bar .btn {
+        flex: 1;
+    }
+
+    /* Extra padding at bottom to account for fixed action bar */
+    .has-mobile-action-bar {
+        padding-bottom: 100px;
+    }
+
+    /* Toast at top on mobile for better visibility */
+    .toast-container {
+        top: 24px;
+        bottom: auto;
+        right: 16px;
+        left: 16px;
+    }
+
+    .toast {
+        width: 100%;
+    }
+
+    /* Larger checkboxes for mobile */
+    .checkbox-custom {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Photo capture button - very prominent */
+    .btn-capture-photo {
+        width: 100%;
+        min-height: 64px;
+        font-size: 1.2rem;
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+        box-shadow: 0 0 25px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-capture-photo .icon {
+        font-size: 1.5rem;
+    }
+
+    /* GPS capture button */
+    .btn-capture-gps {
+        width: 100%;
+        min-height: 56px;
+        font-size: 1.1rem;
+        background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+        color: white;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+        box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
+    }
+
+    /* Audio record button */
+    .btn-record-audio {
+        width: 100%;
+        min-height: 56px;
+        font-size: 1.1rem;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Confirmation dialog - larger buttons */
+    .confirm-dialog-actions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .confirm-dialog-actions .btn {
+        width: 100%;
+        min-height: 52px;
+    }
+}
+
+/* Tap feedback animation */
+.tap-feedback {
+    transition: transform 0.1s ease;
+}
+
+.tap-feedback:active {
+    transform: scale(0.97);
+}
+
+/* ========================================
+   SEARCHABLE SELECT COMPONENT
+   ======================================== */
+.searchable-select {
+    position: relative;
+    width: 100%;
+}
+
+.searchable-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 250px;
+    overflow-y: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--primary-500);
+    border-top: none;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    z-index: 100;
+    display: none;
+    box-shadow: var(--shadow-lg);
+}
+
+.searchable-select-dropdown.show {
+    display: block;
+}
+
+.searchable-select-item {
+    padding: var(--space-3) var(--space-4);
+    cursor: pointer;
+    transition: background 0.15s ease;
+    font-size: 0.9375rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.searchable-select-item:last-child {
+    border-bottom: none;
+}
+
+.searchable-select-item:hover,
+.searchable-select-item.highlighted {
+    background: var(--primary-600);
+    color: white;
+}
+
+.searchable-select-item mark {
+    background: rgba(245, 158, 11, 0.4);
+    color: inherit;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.searchable-select-empty {
+    padding: var(--space-4);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .searchable-select-dropdown {
+    background: #ffffff;
+    border-color: var(--primary-500);
+}
+
+[data-theme="light"] .searchable-select-item {
+    border-bottom-color: #edf2f7;
+}
+
+[data-theme="light"] .searchable-select-item:hover,
+[data-theme="light"] .searchable-select-item.highlighted {
+    background: var(--primary-500);
+}
