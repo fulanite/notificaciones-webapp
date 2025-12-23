@@ -952,6 +952,143 @@
                         </div>
                     </section>
 
+                    <!-- Asignaciones View -->
+                    <section id="view-asignaciones" class="view">
+                        <div class="list-header">
+                            <div class="search-bar">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="search-asignaciones" class="search-input"
+                                    placeholder="Buscar notificaciones pendientes...">
+                            </div>
+                            <div class="filter-bar">
+                                <select id="filter-ujier-asign" class="filter-select">
+                                    <option value="">Todos los ujieres</option>
+                                </select>
+                                <select id="filter-zona-asign" class="filter-select">
+                                    <option value="">Todas las zonas</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="asignaciones-grid">
+                            <!-- Pending notifications panel -->
+                            <div class="asignaciones-panel">
+                                <div class="panel-header">
+                                    <h3>📋 Notificaciones Pendientes</h3>
+                                    <span class="panel-count" id="count-pendientes">0</span>
+                                </div>
+                                <div id="lista-pendientes" class="panel-content">
+                                    <!-- Dynamic content -->
+                                    <div class="empty-state">
+                                        <span class="empty-icon">📭</span>
+                                        <p>No hay notificaciones pendientes de asignar</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bailiff selection panel -->
+                            <div class="asignaciones-panel">
+                                <div class="panel-header">
+                                    <h3>👤 Asignar a Ujier</h3>
+                                </div>
+                                <div id="lista-ujieres-asign" class="panel-content ujieres-grid">
+                                    <!-- Dynamic content -->
+                                </div>
+                                <div class="panel-footer">
+                                    <button class="btn btn-primary" id="btn-asignar-seleccion" disabled>
+                                        ✅ Asignar Seleccionados
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Usuarios View -->
+                    <section id="view-usuarios" class="view">
+                        <div class="list-header">
+                            <div class="search-bar">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="search-usuarios" class="search-input"
+                                    placeholder="Buscar usuarios...">
+                            </div>
+                            <button class="btn btn-primary" id="btn-nuevo-usuario">
+                                ➕ Nuevo Usuario
+                            </button>
+                        </div>
+
+                        <div class="usuarios-table-container">
+                            <table class="usuarios-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Rol</th>
+                                        <th>Estado</th>
+                                        <th>Último Acceso</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usuarios-table-body">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- Modal: Nuevo/Editar Usuario -->
+                    <div id="modal-usuario" class="modal hidden">
+                        <div class="modal-overlay"></div>
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title" id="modal-usuario-title">Nuevo Usuario</h2>
+                                <button class="modal-close" id="btn-close-modal-usuario">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="form-usuario">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="usuario-nombre" class="form-label">Nombre Completo *</label>
+                                            <input type="text" id="usuario-nombre" class="form-input" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="usuario-email" class="form-label">Email *</label>
+                                            <input type="email" id="usuario-email" class="form-input" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="usuario-rol" class="form-label">Rol *</label>
+                                            <select id="usuario-rol" class="form-select" required>
+                                                <option value="">Seleccionar rol...</option>
+                                                <option value="admin">Administrador</option>
+                                                <option value="ujier">Ujier</option>
+                                                <option value="auditor">Auditor</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="usuario-password" class="form-label">Contraseña</label>
+                                            <input type="password" id="usuario-password" class="form-input"
+                                                placeholder="Dejar vacío para no cambiar">
+                                        </div>
+                                        <div class="form-group form-group-full">
+                                            <label class="checkbox-wrapper">
+                                                <input type="checkbox" id="usuario-activo" checked>
+                                                <span class="checkbox-custom"></span>
+                                                <span class="checkbox-label">Usuario activo</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="modal-actions">
+                                        <button type="button" class="btn btn-secondary" id="btn-cancelar-usuario">
+                                            Cancelar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            💾 Guardar Usuario
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Additional views will be added dynamically -->
                 </div>
             </main>
@@ -1101,8 +1238,10 @@
     <script src="js/notifications.js?v=2.3"></script>
     <script src="js/ujier.js?v=2.3"></script>
     <script src="js/dashboard.js?v=2.3"></script>
-    <script src="js/reports.js?v=2.3"></script>
-    <script src="js/app.js?v=2.3"></script>
+    <script src="js/reports.js?v=2.4"></script>
+    <script src="js/asignaciones.js?v=2.4"></script>
+    <script src="js/usuarios.js?v=2.4"></script>
+    <script src="js/app.js?v=2.4"></script>
 
     <!-- Service Worker Registration -->
     <script>

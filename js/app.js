@@ -524,6 +524,12 @@ const app = {
                 case 'historial-ujier':
                     loadPromise = ujier.loadHistory();
                     break;
+                case 'asignaciones':
+                    loadPromise = asignaciones.init();
+                    break;
+                case 'usuarios':
+                    loadPromise = usuarios.init();
+                    break;
                 default:
                     loadPromise = Promise.resolve();
             }
