@@ -65,6 +65,11 @@ const db = {
         return { data, error };
     },
 
+    // Get all ujieres (bailiffs)
+    async getUjieres() {
+        return this.getUsersByRole('ujier');
+    },
+
     async createUser(userData) {
         if (!supabaseClient) return { data: null, error: null };
 
