@@ -1,39 +1,50 @@
 /**
  * SGND - Authentication Module
+ * Updated for PHP/MySQL backend
  */
 
 const auth = {
     currentUser: null,
+    SESSION_KEY: 'sgnd_session',
 
     // Initialize auth and check session
     async init() {
-        if (!supabase) {
-            console.log('Demo mode: Using mock authentication');
-            return null;
-        }
+        // Check for stored session
+        const storedSession = this.getStoredSession();
 
-        // Get current session
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (session) {
-            await this.loadUserProfile(session.user.email);
-        }
-
-        // Listen for auth changes
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_IN' && session) {
-                await this.loadUserProfile(session.user.email);
-                this.onAuthStateChanged(true);
-            } else if (event === 'SIGNED_OUT') {
-                this.currentUser = null;
-                this.onAuthStateChanged(false);
+        if (storedSession) {
+            // Verify session is still valid
+            const verified = await this.verifySession(storedSession.email);
+            if (verified) {
+                this.currentUser = storedSession;
+                return this.currentUser;
+            } else {
+                // Session invalid, clear it
+                this.clearSession();
             }
-        });
+        }
 
-        return this.currentUser;
+        return null;
     },
 
-    // Load user profile from usuarios table
+    // Verify session with server
+    async verifySession(email) {
+        try {
+            const response = await fetch('/api/auth.php?action=verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+            return data.success;
+        } catch (error) {
+            console.error('Session verification failed:', error);
+            return false;
+        }
+    },
+
+    // Load user profile from API
     async loadUserProfile(email) {
         try {
             const { data: profile, error } = await db.getUserByEmail(email);
@@ -47,7 +58,7 @@ const auth = {
                     foto: profile.foto
                 };
             } else {
-                console.warn('Usuario no encontrado en la tabla "usuarios":', email);
+                console.warn('Usuario no encontrado:', email);
                 this.currentUser = null;
             }
         } catch (err) {
@@ -60,96 +71,107 @@ const auth = {
 
     // Sign in with email and password
     async signIn(email, password) {
-        if (!supabase) {
-            // Demo mode - simulate login
-            return this.demoSignIn(email, password);
-        }
-
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password
+            const response = await fetch('/api/auth.php?action=login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
             });
 
-            if (error) throw error;
+            const data = await response.json();
 
-            // Load user profile
-            await this.loadUserProfile(email);
+            if (data.success && data.data) {
+                this.currentUser = {
+                    id: data.data.id,
+                    email: data.data.email,
+                    nombre: data.data.nombre,
+                    rol: data.data.rol,
+                    foto: data.data.foto
+                };
 
-            return { success: true, user: this.currentUser };
+                // Store session
+                this.storeSession(this.currentUser);
+
+                return { success: true, user: this.currentUser };
+            } else {
+                return { success: false, error: data.error || 'Credenciales inválidas' };
+            }
         } catch (error) {
             console.error('Sign in error:', error);
-            return { success: false, error: error.message };
+            return { success: false, error: 'Error de conexión' };
         }
     },
 
-    // Demo sign in (for testing without Supabase)
-    async demoSignIn(email, password) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+    // Store session in localStorage
+    storeSession(user) {
+        localStorage.setItem(this.SESSION_KEY, JSON.stringify(user));
+    },
 
-        // Demo users
-        const demoUsers = {
-            'admin@sgnd.gob.ar': { id: '1', nombre: 'Admin Demo', rol: 'admin' },
-            'ujier@sgnd.gob.ar': { id: '2', nombre: 'Juan Ujier', rol: 'ujier' },
-            'auditor@sgnd.gob.ar': { id: '3', nombre: 'María Auditora', rol: 'auditor' }
-        };
-
-        if (demoUsers[email] && password === 'demo123') {
-            this.currentUser = {
-                id: demoUsers[email].id,
-                email,
-                nombre: demoUsers[email].nombre,
-                rol: demoUsers[email].rol,
-                foto: null
-            };
-
-            // Store in localStorage for persistence
-            localStorage.setItem('sgnd_demo_user', JSON.stringify(this.currentUser));
-
-            return { success: true, user: this.currentUser };
+    // Get stored session
+    getStoredSession() {
+        const stored = localStorage.getItem(this.SESSION_KEY);
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch {
+                return null;
+            }
         }
+        return null;
+    },
 
-        return { success: false, error: 'Credenciales inválidas' };
+    // Clear session
+    clearSession() {
+        localStorage.removeItem(this.SESSION_KEY);
+        localStorage.removeItem('sgnd_demo_user'); // Legacy cleanup
+        this.currentUser = null;
     },
 
     // Sign out
     async signOut() {
-        // Clear local session data always
-        localStorage.removeItem('sgnd_demo_user');
-
-        if (supabase) {
-            try {
-                await supabase.auth.signOut();
-            } catch (error) {
-                console.error('Sign out error:', error);
-            }
-        }
-
-        this.currentUser = null;
+        this.clearSession();
 
         // Force a clean reload to login
         window.location.href = '/';
         return { success: true };
     },
 
-    // Password reset
-    async resetPassword(email) {
-        if (!supabase) {
-            return { success: true, message: 'Demo mode: Password reset simulated' };
-        }
-
+    // Change password
+    async changePassword(userId, newPassword) {
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset-password`
+            const response = await fetch('/api/auth.php?action=change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, new_password: newPassword })
             });
 
-            if (error) throw error;
-
-            return { success: true, message: 'Se ha enviado un correo para restablecer la contraseña' };
+            const data = await response.json();
+            return { success: data.success, error: data.error };
         } catch (error) {
-            console.error('Password reset error:', error);
-            return { success: false, error: error.message };
+            console.error('Change password error:', error);
+            return { success: false, error: 'Error de conexión' };
+        }
+    },
+
+    // Create new user (admin only)
+    async createUser(userData) {
+        try {
+            const response = await fetch('/api/auth.php?action=create-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                return { success: true, user: data.data };
+            } else {
+                return { success: false, error: data.error };
+            }
+        } catch (error) {
+            console.error('Create user error:', error);
+            return { success: false, error: 'Error de conexión' };
         }
     },
 
@@ -169,8 +191,16 @@ const auth = {
         return this.currentUser.rol === role;
     },
 
-    // Check demo session
+    // Check demo session (for backward compatibility)
     checkDemoSession() {
+        // First check new session format
+        const session = this.getStoredSession();
+        if (session) {
+            this.currentUser = session;
+            return this.currentUser;
+        }
+
+        // Check legacy demo session
         const stored = localStorage.getItem('sgnd_demo_user');
         if (stored) {
             this.currentUser = JSON.parse(stored);
@@ -181,7 +211,6 @@ const auth = {
 
     // Auth state change callback
     onAuthStateChanged(isLoggedIn) {
-        // This will be overridden by the app
         console.log('Auth state changed:', isLoggedIn);
     },
 

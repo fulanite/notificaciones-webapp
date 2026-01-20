@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     email VARCHAR(255) UNIQUE NOT NULL,
     nombre VARCHAR(255) NOT NULL,
     rol ENUM('admin', 'administrativo', 'ujier', 'auditor') NOT NULL,
+    password_hash VARCHAR(255) DEFAULT NULL,
     foto TEXT,
     activo TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
