@@ -9,8 +9,8 @@ const app = {
     async init() {
         console.log('🚀 Initializing SGND...');
 
-        // Initialize Supabase
-        initSupabase();
+        // Initialize API Client (PHP/MySQL backend)
+        initApiClient();
 
         // Initialize offline support
         offline.init();
@@ -232,7 +232,7 @@ const app = {
             return;
         }
 
-        // Check Supabase session
+        // Check session
         const user = await auth.init();
 
         if (user) {
@@ -601,7 +601,7 @@ const app = {
             observaciones_iniciales: getVal('observaciones-iniciales')
         };
 
-        console.log('📤 Enviando datos a Supabase:', notificationData);
+        console.log('📤 Enviando datos a MySQL:', notificationData);
 
         // Prevent double submission
         const submitBtn = form.querySelector('button[type="submit"]');
@@ -622,7 +622,7 @@ const app = {
                 result = await notifications.create(notificationData);
             }
 
-            console.log('📥 Resultado de Supabase:', result);
+            console.log('📥 Resultado de MySQL:', result);
 
             if (result.success) {
                 form.reset();
