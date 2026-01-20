@@ -25,3 +25,7 @@ build/
 # Temporary files
 *.tmp
 *.temp
+
+# Local credentials (DO NOT COMMIT)
+api/config.local.php
+

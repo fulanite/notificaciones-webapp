@@ -9,11 +9,18 @@ if (!defined('SGND_API')) {
     die('Direct access not allowed');
 }
 
-// Database Configuration - Hostinger MySQL
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'u170052935_SGND');
-define('DB_USER', 'u170052935_sgnd_user');
-define('DB_PASS', 'ujier_Data_base_26');
+// Load local credentials (this file should NOT be in Git)
+// Create this file manually on the server with your credentials
+$localConfigPath = __DIR__ . '/config.local.php';
+if (file_exists($localConfigPath)) {
+    require_once $localConfigPath;
+} else {
+    // Default/placeholder values - REPLACE THESE ON SERVER
+    define('DB_HOST', 'localhost');
+    define('DB_NAME', 'YOUR_DATABASE_NAME');
+    define('DB_USER', 'YOUR_DATABASE_USER');
+    define('DB_PASS', 'YOUR_DATABASE_PASSWORD');
+}
 define('DB_CHARSET', 'utf8mb4');
 
 // API Settings
@@ -21,7 +28,7 @@ define('API_VERSION', '1.0.0');
 define('UPLOAD_DIR', __DIR__ . '/../uploads/');
 define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10MB
 
-// CORS Settings
+// CORS Settings - Add your domains here
 $allowed_origins = [
     'http://localhost',
     'http://localhost:3000',
