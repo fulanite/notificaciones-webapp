@@ -157,23 +157,32 @@ const usuarios = {
 
         let result;
         if (this.editingId) {
-            // Update
+            // Update existing user
             result = await db.updateUser(this.editingId, userData);
+
+            // If password provided, update it separately
+            if (password) {
+                const pwResult = await auth.changePassword(this.editingId, password);
+                if (!pwResult.success) {
+                    utils.showToast('Usuario actualizado pero error al cambiar contraseña', 'warning');
+                }
+            }
         } else {
-            // Create new user - would need auth signup
+            // Create new user with auth (this hashes the password)
             if (!password) {
                 utils.showToast('La contraseña es obligatoria para nuevos usuarios', 'warning');
                 return;
             }
-            result = await db.createUser({ ...userData, password });
+            // Use auth.createUser which hashes the password server-side
+            result = await auth.createUser({ ...userData, password });
         }
 
         if (result.error) {
-            utils.showToast('Error al guardar: ' + result.error.message, 'error');
+            utils.showToast('Error al guardar: ' + (result.error.message || result.error), 'error');
             return;
         }
 
-        utils.showToast(this.editingId ? 'Usuario actualizado' : 'Usuario creado', 'success');
+        utils.showToast(this.editingId ? 'Usuario actualizado' : 'Usuario creado con contraseña', 'success');
         this.closeModal();
         await this.loadUsers();
     },
