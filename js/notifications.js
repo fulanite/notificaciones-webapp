@@ -143,7 +143,7 @@ const notifications = {
                 </td>
                 <td>${utils.truncate(notif.n_expediente, 20)}</td>
                 <td>${utils.truncate(notif.destinatario_nombre, 25)}</td>
-                <td>${utils.getStatusBadge(notif.estado)}</td>
+                <td>${utils.getStatusBadge(notif.resultado_diligencia || notif.estado)}</td>
                 <td>${notif.usuarios?.nombre || '-'}</td>
                 <td>
                     <div class="table-actions">
@@ -216,7 +216,7 @@ const notifications = {
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Estado:</span>
-                        <span class="detail-value">${utils.getStatusBadge(data.estado)}</span>
+                        <span class="detail-value">${utils.getStatusBadge(data.resultado_diligencia || data.estado)}</span>
                     </div>
                     ${data.resultado_diligencia ? `
                         <div class="detail-item">

@@ -281,12 +281,20 @@ const utils = {
     // Get status badge HTML
     getStatusBadge(status) {
         const badges = {
+            // Estados del proceso
             pendiente: '<span class="status-badge status-pending">⏳ Pendiente</span>',
             diligenciada: '<span class="status-badge status-completed">✅ Diligenciada</span>',
-            diferida: '<span class="status-badge status-deferred">⚠️ Diferida</span>'
+            diferida: '<span class="status-badge status-deferred">⚠️ Diferida</span>',
+            // Resultados del ujier
+            atiende: '<span class="status-badge status-completed">✅ Atiende</span>',
+            no_atiende: '<span class="status-badge status-deferred">🚪 No Atiende</span>',
+            pre_aviso: '<span class="status-badge status-warning">📋 Pre Aviso</span>',
+            estrados: '<span class="status-badge status-completed">🏛️ Estrados</span>',
+            domicilio_inexistente: '<span class="status-badge status-error">❌ Domicilio Inexistente</span>',
+            diligenciador_ausente: '<span class="status-badge status-warning">👤 Diligenciador Ausente</span>'
         };
 
-        return badges[status] || `<span class="status-badge">${status}</span>`;
+        return badges[status] || `<span class="status-badge">${status || 'Sin estado'}</span>`;
     },
 
     // Check if online
