@@ -28,13 +28,13 @@
 }
 
 .btn-secondary {
-    background: var(--bg-card);
+    background: #edf2f7;
     color: var(--text-primary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid #e2e8f0;
 }
 
 .btn-secondary:hover {
-    background: var(--bg-card-hover);
+    background: #e2e8f0;
     border-color: var(--primary-500);
 }
 
@@ -83,8 +83,8 @@
 .form-textarea {
     width: 100%;
     padding: var(--space-3) var(--space-4);
-    background: var(--bg-card);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: var(--radius-md);
     color: var(--text-primary);
     font-size: 0.9375rem;
