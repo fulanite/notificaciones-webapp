@@ -14,6 +14,7 @@ const ujier = {
         this.setupViewToggle();
         await this.loadAssignments();
         this.setupDiligenciaForm();
+        this.loadSavedOrder();
     },
 
     // Update current date display
@@ -76,7 +77,12 @@ const ujier = {
         }
 
         this.assignments = data || [];
+
+        // Aplicar orden guardado
+        this.applySavedOrder();
+
         this.renderAssignments();
+        this.setupDragDrop();
         await this.updateStats();
     },
 
@@ -115,6 +121,169 @@ const ujier = {
                 </div>
             </div>
         `).join('');
+    },
+
+    // Drag & Drop state
+    draggedItem: null,
+    savedOrder: [],
+
+    // Setup drag and drop for assignment cards
+    setupDragDrop() {
+        const listContainer = document.getElementById('assignments-list');
+        if (!listContainer) return;
+
+        const cards = listContainer.querySelectorAll('.assignment-card');
+
+        cards.forEach(card => {
+            const handle = card.querySelector('.assignment-drag-handle');
+
+            // Solo el handle inicia el drag
+            handle.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                card.draggable = true;
+            });
+
+            handle.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                card.draggable = true;
+            }, { passive: true });
+
+            card.addEventListener('dragstart', (e) => {
+                this.draggedItem = card;
+                card.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', card.dataset.id);
+            });
+
+            card.addEventListener('dragend', () => {
+                card.draggable = false;
+                this.draggedItem?.classList.remove('dragging');
+                this.draggedItem = null;
+                this.saveOrder();
+                this.updateAssignmentNumbers();
+            });
+
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+
+                if (!this.draggedItem || this.draggedItem === card) return;
+
+                const rect = card.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+
+                if (e.clientY < midY) {
+                    card.classList.add('drag-over-top');
+                    card.classList.remove('drag-over-bottom');
+                } else {
+                    card.classList.add('drag-over-bottom');
+                    card.classList.remove('drag-over-top');
+                }
+            });
+
+            card.addEventListener('dragleave', () => {
+                card.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+
+            card.addEventListener('drop', (e) => {
+                e.preventDefault();
+                card.classList.remove('drag-over-top', 'drag-over-bottom');
+
+                if (!this.draggedItem || this.draggedItem === card) return;
+
+                const rect = card.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+
+                if (e.clientY < midY) {
+                    listContainer.insertBefore(this.draggedItem, card);
+                } else {
+                    listContainer.insertBefore(this.draggedItem, card.nextSibling);
+                }
+            });
+
+            // Prevenir que el click abra el modal cuando se usa el handle
+            handle.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        });
+    },
+
+    // Cargar orden guardado de localStorage
+    loadSavedOrder() {
+        try {
+            const userId = auth.currentUser?.id;
+            if (!userId) return;
+
+            const saved = localStorage.getItem(`ujier_order_${userId}`);
+            if (saved) {
+                this.savedOrder = JSON.parse(saved);
+            }
+        } catch (e) {
+            console.log('Error cargando orden guardado:', e);
+        }
+    },
+
+    // Aplicar orden guardado a los assignments
+    applySavedOrder() {
+        if (!this.savedOrder.length || !this.assignments.length) return;
+
+        // Crear mapa de IDs a assignments
+        const assignmentMap = new Map();
+        this.assignments.forEach(a => assignmentMap.set(a.id, a));
+
+        // Reordenar según el orden guardado
+        const reordered = [];
+        const remaining = new Set(this.assignments.map(a => a.id));
+
+        this.savedOrder.forEach(id => {
+            if (assignmentMap.has(id)) {
+                reordered.push(assignmentMap.get(id));
+                remaining.delete(id);
+            }
+        });
+
+        // Agregar los nuevos que no estaban en el orden guardado al final
+        remaining.forEach(id => {
+            reordered.push(assignmentMap.get(id));
+        });
+
+        this.assignments = reordered;
+    },
+
+    // Guardar orden actual en localStorage
+    saveOrder() {
+        try {
+            const userId = auth.currentUser?.id;
+            if (!userId) return;
+
+            const listContainer = document.getElementById('assignments-list');
+            const cards = listContainer.querySelectorAll('.assignment-card');
+
+            const order = Array.from(cards).map(card => card.dataset.id);
+            localStorage.setItem(`ujier_order_${userId}`, JSON.stringify(order));
+
+            // También actualizar el array interno
+            const assignmentMap = new Map();
+            this.assignments.forEach(a => assignmentMap.set(a.id, a));
+            this.assignments = order.map(id => assignmentMap.get(id)).filter(Boolean);
+
+            utils.showToast('Orden guardado', 'success');
+        } catch (e) {
+            console.log('Error guardando orden:', e);
+        }
+    },
+
+    // Actualizar números de las tarjetas después de reordenar
+    updateAssignmentNumbers() {
+        const listContainer = document.getElementById('assignments-list');
+        const cards = listContainer.querySelectorAll('.assignment-card');
+
+        cards.forEach((card, index) => {
+            const numberEl = card.querySelector('.assignment-number');
+            if (numberEl) {
+                numberEl.textContent = index + 1;
+            }
+        });
     },
 
     // Update stats display

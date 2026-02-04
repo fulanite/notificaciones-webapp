@@ -502,6 +502,21 @@
     transform: translateX(4px);
 }
 
+/* Drag & Drop Styles */
+.assignment-card.dragging {
+    opacity: 0.4;
+    border: 2px dashed var(--primary-500);
+    transform: scale(0.98);
+}
+
+.assignment-card.drag-over-top {
+    border-top: 3px solid var(--primary-500);
+}
+
+.assignment-card.drag-over-bottom {
+    border-bottom: 3px solid var(--primary-500);
+}
+
 .map-container {
     height: 500px;
     background: var(--bg-card);
