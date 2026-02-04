@@ -439,7 +439,9 @@ const ujier = {
             document.getElementById('ubicacion-lat').value = position.lat;
             document.getElementById('ubicacion-lng').value = position.lng;
 
-            coordsEl.textContent = `${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}`;
+            if (coordsEl) {
+                coordsEl.innerHTML = `<span>LAT: ${position.lat.toFixed(6)}</span><span>LNG: ${position.lng.toFixed(6)}</span>`;
+            }
             gpsInfo?.classList.remove('hidden');
 
             // Mostrar mapa
@@ -527,6 +529,13 @@ const ujier = {
 
         // Actualizar distancia inicial
         this.updateDistanceDisplay(0);
+
+        // Forzar renderizado
+        setTimeout(() => {
+            if (this.gpsMap) {
+                this.gpsMap.invalidateSize();
+            }
+        }, 300);
     },
 
     // Calcular distancia entre dos puntos (Haversine)
@@ -595,7 +604,10 @@ const ujier = {
         // Actualizar coords mostradas
         const lat = parseFloat(document.getElementById('ubicacion-lat').value);
         const lng = parseFloat(document.getElementById('ubicacion-lng').value);
-        document.getElementById('gps-coords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        const coordsEl = document.getElementById('gps-coords');
+        if (coordsEl) {
+            coordsEl.innerHTML = `<span>LAT: ${lat.toFixed(6)}</span><span>LNG: ${lng.toFixed(6)}</span>`;
+        }
     },
 
     // Actualizar display de distancia
