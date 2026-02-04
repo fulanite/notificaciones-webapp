@@ -1,93 +1,70 @@
 -- ================================================
--- SGND - Actualizar Estados de Visitas y Notificaciones
--- Convierte estados viejos a los 6 estados actuales
+-- SGND - Cambiar Estados a los del Ujier
+-- Modificar ENUM para usar los estados reales
 -- ================================================
 
--- =========================================
--- PASO 1: Actualizar estados en VISITAS
--- Convertir estados viejos a los nuevos
--- =========================================
+-- ================================================
+-- PASO 1: Cambiar el tipo de columna estado
+-- De ENUM limitado a VARCHAR para permitir cualquier estado
+-- ================================================
 
--- Entregado → Atiende
-UPDATE visitas 
-SET resultado = 'Atiende'
-WHERE resultado = 'Entregado' AND migrated_from_glide = 1;
+ALTER TABLE notificaciones 
+MODIFY COLUMN estado VARCHAR(50) DEFAULT 'Pendiente';
 
--- No Atiende / se deja bajo la puerta → No Atiende
-UPDATE visitas 
-SET resultado = 'No Atiende'
-WHERE resultado = 'No Atiende / se deja bajo la puerta' AND migrated_from_glide = 1;
+-- ================================================
+-- PASO 2: Actualizar notificaciones con el estado
+-- del resultado de la última visita
+-- ================================================
 
--- Pendiente → NULL (sin resultado aún)
-UPDATE visitas 
-SET resultado = NULL
-WHERE resultado = 'Pendiente' AND migrated_from_glide = 1;
+-- Primero normalizar los resultados en visitas
+UPDATE visitas SET resultado = 'Atiende' WHERE resultado = 'Entregado';
+UPDATE visitas SET resultado = 'No Atiende' WHERE resultado LIKE '%No Atiende%';
 
--- Otros estados que pudieran existir con variantes de escritura
-UPDATE visitas 
-SET resultado = 'Atiende'
-WHERE LOWER(resultado) LIKE '%atiende%' AND resultado != 'No Atiende' AND migrated_from_glide = 1;
-
-UPDATE visitas 
-SET resultado = 'Pre Aviso'
-WHERE LOWER(resultado) LIKE '%pre%aviso%' AND migrated_from_glide = 1;
-
-UPDATE visitas 
-SET resultado = 'Estrados'
-WHERE LOWER(resultado) LIKE '%estrado%' AND migrated_from_glide = 1;
-
--- =========================================
--- PASO 2: Verificar estados en visitas
--- =========================================
-SELECT 
-    IFNULL(resultado, '(sin resultado)') as resultado,
-    COUNT(*) as cantidad
-FROM visitas
-WHERE migrated_from_glide = 1
-GROUP BY resultado
-ORDER BY cantidad DESC;
-
--- =========================================
--- PASO 3: Actualizar NOTIFICACIONES 
--- con resultado de última visita
--- =========================================
-
+-- Actualizar estado en notificaciones desde la última visita
 UPDATE notificaciones n
 INNER JOIN (
     SELECT 
-        v.notificacion_id,
-        v.resultado,
-        v.fecha
-    FROM visitas v
+        v1.notificacion_id,
+        v1.resultado,
+        v1.fecha
+    FROM visitas v1
     INNER JOIN (
         SELECT notificacion_id, MAX(fecha) as max_fecha
         FROM visitas
-        WHERE migrated_from_glide = 1
         GROUP BY notificacion_id
-    ) latest ON v.notificacion_id = latest.notificacion_id 
-            AND v.fecha = latest.max_fecha
-    WHERE v.migrated_from_glide = 1
-) uv ON n.id = uv.notificacion_id
+    ) v2 ON v1.notificacion_id = v2.notificacion_id 
+        AND v1.fecha = v2.max_fecha
+    WHERE v1.resultado IS NOT NULL AND v1.resultado != ''
+) ultima ON n.id = ultima.notificacion_id
 SET 
-    n.resultado_diligencia = CASE uv.resultado
-        WHEN 'Atiende' THEN 'atiende'
-        WHEN 'No Atiende' THEN 'no_atiende'
-        WHEN 'Pre Aviso' THEN 'pre_aviso'
-        WHEN 'Estrados' THEN 'estrados'
-        WHEN 'Domicilio Inexistente' THEN 'domicilio_inexistente'
-        WHEN 'Diligenciador Ausente' THEN 'diligenciador_ausente'
-        ELSE NULL
-    END,
-    n.fecha_diligencia = uv.fecha
+    n.estado = ultima.resultado,
+    n.fecha_diligencia = ultima.fecha
 WHERE n.migrated_from_glide = 1;
 
--- =========================================
--- PASO 4: Verificar resultados finales
--- =========================================
+-- Las que no tienen visita quedan como Pendiente
+UPDATE notificaciones
+SET estado = 'Pendiente'
+WHERE (estado IS NULL OR estado = '' OR estado = 'pendiente')
+  AND migrated_from_glide = 1;
+
+-- ================================================
+-- PASO 3: Verificar resultados
+-- ================================================
 SELECT 
-    IFNULL(resultado_diligencia, '(pendiente)') as resultado,
+    estado,
     COUNT(*) as cantidad
 FROM notificaciones
 WHERE migrated_from_glide = 1
-GROUP BY resultado_diligencia
+GROUP BY estado
 ORDER BY cantidad DESC;
+
+-- Ver muestra
+SELECT 
+    LEFT(id, 8) as id_corto,
+    destinatario_nombre,
+    estado,
+    fecha_diligencia
+FROM notificaciones
+WHERE migrated_from_glide = 1
+  AND estado != 'Pendiente'
+LIMIT 10;

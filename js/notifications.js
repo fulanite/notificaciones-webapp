@@ -144,7 +144,7 @@ const notifications = {
                 <td>${utils.truncate(notif.n_expediente, 20)}</td>
                 <td>${utils.truncate(notif.destinatario_nombre, 25)}</td>
                 <td>${utils.getStatusBadge(notif.resultado_diligencia || notif.estado)}</td>
-                <td>${notif.usuarios?.nombre || '-'}</td>
+                <td>${notif.ujier_nombre || '-'}</td>
                 <td>
                     <div class="table-actions">
                         <button class="action-btn" title="Ver detalles" onclick="notifications.viewDetails('${notif.id}')">
