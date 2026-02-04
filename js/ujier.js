@@ -935,7 +935,10 @@ const ujier = {
 
     // Load work history
     async loadHistory() {
-        if (!auth.currentUser) return;
+        if (!auth.currentUser) {
+            console.error('❌ No hay usuario autenticado para cargar historial');
+            return;
+        }
 
         const listContainer = document.getElementById('historial-list');
         if (!listContainer) return;
@@ -947,12 +950,14 @@ const ujier = {
             </div>
         `;
 
+        console.log('📜 Cargando historial para usuario:', auth.currentUser.id);
         const { data, error } = await db.getUserVisits(auth.currentUser.id);
+        console.log('📜 Resultado historial:', { data, error });
 
         if (error) {
             listContainer.innerHTML = `
                 <div style="text-align: center; padding: 40px; color: var(--error);">
-                    Error al cargar historial
+                    Error al cargar historial: ${error}
                 </div>
             `;
             return;

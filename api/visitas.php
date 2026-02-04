@@ -34,7 +34,7 @@ try {
                            n.caratula,
                            n.zona
                     FROM visitas v
-                    INNER JOIN notificaciones n ON v.notificacion_id = n.id
+                    LEFT JOIN notificaciones n ON v.notificacion_id = n.id
                     WHERE v.ujier_id = ?
                     ORDER BY v.fecha DESC
                     LIMIT 200
