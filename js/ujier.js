@@ -4,6 +4,7 @@
 
 const ujier = {
     assignments: [],
+    savedOrder: [],
     currentAssignment: null,
     mediaRecorder: null,
     audioChunks: [],
@@ -12,9 +13,9 @@ const ujier = {
     async init() {
         this.updateDateDisplay();
         this.setupViewToggle();
+        this.loadSavedOrder(); // Cargar orden antes de las asignaciones
         await this.loadAssignments();
         this.setupDiligenciaForm();
-        this.loadSavedOrder();
     },
 
     // Update current date display
@@ -165,7 +166,7 @@ const ujier = {
 
     // Aplicar orden guardado a los assignments
     applySavedOrder() {
-        if (!this.savedOrder.length || !this.assignments.length) return;
+        if (!this.savedOrder || !this.savedOrder.length || !this.assignments || !this.assignments.length) return;
 
         // Crear mapa de IDs a assignments
         const assignmentMap = new Map();
