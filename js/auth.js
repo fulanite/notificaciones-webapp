@@ -30,7 +30,7 @@ const auth = {
     // Verify session with server
     async verifySession(email) {
         try {
-            const response = await fetch('/api/auth.php?action=verify', {
+            const response = await fetch(`${API_BASE_URL}/auth.php?action=verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
@@ -72,7 +72,7 @@ const auth = {
     // Sign in with email and password
     async signIn(email, password) {
         try {
-            const response = await fetch('/api/auth.php?action=login', {
+            const response = await fetch(`${API_BASE_URL}/auth.php?action=login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -139,7 +139,7 @@ const auth = {
     // Change password
     async changePassword(userId, newPassword) {
         try {
-            const response = await fetch('/api/auth.php?action=change-password', {
+            const response = await fetch(`${API_BASE_URL}/auth.php?action=change-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId, new_password: newPassword })
@@ -156,7 +156,7 @@ const auth = {
     // Create new user (admin only)
     async createUser(userData) {
         try {
-            const response = await fetch('/api/auth.php?action=create-user', {
+            const response = await fetch(`${API_BASE_URL}/auth.php?action=create-user`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData)
