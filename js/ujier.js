@@ -950,9 +950,7 @@ const ujier = {
             </div>
         `;
 
-        console.log('📜 Cargando historial para usuario:', auth.currentUser.id);
         const { data, error } = await db.getUserVisits(auth.currentUser.id);
-        console.log('📜 Resultado historial:', { data, error });
 
         if (error) {
             listContainer.innerHTML = `
@@ -991,30 +989,42 @@ const ujier = {
             diligenciador_ausente: '🚶'
         };
 
-        listContainer.innerHTML = visits.map(visit => `
-            <div class="assignment-card historial-card">
-                <div class="historial-icon">
-                    ${statusIcons[visit.resultado] || '📄'}
+        listContainer.innerHTML = visits.map(visit => {
+            // Normalizar resultado para iconos y clases CSS
+            let status = (visit.resultado || '').toLowerCase();
+            if (status.includes('no atiende')) status = 'no_atiende';
+            else if (status.includes('atiende')) status = 'atiende';
+            else if (status.includes('entregado')) status = 'atiende';
+            else if (status.includes('pre aviso') || status === 'pendiente') status = 'pre_aviso';
+            else if (status.includes('estrados')) status = 'estrados';
+            else if (status.includes('inexistente')) status = 'domicilio_inexistente';
+            else status = status.replace(/\s+/g, '_');
+
+            return `
+                <div class="assignment-card historial-card">
+                    <div class="historial-icon">
+                        ${statusIcons[status] || '📄'}
+                    </div>
+                    <div class="assignment-info">
+                        <div class="historial-header">
+                            <span class="assignment-type">${visit.tipo_notificacion || 'Cédula'}</span>
+                            <span class="historial-fecha">${utils.formatDateTime(visit.fecha)}</span>
+                        </div>
+                        <div class="historial-expediente">📋 ${visit.n_expediente || 'S/N'}</div>
+                        <div class="assignment-recipient">👤 ${visit.destinatario_nombre || 'N/A'}</div>
+                        <div class="historial-resultado">
+                            <span class="resultado-badge resultado-${status}">${(visit.resultado || '').toUpperCase()}</span>
+                            ${visit.zona ? `<span class="historial-zona">${visit.zona}</span>` : ''}
+                        </div>
+                        ${visit.observaciones ? `<p class="historial-obs">📝 ${visit.observaciones}</p>` : ''}
+                    </div>
+                    ${visit.foto_url ? `
+                        <div class="historial-foto" onclick="window.open('${visit.foto_url}', '_blank')">
+                            <img src="${visit.foto_url}" alt="Evidencia">
+                        </div>
+                    ` : ''}
                 </div>
-                <div class="assignment-info">
-                    <div class="historial-header">
-                        <span class="assignment-type">${visit.tipo_notificacion || 'Cédula'}</span>
-                        <span class="historial-fecha">${utils.formatDateTime(visit.fecha)}</span>
-                    </div>
-                    <div class="historial-expediente">📋 ${visit.n_expediente || 'S/N'}</div>
-                    <div class="assignment-recipient">👤 ${visit.destinatario_nombre || 'N/A'}</div>
-                    <div class="historial-resultado">
-                        <span class="resultado-badge resultado-${visit.resultado}">${(visit.resultado || '').replace(/_/g, ' ').toUpperCase()}</span>
-                        ${visit.zona ? `<span class="historial-zona">${visit.zona}</span>` : ''}
-                    </div>
-                    ${visit.observaciones ? `<p class="historial-obs">📝 ${visit.observaciones}</p>` : ''}
-                </div>
-                ${visit.foto_url ? `
-                    <div class="historial-foto" onclick="window.open('${visit.foto_url}', '_blank')">
-                        <img src="${visit.foto_url}" alt="Evidencia">
-                    </div>
-                ` : ''}
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 };
