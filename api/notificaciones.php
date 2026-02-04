@@ -118,12 +118,14 @@ try {
                     tipo_notificacion, n_expediente, caratula, origen, letrado,
                     destinatario_especial, destinatario_nombre, domicilio, zona,
                     tipo_troquel, sin_troquel, n_troquel, medio_pago, costo,
+                    asignado_a, fecha_asignacion, asignado_por,
                     observaciones_iniciales, created_at, updated_at
                 ) VALUES (
                     ?, NOW(), ?, 'pendiente',
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
+                    ?, ?, ?,
                     ?, NOW(), NOW()
                 )
             ");
@@ -145,6 +147,9 @@ try {
                 $data['n_troquel'] ?? null,
                 $data['medio_pago'] ?? null,
                 $data['costo'] ?? 0,
+                $data['asignado_a'] ?? null,
+                !empty($data['asignado_a']) ? date('Y-m-d H:i:s') : null,
+                $data['asignado_por'] ?? null,
                 $data['observaciones_iniciales'] ?? null
             ]);
 
@@ -255,7 +260,8 @@ try {
                     'letrado',
                     'destinatario_nombre',
                     'domicilio',
-                    'zona'
+                    'zona',
+                    'asignado_a'
                 ];
                 $updates = [];
                 $params = [];
@@ -264,6 +270,11 @@ try {
                     if (isset($data[$field])) {
                         $updates[] = "$field = ?";
                         $params[] = Database::sanitize($data[$field]);
+
+                        // Si se cambia el ujier, actualizar también la fecha de asignación
+                        if ($field === 'asignado_a' && !empty($data['asignado_a'])) {
+                            $updates[] = "fecha_asignacion = NOW()";
+                        }
                     }
                 }
 
