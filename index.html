@@ -23,6 +23,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
+    <!-- Leaflet Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <!-- Styles -->
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/base.css">
@@ -1156,8 +1160,24 @@
                                     <span class="gps-status">✅ Capturada</span>
                                 </div>
                             </div>
+                            <!-- Mapa para ajustar ubicación -->
+                            <div id="gps-map-container" class="gps-map-container hidden">
+                                <div class="gps-map-header">
+                                    <span>🎯 Ajustá el pin para mayor precisión</span>
+                                    <span class="gps-map-hint">(máx. 150m del punto GPS)</span>
+                                </div>
+                                <div id="gps-map" class="gps-map"></div>
+                                <div class="gps-map-footer">
+                                    <button type="button" class="btn btn-sm btn-secondary" id="btn-reset-gps">
+                                        🔄 Volver a mi ubicación
+                                    </button>
+                                    <span id="gps-distance" class="gps-distance"></span>
+                                </div>
+                            </div>
                             <input type="hidden" id="ubicacion-lat">
                             <input type="hidden" id="ubicacion-lng">
+                            <input type="hidden" id="ubicacion-original-lat">
+                            <input type="hidden" id="ubicacion-original-lng">
                         </div>
 
                         <div class="form-section">

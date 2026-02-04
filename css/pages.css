@@ -660,6 +660,73 @@
     color: var(--success);
 }
 
+/* GPS Map */
+.gps-map-container {
+    margin-top: var(--space-4);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--bg-tertiary);
+}
+
+.gps-map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    background: rgba(59, 130, 246, 0.1);
+    font-size: 0.85rem;
+}
+
+.gps-map-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.gps-map {
+    height: 200px;
+    width: 100%;
+}
+
+.gps-map-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.gps-distance {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.gps-distance.warning {
+    color: var(--warning);
+}
+
+.gps-distance.ok {
+    color: var(--success);
+}
+
+/* Leaflet custom styles */
+.leaflet-container {
+    font-family: var(--font-sans);
+}
+
+.gps-radius-circle {
+    fill: rgba(59, 130, 246, 0.15);
+    stroke: rgba(59, 130, 246, 0.5);
+    stroke-width: 2;
+}
+
+.original-marker {
+    background: var(--primary-500);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
 .photo-container {
     display: flex;
     align-items: center;

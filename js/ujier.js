@@ -242,6 +242,18 @@ const ujier = {
         document.getElementById('gps-info')?.classList.add('hidden');
         document.getElementById('ubicacion-lat').value = '';
         document.getElementById('ubicacion-lng').value = '';
+        document.getElementById('ubicacion-original-lat').value = '';
+        document.getElementById('ubicacion-original-lng').value = '';
+
+        // Reset mapa GPS
+        document.getElementById('gps-map-container')?.classList.add('hidden');
+        if (this.gpsMap) {
+            this.gpsMap.remove();
+            this.gpsMap = null;
+            this.gpsMarker = null;
+            this.gpsCircle = null;
+        }
+        this.originalPosition = null;
 
         // Reset photo
         document.getElementById('photo-preview')?.classList.add('hidden');
@@ -289,11 +301,19 @@ const ujier = {
         document.getElementById('form-diligenciar')?.addEventListener('submit', (e) => this.submitDiligencia(e));
     },
 
+    // GPS Map instance
+    gpsMap: null,
+    gpsMarker: null,
+    gpsCircle: null,
+    originalPosition: null,
+    MAX_RADIUS: 150, // metros máximo de ajuste
+
     // Capture GPS
     async captureGPS() {
         const btn = document.getElementById('btn-capture-gps');
         const gpsInfo = document.getElementById('gps-info');
         const coordsEl = document.getElementById('gps-coords');
+        const mapContainer = document.getElementById('gps-map-container');
 
         btn.disabled = true;
         btn.innerHTML = '<div class="btn-spinner"></div> Obteniendo...';
@@ -301,19 +321,196 @@ const ujier = {
         try {
             const position = await utils.getGPSPosition();
 
+            // Guardar posición original
+            this.originalPosition = { lat: position.lat, lng: position.lng };
+            document.getElementById('ubicacion-original-lat').value = position.lat;
+            document.getElementById('ubicacion-original-lng').value = position.lng;
+
+            // Establecer posición actual (inicialmente igual a la original)
             document.getElementById('ubicacion-lat').value = position.lat;
             document.getElementById('ubicacion-lng').value = position.lng;
 
             coordsEl.textContent = `${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}`;
             gpsInfo?.classList.remove('hidden');
 
-            utils.showToast('Ubicación capturada', 'success');
+            // Mostrar mapa
+            mapContainer?.classList.remove('hidden');
+            this.initGPSMap(position.lat, position.lng);
+
+            utils.showToast('Ubicación capturada. Podés ajustar el pin si es necesario.', 'success');
         } catch (error) {
             utils.showToast(error.message, 'error');
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<span>📍</span> Capturar Ubicación';
         }
+    },
+
+    // Inicializar mapa GPS con pin arrastrable
+    initGPSMap(lat, lng) {
+        const mapElement = document.getElementById('gps-map');
+        if (!mapElement) return;
+
+        // Si ya existe un mapa, destruirlo
+        if (this.gpsMap) {
+            this.gpsMap.remove();
+        }
+
+        // Crear mapa centrado en la ubicación
+        this.gpsMap = L.map('gps-map', {
+            zoomControl: false,
+            attributionControl: false
+        }).setView([lat, lng], 18);
+
+        // Agregar tiles de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(this.gpsMap);
+
+        // Agregar controles de zoom
+        L.control.zoom({ position: 'topright' }).addTo(this.gpsMap);
+
+        // Crear círculo de radio máximo
+        this.gpsCircle = L.circle([lat, lng], {
+            radius: this.MAX_RADIUS,
+            color: '#3b82f6',
+            fillColor: '#3b82f6',
+            fillOpacity: 0.15,
+            weight: 2,
+            dashArray: '5, 5'
+        }).addTo(this.gpsMap);
+
+        // Marcador de ubicación original (fijo)
+        const originalIcon = L.divIcon({
+            className: 'original-marker-icon',
+            html: '<div style="width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+            iconSize: [12, 12],
+            iconAnchor: [6, 6]
+        });
+        L.marker([lat, lng], { icon: originalIcon }).addTo(this.gpsMap);
+
+        // Marcador arrastrable
+        const draggableIcon = L.divIcon({
+            className: 'draggable-marker-icon',
+            html: '<div style="width: 30px; height: 30px; background: #ef4444; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.4);"></div>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+        });
+
+        this.gpsMarker = L.marker([lat, lng], {
+            icon: draggableIcon,
+            draggable: true
+        }).addTo(this.gpsMap);
+
+        // Evento de drag
+        this.gpsMarker.on('drag', (e) => {
+            this.onMarkerDrag(e.target.getLatLng());
+        });
+
+        this.gpsMarker.on('dragend', (e) => {
+            this.onMarkerDragEnd(e.target.getLatLng());
+        });
+
+        // Botón reset
+        document.getElementById('btn-reset-gps')?.addEventListener('click', () => {
+            this.resetGPSPosition();
+        });
+
+        // Actualizar distancia inicial
+        this.updateDistanceDisplay(0);
+    },
+
+    // Calcular distancia entre dos puntos (Haversine)
+    calculateDistance(lat1, lng1, lat2, lng2) {
+        const R = 6371e3; // Radio de la Tierra en metros
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δφ = (lat2 - lat1) * Math.PI / 180;
+        const Δλ = (lng2 - lng1) * Math.PI / 180;
+
+        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c; // Distancia en metros
+    },
+
+    // Al arrastrar el marcador
+    onMarkerDrag(latlng) {
+        const distance = this.calculateDistance(
+            this.originalPosition.lat,
+            this.originalPosition.lng,
+            latlng.lat,
+            latlng.lng
+        );
+        this.updateDistanceDisplay(distance);
+    },
+
+    // Al soltar el marcador
+    onMarkerDragEnd(latlng) {
+        const distance = this.calculateDistance(
+            this.originalPosition.lat,
+            this.originalPosition.lng,
+            latlng.lat,
+            latlng.lng
+        );
+
+        if (distance > this.MAX_RADIUS) {
+            // Calcular punto en el borde del círculo
+            const angle = Math.atan2(
+                latlng.lng - this.originalPosition.lng,
+                latlng.lat - this.originalPosition.lat
+            );
+
+            // Convertir metros a grados aproximadamente
+            const latOffset = (this.MAX_RADIUS * Math.cos(angle)) / 111320;
+            const lngOffset = (this.MAX_RADIUS * Math.sin(angle)) / (111320 * Math.cos(this.originalPosition.lat * Math.PI / 180));
+
+            const newLat = this.originalPosition.lat + latOffset;
+            const newLng = this.originalPosition.lng + lngOffset;
+
+            this.gpsMarker.setLatLng([newLat, newLng]);
+
+            document.getElementById('ubicacion-lat').value = newLat;
+            document.getElementById('ubicacion-lng').value = newLng;
+
+            this.updateDistanceDisplay(this.MAX_RADIUS);
+            utils.showToast('Ubicación ajustada al límite de 150m', 'warning');
+        } else {
+            document.getElementById('ubicacion-lat').value = latlng.lat;
+            document.getElementById('ubicacion-lng').value = latlng.lng;
+            this.updateDistanceDisplay(distance);
+        }
+
+        // Actualizar coords mostradas
+        const lat = parseFloat(document.getElementById('ubicacion-lat').value);
+        const lng = parseFloat(document.getElementById('ubicacion-lng').value);
+        document.getElementById('gps-coords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    },
+
+    // Actualizar display de distancia
+    updateDistanceDisplay(distance) {
+        const el = document.getElementById('gps-distance');
+        if (!el) return;
+
+        el.textContent = `📏 ${Math.round(distance)}m del punto GPS`;
+        el.className = 'gps-distance ' + (distance > 100 ? 'warning' : 'ok');
+    },
+
+    // Reset a posición original
+    resetGPSPosition() {
+        if (!this.originalPosition || !this.gpsMarker) return;
+
+        this.gpsMarker.setLatLng([this.originalPosition.lat, this.originalPosition.lng]);
+        document.getElementById('ubicacion-lat').value = this.originalPosition.lat;
+        document.getElementById('ubicacion-lng').value = this.originalPosition.lng;
+        document.getElementById('gps-coords').textContent =
+            `${this.originalPosition.lat.toFixed(6)}, ${this.originalPosition.lng.toFixed(6)}`;
+        this.updateDistanceDisplay(0);
+
+        this.gpsMap.setView([this.originalPosition.lat, this.originalPosition.lng], 18);
+        utils.showToast('Ubicación restaurada', 'info');
     },
 
     // Handle photo capture
