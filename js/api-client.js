@@ -208,6 +208,11 @@ const db = {
         return apiClient.get('visitas.php', { notificacion_id: notificationId });
     },
 
+    // Alias para compatibilidad
+    async getVisitas(notificationId) {
+        return this.getNotificationVisits(notificationId);
+    },
+
     async getUserVisits(userId) {
         if (!apiClient) return { data: [], error: null };
         return apiClient.get('visitas.php', { ujier_id: userId });
