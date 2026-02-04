@@ -387,7 +387,8 @@
 
 .assignment-card {
     display: flex;
-    gap: var(--space-4);
+    align-items: flex-start;
+    gap: var(--space-3);
     padding: var(--space-4);
     background: var(--bg-card);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -401,45 +402,104 @@
     box-shadow: var(--shadow-glow);
 }
 
+.assignment-drag-handle {
+    width: 16px;
+    color: var(--text-muted);
+    cursor: grab;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    font-weight: bold;
+    letter-spacing: -4px;
+}
+
+.assignment-card:hover .assignment-drag-handle {
+    opacity: 1;
+}
+
 .assignment-number {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--gradient-primary);
     border-radius: var(--radius-md);
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 700;
+    flex-shrink: 0;
 }
 
 .assignment-info {
     flex: 1;
+    min-width: 0;
+}
+
+.assignment-header-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+    margin-bottom: var(--space-2);
 }
 
 .assignment-type {
     display: inline-block;
-    padding: 2px 8px;
+    padding: 2px 10px;
     font-size: 0.75rem;
     background: rgba(59, 130, 246, 0.15);
-    color: var(--primary-500);
+    color: var(--primary-400);
     border-radius: var(--radius-full);
+    font-weight: 500;
+}
+
+.assignment-zona {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    background: rgba(139, 92, 246, 0.15);
+    color: #a78bfa;
+    border-radius: var(--radius-full);
+}
+
+.assignment-expediente {
+    font-size: 0.85rem;
+    color: var(--text-muted);
     margin-bottom: var(--space-1);
 }
 
+.assignment-caratula {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: var(--space-2);
+    max-height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .assignment-recipient {
-    font-weight: 500;
+    font-size: 0.95rem;
     margin-bottom: var(--space-1);
 }
 
 .assignment-address {
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
 }
 
 .assignment-action {
     display: flex;
     align-items: center;
+    padding-left: var(--space-2);
+}
+
+.assignment-arrow {
+    font-size: 1.5rem;
+    color: var(--primary-500);
+    transition: transform 0.2s;
+}
+
+.assignment-card:hover .assignment-arrow {
+    transform: translateX(4px);
 }
 
 .map-container {
@@ -503,11 +563,79 @@
 
 /* === Diligencia Modal Specific === */
 .notification-summary {
-    padding: var(--space-4);
-    background: rgba(59, 130, 246, 0.1);
+    padding: 0;
+    margin-bottom: var(--space-4);
+}
+
+.notif-summary-card {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
     border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-6);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    background: rgba(59, 130, 246, 0.15);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.summary-tipo {
+    font-weight: 600;
+    color: var(--primary-400);
+    font-size: 0.9rem;
+}
+
+.summary-zona {
+    font-size: 0.75rem;
+    padding: 2px 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    color: var(--text-muted);
+}
+
+.summary-body {
+    padding: var(--space-4);
+}
+
+.summary-row {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    min-width: 110px;
+    flex-shrink: 0;
+}
+
+.summary-value {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.summary-obs {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.summary-obs p {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-top: var(--space-1);
 }
 
 .gps-container {
@@ -946,6 +1074,108 @@
     margin-top: var(--space-6);
     padding-top: var(--space-4);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* === Historial Ujier === */
+.historial-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.historial-card {
+    align-items: flex-start;
+}
+
+.historial-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(59, 130, 246, 0.15);
+    border-radius: var(--radius-md);
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.historial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+}
+
+.historial-fecha {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.historial-expediente {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-1);
+}
+
+.historial-resultado {
+    margin-top: var(--space-2);
+}
+
+.resultado-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+}
+
+.resultado-atiende {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+}
+
+.resultado-no_atiende {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+}
+
+.resultado-pre_aviso {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--primary-400);
+}
+
+.resultado-estrados {
+    background: rgba(139, 92, 246, 0.2);
+    color: #a78bfa;
+}
+
+.resultado-domicilio_inexistente,
+.resultado-diligenciador_ausente {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--error);
+}
+
+.historial-obs {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--text-muted);
+    margin-top: var(--space-2);
+}
+
+.historial-foto {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.historial-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Responsive for new views */

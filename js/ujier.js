@@ -97,15 +97,21 @@ const ujier = {
         }
 
         listContainer.innerHTML = this.assignments.map((assignment, index) => `
-            <div class="assignment-card stagger-item" onclick="ujier.openDiligencia('${assignment.id}')">
+            <div class="assignment-card stagger-item" data-id="${assignment.id}" onclick="ujier.openDiligencia('${assignment.id}')">
+                <div class="assignment-drag-handle" title="Arrastrar para reordenar">⋮⋮</div>
                 <div class="assignment-number">${index + 1}</div>
                 <div class="assignment-info">
-                    <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES[assignment.tipo_notificacion] || assignment.tipo_notificacion}</span>
-                    <div class="assignment-recipient">${assignment.destinatario_nombre}</div>
-                    <div class="assignment-address">📍 ${assignment.domicilio}</div>
+                    <div class="assignment-header-row">
+                        <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
+                        ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
+                    </div>
+                    <div class="assignment-expediente">📋 ${assignment.n_expediente || '-'}</div>
+                    ${assignment.caratula ? `<div class="assignment-caratula">${assignment.caratula}</div>` : ''}
+                    <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || '-'}</strong></div>
+                    <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
                 </div>
                 <div class="assignment-action">
-                    <span style="font-size: 1.5rem;">→</span>
+                    <span class="assignment-arrow">→</span>
                 </div>
             </div>
         `).join('');
@@ -161,12 +167,51 @@ const ujier = {
         if (idInput) idInput.value = id;
 
         if (summary) {
+            // Obtener tipo con fallback
+            const tipoLabel = CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo';
+
             summary.innerHTML = `
-                <div style="display: grid; gap: 8px;">
-                    <div><strong>Tipo:</strong> ${CONFIG.NOTIFICATION_TYPES[assignment.tipo_notificacion]}</div>
-                    <div><strong>Expediente:</strong> ${assignment.n_expediente}</div>
-                    <div><strong>Destinatario:</strong> ${assignment.destinatario_nombre}</div>
-                    <div><strong>Domicilio:</strong> ${assignment.domicilio}</div>
+                <div class="notif-summary-card">
+                    <div class="summary-header">
+                        <span class="summary-tipo">${tipoLabel}</span>
+                        <span class="summary-zona">${assignment.zona || ''}</span>
+                    </div>
+                    <div class="summary-body">
+                        <div class="summary-row">
+                            <span class="summary-label">📋 Expediente:</span>
+                            <span class="summary-value">${assignment.n_expediente || '-'}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">📑 Carátula:</span>
+                            <span class="summary-value">${assignment.caratula || '-'}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">👤 Destinatario:</span>
+                            <span class="summary-value"><strong>${assignment.destinatario_nombre || '-'}</strong></span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">🏠 Domicilio:</span>
+                            <span class="summary-value">${assignment.domicilio || '-'}</span>
+                        </div>
+                        ${assignment.origen ? `
+                        <div class="summary-row">
+                            <span class="summary-label">🏛️ Origen:</span>
+                            <span class="summary-value">${assignment.origen}</span>
+                        </div>
+                        ` : ''}
+                        ${assignment.letrado ? `
+                        <div class="summary-row">
+                            <span class="summary-label">⚖️ Letrado:</span>
+                            <span class="summary-value">${assignment.letrado}</span>
+                        </div>
+                        ` : ''}
+                        ${assignment.observaciones_iniciales ? `
+                        <div class="summary-obs">
+                            <span class="summary-label">📝 Observaciones:</span>
+                            <p>${assignment.observaciones_iniciales}</p>
+                        </div>
+                        ` : ''}
+                    </div>
                 </div>
             `;
         }
@@ -590,20 +635,25 @@ const ujier = {
         };
 
         listContainer.innerHTML = visits.map(visit => `
-            <div class="assignment-card">
-                <div class="assignment-number" style="background: var(--primary-light); color: var(--primary);">
+            <div class="assignment-card historial-card">
+                <div class="historial-icon">
                     ${statusIcons[visit.resultado] || '📄'}
                 </div>
                 <div class="assignment-info">
-                    <span class="assignment-type">Exp. ${visit.notificaciones?.n_expediente || 'S/N'}</span>
-                    <div class="assignment-recipient">${visit.notificaciones?.destinatario_nombre || 'N/A'}</div>
-                    <div class="assignment-address" style="font-size: 0.8rem; color: var(--text-muted);">
-                        ${utils.formatDateTime(visit.fecha)} - <strong>${visit.resultado.replace('_', ' ').toUpperCase()}</strong>
+                    <div class="historial-header">
+                        <span class="assignment-type">${visit.tipo_notificacion || 'Cédula'}</span>
+                        <span class="historial-fecha">${utils.formatDateTime(visit.fecha)}</span>
                     </div>
+                    <div class="historial-expediente">📋 ${visit.n_expediente || 'S/N'}</div>
+                    <div class="assignment-recipient">👤 ${visit.destinatario_nombre || 'N/A'}</div>
+                    <div class="historial-resultado">
+                        <span class="resultado-badge resultado-${visit.resultado}">${(visit.resultado || '').replace(/_/g, ' ').toUpperCase()}</span>
+                    </div>
+                    ${visit.observaciones ? `<p class="historial-obs">📝 ${visit.observaciones}</p>` : ''}
                 </div>
                 ${visit.foto_url ? `
-                    <div class="assignment-action" onclick="window.open('${visit.foto_url}', '_blank')">
-                        <span style="font-size: 1.2rem;">🖼️</span>
+                    <div class="historial-foto" onclick="window.open('${visit.foto_url}', '_blank')">
+                        <img src="${visit.foto_url}" alt="Evidencia">
                     </div>
                 ` : ''}
             </div>
