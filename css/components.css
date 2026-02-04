@@ -431,29 +431,35 @@
 .modal {
     position: fixed;
     inset: 0;
-    z-index: 500;
+    z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: var(--space-4);
 }
 
-.modal-overlay {
+.modal.hidden {
+    display: none;
+}
+
+.modal>.modal-overlay {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
+    z-index: -1;
 }
 
-.modal-content {
+.modal>.modal-content {
     position: relative;
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
     background: var(--bg-card);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl);
+    z-index: 1;
 }
 
 .modal-header {
