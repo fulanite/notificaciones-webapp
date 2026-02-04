@@ -322,7 +322,15 @@ const ujier = {
                         ` : ''}
                     </div>
                 </div>
-            `;
+                <div id="visitas-historial-container" class="visitas-historial-compact hidden">
+                    <h4 class="visitas-title">⌛ Intentos Anteriores</h4>
+                    <div id="visitas-historial-list"></div>
+                </div>
+            </div>
+        `;
+
+            // Cargar historial de visitas para esta notificación
+            this.loadVisitasNotificacion(id);
         }
 
         // Reset form
@@ -340,6 +348,31 @@ const ujier = {
         modal?.classList.remove('show');
         this.currentAssignment = null;
         this.resetDiligenciaForm();
+    },
+
+    // Cargar visitas de una notificación específica
+    async loadVisitasNotificacion(notificacionId) {
+        const container = document.getElementById('visitas-historial-container');
+        const list = document.getElementById('visitas-historial-list');
+        if (!list) return;
+
+        const { data, error } = await db.getNotificationVisits(notificacionId);
+
+        if (error || !data || data.length === 0) {
+            container?.classList.add('hidden');
+            return;
+        }
+
+        container?.classList.remove('hidden');
+        list.innerHTML = data.map(v => `
+            <div class="visita-item-mini">
+                <div class="visita-meta">
+                    <span class="visita-fecha-mini">${utils.formatDateTime(v.fecha)}</span>
+                    <span class="visita-resultado-mini resultado-${v.resultado}">${(v.resultado || '').replace(/_/g, ' ').toUpperCase()}</span>
+                </div>
+                ${v.observaciones ? `<p class="visita-obs-mini">📝 ${v.observaciones}</p>` : ''}
+            </div>
+        `).join('');
     },
 
     // Reset diligencia form
@@ -966,6 +999,7 @@ const ujier = {
                     <div class="assignment-recipient">👤 ${visit.destinatario_nombre || 'N/A'}</div>
                     <div class="historial-resultado">
                         <span class="resultado-badge resultado-${visit.resultado}">${(visit.resultado || '').replace(/_/g, ' ').toUpperCase()}</span>
+                        ${visit.zona ? `<span class="historial-zona">${visit.zona}</span>` : ''}
                     </div>
                     ${visit.observaciones ? `<p class="historial-obs">📝 ${visit.observaciones}</p>` : ''}
                 </div>

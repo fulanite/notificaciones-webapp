@@ -25,14 +25,19 @@ try {
                 $stmt->execute([$_GET['notificacion_id']]);
                 Database::sendResponse($stmt->fetchAll());
             } elseif (isset($_GET['ujier_id'])) {
-                // Get visits by ujier
+                // Get visits by ujier with full notification info
                 $stmt = $pdo->prepare("
-                    SELECT v.*, n.n_expediente, n.destinatario_nombre, n.tipo_notificacion
+                    SELECT v.*, 
+                           n.n_expediente, 
+                           n.destinatario_nombre, 
+                           n.tipo_notificacion,
+                           n.caratula,
+                           n.zona
                     FROM visitas v
-                    LEFT JOIN notificaciones n ON v.notificacion_id = n.id
+                    INNER JOIN notificaciones n ON v.notificacion_id = n.id
                     WHERE v.ujier_id = ?
                     ORDER BY v.fecha DESC
-                    LIMIT 100
+                    LIMIT 200
                 ");
                 $stmt->execute([$_GET['ujier_id']]);
                 Database::sendResponse($stmt->fetchAll());
