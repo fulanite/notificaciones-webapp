@@ -201,10 +201,17 @@ const notifications = {
                             ${visitasResp.data.map(v => `
                                 <div class="visita-item">
                                     <div class="visita-header">
-                                        <span class="visita-fecha">${utils.formatDateTime(v.fecha)}</span>
+                                        <span class="visita-fecha">${utils.formatDateTime(v.fecha)}${v.ujier_nombre ? ` - <strong>${v.ujier_nombre}</strong>` : ''}</span>
                                         ${utils.getStatusBadge(v.resultado?.toLowerCase().replace(/ /g, '_') || 'pendiente')}
                                     </div>
-                                    ${v.observaciones ? `<p class="visita-obs">${v.observaciones}</p>` : ''}
+                                    ${v.observaciones ? `<p class="visita-obs">📝 ${v.observaciones}</p>` : ''}
+                                    ${v.audio_transcripcion ? `<p class="visita-obs">🎤 <em>${v.audio_transcripcion}</em></p>` : ''}
+                                    ${v.ubicacion_lat && v.ubicacion_lng ? `
+                                        <a href="https://www.google.com/maps?q=${v.ubicacion_lat},${v.ubicacion_lng}" 
+                                           target="_blank" class="visita-ubicacion">
+                                            📍 Ver ubicación en Google Maps
+                                        </a>
+                                    ` : ''}
                                     ${v.foto_url ? `<img src="${v.foto_url}" class="visita-foto" onclick="window.open('${v.foto_url}', '_blank')">` : ''}
                                 </div>
                             `).join('')}
