@@ -502,19 +502,47 @@
     transform: translateX(4px);
 }
 
-/* Drag & Drop Styles */
-.assignment-card.dragging {
-    opacity: 0.4;
-    border: 2px dashed var(--primary-500);
-    transform: scale(0.98);
+/* Reorder Controls */
+.assignment-reorder-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-right: var(--space-3);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    margin-right: var(--space-3);
 }
 
-.assignment-card.drag-over-top {
-    border-top: 3px solid var(--primary-500);
+.reorder-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    width: 32px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+    cursor: pointer;
 }
 
-.assignment-card.drag-over-bottom {
-    border-bottom: 3px solid var(--primary-500);
+.reorder-btn:hover:not(:disabled) {
+    background: var(--primary-500);
+    color: white;
+    border-color: var(--primary-500);
+}
+
+.reorder-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+.assignment-main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
 }
 
 .map-container {

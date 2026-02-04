@@ -103,109 +103,49 @@ const ujier = {
         }
 
         listContainer.innerHTML = this.assignments.map((assignment, index) => `
-            <div class="assignment-card stagger-item" data-id="${assignment.id}" onclick="ujier.openDiligencia('${assignment.id}')">
-                <div class="assignment-drag-handle" title="Arrastrar para reordenar">⋮⋮</div>
-                <div class="assignment-number">${index + 1}</div>
-                <div class="assignment-info">
-                    <div class="assignment-header-row">
-                        <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
-                        ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
-                    </div>
-                    <div class="assignment-expediente">📋 ${assignment.n_expediente || '-'}</div>
-                    ${assignment.caratula ? `<div class="assignment-caratula">${assignment.caratula}</div>` : ''}
-                    <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || '-'}</strong></div>
-                    <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
+            <div class="assignment-card stagger-item" data-id="${assignment.id}">
+                <div class="assignment-reorder-controls">
+                    <button class="reorder-btn up" onclick="ujier.moveAssignment(${index}, -1)" ${index === 0 ? 'disabled' : ''} title="Subir">▲</button>
+                    <button class="reorder-btn down" onclick="ujier.moveAssignment(${index}, 1)" ${index === this.assignments.length - 1 ? 'disabled' : ''} title="Bajar">▼</button>
                 </div>
-                <div class="assignment-action">
+                <div class="assignment-main-content" onclick="ujier.openDiligencia('${assignment.id}')">
+                    <div class="assignment-number">${index + 1}</div>
+                    <div class="assignment-info">
+                        <div class="assignment-header-row">
+                            <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
+                            ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
+                        </div>
+                        <div class="assignment-expediente">📋 ${assignment.n_expediente || '-'}</div>
+                        ${assignment.caratula ? `<div class="assignment-caratula">${assignment.caratula}</div>` : ''}
+                        <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || '-'}</strong></div>
+                        <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
+                    </div>
+                </div>
+                <div class="assignment-action" onclick="ujier.openDiligencia('${assignment.id}')">
                     <span class="assignment-arrow">→</span>
                 </div>
             </div>
         `).join('');
     },
 
-    // Drag & Drop state
-    draggedItem: null,
-    savedOrder: [],
+    // Move assignment in the list
+    moveAssignment(index, direction) {
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= this.assignments.length) return;
 
-    // Setup drag and drop for assignment cards
+        // Swapping elements
+        const temp = this.assignments[index];
+        this.assignments[index] = this.assignments[newIndex];
+        this.assignments[newIndex] = temp;
+
+        // Re-render and save
+        this.renderAssignments();
+        this.saveOrder();
+    },
+
+    // Setup (keeping for compatibility, but simplified)
     setupDragDrop() {
-        const listContainer = document.getElementById('assignments-list');
-        if (!listContainer) return;
-
-        const cards = listContainer.querySelectorAll('.assignment-card');
-
-        cards.forEach(card => {
-            const handle = card.querySelector('.assignment-drag-handle');
-
-            // Solo el handle inicia el drag
-            handle.addEventListener('mousedown', (e) => {
-                e.stopPropagation();
-                card.draggable = true;
-            });
-
-            handle.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-                card.draggable = true;
-            }, { passive: true });
-
-            card.addEventListener('dragstart', (e) => {
-                this.draggedItem = card;
-                card.classList.add('dragging');
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', card.dataset.id);
-            });
-
-            card.addEventListener('dragend', () => {
-                card.draggable = false;
-                this.draggedItem?.classList.remove('dragging');
-                this.draggedItem = null;
-                this.saveOrder();
-                this.updateAssignmentNumbers();
-            });
-
-            card.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-
-                if (!this.draggedItem || this.draggedItem === card) return;
-
-                const rect = card.getBoundingClientRect();
-                const midY = rect.top + rect.height / 2;
-
-                if (e.clientY < midY) {
-                    card.classList.add('drag-over-top');
-                    card.classList.remove('drag-over-bottom');
-                } else {
-                    card.classList.add('drag-over-bottom');
-                    card.classList.remove('drag-over-top');
-                }
-            });
-
-            card.addEventListener('dragleave', () => {
-                card.classList.remove('drag-over-top', 'drag-over-bottom');
-            });
-
-            card.addEventListener('drop', (e) => {
-                e.preventDefault();
-                card.classList.remove('drag-over-top', 'drag-over-bottom');
-
-                if (!this.draggedItem || this.draggedItem === card) return;
-
-                const rect = card.getBoundingClientRect();
-                const midY = rect.top + rect.height / 2;
-
-                if (e.clientY < midY) {
-                    listContainer.insertBefore(this.draggedItem, card);
-                } else {
-                    listContainer.insertBefore(this.draggedItem, card.nextSibling);
-                }
-            });
-
-            // Prevenir que el click abra el modal cuando se usa el handle
-            handle.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
-        });
+        // Now using button controls, no listeners needed here
     },
 
     // Cargar orden guardado de localStorage
