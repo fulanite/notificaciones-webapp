@@ -213,6 +213,8 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-lg);
     color: var(--text-primary);
+    font-size: 0.9rem;
+    /* Un poco más pequeño para móviles */
 }
 
 .filter-bar {
@@ -361,7 +363,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    /* Permitir que baje si no entra */
 }
 
 .view-mode-btns {
@@ -1215,7 +1219,8 @@
 }
 
 /* === Historial Ujier === */
-.filter-input-date {
+.filter-input-date,
+.filter-input-select {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-md);
@@ -1225,11 +1230,20 @@
     height: 42px;
     outline: none;
     transition: all 0.2s;
+    flex: 1;
+    min-width: 120px;
 }
 
-.filter-input-date:focus {
+.filter-input-date:focus,
+.filter-input-select:focus {
     border-color: var(--primary-500);
     background: rgba(255, 255, 255, 0.08);
+}
+
+.filter-group {
+    display: flex;
+    gap: var(--space-2);
+    width: 100%;
 }
 
 .historial-list {
@@ -1414,5 +1428,40 @@
     .usuarios-table th:nth-child(5),
     .usuarios-table td:nth-child(5) {
         display: none;
+    }
+
+    .view-toggle {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .search-bar {
+        min-width: 100%;
+    }
+
+    .filter-group {
+        flex-direction: column;
+    }
+
+    .filter-input-date,
+    .filter-input-select {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .view-toggle {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .view-mode-btns {
+        justify-content: center;
+    }
+
+    .btn-reorder-toggle {
+        width: 100%;
+        text-align: center;
     }
 }

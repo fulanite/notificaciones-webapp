@@ -74,20 +74,41 @@ const ujier = {
     setupHistoryFilters() {
         const searchInput = document.getElementById('search-historial');
         const dateInput = document.getElementById('filter-historial-fecha');
+        const statusSelect = document.getElementById('filter-historial-estado');
 
         searchInput?.addEventListener('input', () => this.filterHistory());
         dateInput?.addEventListener('change', () => this.filterHistory());
+        statusSelect?.addEventListener('change', () => this.filterHistory());
+    },
+
+    // Get normalized status for filtering and rendering
+    getNormalizedStatus(resultado) {
+        let status = (resultado || '').toLowerCase();
+        if (status.includes('no atiende')) return 'no_atiende';
+        if (status.includes('atiende')) return 'atiende';
+        if (status.includes('entregado')) return 'atiende';
+        if (status.includes('pre aviso')) return 'pre_aviso';
+        if (status === 'pendiente') return 'pre_aviso';
+        if (status.includes('estrados')) return 'estrados';
+        if (status.includes('inexistente')) return 'domicilio_inexistente';
+        if (status.includes('ausente')) return 'diligenciador_ausente';
+        return status.replace(/\s+/g, '_');
     },
 
     // Filter history local data
     filterHistory() {
         const query = document.getElementById('search-historial')?.value.toLowerCase() || '';
         const filterDate = document.getElementById('filter-historial-fecha')?.value || '';
+        const filterStatus = document.getElementById('filter-historial-estado')?.value || '';
 
         const filtered = this.historyData.filter(visit => {
             // Filter by date (YYYY-MM-DD)
             const visitDateStr = visit.fecha ? visit.fecha.split(' ')[0] : '';
             const matchesDate = !filterDate || visitDateStr === filterDate;
+
+            // Filter by status
+            const normalizedStatus = this.getNormalizedStatus(visit.resultado);
+            const matchesStatus = !filterStatus || normalizedStatus === filterStatus;
 
             // Filter by search query - expanded to all fields
             const searchTargets = [
@@ -103,7 +124,7 @@ const ujier = {
 
             const matchesSearch = !query || searchTargets.some(t => t.includes(query));
 
-            return matchesDate && matchesSearch;
+            return matchesDate && matchesStatus && matchesSearch;
         });
 
         this.renderHistory(filtered);
@@ -1077,15 +1098,7 @@ const ujier = {
         };
 
         listContainer.innerHTML = visits.map(visit => {
-            let status = (visit.resultado || '').toLowerCase();
-            if (status.includes('no atiende')) status = 'no_atiende';
-            else if (status.includes('atiende')) status = 'atiende';
-            else if (status.includes('entregado')) status = 'atiende';
-            else if (status.includes('pre aviso')) status = 'pre_aviso';
-            else if (status === 'pendiente') status = 'pre_aviso';
-            else if (status.includes('estrados')) status = 'estrados';
-            else if (status.includes('inexistente')) status = 'domicilio_inexistente';
-            else status = status.replace(/\s+/g, '_');
+            const status = this.getNormalizedStatus(visit.resultado);
 
             return `
                 <div class="assignment-card historial-card" onclick="ujier.openDiligencia('${visit.notificacion_id}')">

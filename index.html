@@ -28,12 +28,12 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/variables.css?v=14.0">
-    <link rel="stylesheet" href="css/base.css?v=14.0">
-    <link rel="stylesheet" href="css/components.css?v=14.0">
-    <link rel="stylesheet" href="css/layout.css?v=14.0">
-    <link rel="stylesheet" href="css/pages.css?v=14.0">
-    <link rel="stylesheet" href="css/animations.css?v=14.0">
+    <link rel="stylesheet" href="css/variables.css?v=15.0">
+    <link rel="stylesheet" href="css/base.css?v=15.0">
+    <link rel="stylesheet" href="css/components.css?v=15.0">
+    <link rel="stylesheet" href="css/layout.css?v=15.0">
+    <link rel="stylesheet" href="css/pages.css?v=15.0">
+    <link rel="stylesheet" href="css/animations.css?v=15.0">
 </head>
 
 <body>
@@ -887,6 +887,16 @@
                                     placeholder="Buscar por nombre, domicilio, expediente...">
                             </div>
                             <div class="filter-group">
+                                <select id="filter-historial-estado" class="filter-input-select"
+                                    title="Filtrar por estado">
+                                    <option value="">📊 Todos los estados</option>
+                                    <option value="atiende">✅ Atiende</option>
+                                    <option value="no_atiende">🏠 No Atiende</option>
+                                    <option value="pre_aviso">📝 Pre Aviso</option>
+                                    <option value="estrados">⚖️ Estrados</option>
+                                    <option value="domicilio_inexistente">❌ Inexistente</option>
+                                    <option value="diligenciador_ausente">🚶 Ausente</option>
+                                </select>
                                 <input type="date" id="filter-historial-fecha" class="filter-input-date"
                                     title="Filtrar por fecha de visita">
                             </div>
@@ -1266,19 +1276,19 @@
     </div>
 
     <!-- App Scripts -->
-    <script src="js/config.js?v=14.0"></script>
-    <script src="js/data.js?v=14.0"></script>
-    <script src="js/api-client.js?v=14.0"></script>
-    <script src="js/auth.js?v=14.0"></script>
-    <script src="js/utils.js?v=14.0"></script>
-    <script src="js/offline.js?v=14.0"></script>
-    <script src="js/notifications.js?v=14.0"></script>
-    <script src="js/ujier.js?v=14.0"></script>
-    <script src="js/dashboard.js?v=14.0"></script>
-    <script src="js/reports.js?v=14.0"></script>
-    <script src="js/asignaciones.js?v=14.0"></script>
-    <script src="js/usuarios.js?v=14.0"></script>
-    <script src="js/app.js?v=14.0"></script>
+    <script src="js/config.js?v=15.0"></script>
+    <script src="js/data.js?v=15.0"></script>
+    <script src="js/api-client.js?v=15.0"></script>
+    <script src="js/auth.js?v=15.0"></script>
+    <script src="js/utils.js?v=15.0"></script>
+    <script src="js/offline.js?v=15.0"></script>
+    <script src="js/notifications.js?v=15.0"></script>
+    <script src="js/ujier.js?v=15.0"></script>
+    <script src="js/dashboard.js?v=15.0"></script>
+    <script src="js/reports.js?v=15.0"></script>
+    <script src="js/asignaciones.js?v=15.0"></script>
+    <script src="js/usuarios.js?v=15.0"></script>
+    <script src="js/app.js?v=15.0"></script>
 
     <!-- Service Worker Registration -->
     <script>
