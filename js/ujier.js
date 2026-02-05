@@ -9,6 +9,7 @@ const ujier = {
     currentAssignment: null,
     mediaRecorder: null,
     audioChunks: [],
+    reorderMode: false, // Nuevo: modo reordenamiento desactivado por defecto
 
     // Initialize ujier view
     async init() {
@@ -50,6 +51,21 @@ const ujier = {
                 }
             });
         });
+
+        // Toggle reorder mode
+        document.getElementById('btn-reorder-toggle')?.addEventListener('click', () => {
+            this.toggleReorderMode();
+        });
+    },
+
+    toggleReorderMode() {
+        this.reorderMode = !this.reorderMode;
+        const btn = document.getElementById('btn-reorder-toggle');
+        if (btn) {
+            btn.innerHTML = this.reorderMode ? '✅ Listo' : '🔃 Reordenar';
+            btn.classList.toggle('active', this.reorderMode);
+        }
+        this.renderAssignments();
     },
 
     // Load user's assignments
@@ -104,20 +120,38 @@ const ujier = {
             return;
         }
 
-        listContainer.innerHTML = this.assignments.map((assignment, index) => `
-            <div class="assignment-card stagger-item" data-id="${assignment.id}" onclick="ujier.openDiligencia('${assignment.id}')">
-                <div class="assignment-number">${index + 1}</div>
+        listContainer.innerHTML = this.assignments.map((assignment, index) => {
+            const isSelected = this.selectedCardId === assignment.id;
+
+            return `
+            <div class="assignment-card stagger-item ${isSelected ? 'selected' : ''}" 
+                 data-id="${assignment.id}" 
+                 onclick="${this.reorderMode ? '' : `ujier.openDiligencia('${assignment.id}')`}">
+                
+                ${this.reorderMode ? `
+                <div class="reorder-controls-vertical" onclick="event.stopPropagation()">
+                    <button class="reorder-btn-mini" onclick="ujier.moveAssignment(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+                    <button class="reorder-btn-mini" onclick="ujier.moveAssignment(${index}, 1)" ${index === this.assignments.length - 1 ? 'disabled' : ''}>▼</button>
+                </div>
+                ` : `<div class="assignment-number">${index + 1}</div>`}
+
                 <div class="assignment-info">
                     <div class="assignment-header-row">
                         <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
                         ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
                     </div>
+                    ${assignment.caratula ? `<div class="assignment-caratula">📄 ${assignment.caratula}</div>` : ''}
                     <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || '-'}</strong></div>
                     <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
                 </div>
-                <div class="assignment-arrow">›</div>
+                
+                ${this.reorderMode ? '' : '<div class="assignment-arrow">›</div>'}
             </div>
-        `).join('');
+            `;
+        }).join('');
+
+        // Limpiar selección después de renderizar (opcional)
+        // this.selectedCardId = null;
     },
 
     // Move assignment in the list

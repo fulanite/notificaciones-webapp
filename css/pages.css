@@ -357,13 +357,39 @@
 }
 
 .view-toggle {
+    margin-bottom: var(--space-4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.view-mode-btns {
     display: flex;
     gap: var(--space-1);
-    margin-bottom: var(--space-6);
+    background: rgba(255, 255, 255, 0.05);
     padding: 4px;
-    background: var(--bg-card);
     border-radius: var(--radius-lg);
-    width: fit-content;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-reorder-toggle {
+    padding: var(--space-2) var(--space-4);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-reorder-toggle.active {
+    background: var(--primary-500);
+    color: white;
+    border-color: var(--primary-400);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
 }
 
 .toggle-btn {
@@ -447,6 +473,16 @@
     border-radius: var(--radius-full);
 }
 
+.assignment-caratula {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .assignment-recipient {
     font-size: 0.9rem;
     margin-bottom: var(--space-1);
@@ -522,6 +558,51 @@
     border-radius: var(--radius-md);
     color: var(--text-primary);
     text-align: center;
+}
+
+.assignment-arrow {
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    opacity: 0.5;
+}
+
+/* Reorder Controls Vertical */
+.reorder-controls-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-right: var(--space-2);
+}
+
+.reorder-btn-mini {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reorder-btn-mini:hover:not(:disabled) {
+    background: var(--primary-500);
+    color: white;
+}
+
+.reorder-btn-mini:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+.assignment-card.selected {
+    border-color: var(--primary-500);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+    background: rgba(59, 130, 246, 0.05);
 }
 
 /* === Diligencia Modal Specific === */
