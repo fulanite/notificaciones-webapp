@@ -31,13 +31,16 @@ try {
                 }
             } elseif (isset($_GET['asignado_a'])) {
                 // Get notifications assigned to a user
-                $estado = $_GET['estado'] ?? 'pendiente';
-                $stmt = $pdo->prepare("
-                    SELECT * FROM notificaciones 
-                    WHERE asignado_a = ? AND estado = ?
-                    ORDER BY fecha_carga ASC
-                ");
-                $stmt->execute([$_GET['asignado_a'], $estado]);
+                $estadosStr = $_GET['estado'] ?? 'pendiente';
+                $estadosArr = explode(',', $estadosStr);
+                $placeholders = implode(',', array_fill(0, count($estadosArr), '?'));
+
+                $sql = "SELECT * FROM notificaciones 
+                        WHERE asignado_a = ? AND estado IN ($placeholders)
+                        ORDER BY fecha_carga ASC";
+
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute(array_merge([$_GET['asignado_a']], $estadosArr));
                 Database::sendResponse($stmt->fetchAll());
             } else {
                 // Get all notifications with filters
@@ -188,9 +191,13 @@ try {
                         ]);
                         break;
 
-                    case 'result':
                         // Register result (diligencia)
-                        $newEstado = ($data['es_carga_diferida'] ?? false) ? 'diferida' : 'diligenciada';
+                        $newEstado = 'diligenciada';
+                        if ($data['es_carga_diferida'] ?? false) {
+                            $newEstado = 'diferida';
+                        } elseif (($data['resultado'] ?? '') === 'pre_aviso') {
+                            $newEstado = 'pre_aviso';
+                        }
 
                         $stmt = $pdo->prepare("
                             UPDATE notificaciones SET

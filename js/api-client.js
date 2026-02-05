@@ -171,7 +171,7 @@ const db = {
 
     async getMyAssignments(userId) {
         if (!apiClient) return { data: [], error: null };
-        return apiClient.get('notificaciones.php', { asignado_a: userId, estado: 'pendiente' });
+        return apiClient.get('notificaciones.php', { asignado_a: userId, estado: 'pendiente,pre_aviso' });
     },
 
     async createNotification(notificationData) {

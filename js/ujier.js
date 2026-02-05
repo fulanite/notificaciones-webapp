@@ -185,6 +185,8 @@ const ujier = {
         listContainer.innerHTML = this.assignments.map((assignment, index) => {
             const isSelected = this.selectedCardId === assignment.id;
 
+            const isPreAviso = assignment.estado === 'pre_aviso';
+
             return `
             <div class="assignment-card stagger-item ${isSelected ? 'selected' : ''}" 
                  data-id="${assignment.id}" 
@@ -195,7 +197,7 @@ const ujier = {
                     <button class="reorder-btn-mini" onclick="ujier.moveAssignment(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
                     <button class="reorder-btn-mini" onclick="ujier.moveAssignment(${index}, 1)" ${index === this.assignments.length - 1 ? 'disabled' : ''}>▼</button>
                 </div>
-                ` : `<div class="assignment-number">${index + 1}</div>`}
+                ` : `<div class="assignment-number ${isPreAviso ? 'is-pre-aviso' : ''}">${index + 1}</div>`}
 
                 <div class="assignment-info">
                     <div class="assignment-header-row">
