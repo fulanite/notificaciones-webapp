@@ -32,6 +32,7 @@ try {
                            n.destinatario_nombre, 
                            n.tipo_notificacion,
                            n.caratula,
+                           n.domicilio,
                            n.zona
                     FROM visitas v
                     LEFT JOIN notificaciones n ON v.notificacion_id = n.id

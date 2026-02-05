@@ -526,6 +526,8 @@
 
     .main-content {
         margin-left: 0;
+        width: 100%;
+        overflow-x: hidden;
     }
 
     .mobile-menu-toggle {
@@ -534,6 +536,8 @@
 
     .content-area {
         padding: var(--space-4);
+        width: 100%;
+        overflow-x: hidden;
     }
 }
 

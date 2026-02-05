@@ -322,12 +322,17 @@
     color: var(--text-muted);
 }
 
-/* === Ujier View === */
+/* Header de ujier más compacto */
 .ujier-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-4);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-md);
 }
 
 .date-info {
@@ -349,8 +354,16 @@
 
 .route-stat .stat-number {
     display: block;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
+    line-height: 1.2;
+}
+
+.route-stat .stat-text {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
 }
 
 .route-stat .stat-text {
@@ -370,11 +383,25 @@
 
 .view-mode-btns {
     display: flex;
-    gap: var(--space-1);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 4px;
+    background: rgba(49, 130, 206, 0.05);
+    padding: 2px;
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(49, 130, 206, 0.1);
+}
+
+.toggle-btn {
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.toggle-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-reorder-toggle {
@@ -968,6 +995,15 @@
 
     .ujier-header {
         flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: var(--space-4);
+        gap: var(--space-3);
+    }
+
+    .route-stats {
+        width: 100%;
+        justify-content: center;
         gap: var(--space-4);
     }
 }
@@ -1381,6 +1417,35 @@
 
 .visita-item-mini:last-child {
     border-bottom: none;
+}
+
+.visita-adjuntos-mini {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+.visita-foto-mini {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.visita-foto-mini img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.visita-gps-link {
+    font-size: 0.75rem;
+    color: var(--primary-400);
+    text-decoration: underline;
+    font-weight: 500;
 }
 
 .visita-meta {

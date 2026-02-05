@@ -486,6 +486,18 @@ const ujier = {
                     <span class="visita-resultado-mini resultado-${v.resultado}">${(v.resultado || '').replace(/_/g, ' ').toUpperCase()}</span>
                 </div>
                 ${v.observaciones ? `<p class="visita-obs-mini">📝 ${v.observaciones}</p>` : ''}
+                <div class="visita-adjuntos-mini">
+                    ${v.foto_url ? `
+                    <div class="visita-foto-mini" onclick="window.open('${v.foto_url}', '_blank')">
+                        <img src="${v.foto_url}" alt="Foto visita" loading="lazy">
+                    </div>
+                    ` : ''}
+                    ${(v.lat && v.lng) ? `
+                    <a href="https://www.google.com/maps?q=${v.lat},${v.lng}" target="_blank" class="visita-gps-link">
+                        📍 Ver Ubicación
+                    </a>
+                    ` : ''}
+                </div>
             </div>
         `).join('');
     },
