@@ -387,13 +387,12 @@
 
 .assignment-card {
     display: flex;
-    align-items: flex-start;
-    gap: var(--space-3);
-    padding: var(--space-4);
+    flex-direction: column;
+    gap: 0;
+    padding: var(--space-3);
     background: var(--bg-card);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-lg);
-    cursor: pointer;
     transition: var(--transition-fast);
 }
 
@@ -417,14 +416,14 @@
 }
 
 .assignment-number {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--gradient-primary);
     border-radius: var(--radius-md);
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 700;
     flex-shrink: 0;
 }
@@ -437,15 +436,15 @@
 .assignment-header-row {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2);
+    gap: var(--space-1);
     align-items: center;
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-1);
 }
 
 .assignment-type {
     display: inline-block;
-    padding: 2px 10px;
-    font-size: 0.75rem;
+    padding: 2px 8px;
+    font-size: 0.7rem;
     background: rgba(59, 130, 246, 0.15);
     color: var(--primary-400);
     border-radius: var(--radius-full);
@@ -453,37 +452,27 @@
 }
 
 .assignment-zona {
-    font-size: 0.7rem;
-    padding: 2px 8px;
+    font-size: 0.65rem;
+    padding: 2px 6px;
     background: rgba(139, 92, 246, 0.15);
     color: #a78bfa;
     border-radius: var(--radius-full);
 }
 
-.assignment-expediente {
+.assignment-recipient {
     font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: var(--space-1);
-}
-
-.assignment-caratula {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    font-style: italic;
-    margin-bottom: var(--space-2);
-    max-height: 40px;
+    margin-bottom: 2px;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.assignment-recipient {
-    font-size: 0.95rem;
-    margin-bottom: var(--space-1);
-}
-
 .assignment-address {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .assignment-action {
@@ -502,26 +491,26 @@
     transform: translateX(4px);
 }
 
-/* Reorder Controls */
-.assignment-reorder-controls {
+/* Reorder Bar - Nueva ubicación horizontal inferior */
+.assignment-reorder-bar {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-    padding-right: var(--space-3);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    margin-right: var(--space-3);
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-top: var(--space-3);
+    margin-top: var(--space-3);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .reorder-btn {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--text-muted);
-    border-radius: var(--radius-sm);
-    width: 32px;
-    height: 28px;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: var(--space-1);
     font-size: 0.75rem;
     transition: all 0.2s;
     cursor: pointer;
@@ -534,14 +523,32 @@
 }
 
 .reorder-btn:disabled {
-    opacity: 0.2;
+    opacity: 0.25;
     cursor: not-allowed;
+}
+
+.reorder-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.reorder-position {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Tarjeta seleccionada */
+.assignment-card.selected {
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3), var(--shadow-glow);
+    background: rgba(59, 130, 246, 0.05);
 }
 
 .assignment-main-content {
     flex: 1;
     display: flex;
     align-items: center;
+    gap: var(--space-3);
     cursor: pointer;
 }
 

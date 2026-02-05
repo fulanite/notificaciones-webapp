@@ -272,6 +272,19 @@ const app = {
             document.getElementById('sidebar')?.classList.toggle('open');
         });
 
+        // Cerrar sidebar al hacer clic fuera (en el overlay)
+        document.addEventListener('click', (e) => {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('mobile-menu-toggle');
+
+            if (sidebar?.classList.contains('open') &&
+                window.innerWidth <= 1024 &&
+                !sidebar.contains(e.target) &&
+                !menuToggle?.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
         // Sidebar navigation
         document.querySelectorAll('.nav-link[data-view]').forEach(link => {
             link.addEventListener('click', (e) => {

@@ -1183,3 +1183,170 @@
 [data-theme="light"] .searchable-select-item.highlighted {
     background: var(--primary-500);
 }
+
+/* ========================================
+   MEJORAS UX MOBILE - Mi Ruta y Modal
+   ======================================== */
+
+/* Reducir gap en lista de asignaciones para móvil */
+@media (max-width: 768px) {
+    .assignments-list {
+        gap: var(--space-3);
+    }
+
+    .assignment-card {
+        padding: var(--space-3);
+    }
+
+    .assignment-reorder-bar {
+        padding-top: var(--space-2);
+        margin-top: var(--space-2);
+    }
+
+    .reorder-btn {
+        padding: var(--space-2);
+        font-size: 0.7rem;
+    }
+
+    /* Modal mejorado para móvil */
+    .modal-body .form-section {
+        padding: var(--space-3);
+        margin-bottom: var(--space-3);
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: var(--radius-md);
+    }
+
+    .modal-body .section-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: var(--space-2);
+    }
+
+    /* Botón GPS más destacado */
+    .btn-gps {
+        width: 100%;
+        padding: var(--space-4);
+        font-size: 1rem;
+        justify-content: center;
+    }
+
+    .gps-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        padding: var(--space-3);
+        background: rgba(34, 197, 94, 0.15);
+        border-radius: var(--radius-md);
+        color: #22c55e;
+        font-weight: 500;
+    }
+
+    /* Resumen de notificación en modal */
+    .notif-summary-card {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: var(--radius-md);
+        padding: var(--space-3);
+        margin-bottom: var(--space-4);
+    }
+
+    .summary-header {
+        display: flex;
+        gap: var(--space-2);
+        margin-bottom: var(--space-3);
+        flex-wrap: wrap;
+    }
+
+    .summary-tipo {
+        padding: var(--space-1) var(--space-3);
+        background: var(--gradient-primary);
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .summary-zona {
+        padding: var(--space-1) var(--space-2);
+        background: rgba(139, 92, 246, 0.2);
+        color: #a78bfa;
+        border-radius: var(--radius-full);
+        font-size: 0.7rem;
+    }
+
+    .summary-body {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .summary-row {
+        display: flex;
+        gap: var(--space-2);
+        font-size: 0.85rem;
+    }
+
+    .summary-label {
+        color: var(--text-muted);
+        flex-shrink: 0;
+    }
+
+    .summary-value {
+        flex: 1;
+        word-break: break-word;
+    }
+
+    /* Select de resultado más grande */
+    #resultado-diligencia {
+        min-height: 52px;
+        font-size: 1rem;
+    }
+
+    /* Botones de acción más grandes */
+    .modal-actions .btn {
+        padding: var(--space-4);
+        font-size: 1rem;
+    }
+}
+
+/* Header de ujier más compacto */
+.ujier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+    gap: var(--space-3);
+}
+
+.date-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.route-stats {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.route-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.route-stat .stat-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.route-stat .stat-text {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}

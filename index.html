@@ -1152,32 +1152,15 @@
                         <div class="form-section">
                             <h4 class="section-subtitle">📍 Ubicación GPS</h4>
                             <div class="gps-container" id="gps-container">
-                                <button type="button" class="btn btn-secondary" id="btn-capture-gps">
+                                <button type="button" class="btn btn-secondary btn-gps" id="btn-capture-gps">
                                     <span>📍</span> Capturar Ubicación
                                 </button>
                                 <div class="gps-info hidden" id="gps-info">
-                                    <span class="gps-coords" id="gps-coords"></span>
-                                    <span class="gps-status">✅ Capturada</span>
-                                </div>
-                            </div>
-                            <!-- Mapa para ajustar ubicación -->
-                            <div id="gps-map-container" class="gps-map-container hidden">
-                                <div class="gps-map-header">
-                                    <span>🎯 Ajustá el pin para mayor precisión</span>
-                                    <span class="gps-map-hint">(máx. 150m del punto GPS)</span>
-                                </div>
-                                <div id="gps-map" class="gps-map"></div>
-                                <div class="gps-map-footer">
-                                    <button type="button" class="btn btn-sm btn-secondary" id="btn-reset-gps">
-                                        🔄 Volver a mi ubicación
-                                    </button>
-                                    <span id="gps-distance" class="gps-distance"></span>
+                                    <span class="gps-status">✅ Ubicación capturada</span>
                                 </div>
                             </div>
                             <input type="hidden" id="ubicacion-lat">
                             <input type="hidden" id="ubicacion-lng">
-                            <input type="hidden" id="ubicacion-original-lat">
-                            <input type="hidden" id="ubicacion-original-lng">
                         </div>
 
                         <div class="form-section">
@@ -1247,19 +1230,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
 
     <!-- App Scripts -->
-    <script src="js/config.js?v=7.0"></script>
-    <script src="js/data.js?v=7.0"></script>
-    <script src="js/api-client.js?v=7.0"></script>
-    <script src="js/auth.js?v=7.0"></script>
-    <script src="js/utils.js?v=7.0"></script>
-    <script src="js/offline.js?v=7.0"></script>
-    <script src="js/notifications.js?v=7.0"></script>
-    <script src="js/ujier.js?v=7.1"></script>
-    <script src="js/dashboard.js?v=7.0"></script>
-    <script src="js/reports.js?v=7.0"></script>
-    <script src="js/asignaciones.js?v=7.0"></script>
-    <script src="js/usuarios.js?v=7.0"></script>
-    <script src="js/app.js?v=7.0"></script>
+    <script src="js/config.js?v=8.0"></script>
+    <script src="js/data.js?v=8.0"></script>
+    <script src="js/api-client.js?v=8.0"></script>
+    <script src="js/auth.js?v=8.0"></script>
+    <script src="js/utils.js?v=8.0"></script>
+    <script src="js/offline.js?v=8.0"></script>
+    <script src="js/notifications.js?v=8.0"></script>
+    <script src="js/ujier.js?v=8.0"></script>
+    <script src="js/dashboard.js?v=8.0"></script>
+    <script src="js/reports.js?v=8.0"></script>
+    <script src="js/asignaciones.js?v=8.0"></script>
+    <script src="js/usuarios.js?v=8.0"></script>
+    <script src="js/app.js?v=8.0"></script>
 
     <!-- Service Worker Registration -->
     <script>

@@ -5,6 +5,7 @@
 const ujier = {
     assignments: [],
     savedOrder: [],
+    selectedCardId: null,
     currentAssignment: null,
     mediaRecorder: null,
     audioChunks: [],
@@ -104,11 +105,7 @@ const ujier = {
         }
 
         listContainer.innerHTML = this.assignments.map((assignment, index) => `
-            <div class="assignment-card stagger-item" data-id="${assignment.id}">
-                <div class="assignment-reorder-controls">
-                    <button class="reorder-btn up" onclick="ujier.moveAssignment(${index}, -1)" ${index === 0 ? 'disabled' : ''} title="Subir">▲</button>
-                    <button class="reorder-btn down" onclick="ujier.moveAssignment(${index}, 1)" ${index === this.assignments.length - 1 ? 'disabled' : ''} title="Bajar">▼</button>
-                </div>
+            <div class="assignment-card stagger-item ${this.selectedCardId === assignment.id ? 'selected' : ''}" data-id="${assignment.id}">
                 <div class="assignment-main-content" onclick="ujier.openDiligencia('${assignment.id}')">
                     <div class="assignment-number">${index + 1}</div>
                     <div class="assignment-info">
@@ -116,14 +113,21 @@ const ujier = {
                             <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
                             ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
                         </div>
-                        <div class="assignment-expediente">📋 ${assignment.n_expediente || '-'}</div>
-                        ${assignment.caratula ? `<div class="assignment-caratula">${assignment.caratula}</div>` : ''}
                         <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || '-'}</strong></div>
                         <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
                     </div>
+                    <div class="assignment-action">
+                        <span class="assignment-arrow">→</span>
+                    </div>
                 </div>
-                <div class="assignment-action" onclick="ujier.openDiligencia('${assignment.id}')">
-                    <span class="assignment-arrow">→</span>
+                <div class="assignment-reorder-bar">
+                    <button class="reorder-btn" onclick="event.stopPropagation(); ujier.moveAssignment(${index}, -1)" ${index === 0 ? 'disabled' : ''} title="Subir">
+                        <span>▲</span> Subir
+                    </button>
+                    <span class="reorder-position">${index + 1} de ${this.assignments.length}</span>
+                    <button class="reorder-btn" onclick="event.stopPropagation(); ujier.moveAssignment(${index}, 1)" ${index === this.assignments.length - 1 ? 'disabled' : ''} title="Bajar">
+                        Bajar <span>▼</span>
+                    </button>
                 </div>
             </div>
         `).join('');
@@ -134,6 +138,9 @@ const ujier = {
         const newIndex = index + direction;
         if (newIndex < 0 || newIndex >= this.assignments.length) return;
 
+        // Guardar ID de la tarjeta que estamos moviendo para resaltarla
+        this.selectedCardId = this.assignments[index].id;
+
         // Swapping elements
         const temp = this.assignments[index];
         this.assignments[index] = this.assignments[newIndex];
@@ -142,6 +149,12 @@ const ujier = {
         // Re-render and save
         this.renderAssignments();
         this.saveOrder();
+
+        // Scroll a la tarjeta seleccionada
+        setTimeout(() => {
+            const selectedCard = document.querySelector(`.assignment-card[data-id="${this.selectedCardId}"]`);
+            selectedCard?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
     },
 
     // Setup (keeping for compatibility, but simplified)
@@ -340,6 +353,12 @@ const ujier = {
         // Show modal
         modal?.classList.remove('hidden');
         modal?.classList.add('show');
+
+        // Scroll al inicio del modal
+        const modalBody = modal?.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.scrollTop = 0;
+        }
     },
 
     // Close diligencia modal
@@ -455,8 +474,6 @@ const ujier = {
     async captureGPS() {
         const btn = document.getElementById('btn-capture-gps');
         const gpsInfo = document.getElementById('gps-info');
-        const coordsEl = document.getElementById('gps-coords');
-        const mapContainer = document.getElementById('gps-map-container');
 
         btn.disabled = true;
         btn.innerHTML = '<div class="btn-spinner"></div> Obteniendo...';
@@ -464,34 +481,23 @@ const ujier = {
         try {
             const position = await utils.getGPSPosition();
 
-            // Guardar posición original
-            this.originalPosition = { lat: position.lat, lng: position.lng };
-            document.getElementById('ubicacion-original-lat').value = position.lat;
-            document.getElementById('ubicacion-original-lng').value = position.lng;
-
-            // Establecer posición actual (inicialmente igual a la original)
+            // Establecer posición
             document.getElementById('ubicacion-lat').value = position.lat;
             document.getElementById('ubicacion-lng').value = position.lng;
 
-            if (coordsEl) {
-                coordsEl.innerHTML = `<span>LAT: ${position.lat.toFixed(6)}</span><span>LNG: ${position.lng.toFixed(6)}</span>`;
-            }
+            // Mostrar confirmación
             gpsInfo?.classList.remove('hidden');
+            btn.classList.add('hidden');
 
-            // Mostrar mapa
-            mapContainer?.classList.remove('hidden');
-            this.initGPSMap(position.lat, position.lng);
-
-            utils.showToast('Ubicación capturada. Podés ajustar el pin si es necesario.', 'success');
+            utils.showToast('Ubicación capturada correctamente', 'success');
         } catch (error) {
             utils.showToast(error.message, 'error');
-        } finally {
             btn.disabled = false;
             btn.innerHTML = '<span>📍</span> Capturar Ubicación';
         }
     },
 
-    // Inicializar mapa GPS con pin arrastrable
+    // Inicializar mapa GPS con pin arrastrable (mantenido por compatibilidad)
     initGPSMap(lat, lng) {
         const mapElement = document.getElementById('gps-map');
         if (!mapElement) return;
