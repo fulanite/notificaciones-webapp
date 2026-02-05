@@ -194,10 +194,15 @@
     top: 0;
     width: var(--sidebar-width);
     height: 100vh;
+    height: 100dvh;
+    /* Dynamic viewport height para móviles */
     display: flex;
     flex-direction: column;
     z-index: 300;
     transition: transform 0.3s ease;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .sidebar-header {
@@ -477,6 +482,8 @@
     .sidebar {
         transform: translateX(-100%);
         z-index: 1001;
+        width: min(280px, 85vw);
+        background: var(--bg-darker);
     }
 
     .sidebar.open {
@@ -484,15 +491,37 @@
     }
 
     /* Overlay cuando el sidebar está abierto */
-    .sidebar.open::before {
+    .sidebar.open::after {
         content: '';
         position: fixed;
         top: 0;
-        left: 280px;
-        right: 0;
-        bottom: 0;
+        left: 100%;
+        width: 100vw;
+        height: 100vh;
         background: rgba(0, 0, 0, 0.5);
-        z-index: -1;
+    }
+
+    /* Reducir padding en móvil */
+    .sidebar-header {
+        padding: var(--space-4);
+    }
+
+    .sidebar-user {
+        padding: var(--space-3) var(--space-4);
+        margin: var(--space-2) var(--space-3) 0;
+    }
+
+    .sidebar-nav {
+        padding: var(--space-3);
+    }
+
+    .nav-link {
+        padding: var(--space-3);
+    }
+
+    .sidebar-footer {
+        padding: var(--space-3) var(--space-4);
+        padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
     }
 
     .main-content {
@@ -515,9 +544,5 @@
 
     .header-title h1 {
         font-size: 1.25rem;
-    }
-
-    .sidebar.open::before {
-        left: 260px;
     }
 }
