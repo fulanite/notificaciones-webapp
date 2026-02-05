@@ -402,12 +402,13 @@ const ujier = {
 
         // Reset GPS
         document.getElementById('gps-info')?.classList.add('hidden');
-        document.getElementById('ubicacion-lat').value = '';
-        document.getElementById('ubicacion-lng').value = '';
-        document.getElementById('ubicacion-original-lat').value = '';
-        document.getElementById('ubicacion-original-lng').value = '';
+        document.getElementById('btn-capture-gps')?.classList.remove('hidden');
+        const ubicacionLat = document.getElementById('ubicacion-lat');
+        const ubicacionLng = document.getElementById('ubicacion-lng');
+        if (ubicacionLat) ubicacionLat.value = '';
+        if (ubicacionLng) ubicacionLng.value = '';
 
-        // Reset mapa GPS
+        // Reset mapa GPS (si existe)
         document.getElementById('gps-map-container')?.classList.add('hidden');
         if (this.gpsMap) {
             this.gpsMap.remove();
