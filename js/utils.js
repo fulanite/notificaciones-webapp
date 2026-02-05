@@ -207,6 +207,24 @@ const utils = {
         });
     },
 
+    // Show global loading overlay
+    showLoading(text = 'Cargando...') {
+        const overlay = document.getElementById('global-loading');
+        const textEl = document.getElementById('loading-text');
+        if (overlay) {
+            if (textEl) textEl.textContent = text;
+            overlay.classList.add('active');
+        }
+    },
+
+    // Hide global loading overlay
+    hideLoading() {
+        const overlay = document.getElementById('global-loading');
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+    },
+
     // Show toast notification
     showToast(message, type = 'info', duration = 4000) {
         const container = document.getElementById('toast-container');
