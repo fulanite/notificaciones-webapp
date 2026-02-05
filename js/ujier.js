@@ -399,18 +399,27 @@ const ujier = {
         const form = document.getElementById('form-diligenciar');
         form?.reset();
 
-        // Reset GPS
-        document.getElementById('gps-info')?.classList.add('hidden');
-        document.getElementById('btn-capture-gps')?.classList.remove('hidden');
+        // Reset GPS safety checks
+        const gpsInfo = document.getElementById('gps-info');
+        const btnCapture = document.getElementById('btn-capture-gps');
         const ubicacionLat = document.getElementById('ubicacion-lat');
         const ubicacionLng = document.getElementById('ubicacion-lng');
+
+        if (gpsInfo) gpsInfo.classList.add('hidden');
+        if (btnCapture) btnCapture.classList.remove('hidden');
         if (ubicacionLat) ubicacionLat.value = '';
         if (ubicacionLng) ubicacionLng.value = '';
 
         // Reset mapa GPS (si existe)
-        document.getElementById('gps-map-container')?.classList.add('hidden');
+        const mapContainer = document.getElementById('gps-map-container');
+        if (mapContainer) mapContainer.classList.add('hidden');
+
         if (this.gpsMap) {
-            this.gpsMap.remove();
+            try {
+                this.gpsMap.remove();
+            } catch (e) {
+                console.log('Error removing map:', e);
+            }
             this.gpsMap = null;
             this.gpsMarker = null;
             this.gpsCircle = null;
@@ -418,8 +427,10 @@ const ujier = {
         this.originalPosition = null;
 
         // Reset photo
-        document.getElementById('photo-preview')?.classList.add('hidden');
-        document.getElementById('preview-img').src = '';
+        const photoPreview = document.getElementById('photo-preview');
+        const previewImg = document.getElementById('preview-img');
+        if (photoPreview) photoPreview.classList.add('hidden');
+        if (previewImg) previewImg.src = '';
 
         // Reset audio
         document.getElementById('audio-playback')?.classList.add('hidden');

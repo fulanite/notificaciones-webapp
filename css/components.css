@@ -431,7 +431,8 @@
 .modal {
     position: fixed;
     inset: 0;
-    z-index: 1000;
+    z-index: 11000;
+    /* Por encima del bottom nav (9999) */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -458,6 +459,7 @@
     overflow-y: auto;
     background: var(--bg-card);
     border-radius: var(--radius-xl);
+    padding-bottom: env(safe-area-inset-bottom);
     box-shadow: var(--shadow-xl);
     z-index: 1;
 }
