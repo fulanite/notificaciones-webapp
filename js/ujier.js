@@ -9,12 +9,14 @@ const ujier = {
     currentAssignment: null,
     mediaRecorder: null,
     audioChunks: [],
-    reorderMode: false, // Nuevo: modo reordenamiento desactivado por defecto
+    reorderMode: false,
+    historyData: [], // Almacenar historial completo para filtrado local
 
     // Initialize ujier view
     async init() {
         this.updateDateDisplay();
         this.setupViewToggle();
+        this.setupHistoryFilters();
         this.loadSavedOrder(); // Cargar orden antes de las asignaciones
         await this.loadAssignments();
         this.setupDiligenciaForm();
@@ -66,6 +68,45 @@ const ujier = {
             btn.classList.toggle('active', this.reorderMode);
         }
         this.renderAssignments();
+    },
+
+    // Setup history filters
+    setupHistoryFilters() {
+        const searchInput = document.getElementById('search-historial');
+        const dateInput = document.getElementById('filter-historial-fecha');
+
+        searchInput?.addEventListener('input', () => this.filterHistory());
+        dateInput?.addEventListener('change', () => this.filterHistory());
+    },
+
+    // Filter history local data
+    filterHistory() {
+        const query = document.getElementById('search-historial')?.value.toLowerCase() || '';
+        const filterDate = document.getElementById('filter-historial-fecha')?.value || '';
+
+        const filtered = this.historyData.filter(visit => {
+            // Filter by date (YYYY-MM-DD)
+            const visitDateStr = visit.fecha ? visit.fecha.split(' ')[0] : '';
+            const matchesDate = !filterDate || visitDateStr === filterDate;
+
+            // Filter by search query - expanded to all fields
+            const searchTargets = [
+                visit.destinatario_nombre,
+                visit.domicilio,
+                visit.tipo_notificacion,
+                visit.resultado,
+                visit.caratula,
+                visit.n_expediente,
+                visit.zona,
+                visit.observaciones
+            ].map(v => (v || '').toLowerCase());
+
+            const matchesSearch = !query || searchTargets.some(t => t.includes(query));
+
+            return matchesDate && matchesSearch;
+        });
+
+        this.renderHistory(filtered);
     },
 
     // Load user's assignments
@@ -1006,7 +1047,8 @@ const ujier = {
             return;
         }
 
-        this.renderHistory(data || []);
+        this.historyData = data || [];
+        this.filterHistory(); // Renderizar aplicando filtros actuales
     },
 
     // Render history list

@@ -1215,6 +1215,23 @@
 }
 
 /* === Historial Ujier === */
+.filter-input-date {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    height: 42px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.filter-input-date:focus {
+    border-color: var(--primary-500);
+    background: rgba(255, 255, 255, 0.08);
+}
+
 .historial-list {
     display: flex;
     flex-direction: column;
