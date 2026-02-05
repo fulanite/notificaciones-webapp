@@ -264,8 +264,20 @@ const ujier = {
 
     // Open diligencia modal
     async openDiligencia(id) {
-        const assignment = this.assignments.find(a => a.id === id);
-        if (!assignment) return;
+        let assignment = this.assignments.find(a => a.id === id);
+
+        if (!assignment) {
+            // Check if it's cached in history? Or just fetch it
+            utils.showLoading('Cargando datos...');
+            const { data, error } = await db.getNotificationById(id);
+            utils.hideLoading();
+
+            if (error || !data) {
+                utils.showToast('No se encontró la notificación', 'error');
+                return;
+            }
+            assignment = data;
+        }
 
         this.currentAssignment = assignment;
 
@@ -929,10 +941,7 @@ const ujier = {
 
     // Load work history
     async loadHistory() {
-        if (!auth.currentUser) {
-            console.error('❌ No hay usuario autenticado para cargar historial');
-            return;
-        }
+        if (!auth.currentUser) return;
 
         const listContainer = document.getElementById('historial-list');
         if (!listContainer) return;
@@ -944,14 +953,11 @@ const ujier = {
             </div>
         `;
 
+        // Obtener visitas recientes del usuario
         const { data, error } = await db.getUserVisits(auth.currentUser.id);
 
         if (error) {
-            listContainer.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: var(--error);">
-                    Error al cargar historial: ${error}
-                </div>
-            `;
+            listContainer.innerHTML = `<div class="error-msg">Error al cargar historial: ${error}</div>`;
             return;
         }
 
@@ -965,10 +971,10 @@ const ujier = {
 
         if (visits.length === 0) {
             listContainer.innerHTML = `
-                <div style="text-align: center; padding: 60px;">
-                    <div style="font-size: 4rem; margin-bottom: 16px;">📋</div>
-                    <h3 style="margin-bottom: 8px;">Sin actividad reciente</h3>
-                    <p style="color: var(--text-muted);">Aún no has registrado ninguna diligencia.</p>
+                <div class="empty-state">
+                    <div class="empty-icon">📂</div>
+                    <h3>Sin actividad reciente</h3>
+                    <p>Las diligencias que realices aparecerán aquí.</p>
                 </div>
             `;
             return;
@@ -984,39 +990,32 @@ const ujier = {
         };
 
         listContainer.innerHTML = visits.map(visit => {
-            // Normalizar resultado para iconos y clases CSS
             let status = (visit.resultado || '').toLowerCase();
             if (status.includes('no atiende')) status = 'no_atiende';
             else if (status.includes('atiende')) status = 'atiende';
             else if (status.includes('entregado')) status = 'atiende';
-            else if (status.includes('pre aviso') || status === 'pendiente') status = 'pre_aviso';
+            else if (status.includes('pre aviso')) status = 'pre_aviso';
+            else if (status === 'pendiente') status = 'pre_aviso';
             else if (status.includes('estrados')) status = 'estrados';
             else if (status.includes('inexistente')) status = 'domicilio_inexistente';
             else status = status.replace(/\s+/g, '_');
 
             return `
-                <div class="assignment-card historial-card">
-                    <div class="historial-icon">
-                        ${statusIcons[status] || '📄'}
-                    </div>
+                <div class="assignment-card historial-card" onclick="ujier.openDiligencia('${visit.notificacion_id}')">
+                    <div class="historial-icon">${statusIcons[status] || '📄'}</div>
                     <div class="assignment-info">
                         <div class="historial-header">
-                            <span class="assignment-type">${visit.tipo_notificacion || 'Cédula'}</span>
+                            <span class="assignment-type">${visit.tipo_notificacion || 'Notificación'}</span>
                             <span class="historial-fecha">${utils.formatDateTime(visit.fecha)}</span>
                         </div>
-                        <div class="historial-expediente">📋 ${visit.n_expediente || 'S/N'}</div>
-                        <div class="assignment-recipient">👤 ${visit.destinatario_nombre || 'N/A'}</div>
-                        <div class="historial-resultado">
-                            <span class="resultado-badge resultado-${status}">${(visit.resultado || '').toUpperCase()}</span>
+                        <div class="assignment-recipient">👤 <strong>${visit.destinatario_nombre || '-'}</strong></div>
+                        <div class="assignment-address">🏠 ${visit.domicilio || '-'}</div>
+                        <div class="historial-footer">
+                            <span class="resultado-badge resultado-${status}">${(visit.resultado || 'PENDIENTE').toUpperCase()}</span>
                             ${visit.zona ? `<span class="historial-zona">${visit.zona}</span>` : ''}
                         </div>
-                        ${visit.observaciones ? `<p class="historial-obs">📝 ${visit.observaciones}</p>` : ''}
                     </div>
-                    ${visit.foto_url ? `
-                        <div class="historial-foto" onclick="window.open('${visit.foto_url}', '_blank')">
-                            <img src="${visit.foto_url}" alt="Evidencia">
-                        </div>
-                    ` : ''}
+                    <div class="assignment-arrow">›</div>
                 </div>
             `;
         }).join('');
