@@ -105,30 +105,17 @@ const ujier = {
         }
 
         listContainer.innerHTML = this.assignments.map((assignment, index) => `
-            <div class="assignment-card stagger-item ${this.selectedCardId === assignment.id ? 'selected' : ''}" data-id="${assignment.id}">
-                <div class="assignment-main-content" onclick="ujier.openDiligencia('${assignment.id}')">
-                    <div class="assignment-number">${index + 1}</div>
-                    <div class="assignment-info">
-                        <div class="assignment-header-row">
-                            <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
-                            ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
-                        </div>
-                        <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || '-'}</strong></div>
-                        <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
+            <div class="assignment-card stagger-item" data-id="${assignment.id}" onclick="ujier.openDiligencia('${assignment.id}')">
+                <div class="assignment-number">${index + 1}</div>
+                <div class="assignment-info">
+                    <div class="assignment-header-row">
+                        <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
+                        ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
                     </div>
-                    <div class="assignment-action">
-                        <span class="assignment-arrow">→</span>
-                    </div>
+                    <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || '-'}</strong></div>
+                    <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
                 </div>
-                <div class="assignment-reorder-bar">
-                    <button class="reorder-btn" onclick="event.stopPropagation(); ujier.moveAssignment(${index}, -1)" ${index === 0 ? 'disabled' : ''} title="Subir">
-                        <span>▲</span> Subir
-                    </button>
-                    <span class="reorder-position">${index + 1} de ${this.assignments.length}</span>
-                    <button class="reorder-btn" onclick="event.stopPropagation(); ujier.moveAssignment(${index}, 1)" ${index === this.assignments.length - 1 ? 'disabled' : ''} title="Bajar">
-                        Bajar <span>▼</span>
-                    </button>
-                </div>
+                <div class="assignment-arrow">›</div>
             </div>
         `).join('');
     },

@@ -303,6 +303,23 @@ const app = {
             });
         });
 
+        // Bottom tab bar navigation (móvil)
+        document.querySelectorAll('.bottom-nav-item[data-view]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const view = btn.dataset.view;
+                console.log('📱 Bottom nav a:', view);
+
+                // Actualizar estado activo
+                document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                this.navigateTo(view);
+            });
+        });
+
+        // Logout móvil
+        document.getElementById('btn-logout-mobile')?.addEventListener('click', () => this.handleLogout());
+
         // Sync button
         document.getElementById('btn-sync')?.addEventListener('click', async () => {
             if (offline.getPendingCount() > 0) {

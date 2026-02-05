@@ -546,3 +546,71 @@
         font-size: 1.25rem;
     }
 }
+
+/* === Barra de navegación inferior (móvil) === */
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-darker);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: var(--space-2) var(--space-3);
+    padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom));
+    z-index: 1000;
+}
+
+@media (max-width: 1024px) {
+    .mobile-bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    /* Ocultar hamburguesa ya que tenemos bottom nav */
+    .mobile-menu-toggle {
+        display: none !important;
+    }
+
+    /* Agregar padding inferior al contenido para que no quede tapado */
+    .content-area {
+        padding-bottom: calc(80px + env(safe-area-inset-bottom));
+    }
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: var(--space-2) var(--space-3);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+    min-width: 60px;
+}
+
+.bottom-nav-item .nav-icon {
+    font-size: 1.25rem;
+}
+
+.bottom-nav-item .nav-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+}
+
+.bottom-nav-item.active {
+    color: var(--primary-400);
+}
+
+.bottom-nav-item.active .nav-icon {
+    transform: scale(1.1);
+}
+
+.bottom-nav-item:active {
+    transform: scale(0.95);
+}
