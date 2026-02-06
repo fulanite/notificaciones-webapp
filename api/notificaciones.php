@@ -80,11 +80,24 @@ try {
 
                 if (!empty($_GET['search'])) {
                     $search = "%" . $_GET['search'] . "%";
-                    $where[] = "(n.n_expediente LIKE ? OR n.destinatario_nombre LIKE ? OR n.caratula LIKE ? OR n.origen LIKE ?)";
-                    $params[] = $search;
-                    $params[] = $search;
-                    $params[] = $search;
-                    $params[] = $search;
+                    $where[] = "(
+                        n.n_expediente LIKE ? OR 
+                        n.destinatario_nombre LIKE ? OR 
+                        n.caratula LIKE ? OR 
+                        n.origen LIKE ? OR 
+                        n.letrado LIKE ? OR 
+                        n.domicilio LIKE ? OR 
+                        n.zona LIKE ? OR 
+                        n.n_troquel LIKE ? OR 
+                        n.tipo_notificacion LIKE ? OR 
+                        n.observaciones_iniciales LIKE ? OR 
+                        n.observaciones_resultado LIKE ? OR 
+                        n.destinatario_especial LIKE ?
+                    )";
+                    // Add params for each field (12 fields)
+                    for ($i = 0; $i < 12; $i++) {
+                        $params[] = $search;
+                    }
                 }
 
                 // Count total
