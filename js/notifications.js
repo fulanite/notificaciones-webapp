@@ -182,13 +182,16 @@ const notifications = {
 
         tbody.innerHTML = data.map(notif => `
             <tr class="stagger-item">
-                <td style="white-space: nowrap;">${utils.formatDate(notif.fecha_carga)}</td>
-                <td title="${notif.origen}">${utils.truncate(notif.origen, 20)}</td>
-                <td><strong>${utils.truncate(notif.n_expediente, 18)}</strong></td>
-                <td>${utils.truncate(notif.destinatario_nombre, 22)}</td>
+                <td style="white-space: nowrap; font-size: 0.75rem;">${utils.formatDate(notif.fecha_carga)}</td>
+                <td title="${notif.origen}">${utils.truncate(notif.origen, 15)}</td>
+                <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 15)}</td>
+                <td><strong>${utils.truncate(notif.n_expediente, 15)}</strong></td>
+                <td title="${notif.destinatario_nombre}">${utils.truncate(notif.destinatario_nombre, 18)}</td>
+                <td title="${notif.domicilio}">${utils.truncate(notif.domicilio, 20)}</td>
                 <td><span class="badge-zona">${notif.zona || '-'}</span></td>
+                <td style="font-family: monospace; font-size: 0.75rem;">${notif.n_troquel || '-'}</td>
                 <td>${utils.getStatusBadge(notif.resultado_diligencia || notif.estado)}</td>
-                <td>${notif.ujier_nombre || '-'}</td>
+                <td style="font-size: 0.75rem;">${notif.ujier_nombre ? notif.ujier_nombre.split(' ')[0] : '-'}</td>
                 <td>
                     <div class="table-actions">
                         <button class="action-btn" title="Ver detalles" onclick="notifications.viewDetails('${notif.id}')">
