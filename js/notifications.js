@@ -264,7 +264,7 @@ const notifications = {
         try {
             const visitasResp = await db.getVisitas(id);
             if (visitasResp.data && visitasResp.data.length > 0) {
-                // Tactical Logistics Timeline (Shipping style)
+                // Tactical Logistics Timeline (Shipping style) - Light Theme Optimized
                 visitasHtml = visitasResp.data.map((v, index) => `
                     <div class="timeline-item-tactical">
                         <div class="timeline-dot-box">
@@ -272,27 +272,40 @@ const notifications = {
                         </div>
                         <div class="timeline-detail">
                             <div class="timeline-header">
-                                <span class="timeline-step">Gestión #${visitasResp.data.length - index}</span>
-                                <span class="timeline-time">${utils.formatDateTime(v.fecha)}</span>
+                                <div class="timeline-header-top">
+                                    <span class="timeline-step">Visita #${visitasResp.data.length - index}</span>
+                                    <span class="timeline-time">${utils.formatDateTime(v.fecha)}</span>
+                                </div>
+                                <div class="timeline-ujier-info">
+                                    <span class="ujier-badge-mini">🚶 ${v.ujier_nombre || 'N/A'}</span>
+                                </div>
                             </div>
                             <div class="timeline-status">
-                                ${v.resultado ? `<strong>${v.resultado}</strong>` : '<em>Registrado</em>'}
+                                ${v.resultado ? `<strong>${v.resultado}</strong>` : '<em>Registrada</em>'}
                             </div>
                             
-                            ${v.observaciones ? `<p class="dashboard-notes mt-2" style="padding: 8px; font-size: 0.75rem;">📝 ${v.observaciones}</p>` : ''}
+                            ${v.observaciones ? `<div class="visit-notes-box">📝 ${v.observaciones}</div>` : ''}
                             
-                            ${v.audio_transcripcion ? `<p class="mt-1" style="font-size: 0.75rem; color: #4ade80;">🎤 <em>${v.audio_transcripcion}</em></p>` : ''}
+                            ${v.audio_transcripcion ? `
+                                <div class="audio-transcription-box">
+                                    <span class="audio-icon">🎤</span>
+                                    <div class="audio-body">
+                                        <span class="audio-label">Transcripción de voz:</span>
+                                        <p class="transcription-text">${v.audio_transcripcion}</p>
+                                    </div>
+                                </div>
+                            ` : ''}
                             
-                            <div class="timeline-footer mt-2" style="display:flex; gap:10px;">
+                            <div class="timeline-footer mt-2">
                                 ${v.ubicacion_lat && v.ubicacion_lng ? `
                                     <a href="https://www.google.com/maps?q=${v.ubicacion_lat},${v.ubicacion_lng}" 
-                                       target="_blank" style="font-size: 10px; color: #6366f1; text-decoration:none;">
+                                       target="_blank" class="timeline-link">
                                         📍 Ubicación GPS
                                     </a>
                                 ` : ''}
                                 ${v.foto_url ? `
-                                    <a href="${v.foto_url}" target="_blank" style="font-size: 10px; color: #a78bfa; text-decoration:none;">
-                                        📸 Foto Evidencia
+                                    <a href="${v.foto_url}" target="_blank" class="timeline-link photo-link">
+                                        📸 Ver Foto
                                     </a>
                                 ` : ''}
                             </div>
@@ -307,14 +320,14 @@ const notifications = {
         // Create modal HTML
         const modalHtml = `
             <div class="modal-overlay" id="modal-detalle" onclick="notifications.closeModal(event)">
-                <div class="modal-content modal-panoramic-v2" onclick="event.stopPropagation()">
+                <div class="modal-content modal-panoramic-v2 light-theme" onclick="event.stopPropagation()">
                     <div class="modal-header-v2">
                         <div class="header-main-left">
                             <div class="header-title-container">
                                 <h2>📄 Detalle de Notificación</h2>
                                 <div class="header-badges">
                                     <span class="badge-type-pill-v2">${CONFIG.NOTIFICATION_TYPES[data.tipo_notificacion] || data.tipo_notificacion}</span>
-                                    <span class="header-id-pill">#${data.id.substring(0, 8)}</span>
+                                    <span class="header-id-pill">ID: ${data.id}</span>
                                 </div>
                             </div>
                         </div>
@@ -325,7 +338,7 @@ const notifications = {
                     </div>
 
                     <div class="modal-body p-0">
-                        <!-- New Premium Master Bar -->
+                        <!-- Premium Master Bar (Light Mode) -->
                         <div class="master-premium-bar">
                             <div class="premium-card zona-card">
                                 <div class="card-icon">📍</div>
@@ -425,13 +438,13 @@ const notifications = {
                                         <h4 class="sidebar-title">📸 Evidencia</h4>
                                         <div class="photo-container" onclick="window.open('${data.evidencia_foto}', '_blank')">
                                             <img src="${data.evidencia_foto}">
-                                            <div class="photo-hint">Expandir Imagen</div>
+                                            <div class="photo-hint">Ampliar Evidencia</div>
                                         </div>
                                     </div>
                                 ` : ''}
 
                                 <div class="sidebar-timeline-box">
-                                    <h4 class="sidebar-title">📜 Historial de Gestión</h4>
+                                    <h4 class="sidebar-title">📜 Historial de Visitas</h4>
                                     <div class="logistics-timeline">
                                         ${visitasHtml || '<div class="timeline-empty">Sin visitas registradas</div>'}
                                     </div>
@@ -448,7 +461,7 @@ const notifications = {
                             ${data.migrated_from_glide ? '<span class="badge-migrated-v2">📦 REGISTRO MIGRADO</span>' : ''}
                         </div>
                         <div class="footer-main-actions">
-                            <button class="btn btn-glass" onclick="notifications.closeModal()">Cerrar</button>
+                            <button class="btn btn-light-glass" onclick="notifications.closeModal()">Cerrar</button>
                             <button class="btn btn-primary btn-action-main" onclick="notifications.edit('${data.id}'); notifications.closeModal();">
                                 ✏️ Editar Diligencia
                             </button>
