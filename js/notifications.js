@@ -299,8 +299,10 @@ const notifications = {
                 <div class="modal-content modal-panoramic" onclick="event.stopPropagation()">
                     <div class="modal-header">
                         <div class="header-info">
-                            <h2>📄 Detalle de Notificación</h2>
-                            <span class="header-id">Expediente N° ${data.n_expediente}</span>
+                            <div class="header-main-title">
+                                <h2>📄 Detalle de Notificación</h2>
+                                <span class="badge-type-pill">${CONFIG.NOTIFICATION_TYPES[data.tipo_notificacion] || data.tipo_notificacion}</span>
+                            </div>
                         </div>
                         <div class="header-status-pill">
                             ${utils.getStatusBadge(data.resultado_diligencia || data.estado)}
@@ -309,44 +311,42 @@ const notifications = {
                     </div>
 
                     <div class="modal-body p-0">
-                        <!-- Barra Maestra Superior: Info Crítica -->
+                        <!-- Barra Maestra Superior: Info Crítica Expandida -->
                         <div class="modal-master-bar">
                             <div class="master-item">
-                                <span class="master-label">📍 Zona de Trabajo</span>
+                                <span class="master-label">📍 Zona</span>
                                 <span class="master-value"><span class="badge-zona-lg">${data.zona || 'N/A'}</span></span>
                             </div>
-                            <div class="master-item highlighted">
-                                <span class="master-label">🚶 Ujier Asignado</span>
+                            <div class="master-item">
+                                <span class="master-label">🚶 Ujier</span>
                                 <div class="ujier-assigned-box">
                                     <div class="ujier-avatar-mini">${data.ujier_nombre ? data.ujier_nombre.charAt(0) : '?'}</div>
                                     <span class="master-value"><strong>${data.ujier_nombre || 'Sin asignar'}</strong></span>
                                 </div>
                             </div>
+                            <div class="master-item highlighted">
+                                <span class="master-label">👤 Destinatario</span>
+                                <span class="master-value"><strong>${data.destinatario_nombre}</strong></span>
+                            </div>
                             <div class="master-item grow">
-                                <span class="master-label">🏠 Domicilio de Notificación</span>
+                                <span class="master-label">🏠 Domicilio</span>
                                 <span class="master-value domicile-large">${data.domicilio}</span>
                             </div>
-                            ${data.destinatario_especial ? `
-                                <div class="master-item">
-                                    <span class="master-label">🏢 Destino Especial</span>
-                                    <span class="master-value">${data.destinatario_especial}</span>
-                                </div>
-                            ` : ''}
                         </div>
 
                         <div class="modal-detailed-grid mt-0">
-                            <!-- Columna Izquierda: Datos Técnicos y Legales -->
+                            <!-- Columna Izquierda: Datos Legales Compactos -->
                             <div class="modal-col-main">
                                 <div class="info-section-group">
-                                    <h4 class="info-group-title">⚖️ Datos Legales</h4>
+                                    <h4 class="info-group-title">⚖️ Información del Expediente</h4>
                                     <table class="compact-info-table">
                                         <tr>
-                                            <th>Tipo de Notific.</th>
-                                            <td>${CONFIG.NOTIFICATION_TYPES[data.tipo_notificacion] || data.tipo_notificacion}</td>
+                                            <th>N° Expediente</th>
+                                            <td><span class="expediente-highlight">${data.n_expediente}</span></td>
                                         </tr>
                                         <tr>
                                             <th>Carátula</th>
-                                            <td>${data.caratula}</td>
+                                            <td class="text-secondary">${data.caratula}</td>
                                         </tr>
                                         <tr>
                                             <th>Organismo Origen</th>
@@ -356,29 +356,21 @@ const notifications = {
                                             <th>Letrado Actuante</th>
                                             <td>${data.letrado || '-'}</td>
                                         </tr>
+                                        ${data.destinatario_especial ? `
+                                            <tr>
+                                                <th>Destino Especial</th>
+                                                <td><span class="text-warning">${data.destinatario_especial}</span></td>
+                                            </tr>
+                                        ` : ''}
                                     </table>
                                 </div>
 
                                 <div class="info-section-group">
-                                    <h4 class="info-group-title">👤 Destinatario</h4>
-                                    <table class="compact-info-table">
-                                        <tr>
-                                            <th>Nombre Completo</th>
-                                            <td><strong>${data.destinatario_nombre}</strong></td>
-                                        </tr>
-                                        <tr>
-                                            <th>Identificador</th>
-                                            <td>${data.id}</td>
-                                        </tr>
-                                    </table>
-                                </div>
-
-                                <div class="info-section-group">
-                                    <h4 class="info-group-title">🎫 Control Interno</h4>
+                                    <h4 class="info-group-title">🎫 Control y Pago</h4>
                                     <div class="control-badges">
                                         <div class="control-tag">
-                                            <span class="tag-label">Troquel:</span>
-                                            <span class="tag-value">${data.sin_troquel ? 'N/A' : (data.n_troquel || '-')}</span>
+                                            <span class="tag-label">N° Troquel:</span>
+                                            <span class="tag-value">${data.sin_troquel ? 'No posee' : (data.n_troquel || '-')}</span>
                                         </div>
                                         <div class="control-tag">
                                             <span class="tag-label">Medio Pago:</span>
@@ -399,33 +391,36 @@ const notifications = {
                                 ` : ''}
                             </div>
 
-                            <!-- Columna Derecha: Multimedia e Historial -->
-                            <div class="modal-col-side">
+                            <!-- Columna Derecha: Evidencia e Historial (Limpio) -->
+                            <div class="modal-col-side side-clean">
                                 ${data.evidencia_foto ? `
-                                    <div class="side-panel-section">
-                                        <h4 class="side-title">📸 Evidencia Fotográfica</h4>
-                                        <div class="photo-frame" onclick="window.open('${data.evidencia_foto}', '_blank')">
+                                    <div class="side-panel-section mb-6">
+                                        <h4 class="side-title">📸 Evidencia</h4>
+                                        <div class="photo-frame-modern" onclick="window.open('${data.evidencia_foto}', '_blank')">
                                             <img src="${data.evidencia_foto}" class="img-fluid">
-                                            <div class="photo-hint">Expandir 🔍</div>
+                                            <div class="photo-overlay">Ver pantalla completa 🔍</div>
                                         </div>
                                     </div>
                                 ` : ''}
 
                                 <div class="side-panel-section scrollable">
                                     <h4 class="side-title">📜 Historial de Visitas</h4>
-                                    ${visitasHtml || '<p class="text-muted text-center p-4">Sin visitas registradas</p>'}
-                                </div>
-                                
-                                <div class="modal-system-footer">
-                                    <span>Cargado: ${utils.formatDateTime(data.fecha_carga)}</span>
-                                    <span>por ${data.usuario_carga || '-'}</span>
+                                    <div class="timeline-container">
+                                        ${visitasHtml || '<p class="text-muted text-center p-4">Sin registro de visitas</p>'}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <div class="footer-left">
-                            ${data.migrated_from_glide ? '<span class="badge-migrated">📦 Registro Migrado</span>' : ''}
+                    
+                    <div class="modal-footer-modern">
+                        <div class="footer-meta-info">
+                            <span class="meta-item id-tag">ID: ${data.id}</span>
+                            <span class="meta-divider">|</span>
+                            <span class="meta-item">Carga: ${utils.formatDateTime(data.fecha_carga)}</span>
+                            <span class="meta-divider">|</span>
+                            <span class="meta-item">Por: <strong>${data.usuario_carga || '-'}</strong></span>
+                            ${data.migrated_from_glide ? '<span class="meta-divider">|</span><span class="badge-migrated-sutil">📦 Registro Migrado</span>' : ''}
                         </div>
                         <div class="footer-actions">
                             <button class="btn btn-secondary-outline" onclick="notifications.closeModal()">Cerrar</button>
