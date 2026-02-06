@@ -16,9 +16,12 @@ try {
             if (isset($_GET['id'])) {
                 // Get single notification with user info
                 $stmt = $pdo->prepare("
-                    SELECT n.*, u.nombre as ujier_nombre, u.email as ujier_email
+                    SELECT n.*, 
+                           COALESCE(u1.nombre, u2.nombre) as ujier_nombre, 
+                           COALESCE(u1.email, u2.email) as ujier_email
                     FROM notificaciones n
-                    LEFT JOIN usuarios u ON n.asignado_a = u.id
+                    LEFT JOIN usuarios u1 ON n.asignado_a = u1.id
+                    LEFT JOIN usuarios u2 ON n.asignado_a = u2.dni
                     WHERE n.id = ?
                 ");
                 $stmt->execute([$_GET['id']]);
@@ -112,9 +115,12 @@ try {
                 $offset = ($page - 1) * $limit;
 
                 $sql = "
-                    SELECT n.*, u.nombre as ujier_nombre, u.email as ujier_email
+                    SELECT n.*, 
+                           COALESCE(u1.nombre, u2.nombre) as ujier_nombre, 
+                           COALESCE(u1.email, u2.email) as ujier_email
                     FROM notificaciones n
-                    LEFT JOIN usuarios u ON n.asignado_a = u.id
+                    LEFT JOIN usuarios u1 ON n.asignado_a = u1.id
+                    LEFT JOIN usuarios u2 ON n.asignado_a = u2.dni
                     WHERE " . implode(" AND ", $where) . "
                     ORDER BY n.fecha_carga DESC
                     LIMIT $limit OFFSET $offset

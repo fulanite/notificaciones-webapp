@@ -41,7 +41,7 @@ const asignaciones = {
 
         try {
             const [notifResult, ujieresResult] = await Promise.all([
-                db.getNotifications(),
+                db.getNotifications({ limit: 1000 }), // Increased limit for assignments
                 db.getUjieres()
             ]);
 
@@ -147,7 +147,11 @@ const asignaciones = {
         let result = [...this.state.notificacionesAsignadas];
 
         if (this.state.ujierOrigenId) {
-            result = result.filter(n => n.asignado_a === this.state.ujierOrigenId);
+            const ujier = this.state.ujieres.find(u => u.id === this.state.ujierOrigenId);
+            result = result.filter(n =>
+                n.asignado_a === this.state.ujierOrigenId ||
+                (ujier && ujier.dni && n.asignado_a == ujier.dni)
+            );
         }
 
         if (query) {
