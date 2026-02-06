@@ -25,6 +25,18 @@ class Database
             $this->pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
             // Set timezone for the session
             $this->pdo->exec("SET time_zone = '-03:00'");
+
+            // Quick fix for missing columns
+            try {
+                $this->pdo->exec("ALTER TABLE visitas ADD COLUMN transcripcion_audio TEXT NULL AFTER audio_url");
+            } catch (PDOException $e) {
+            }
+
+            try {
+                $this->pdo->exec("ALTER TABLE visitas ADD COLUMN ubicacion_lat VARCHAR(50) NULL AFTER transcripcion_audio");
+                $this->pdo->exec("ALTER TABLE visitas ADD COLUMN ubicacion_lng VARCHAR(50) NULL AFTER ubicacion_lat");
+            } catch (PDOException $e) {
+            }
         } catch (PDOException $e) {
             $this->sendError('Database connection failed: ' . $e->getMessage(), 500);
         }
