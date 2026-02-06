@@ -38,7 +38,7 @@ try {
                     LEFT JOIN notificaciones n ON v.notificacion_id = n.id
                     WHERE v.ujier_id = ? OR (v.ujier_id IS NULL AND n.asignado_a = ?)
                     ORDER BY v.fecha DESC
-                    LIMIT 200
+                    LIMIT 1000
                 ");
                 $stmt->execute([$_GET['ujier_id'], $_GET['ujier_id']]);
                 Database::sendResponse($stmt->fetchAll());

@@ -360,15 +360,37 @@
 }
 
 .route-stat .stat-text {
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
-.route-stat .stat-text {
     font-size: 0.75rem;
     color: var(--text-muted);
+}
+
+.btn-refresh {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 5px;
+}
+
+.btn-refresh:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(180deg);
+}
+
+.btn-refresh:active {
+    transform: scale(0.9) rotate(180deg);
+}
+
+.btn-refresh.spinning span {
+    display: inline-block;
+    animation: spin 1s linear infinite;
 }
 
 .view-toggle {

@@ -58,6 +58,15 @@ const ujier = {
         document.getElementById('btn-reorder-toggle')?.addEventListener('click', () => {
             this.toggleReorderMode();
         });
+
+        // Refresh assignments
+        document.getElementById('btn-refresh-assignments')?.addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            btn.classList.add('spinning');
+            await this.loadAssignments();
+            setTimeout(() => btn.classList.remove('spinning'), 600);
+            utils.showToast('Ruta actualizada', 'info');
+        });
     },
 
     toggleReorderMode() {
@@ -84,14 +93,16 @@ const ujier = {
     // Get normalized status for filtering and rendering
     getNormalizedStatus(resultado) {
         let status = (resultado || '').toLowerCase();
-        if (status.includes('no atiende')) return 'no_atiende';
-        if (status.includes('atiende')) return 'atiende';
-        if (status.includes('entregado')) return 'atiende';
-        if (status.includes('pre aviso')) return 'pre_aviso';
+
+        // Handle values with underscores or spaces
+        if (status === 'no_atiende' || status.includes('no atiende')) return 'no_atiende';
+        if (status === 'atiende' || status.includes('entregado') || (status.includes('atiende') && !status.includes('no'))) return 'atiende';
+        if (status === 'pre_aviso' || status.includes('pre aviso')) return 'pre_aviso';
         if (status === 'pendiente') return 'pre_aviso';
-        if (status.includes('estrados')) return 'estrados';
+        if (status === 'estrados' || status.includes('estrados')) return 'estrados';
         if (status.includes('inexistente')) return 'domicilio_inexistente';
         if (status.includes('ausente')) return 'diligenciador_ausente';
+
         return status.replace(/\s+/g, '_');
     },
 
@@ -1213,7 +1224,7 @@ const ujier = {
                         <div class="assignment-recipient">👤 <strong>${visit.destinatario_nombre || '-'}</strong></div>
                         <div class="assignment-address">🏠 ${visit.domicilio || '-'}</div>
                         <div class="historial-footer">
-                            <span class="resultado-badge resultado-${status}">${(visit.resultado || 'PENDIENTE').toUpperCase()}</span>
+                            <span class="resultado-badge resultado-${status}">${(visit.resultado || 'PENDIENTE').replace(/_/g, ' ').toUpperCase()}</span>
                             ${visit.zona ? `<span class="historial-zona">${visit.zona}</span>` : ''}
                         </div>
                     </div>
