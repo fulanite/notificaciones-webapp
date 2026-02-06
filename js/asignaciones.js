@@ -203,11 +203,11 @@ const asignaciones = {
                     <span class="checkbox-custom"></span>
                 </label>
                 <div class="asignacion-info">
-                    <span class="asignacion-expediente">${n.n_expediente || 'S/N'}</span>
-                    <span class="asignacion-tipo">${CONFIG.NOTIFICATION_TYPES[n.tipo_notificacion] || n.tipo_notificacion}</span>
-                    <span class="asignacion-destinatario">${n.destinatario_nombre || '-'}</span>
-                    ${!isNuevas ? `<span class="asignacion-ujier-actual">👤 ${n.ujier_nombre || 'Desconocido'}</span>` : ''}
-                    <span class="asignacion-zona badge-zona">${n.zona || '-'}</span>
+                    <span class="asignacion-expediente"><strong>Exp:</strong> ${n.n_expediente || 'S/N'}</span>
+                    <span class="asignacion-tipo"><strong>Tipo:</strong> ${CONFIG.NOTIFICATION_TYPES[n.tipo_notificacion] || n.tipo_notificacion}</span>
+                    <span class="asignacion-destinatario"><strong>Dest:</strong> ${n.destinatario_nombre || '-'}</span>
+                    ${!isNuevas ? `<span class="asignacion-ujier-actual"><strong>👤 Ujier:</strong> ${n.ujier_nombre || 'Desconocido'}</span>` : ''}
+                    <span class="asignacion-zona badge-zona"><strong>📍 Zona:</strong> ${n.zona || '-'}</span>
                 </div>
             </div>
         `).join('');

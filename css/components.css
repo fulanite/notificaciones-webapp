@@ -2228,3 +2228,35 @@
     border-radius: 6px;
 }
 
+
+/* === Asignaciones Header Improvements === */
+.asignaciones-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+    padding: 10px 16px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.asignaciones-panel .panel-header h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.asignacion-info strong {
+    color: #64748b;
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+}
+
