@@ -41,7 +41,10 @@ const asignaciones = {
 
         try {
             const [notifResult, ujieresResult] = await Promise.all([
-                db.getNotifications({ limit: 1000 }), // Increased limit for assignments
+                db.getNotifications({
+                    limit: 1000,
+                    estado: 'pendiente,en_proceso,pre_aviso' // Fetch only active work
+                }),
                 db.getUjieres()
             ]);
 
@@ -52,12 +55,16 @@ const asignaciones = {
             this.state.ujieres = ujieresResult.data || [];
 
             // Categorize notifications
+            // Nuevas: Anything pending/active that has NO assignment
+            const activeStates = ['pendiente', 'en_proceso', 'pre_aviso'];
+
             this.state.notificacionesPendientes = allNotifs.filter(n =>
-                n.estado === 'pendiente' && !n.asignado_a
+                activeStates.includes(n.estado) && !n.asignado_a
             );
 
+            // Reasignaciones: Anything pending/active that IS already assigned
             this.state.notificacionesAsignadas = allNotifs.filter(n =>
-                n.asignado_a && (n.estado === 'pendiente' || n.estado === 'en_proceso')
+                n.asignado_a && activeStates.includes(n.estado)
             );
 
             // Initial filter (all)

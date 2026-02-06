@@ -51,8 +51,12 @@ try {
                 $params = [];
 
                 if (!empty($_GET['estado'])) {
-                    $where[] = "n.estado = ?";
-                    $params[] = $_GET['estado'];
+                    $estadosArr = explode(',', $_GET['estado']);
+                    $placeholders = implode(',', array_fill(0, count($estadosArr), '?'));
+                    $where[] = "n.estado IN ($placeholders)";
+                    foreach ($estadosArr as $est) {
+                        $params[] = trim($est);
+                    }
                 }
 
                 if (!empty($_GET['tipo'])) {
