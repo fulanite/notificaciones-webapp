@@ -107,11 +107,16 @@ try {
             $data = Database::getJsonBody();
 
             // Validate required fields
-            $required = ['tipo_notificacion', 'n_expediente', 'caratula', 'origen', 'destinatario_nombre', 'domicilio', 'zona'];
+            $required = ['tipo_notificacion', 'n_expediente', 'caratula', 'origen', 'destinatario_nombre', 'zona'];
             foreach ($required as $field) {
                 if (empty($data[$field])) {
                     Database::sendError("Field '$field' is required", 400);
                 }
+            }
+
+            // Domicilio is only required if NOT a special recipient
+            if (empty($data['destinatario_especial']) && empty($data['domicilio'])) {
+                Database::sendError("Field 'domicilio' is required for regular recipients", 400);
             }
 
             $id = Database::generateUUID();

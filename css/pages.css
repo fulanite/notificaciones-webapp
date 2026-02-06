@@ -509,6 +509,45 @@
     border-radius: var(--radius-full);
 }
 
+.badge-special {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+}
+
+.assignment-actions-quick {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.btn-quick-deliver {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-quick-deliver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+    filter: brightness(1.1);
+}
+
+.btn-quick-deliver:active {
+    transform: translateY(0);
+}
+
 .assignment-caratula {
     font-size: 0.75rem;
     color: var(--text-muted);

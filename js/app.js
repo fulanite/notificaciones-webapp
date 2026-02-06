@@ -351,6 +351,33 @@ const app = {
             this.handleTipoNotificacionChange(e.target.value);
         });
 
+        // Destinatario Especial change
+        document.getElementById('destinatario-especial')?.addEventListener('change', (e) => {
+            const val = e.target.value;
+            const nombreInput = document.getElementById('destinatario-nombre');
+            const domicilioInput = document.getElementById('domicilio');
+            const labelDomicilio = document.querySelector('label[for="domicilio"]');
+
+            if (val && val !== '') {
+                // Autopopulate name
+                if (nombreInput) nombreInput.value = val;
+
+                // Domicilio non-mandatory
+                if (domicilioInput) {
+                    domicilioInput.required = false;
+                    domicilioInput.placeholder = "Dirección (Opcional para destinatario especial)";
+                }
+                if (labelDomicilio) labelDomicilio.innerHTML = 'Domicilio';
+            } else {
+                // Reset mandatory
+                if (domicilioInput) {
+                    domicilioInput.required = true;
+                    domicilioInput.placeholder = "Dirección completa";
+                }
+                if (labelDomicilio) labelDomicilio.innerHTML = 'Domicilio *';
+            }
+        });
+
         // Medio pago change
         document.getElementById('medio-pago')?.addEventListener('change', (e) => {
             const costoGroup = document.getElementById('grupo-costo');

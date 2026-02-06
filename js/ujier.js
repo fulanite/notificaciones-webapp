@@ -186,6 +186,7 @@ const ujier = {
             const isSelected = this.selectedCardId === assignment.id;
 
             const isPreAviso = assignment.estado === 'pre_aviso';
+            const isSpecial = !!assignment.destinatario_especial;
 
             return `
             <div class="assignment-card stagger-item ${isSelected ? 'selected' : ''}" 
@@ -203,19 +204,78 @@ const ujier = {
                     <div class="assignment-header-row">
                         <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
                         ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
+                        ${isSpecial ? '<span class="badge-special">⭐ Especial</span>' : ''}
                     </div>
                     ${assignment.caratula ? `<div class="assignment-caratula">📄 ${assignment.caratula}</div>` : ''}
                     <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || '-'}</strong></div>
                     <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
                 </div>
                 
-                ${this.reorderMode ? '' : '<div class="assignment-arrow">›</div>'}
+                ${this.reorderMode ? '' : `
+                    <div class="assignment-actions-quick" onclick="event.stopPropagation()">
+                        ${isSpecial ? `
+                        <button class="btn-quick-deliver" onclick="ujier.quickDeliver('${assignment.id}')" title="Entrega rápida">
+                            ⚡ Entregar
+                        </button>
+                        ` : '<div class="assignment-arrow">›</div>'}
+                    </div>
+                `}
             </div>
             `;
         }).join('');
 
         // Limpiar selección después de renderizar (opcional)
         // this.selectedCardId = null;
+    },
+
+    // Quick delivery for special recipients
+    async quickDeliver(id) {
+        const assignment = this.assignments.find(a => a.id === id);
+        if (!assignment) return;
+
+        const confirmMsg = `¿Confirmar entrega rápida a ${assignment.destinatario_nombre}?`;
+        if (!confirm(confirmMsg)) return;
+
+        utils.showLoading('Procesando entrega rápida...');
+
+        try {
+            let lat = null;
+            let lng = null;
+
+            // Try to get GPS but don't block forever
+            try {
+                const pos = await utils.getGPSPosition();
+                lat = pos.lat;
+                lng = pos.lng;
+            } catch (e) {
+                console.warn('No se pudo obtener GPS para entrega rápida:', e);
+            }
+
+            const resultData = {
+                resultado: 'atiende', // 'Atiende' is the internal value for 'Entregado'
+                ubicacion_lat: lat,
+                ubicacion_lng: lng,
+                es_carga_diferida: false,
+                observaciones: 'ENTREGA RÁPIDA (DESTINATARIO ESPECIAL)'
+            };
+
+            const { error } = await db.registerResult(
+                id,
+                resultData,
+                auth.currentUser?.id
+            );
+
+            if (error) throw error;
+
+            utils.showToast(`Entregada: ${assignment.destinatario_nombre}`, 'success');
+            await this.loadAssignments();
+
+        } catch (error) {
+            console.error('Error en quickDeliver:', error);
+            utils.showToast('Error al entregar: ' + error.message, 'error');
+        } finally {
+            utils.hideLoading();
+        }
     },
 
     // Move assignment in the list
@@ -446,6 +506,27 @@ const ujier = {
 
         // Reset form
         this.resetDiligenciaForm();
+
+        // Limit results for special recipients
+        const resultSelect = document.getElementById('resultado-diligencia');
+        if (resultSelect) {
+            if (assignment.destinatario_especial) {
+                // Only 'Atiende' (which means Entregado for these)
+                Array.from(resultSelect.options).forEach(opt => {
+                    if (opt.value !== '' && opt.value !== 'atiende') {
+                        opt.disabled = true;
+                        opt.style.display = 'none';
+                    }
+                });
+                resultSelect.value = 'atiende';
+            } else {
+                // Show all
+                Array.from(resultSelect.options).forEach(opt => {
+                    opt.disabled = false;
+                    opt.style.display = 'block';
+                });
+            }
+        }
 
         // Show modal
         modal?.classList.remove('hidden');
