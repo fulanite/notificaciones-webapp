@@ -1010,49 +1010,112 @@
                     <!-- Asignaciones View -->
                     <section id="view-asignaciones" class="view">
                         <div class="list-header">
-                            <div class="search-bar">
-                                <span class="search-icon">🔍</span>
-                                <input type="text" id="search-asignaciones" class="search-input"
-                                    placeholder="Buscar notificaciones pendientes...">
-                            </div>
-                            <div class="filter-bar">
-                                <select id="filter-ujier-asign" class="filter-select">
-                                    <option value="">Todos los ujieres</option>
-                                </select>
-                                <select id="filter-zona-asign" class="filter-select">
-                                    <option value="">Todas las zonas</option>
-                                </select>
+                            <!-- Tabs -->
+                            <div class="tabs-container">
+                                <button id="tab-asign-nuevas" class="tab-btn active">
+                                    📋 Asignaciones Nuevas
+                                </button>
+                                <button id="tab-reasignaciones" class="tab-btn">
+                                    🔄 Reasignaciones
+                                </button>
                             </div>
                         </div>
 
-                        <div class="asignaciones-grid">
-                            <!-- Pending notifications panel -->
-                            <div class="asignaciones-panel">
-                                <div class="panel-header">
-                                    <h3>📋 Notificaciones Pendientes</h3>
-                                    <span class="panel-count" id="count-pendientes">0</span>
+                        <!-- Section: Nuevas Asignaciones -->
+                        <div id="section-nuevas">
+                            <div class="list-header">
+                                <div class="search-bar">
+                                    <span class="search-icon">🔍</span>
+                                    <input type="text" id="search-asignaciones" class="search-input"
+                                        placeholder="Buscar notificaciones pendientes...">
                                 </div>
-                                <div id="lista-pendientes" class="panel-content">
-                                    <!-- Dynamic content -->
-                                    <div class="empty-state">
-                                        <span class="empty-icon">📭</span>
-                                        <p>No hay notificaciones pendientes de asignar</p>
-                                    </div>
+                                <div class="filter-bar">
+                                    <select id="filter-ujier-asign" class="filter-select">
+                                        <option value="">Todos los ujieres</option>
+                                    </select>
+                                    <select id="filter-zona-asign" class="filter-select">
+                                        <option value="">Todas las zonas</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            <!-- Bailiff selection panel -->
-                            <div class="asignaciones-panel">
-                                <div class="panel-header">
-                                    <h3>👤 Asignar a Ujier</h3>
+                            <div class="asignaciones-grid">
+                                <!-- Pending notifications panel -->
+                                <div class="asignaciones-panel">
+                                    <div class="panel-header">
+                                        <h3>📋 Notificaciones Pendientes</h3>
+                                        <span class="panel-count" id="count-pendientes">0</span>
+                                    </div>
+                                    <div id="lista-pendientes" class="panel-content">
+                                        <!-- Dynamic content -->
+                                        <div class="empty-state">
+                                            <span class="empty-icon">📭</span>
+                                            <p>No hay notificaciones pendientes de asignar</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div id="lista-ujieres-asign" class="panel-content ujieres-grid">
-                                    <!-- Dynamic content -->
+
+                                <!-- Bailiff selection panel -->
+                                <div class="asignaciones-panel">
+                                    <div class="panel-header">
+                                        <h3>👤 Asignar a Ujier</h3>
+                                    </div>
+                                    <div id="lista-ujieres-asign" class="panel-content ujieres-grid">
+                                        <!-- Dynamic content -->
+                                    </div>
+                                    <div class="panel-footer">
+                                        <button class="btn btn-primary" id="btn-asignar-seleccion" disabled>
+                                            ✅ Asignar Seleccionados
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="panel-footer">
-                                    <button class="btn btn-primary" id="btn-asignar-seleccion" disabled>
-                                        ✅ Asignar Seleccionados
-                                    </button>
+                            </div>
+                        </div>
+
+                        <!-- Section: Reasignaciones -->
+                        <div id="section-reasignaciones" class="hidden">
+                            <div class="list-header">
+                                <div class="search-bar">
+                                    <span class="search-icon">🔍</span>
+                                    <input type="text" id="search-reasignaciones" class="search-input"
+                                        placeholder="Buscar notificaciones asignadas...">
+                                </div>
+                                <div class="filter-bar">
+                                    <select id="filter-ujier-origen" class="filter-select">
+                                        <option value="">📍 Ujier Origen: Todos</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="asignaciones-grid">
+                                <!-- Assigned notifications panel -->
+                                <div class="asignaciones-panel">
+                                    <div class="panel-header">
+                                        <h3>📋 Notificaciones Asignadas</h3>
+                                        <span class="panel-count" id="count-asignadas">0</span>
+                                    </div>
+                                    <div id="lista-asignadas" class="panel-content">
+                                        <!-- Dynamic content -->
+                                        <div class="empty-state">
+                                            <span class="empty-icon">📋</span>
+                                            <p>No hay notificaciones asignadas</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Bailiff selection panel for reassignment -->
+                                <div class="asignaciones-panel">
+                                    <div class="panel-header">
+                                        <h3>👤 Reasignar a Ujier</h3>
+                                    </div>
+                                    <div id="lista-ujieres-reasign" class="panel-content ujieres-grid">
+                                        <!-- Dynamic content -->
+                                    </div>
+                                    <div class="panel-footer">
+                                        <button class="btn btn-primary" id="btn-reasignar-seleccion" disabled>
+                                            🔄 Reasignar Seleccionados
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
