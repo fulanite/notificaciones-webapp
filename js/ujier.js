@@ -222,7 +222,9 @@ const ujier = {
                     <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
                 </div>
                 
-                ${this.reorderMode ? '' : `
+                ${this.reorderMode ? `
+                    <div class="reorder-position-badge">ORDEN: ${index + 1}</div>
+                ` : `
                     <div class="assignment-actions-quick" onclick="event.stopPropagation()">
                         ${isSpecial ? `
                         <button class="btn-quick-deliver" onclick="ujier.quickDeliver('${assignment.id}')" title="Entrega rápida">
@@ -559,6 +561,11 @@ const ujier = {
 
     // Close diligencia modal
     closeDiligencia() {
+        // Stop recording if active
+        if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+            try { this.mediaRecorder.stop(); } catch (e) { }
+        }
+
         const modal = document.getElementById('modal-diligenciar');
         modal?.classList.add('hidden');
         modal?.classList.remove('show');
@@ -615,36 +622,30 @@ const ujier = {
         const ubicacionLng = document.getElementById('ubicacion-lng');
 
         if (gpsInfo) gpsInfo.classList.add('hidden');
-        if (btnCapture) btnCapture.classList.remove('hidden');
+        if (btnCapture) {
+            btnCapture.classList.remove('hidden');
+            btnCapture.disabled = false;
+            btnCapture.innerHTML = '<span>📍</span> Capturar Ubicación';
+        }
         if (ubicacionLat) ubicacionLat.value = '';
         if (ubicacionLng) ubicacionLng.value = '';
-
-        // Reset mapa GPS (si existe)
-        const mapContainer = document.getElementById('gps-map-container');
-        if (mapContainer) mapContainer.classList.add('hidden');
-
-        if (this.gpsMap) {
-            try {
-                this.gpsMap.remove();
-            } catch (e) {
-                console.log('Error removing map:', e);
-            }
-            this.gpsMap = null;
-            this.gpsMarker = null;
-            this.gpsCircle = null;
-        }
-        this.originalPosition = null;
 
         // Reset photo
         const photoPreview = document.getElementById('photo-preview');
         const previewImg = document.getElementById('preview-img');
+        const photoInput = document.getElementById('evidencia-foto');
         if (photoPreview) photoPreview.classList.add('hidden');
         if (previewImg) previewImg.src = '';
+        if (photoInput) photoInput.value = '';
+        this.capturedPhoto = null;
 
         // Reset audio
         document.getElementById('audio-playback')?.classList.add('hidden');
         document.getElementById('audio-recording')?.classList.add('hidden');
         document.getElementById('transcripcion-audio')?.classList.add('hidden');
+        document.getElementById('btn-record-audio')?.classList.remove('hidden');
+        this.capturedAudio = null;
+        this.audioChunks = [];
 
         // Reset deferred fields
         document.getElementById('motivo-falla-container')?.classList.add('hidden');

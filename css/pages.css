@@ -570,6 +570,18 @@
     transform: translateY(0);
 }
 
+.reorder-position-badge {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: var(--radius-md);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--primary-400);
+    white-space: nowrap;
+    margin-left: var(--space-2);
+}
+
 .assignment-caratula {
     font-size: 0.75rem;
     color: var(--text-muted);
