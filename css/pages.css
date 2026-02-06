@@ -1429,7 +1429,7 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: var(--space-3) var(--space-2);
+    padding: var(--space-4) var(--space-2);
 }
 
 .notifications-table tr {
@@ -1447,9 +1447,11 @@
 }
 
 .notifications-table td {
-    padding: var(--space-2);
-    font-size: 0.8rem;
+    padding: var(--space-4) var(--space-2);
+    font-size: 0.825rem;
     color: var(--text-base);
+    line-height: 1.4;
+    vertical-align: middle;
 }
 
 .date-group-row td {

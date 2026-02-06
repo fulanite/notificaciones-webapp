@@ -203,11 +203,11 @@ const notifications = {
             html += `
                 <tr class="stagger-item">
                     <td style="white-space: nowrap; font-size: 0.75rem;">${utils.formatDate(notif.fecha_carga)}</td>
-                    <td title="${notif.origen}">${utils.truncate(notif.origen, 15)}</td>
-                    <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 15)}</td>
-                    <td><strong>${utils.truncate(notif.n_expediente, 15)}</strong></td>
-                    <td title="${notif.destinatario_nombre}">${utils.truncate(notif.destinatario_nombre, 18)}</td>
-                    <td title="${notif.domicilio}">${utils.truncate(notif.domicilio, 20)}</td>
+                    <td title="${notif.origen}">${utils.truncate(notif.origen, 25)}</td>
+                    <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 30)}</td>
+                    <td><strong style="font-size: 0.85rem;">${utils.truncate(notif.n_expediente, 25)}</strong></td>
+                    <td title="${notif.destinatario_nombre}">${utils.truncate(notif.destinatario_nombre, 40)}</td>
+                    <td title="${notif.domicilio}">${utils.truncate(notif.domicilio, 50)}</td>
                     <td><span class="badge-zona">${notif.zona || '-'}</span></td>
                     <td style="font-family: monospace; font-size: 0.75rem;">${notif.n_troquel || '-'}</td>
                     <td>${utils.getStatusBadge(notif.resultado_diligencia || notif.estado)}</td>
