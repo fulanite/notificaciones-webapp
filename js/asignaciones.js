@@ -11,6 +11,7 @@ const asignaciones = {
     ujieres: [],
     currentTab: 'nuevas', // 'nuevas' or 'reasignaciones'
     sourceUjier: null, // For reassignments
+    currentFilteredNotifications: [], // For select all functionality
 
     // Initialize the module
     async init() {
@@ -53,6 +54,11 @@ const asignaciones = {
         document.getElementById('section-nuevas')?.classList.toggle('hidden', tab !== 'nuevas');
         document.getElementById('section-reasignaciones')?.classList.toggle('hidden', tab !== 'reasignaciones');
 
+        // Update buttons
+        this.updateAssignButton();
+        this.updateReassignButton();
+        this.updateSelectionCounter();
+
         if (tab === 'reasignaciones') {
             this.loadAssignedNotifications();
         }
@@ -75,6 +81,23 @@ const asignaciones = {
             this.reassignSelected();
         });
 
+        // Select all/none buttons
+        document.getElementById('btn-select-all-nuevas')?.addEventListener('click', () => {
+            this.selectAll('nuevas');
+        });
+
+        document.getElementById('btn-select-none-nuevas')?.addEventListener('click', () => {
+            this.selectNone();
+        });
+
+        document.getElementById('btn-select-all-reasign')?.addEventListener('click', () => {
+            this.selectAll('reasignaciones');
+        });
+
+        document.getElementById('btn-select-none-reasign')?.addEventListener('click', () => {
+            this.selectNone();
+        });
+
         // Filter by zone
         document.getElementById('filter-zona-asign')?.addEventListener('change', (e) => {
             this.filterByZone(e.target.value);
@@ -83,6 +106,7 @@ const asignaciones = {
         // Filter by source ujier (for reassignments)
         document.getElementById('filter-ujier-origen')?.addEventListener('change', (e) => {
             this.sourceUjier = e.target.value;
+            this.selectedNotifications.clear(); // Clear selection when changing filter
             this.loadAssignedNotifications();
         });
 
@@ -92,17 +116,67 @@ const asignaciones = {
         });
     },
 
+    // Select all visible notifications
+    selectAll(context) {
+        const notifications = context === 'nuevas' ? this.currentFilteredNotifications : this.assignedNotifications;
+
+        if (notifications.length === 0) {
+            utils.showToast('No hay notificaciones para seleccionar', 'warning');
+            return;
+        }
+
+        notifications.forEach(n => this.selectedNotifications.add(n.id));
+
+        if (context === 'nuevas') {
+            this.renderNotifications(this.currentFilteredNotifications);
+            this.updateAssignButton();
+        } else {
+            this.renderAssignedNotifications(this.assignedNotifications);
+            this.updateReassignButton();
+        }
+
+        this.updateSelectionCounter();
+        utils.showToast(`${notifications.length} notificaciones seleccionadas`, 'success');
+    },
+
+    // Deselect all
+    selectNone() {
+        this.selectedNotifications.clear();
+
+        if (this.currentTab === 'nuevas') {
+            this.renderNotifications(this.currentFilteredNotifications);
+            this.updateAssignButton();
+        } else {
+            this.renderAssignedNotifications(this.assignedNotifications);
+            this.updateReassignButton();
+        }
+
+        this.updateSelectionCounter();
+    },
+
+    // Update selection counter
+    updateSelectionCounter() {
+        const counterNuevas = document.getElementById('selection-counter-nuevas');
+        const counterReasign = document.getElementById('selection-counter-reasign');
+
+        const count = this.selectedNotifications.size;
+        const text = count > 0 ? `${count} seleccionada${count > 1 ? 's' : ''}` : '';
+
+        if (counterNuevas) counterNuevas.textContent = text;
+        if (counterReasign) counterReasign.textContent = text;
+    },
+
     // Load pending notifications (not assigned)
     async loadPendingNotifications() {
         const container = document.getElementById('lista-pendientes');
         if (!container) return;
 
-        container.innerHTML = '<div class="loading-spinner">Cargando...</div>';
+        container.innerHTML = '<div class="loading-spinner">⏳ Cargando notificaciones...</div>';
 
         const { data, error } = await db.getNotifications();
 
         if (error) {
-            container.innerHTML = '<div class="error-message">Error al cargar notificaciones</div>';
+            container.innerHTML = '<div class="error-message">❌ Error al cargar notificaciones</div>';
             return;
         }
 
@@ -111,7 +185,13 @@ const asignaciones = {
             n.estado === 'pendiente' && !n.asignado_a
         );
 
-        document.getElementById('count-pendientes').textContent = this.notifications.length;
+        this.currentFilteredNotifications = this.notifications;
+
+        const countEl = document.getElementById('count-pendientes');
+        if (countEl) {
+            countEl.textContent = this.notifications.length;
+            countEl.style.display = this.notifications.length > 0 ? 'inline' : 'none';
+        }
 
         this.renderNotifications(this.notifications);
     },
@@ -121,12 +201,12 @@ const asignaciones = {
         const container = document.getElementById('lista-asignadas');
         if (!container) return;
 
-        container.innerHTML = '<div class="loading-spinner">Cargando...</div>';
+        container.innerHTML = '<div class="loading-spinner">⏳ Cargando notificaciones asignadas...</div>';
 
         const { data, error } = await db.getNotifications();
 
         if (error) {
-            container.innerHTML = '<div class="error-message">Error al cargar notificaciones</div>';
+            container.innerHTML = '<div class="error-message">❌ Error al cargar notificaciones</div>';
             return;
         }
 
@@ -142,7 +222,11 @@ const asignaciones = {
 
         this.assignedNotifications = assigned;
 
-        document.getElementById('count-asignadas').textContent = assigned.length;
+        const countEl = document.getElementById('count-asignadas');
+        if (countEl) {
+            countEl.textContent = assigned.length;
+            countEl.style.display = assigned.length > 0 ? 'inline' : 'none';
+        }
 
         this.renderAssignedNotifications(assigned);
     },
@@ -151,6 +235,8 @@ const asignaciones = {
     renderNotifications(notifications) {
         const container = document.getElementById('lista-pendientes');
         if (!container) return;
+
+        this.currentFilteredNotifications = notifications;
 
         if (notifications.length === 0) {
             container.innerHTML = `
@@ -189,6 +275,7 @@ const asignaciones = {
                     this.selectedNotifications.delete(id);
                 }
                 this.updateAssignButton();
+                this.updateSelectionCounter();
                 e.target.closest('.asignacion-item').classList.toggle('selected', e.target.checked);
             });
         });
@@ -200,10 +287,13 @@ const asignaciones = {
         if (!container) return;
 
         if (notifications.length === 0) {
+            const msg = this.sourceUjier
+                ? 'No hay notificaciones asignadas para este ujier'
+                : 'No hay notificaciones asignadas';
             container.innerHTML = `
                 <div class="empty-state">
                     <span class="empty-icon">📋</span>
-                    <p>No hay notificaciones asignadas${this.sourceUjier ? ' para este ujier' : ''}</p>
+                    <p>${msg}</p>
                 </div>
             `;
             return;
@@ -237,6 +327,7 @@ const asignaciones = {
                     this.selectedNotifications.delete(id);
                 }
                 this.updateReassignButton();
+                this.updateSelectionCounter();
                 e.target.closest('.asignacion-item').classList.toggle('selected', e.target.checked);
             });
         });
@@ -250,8 +341,9 @@ const asignaciones = {
         const { data, error } = await db.getUjieres();
 
         if (error || !data) {
-            if (container) container.innerHTML = '<div class="error-message">Error al cargar ujieres</div>';
-            if (containerReassign) containerReassign.innerHTML = '<div class="error-message">Error al cargar ujieres</div>';
+            const errorMsg = '<div class="error-message">❌ Error al cargar ujieres</div>';
+            if (container) container.innerHTML = errorMsg;
+            if (containerReassign) containerReassign.innerHTML = errorMsg;
             return;
         }
 
@@ -318,8 +410,8 @@ const asignaciones = {
 
         const filterOrigen = document.getElementById('filter-ujier-origen');
         if (filterOrigen) {
-            filterOrigen.innerHTML = '<option value="">Todos los ujieres</option>' +
-                data.map(u => `<option value="${u.id}">${u.nombre || u.email}</option>`).join('');
+            filterOrigen.innerHTML = '<option value="">📍 Ujier Origen: Todos</option>' +
+                data.map(u => `<option value="${u.id}">📍 ${u.nombre || u.email}</option>`).join('');
         }
     },
 
@@ -329,9 +421,15 @@ const asignaciones = {
         if (btn) {
             const canAssign = this.selectedNotifications.size > 0 && this.selectedUjier;
             btn.disabled = !canAssign;
-            btn.textContent = canAssign
-                ? `✅ Asignar ${this.selectedNotifications.size} notificación(es)`
-                : '✅ Asignar Seleccionados';
+
+            if (canAssign) {
+                const ujier = this.ujieres.find(u => u.id === this.selectedUjier);
+                btn.textContent = `✅ Asignar ${this.selectedNotifications.size} a ${ujier?.nombre || 'ujier'}`;
+            } else if (this.selectedNotifications.size > 0) {
+                btn.textContent = `⚠️ Seleccioná un ujier destino`;
+            } else {
+                btn.textContent = '✅ Asignar Seleccionados';
+            }
         }
     },
 
@@ -341,9 +439,15 @@ const asignaciones = {
         if (btn) {
             const canReassign = this.selectedNotifications.size > 0 && this.selectedUjier;
             btn.disabled = !canReassign;
-            btn.textContent = canReassign
-                ? `🔄 Reasignar ${this.selectedNotifications.size} notificación(es)`
-                : '🔄 Reasignar Seleccionados';
+
+            if (canReassign) {
+                const ujier = this.ujieres.find(u => u.id === this.selectedUjier);
+                btn.textContent = `🔄 Reasignar ${this.selectedNotifications.size} a ${ujier?.nombre || 'ujier'}`;
+            } else if (this.selectedNotifications.size > 0) {
+                btn.textContent = `⚠️ Seleccioná un ujier destino`;
+            } else {
+                btn.textContent = '🔄 Reasignar Seleccionados';
+            }
         }
     },
 
@@ -354,9 +458,15 @@ const asignaciones = {
             return;
         }
 
+        const ujierDestino = this.ujieres.find(u => u.id === this.selectedUjier);
+        const confirmMsg = `¿Asignar ${this.selectedNotifications.size} notificación(es) a ${ujierDestino?.nombre || ujierDestino?.email}?`;
+
+        if (!confirm(confirmMsg)) return;
+
         const btn = document.getElementById('btn-asignar-seleccion');
+        const originalText = btn.textContent;
         btn.disabled = true;
-        btn.textContent = 'Asignando...';
+        btn.textContent = '⏳ Asignando...';
 
         let successCount = 0;
         let errorCount = 0;
@@ -375,17 +485,20 @@ const asignaciones = {
         }
 
         if (successCount > 0) {
-            utils.showToast(`${successCount} notificación(es) asignadas correctamente`, 'success');
+            utils.showToast(`✅ ${successCount} notificación(es) asignadas correctamente`, 'success');
         }
         if (errorCount > 0) {
-            utils.showToast(`${errorCount} notificación(es) no se pudieron asignar`, 'error');
+            utils.showToast(`❌ ${errorCount} notificación(es) no se pudieron asignar`, 'error');
         }
 
         // Reset and reload
         this.selectedNotifications.clear();
         this.selectedUjier = null;
+        this.updateSelectionCounter();
         await this.loadPendingNotifications();
         await this.loadUjieres();
+
+        btn.textContent = originalText;
     },
 
     // Reassign selected notifications to another ujier
@@ -401,8 +514,9 @@ const asignaciones = {
         if (!confirm(confirmMsg)) return;
 
         const btn = document.getElementById('btn-reasignar-seleccion');
+        const originalText = btn.textContent;
         btn.disabled = true;
-        btn.textContent = 'Reasignando...';
+        btn.textContent = '⏳ Reasignando...';
 
         let successCount = 0;
         let errorCount = 0;
@@ -421,17 +535,20 @@ const asignaciones = {
         }
 
         if (successCount > 0) {
-            utils.showToast(`${successCount} notificación(es) reasignadas correctamente`, 'success');
+            utils.showToast(`✅ ${successCount} notificación(es) reasignadas correctamente`, 'success');
         }
         if (errorCount > 0) {
-            utils.showToast(`${errorCount} notificación(es) no se pudieron reasignar`, 'error');
+            utils.showToast(`❌ ${errorCount} notificación(es) no se pudieron reasignar`, 'error');
         }
 
         // Reset and reload
         this.selectedNotifications.clear();
         this.selectedUjier = null;
+        this.updateSelectionCounter();
         await this.loadAssignedNotifications();
         await this.loadUjieres();
+
+        btn.textContent = originalText;
     },
 
     // Filter notifications by search
