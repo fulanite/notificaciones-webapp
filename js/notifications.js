@@ -9,13 +9,17 @@ const notifications = {
         estado: '',
         tipo: '',
         fecha: '',
-        search: ''
+        search: '',
+        zona: '',
+        year: '2026',
+        own_only: false
     },
 
     // Initialize notifications list
     async init() {
         this.setupFilters();
         await this.loadNotifications();
+        this.updateYearBadges();
     },
 
     // Setup filter listeners
@@ -24,38 +28,54 @@ const notifications = {
         const filterEstado = document.getElementById('filter-estado');
         const filterTipo = document.getElementById('filter-tipo');
         const filterFecha = document.getElementById('filter-fecha');
+        const filterZona = document.getElementById('filter-zona');
+        const filterPropio = document.getElementById('filter-propio');
 
-        if (searchInput) {
-            searchInput.addEventListener('input', utils.debounce(() => {
-                this.filters.search = searchInput.value;
-                this.currentPage = 1;
-                this.loadNotifications();
-            }, 300));
-        }
+        const updateAndLoad = () => {
+            this.currentPage = 1;
+            this.loadNotifications();
+        };
 
-        if (filterEstado) {
-            filterEstado.addEventListener('change', () => {
-                this.filters.estado = filterEstado.value;
-                this.currentPage = 1;
-                this.loadNotifications();
-            });
-        }
+        searchInput?.addEventListener('input', utils.debounce(() => {
+            this.filters.search = searchInput.value;
+            updateAndLoad();
+        }, 300));
 
-        if (filterTipo) {
-            filterTipo.addEventListener('change', () => {
-                this.filters.tipo = filterTipo.value;
-                this.currentPage = 1;
-                this.loadNotifications();
-            });
-        }
+        filterEstado?.addEventListener('change', () => {
+            this.filters.estado = filterEstado.value;
+            updateAndLoad();
+        });
 
-        if (filterFecha) {
-            filterFecha.addEventListener('change', () => {
-                this.filters.fecha = filterFecha.value;
-                this.currentPage = 1;
-                this.loadNotifications();
-            });
-        }
+        filterTipo?.addEventListener('change', () => {
+            this.filters.tipo = filterTipo.value;
+            updateAndLoad();
+        });
+
+        filterFecha?.addEventListener('change', () => {
+            this.filters.fecha = filterFecha.value;
+            updateAndLoad();
+        });
+
+        filterZona?.addEventListener('change', () => {
+            this.filters.zona = filterZona.value;
+            updateAndLoad();
+        });
+
+        filterPropio?.addEventListener('change', () => {
+            this.filters.own_only = filterPropio.value === 'true';
+            if (this.filters.own_only) {
+                const today = new Date();
+                // Compensate for local timezone to get YYYY-MM-DD correctly
+                const offset = today.getTimezoneOffset();
+                const localToday = new Date(today.getTime() - (offset * 60 * 1000));
+                const dateStr = localToday.toISOString().split('T')[0];
+
+                this.filters.fecha = dateStr;
+                if (filterFecha) filterFecha.value = dateStr;
+                utils.showToast(`Filtrando tus cargas de hoy (${dateStr})`, 'info');
+            }
+            updateAndLoad();
+        });
 
         // Pagination
         document.getElementById('btn-prev-page')?.addEventListener('click', () => {
@@ -71,6 +91,25 @@ const notifications = {
                 this.loadNotifications();
             }
         });
+    },
+
+    // Switch between years
+    setYear(year, btn) {
+        this.filters.year = year;
+        this.currentPage = 1;
+
+        // Update UI
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        this.loadNotifications();
+    },
+
+    // Update counts on year tabs
+    async updateYearBadges() {
+        const userId = this.filters.own_only ? auth.currentUser?.email : null;
+        // This is a simplified call, ideally we'd have a specific endpoint for counts
+        // but for now we'll just show the total if needed or keep it static
     },
 
     // Load notifications from database
@@ -91,19 +130,18 @@ const notifications = {
         const options = {
             page: this.currentPage,
             limit: CONFIG.ITEMS_PER_PAGE,
-            ...this.filters
+            ...this.filters,
+            user_id: auth.currentUser?.id,
+            user_email: auth.currentUser?.email
         };
 
-        console.log('📋 Cargando notificaciones con opciones:', options);
         const { data, error, count } = await db.getNotifications(options);
-        console.log('📋 Resultado:', { data: data?.length, error, count });
 
         if (error) {
-            console.error('❌ Error cargando notificaciones:', error);
             tbody.innerHTML = `
                 <tr>
                     <td colspan="8" style="text-align: center; padding: 40px; color: var(--error);">
-                        Error al cargar notificaciones: ${error.message || 'Error desconocido'}
+                        Error al cargar notificaciones: ${error.message}
                     </td>
                 </tr>
             `;
@@ -112,6 +150,10 @@ const notifications = {
 
         this.renderNotifications(data || []);
         this.updatePagination(count || 0);
+
+        // Update current year badge with total count only if it's the current year
+        const badge = document.getElementById(`badge-${this.filters.year}`);
+        if (badge) badge.textContent = count || 0;
     },
 
     // Render notifications table
@@ -132,17 +174,11 @@ const notifications = {
 
         tbody.innerHTML = data.map(notif => `
             <tr class="stagger-item">
-                <td>
-                    <code style="font-size: 0.75rem; color: var(--primary-500);">
-                        ${notif.id.substring(0, 8)}...
-                    </code>
-                </td>
-                <td>${utils.formatDate(notif.fecha_carga)}</td>
-                <td>
-                    <span class="type-badge">${CONFIG.NOTIFICATION_TYPES[notif.tipo_notificacion] || notif.tipo_notificacion}</span>
-                </td>
-                <td>${utils.truncate(notif.n_expediente, 20)}</td>
-                <td>${utils.truncate(notif.destinatario_nombre, 25)}</td>
+                <td style="white-space: nowrap;">${utils.formatDate(notif.fecha_carga)}</td>
+                <td title="${notif.origen}">${utils.truncate(notif.origen, 20)}</td>
+                <td><strong>${utils.truncate(notif.n_expediente, 18)}</strong></td>
+                <td>${utils.truncate(notif.destinatario_nombre, 22)}</td>
+                <td><span class="badge-zona">${notif.zona || '-'}</span></td>
                 <td>${utils.getStatusBadge(notif.resultado_diligencia || notif.estado)}</td>
                 <td>${notif.ujier_nombre || '-'}</td>
                 <td>

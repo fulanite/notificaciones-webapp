@@ -28,12 +28,12 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/variables.css?v=24.0">
-    <link rel="stylesheet" href="css/base.css?v=24.0">
-    <link rel="stylesheet" href="css/components.css?v=24.0">
-    <link rel="stylesheet" href="css/layout.css?v=24.0">
-    <link rel="stylesheet" href="css/pages.css?v=24.0">
-    <link rel="stylesheet" href="css/animations.css?v=24.0">
+    <link rel="stylesheet" href="css/variables.css?v=25.0">
+    <link rel="stylesheet" href="css/base.css?v=25.0">
+    <link rel="stylesheet" href="css/components.css?v=25.0">
+    <link rel="stylesheet" href="css/layout.css?v=25.0">
+    <link rel="stylesheet" href="css/pages.css?v=25.0">
+    <link rel="stylesheet" href="css/animations.css?v=25.0">
 </head>
 
 <body>
@@ -791,13 +791,36 @@
 
                     <!-- Lista de Notificaciones View -->
                     <section id="view-lista-notificaciones" class="view">
+                        <!-- Pestañas de Año -->
+                        <div class="view-tabs">
+                            <button class="tab-btn active" data-year="2026"
+                                onclick="notifications.setYear('2026', this)">
+                                📅 2026 <span class="tab-badge" id="badge-2026">0</span>
+                            </button>
+                            <button class="tab-btn" data-year="2025" onclick="notifications.setYear('2025', this)">
+                                📅 2025 <span class="tab-badge" id="badge-2025">0</span>
+                            </button>
+                        </div>
+
                         <div class="list-header">
                             <div class="search-bar">
                                 <span class="search-icon">🔍</span>
                                 <input type="text" id="search-notificaciones" class="search-input"
-                                    placeholder="Buscar por expediente, destinatario...">
+                                    placeholder="Buscar expediente, destinatario, carátula...">
                             </div>
                             <div class="filter-bar">
+                                <select id="filter-propio" class="filter-select highlight">
+                                    <option value="false">🌎 Todas las notif.</option>
+                                    <option value="true">👤 Mis cargas (Hoy)</option>
+                                </select>
+                                <select id="filter-zona" class="filter-select">
+                                    <option value="">Todas las zonas</option>
+                                    <option value="NORTE">ZONA NORTE</option>
+                                    <option value="SUR">ZONA SUR</option>
+                                    <option value="CENTRO">ZONA CENTRO</option>
+                                    <option value="REBOTE">REBOTE</option>
+                                    <option value="INTERIOR">INTERIOR</option>
+                                </select>
                                 <select id="filter-estado" class="filter-select">
                                     <option value="">Todos los estados</option>
                                     <option value="pendiente">Pendiente</option>
@@ -817,11 +840,11 @@
                             <table class="notifications-table">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>Fecha</th>
-                                        <th>Tipo</th>
+                                        <th>Origen</th>
                                         <th>Expediente</th>
                                         <th>Destinatario</th>
+                                        <th>Zona</th>
                                         <th>Estado</th>
                                         <th>Ujier</th>
                                         <th>Acciones</th>
@@ -1299,19 +1322,19 @@
     </div>
 
     <!-- App Scripts -->
-    <script src="js/config.js?v=24.0"></script>
-    <script src="js/data.js?v=24.0"></script>
-    <script src="js/api-client.js?v=24.0"></script>
-    <script src="js/auth.js?v=24.0"></script>
-    <script src="js/utils.js?v=24.0"></script>
-    <script src="js/offline.js?v=24.0"></script>
-    <script src="js/notifications.js?v=24.0"></script>
-    <script src="js/ujier.js?v=24.0"></script>
-    <script src="js/dashboard.js?v=24.0"></script>
-    <script src="js/reports.js?v=24.0"></script>
-    <script src="js/asignaciones.js?v=24.0"></script>
-    <script src="js/usuarios.js?v=24.0"></script>
-    <script src="js/app.js?v=24.0"></script>
+    <script src="js/config.js?v=25.0"></script>
+    <script src="js/data.js?v=25.0"></script>
+    <script src="js/api-client.js?v=25.0"></script>
+    <script src="js/auth.js?v=25.0"></script>
+    <script src="js/utils.js?v=25.0"></script>
+    <script src="js/offline.js?v=25.0"></script>
+    <script src="js/notifications.js?v=25.0"></script>
+    <script src="js/ujier.js?v=25.0"></script>
+    <script src="js/dashboard.js?v=25.0"></script>
+    <script src="js/reports.js?v=25.0"></script>
+    <script src="js/asignaciones.js?v=25.0"></script>
+    <script src="js/usuarios.js?v=25.0"></script>
+    <script src="js/app.js?v=25.0"></script>
 
     <!-- Service Worker Registration -->
     <script>

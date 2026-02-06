@@ -145,6 +145,12 @@ const db = {
         if (options.asignado_a) params.asignado_a = options.asignado_a;
         if (options.fecha) params.fecha = options.fecha;
         if (options.search) params.search = options.search;
+        if (options.zona) params.zona = options.zona;
+        if (options.year) params.year = options.year;
+        if (options.own_only) {
+            params.own_only = '1';
+            params.user_email = options.user_email;
+        }
         if (options.page) params.page = options.page;
         if (options.limit) params.limit = options.limit;
 

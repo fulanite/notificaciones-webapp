@@ -62,9 +62,26 @@ try {
                     $params[] = $_GET['fecha'];
                 }
 
+                if (!empty($_GET['zona'])) {
+                    $where[] = "n.zona = ?";
+                    $params[] = $_GET['zona'];
+                }
+
+                if (!empty($_GET['year'])) {
+                    $year = (int) $_GET['year'];
+                    $where[] = "YEAR(n.fecha_carga) = ?";
+                    $params[] = $year;
+                }
+
+                if (!empty($_GET['own_only']) && $_GET['own_only'] == '1' && !empty($_GET['user_email'])) {
+                    $where[] = "n.usuario_carga = ?";
+                    $params[] = $_GET['user_email'];
+                }
+
                 if (!empty($_GET['search'])) {
                     $search = "%" . $_GET['search'] . "%";
-                    $where[] = "(n.n_expediente LIKE ? OR n.destinatario_nombre LIKE ? OR n.caratula LIKE ?)";
+                    $where[] = "(n.n_expediente LIKE ? OR n.destinatario_nombre LIKE ? OR n.caratula LIKE ? OR n.origen LIKE ?)";
+                    $params[] = $search;
                     $params[] = $search;
                     $params[] = $search;
                     $params[] = $search;
