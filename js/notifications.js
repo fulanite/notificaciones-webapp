@@ -277,7 +277,7 @@ const notifications = {
                                     <span class="timeline-time">${utils.formatDateTime(v.fecha)}</span>
                                 </div>
                                 <div class="timeline-ujier-info">
-                                    <span class="ujier-badge-mini">🚶 ${v.ujier_nombre || 'Dato no migrado'}</span>
+                                    <span class="ujier-badge-mini">🚶 ${v.ujier_nombre || 'Sin registro'}</span>
                                 </div>
                             </div>
                             <div class="timeline-status">

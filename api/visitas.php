@@ -15,10 +15,13 @@ try {
         case 'GET':
             if (isset($_GET['notificacion_id'])) {
                 // Get visits for a notification
+                // Support both new data (ujier_id = UUID) and migrated data (ujier_id = DNI)
                 $stmt = $pdo->prepare("
-                    SELECT v.*, u.nombre as ujier_nombre
+                    SELECT v.*, 
+                           COALESCE(u1.nombre, u2.nombre) as ujier_nombre
                     FROM visitas v
-                    LEFT JOIN usuarios u ON v.ujier_id = u.id
+                    LEFT JOIN usuarios u1 ON v.ujier_id = u1.id
+                    LEFT JOIN usuarios u2 ON v.ujier_id = u2.dni
                     WHERE v.notificacion_id = ?
                     ORDER BY v.fecha DESC
                 ");
@@ -45,9 +48,12 @@ try {
             } else {
                 // Get all recent visits
                 $stmt = $pdo->query("
-                    SELECT v.*, u.nombre as ujier_nombre, n.n_expediente
+                    SELECT v.*, 
+                           COALESCE(u1.nombre, u2.nombre) as ujier_nombre, 
+                           n.n_expediente
                     FROM visitas v
-                    LEFT JOIN usuarios u ON v.ujier_id = u.id
+                    LEFT JOIN usuarios u1 ON v.ujier_id = u1.id
+                    LEFT JOIN usuarios u2 ON v.ujier_id = u2.dni
                     LEFT JOIN notificaciones n ON v.notificacion_id = n.id
                     ORDER BY v.fecha DESC
                     LIMIT 100
