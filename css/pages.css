@@ -1504,6 +1504,42 @@
     margin-top: var(--space-2);
 }
 
+.modal-image-content {
+    max-width: 90vw;
+    width: 500px;
+}
+
+.visita-trans-mini {
+    font-size: 0.8rem;
+    color: var(--primary-300);
+    margin-top: 4px;
+    background: rgba(59, 130, 246, 0.05);
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    border-left: 2px solid var(--primary-500);
+}
+
+.visita-gps-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    color: var(--primary-400);
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: var(--radius-full);
+    width: fit-content;
+    transition: all 0.2s;
+}
+
+.visita-gps-link:hover {
+    background: rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
+}
+
 .visita-foto-mini {
     width: 44px;
     height: 44px;

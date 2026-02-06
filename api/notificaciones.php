@@ -242,8 +242,8 @@ try {
                         // Also save to visitas history
                         $visitaId = Database::generateUUID();
                         $stmtVisita = $pdo->prepare("
-                            INSERT INTO visitas (id, notificacion_id, ujier_id, resultado, observaciones, ubicacion_lat, ubicacion_lng, foto_url, audio_url, fecha)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                            INSERT INTO visitas (id, notificacion_id, ujier_id, resultado, observaciones, transcripcion_audio, ubicacion_lat, ubicacion_lng, foto_url, audio_url, fecha)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
                         ");
                         $stmtVisita->execute([
                             $visitaId,
@@ -251,6 +251,7 @@ try {
                             $data['user_id'],
                             $data['resultado'],
                             $data['observaciones'] ?? null,
+                            $data['transcripcion_audio'] ?? null,
                             $data['ubicacion_lat'] ?? null,
                             $data['ubicacion_lng'] ?? null,
                             $data['evidencia_foto'] ?? null,

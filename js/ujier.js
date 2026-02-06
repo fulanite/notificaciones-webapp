@@ -594,20 +594,42 @@ const ujier = {
                     <span class="visita-resultado-mini resultado-${v.resultado}">${(v.resultado || '').replace(/_/g, ' ').toUpperCase()}</span>
                 </div>
                 ${v.observaciones ? `<p class="visita-obs-mini">📝 ${v.observaciones}</p>` : ''}
+                ${v.transcripcion_audio ? `<p class="visita-trans-mini">🎤 <em>"${v.transcripcion_audio}"</em></p>` : ''}
                 <div class="visita-adjuntos-mini">
                     ${v.foto_url ? `
-                    <div class="visita-foto-mini" onclick="window.open('${v.foto_url}', '_blank')">
+                    <div class="visita-foto-mini" onclick="ujier.viewFullImage('${v.foto_url}')">
                         <img src="${v.foto_url}" alt="Foto visita" loading="lazy">
                     </div>
                     ` : ''}
-                    ${(v.lat && v.lng) ? `
-                    <a href="https://www.google.com/maps?q=${v.lat},${v.lng}" target="_blank" class="visita-gps-link">
-                        📍 Ver Ubicación
+                    ${v.audio_url ? `
+                    <div class="visita-audio-mini">
+                        <audio src="${v.audio_url}" controls style="height: 30px;"></audio>
+                    </div>
+                    ` : ''}
+                    ${(v.ubicacion_lat && v.ubicacion_lng) ? `
+                    <a href="https://www.google.com/maps?q=${v.ubicacion_lat},${v.ubicacion_lng}" target="_blank" class="visita-gps-link">
+                        📍 Posición GPS
                     </a>
                     ` : ''}
                 </div>
             </div>
         `).join('');
+    },
+
+    // Ver imagen a pantalla completa
+    viewFullImage(url) {
+        const modal = document.getElementById('modal-image-viewer');
+        const img = document.getElementById('full-image-display');
+        if (img) img.src = url;
+        modal?.classList.remove('hidden');
+        setTimeout(() => modal?.classList.add('show'), 10);
+    },
+
+    // Cerrar visor de imagen
+    closeImageViewer() {
+        const modal = document.getElementById('modal-image-viewer');
+        modal?.classList.remove('show');
+        setTimeout(() => modal?.classList.add('hidden'), 300);
     },
 
     // Reset diligencia form

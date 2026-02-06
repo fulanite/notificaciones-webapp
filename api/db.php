@@ -23,6 +23,8 @@ class Database
             ];
 
             $this->pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+            // Set timezone for the session
+            $this->pdo->exec("SET time_zone = '-03:00'");
         } catch (PDOException $e) {
             $this->sendError('Database connection failed: ' . $e->getMessage(), 500);
         }
