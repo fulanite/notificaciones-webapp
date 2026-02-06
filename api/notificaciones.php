@@ -191,6 +191,7 @@ try {
                         ]);
                         break;
 
+                    case 'result':
                         // Register result (diligencia)
                         $newEstado = 'diligenciada';
                         if ($data['es_carga_diferida'] ?? false) {
