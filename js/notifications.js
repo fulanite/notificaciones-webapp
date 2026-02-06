@@ -115,9 +115,11 @@ const notifications = {
     // Load notifications from database
     async loadNotifications() {
         const tbody = document.getElementById('tabla-notificaciones');
+        const refreshBtn = document.getElementById('btn-refresh-list');
         if (!tbody) return;
 
         // Show loading
+        if (refreshBtn) refreshBtn.classList.add('rotating');
         tbody.innerHTML = `
             <tr>
                 <td colspan="8" style="text-align: center; padding: 40px;">
@@ -135,25 +137,31 @@ const notifications = {
             user_email: auth.currentUser?.email
         };
 
-        const { data, error, count } = await db.getNotifications(options);
+        try {
+            const { data, error, count } = await db.getNotifications(options);
 
-        if (error) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" style="text-align: center; padding: 40px; color: var(--error);">
-                        Error al cargar notificaciones: ${error.message}
-                    </td>
-                </tr>
-            `;
-            return;
+            if (error) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: var(--error);">
+                            Error al cargar notificaciones: ${error.message}
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            this.renderNotifications(data || []);
+            this.updatePagination(count || 0);
+
+            // Update current year badge with total count only if it's the current year
+            const badge = document.getElementById(`badge-${this.filters.year}`);
+            if (badge) badge.textContent = count || 0;
+        } finally {
+            if (refreshBtn) {
+                setTimeout(() => refreshBtn.classList.remove('rotating'), 500);
+            }
         }
-
-        this.renderNotifications(data || []);
-        this.updatePagination(count || 0);
-
-        // Update current year badge with total count only if it's the current year
-        const badge = document.getElementById(`badge-${this.filters.year}`);
-        if (badge) badge.textContent = count || 0;
     },
 
     // Render notifications table

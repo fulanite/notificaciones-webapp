@@ -1416,6 +1416,47 @@
     padding-top: var(--space-2);
 }
 
+.action-btn-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-card);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.action-btn-circle:hover {
+    background: var(--primary-600);
+    transform: scale(1.05);
+}
+
+.action-btn-circle.rotating span {
+    animation: rotate 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
 /* === Historial Ujier === */
 .filter-input-date,
 .filter-input-select {
