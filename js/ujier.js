@@ -601,11 +601,6 @@ const ujier = {
                         <img src="${v.foto_url}" alt="Foto visita" loading="lazy">
                     </div>
                     ` : ''}
-                    ${v.audio_url ? `
-                    <div class="visita-audio-mini">
-                        <audio src="${v.audio_url}" controls style="height: 30px;"></audio>
-                    </div>
-                    ` : ''}
                     ${(v.ubicacion_lat && v.ubicacion_lng) ? `
                     <a href="https://www.google.com/maps?q=${v.ubicacion_lat},${v.ubicacion_lng}" target="_blank" class="visita-gps-link">
                         📍 Posición GPS
