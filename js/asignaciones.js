@@ -1,584 +1,407 @@
 /**
- * SGND - Asignaciones Module
- * Manages assignment of notifications to bailiffs
+ * SGND - Asignaciones Module v37.2
+ * Completely rewritten for maximum reliability and clean state management.
  */
 
 const asignaciones = {
-    selectedNotifications: new Set(),
-    selectedUjier: null,
-    notifications: [],
-    assignedNotifications: [],
-    ujieres: [],
-    currentTab: 'nuevas', // 'nuevas' or 'reasignaciones'
-    sourceUjier: null, // For reassignments
-    currentFilteredNotifications: [], // For select all functionality
+    // State
+    state: {
+        currentTab: 'nuevas', // 'nuevas' | 'reasignaciones'
+        ujieres: [],
+        notificacionesPendientes: [],
+        notificacionesAsignadas: [],
+        filteredPendientes: [],
+        filteredAsignadas: [],
+        selectedIds: new Set(),
+        selectedUjierDestinoId: null,
+        ujierOrigenId: null,
+        loading: false
+    },
 
     // Initialize the module
     async init() {
-        await this.loadPendingNotifications();
-        await this.loadUjieres();
-        this.setupEventListeners();
-        this.setupTabs();
+        console.log('[Asignaciones] Initializing v37.2...');
+        this.resetState();
+        this.setupStaticEventListeners();
+        await this.refreshData();
+        console.log('[Asignaciones] Ready.');
     },
 
-    // Setup tabs
-    setupTabs() {
-        const tabNuevas = document.getElementById('tab-asign-nuevas');
-        const tabReasign = document.getElementById('tab-reasignaciones');
+    resetState() {
+        this.state.selectedIds.clear();
+        this.state.selectedUjierDestinoId = null;
+        this.state.ujierOrigenId = null;
+        this.state.currentTab = 'nuevas';
+    },
 
-        if (tabNuevas) {
-            tabNuevas.addEventListener('click', () => {
-                this.switchTab('nuevas');
-            });
-        }
+    // Refresh all data from database
+    async refreshData() {
+        this.state.loading = true;
+        this.showLoading();
 
-        if (tabReasign) {
-            tabReasign.addEventListener('click', () => {
-                this.switchTab('reasignaciones');
-            });
+        try {
+            const [notifResult, ujieresResult] = await Promise.all([
+                db.getNotifications(),
+                db.getUjieres()
+            ]);
+
+            if (notifResult.error) throw notifResult.error;
+            if (ujieresResult.error) throw ujieresResult.error;
+
+            const allNotifs = notifResult.data || [];
+            this.state.ujieres = ujieresResult.data || [];
+
+            // Categorize notifications
+            this.state.notificacionesPendientes = allNotifs.filter(n =>
+                n.estado === 'pendiente' && !n.asignado_a
+            );
+
+            this.state.notificacionesAsignadas = allNotifs.filter(n =>
+                n.asignado_a && (n.estado === 'pendiente' || n.estado === 'en_proceso')
+            );
+
+            // Initial filter (all)
+            this.state.filteredPendientes = [...this.state.notificacionesPendientes];
+            this.applyReassignFilter();
+
+            this.renderAll();
+            this.updateFilters();
+        } catch (err) {
+            console.error('[Asignaciones] Error loading data:', err);
+            utils.showToast('Error al cargar datos de asignaciones', 'error');
+        } finally {
+            this.state.loading = false;
         }
     },
 
-    // Switch between tabs
+    // Static listeners (Tabs, Search, Global Filters, Action Buttons)
+    setupStaticEventListeners() {
+        // Tab Switching
+        document.getElementById('tab-asign-nuevas')?.addEventListener('click', () => this.switchTab('nuevas'));
+        document.getElementById('tab-reasignaciones')?.addEventListener('click', () => this.switchTab('reasignaciones'));
+
+        // Search - Nuevas
+        document.getElementById('search-asignaciones')?.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            this.state.filteredPendientes = this.state.notificacionesPendientes.filter(n =>
+                (n.n_expediente || '').toLowerCase().includes(query) ||
+                (n.destinatario_nombre || '').toLowerCase().includes(query) ||
+                (n.zona || '').toLowerCase().includes(query)
+            );
+            this.renderNotifList();
+        });
+
+        // Search - Reasignaciones
+        document.getElementById('search-reasignaciones')?.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            this.applyReassignFilter(query);
+            this.renderNotifList();
+        });
+
+        // Filter: Zone (Nuevas)
+        document.getElementById('filter-zona-asign')?.addEventListener('change', (e) => {
+            const zona = e.target.value;
+            this.state.filteredPendientes = zona
+                ? this.state.notificacionesPendientes.filter(n => n.zona === zona)
+                : [...this.state.notificacionesPendientes];
+            this.renderNotifList();
+        });
+
+        // Filter: Ujier Origen (Reasignaciones)
+        document.getElementById('filter-ujier-origen')?.addEventListener('change', (e) => {
+            this.state.ujierOrigenId = e.target.value || null;
+            this.state.selectedIds.clear(); // Important: clear selection on filter change
+            this.applyReassignFilter();
+            this.renderNotifList();
+            this.updateUI();
+        });
+
+        // Bulk Selection Actions
+        document.getElementById('btn-select-all-nuevas')?.addEventListener('click', () => this.selectAll('nuevas'));
+        document.getElementById('btn-select-none-nuevas')?.addEventListener('click', () => this.selectNone());
+        document.getElementById('btn-select-all-reasign')?.addEventListener('click', () => this.selectAll('reasignaciones'));
+        document.getElementById('btn-select-none-reasign')?.addEventListener('click', () => this.selectNone());
+
+        // Main Execution Buttons
+        document.getElementById('btn-asignar-seleccion')?.addEventListener('click', () => this.executeAssignment());
+        document.getElementById('btn-reasignar-seleccion')?.addEventListener('click', () => this.executeAssignment());
+    },
+
     switchTab(tab) {
-        this.currentTab = tab;
-        this.selectedNotifications.clear();
-        this.selectedUjier = null;
-        this.sourceUjier = null;
+        this.state.currentTab = tab;
+        this.state.selectedIds.clear();
+        this.state.selectedUjierDestinoId = null;
 
-        // Update tab buttons
+        // UI Classes
         document.getElementById('tab-asign-nuevas')?.classList.toggle('active', tab === 'nuevas');
         document.getElementById('tab-reasignaciones')?.classList.toggle('active', tab === 'reasignaciones');
 
-        // Show/hide sections
         document.getElementById('section-nuevas')?.classList.toggle('hidden', tab !== 'nuevas');
         document.getElementById('section-reasignaciones')?.classList.toggle('hidden', tab !== 'reasignaciones');
 
-        // Update buttons
-        this.updateAssignButton();
-        this.updateReassignButton();
-        this.updateSelectionCounter();
+        this.renderAll();
+    },
 
-        if (tab === 'reasignaciones') {
-            this.loadAssignedNotifications();
+    applyReassignFilter(searchQuery = '') {
+        const query = searchQuery || document.getElementById('search-reasignaciones')?.value.toLowerCase() || '';
+        let result = [...this.state.notificacionesAsignadas];
+
+        if (this.state.ujierOrigenId) {
+            result = result.filter(n => n.asignado_a === this.state.ujierOrigenId);
         }
+
+        if (query) {
+            result = result.filter(n =>
+                (n.n_expediente || '').toLowerCase().includes(query) ||
+                (n.destinatario_nombre || '').toLowerCase().includes(query) ||
+                (n.ujier_nombre || '').toLowerCase().includes(query) ||
+                (n.zona || '').toLowerCase().includes(query)
+            );
+        }
+
+        this.state.filteredAsignadas = result;
     },
 
-    // Setup event listeners
-    setupEventListeners() {
-        // Search
-        document.getElementById('search-asignaciones')?.addEventListener('input', (e) => {
-            this.filterNotifications(e.target.value);
-        });
-
-        // Assign button
-        document.getElementById('btn-asignar-seleccion')?.addEventListener('click', () => {
-            this.assignSelected();
-        });
-
-        // Reassign button
-        document.getElementById('btn-reasignar-seleccion')?.addEventListener('click', () => {
-            this.reassignSelected();
-        });
-
-        // Select all/none buttons
-        document.getElementById('btn-select-all-nuevas')?.addEventListener('click', () => {
-            this.selectAll('nuevas');
-        });
-
-        document.getElementById('btn-select-none-nuevas')?.addEventListener('click', () => {
-            this.selectNone();
-        });
-
-        document.getElementById('btn-select-all-reasign')?.addEventListener('click', () => {
-            this.selectAll('reasignaciones');
-        });
-
-        document.getElementById('btn-select-none-reasign')?.addEventListener('click', () => {
-            this.selectNone();
-        });
-
-        // Filter by zone
-        document.getElementById('filter-zona-asign')?.addEventListener('change', (e) => {
-            this.filterByZone(e.target.value);
-        });
-
-        // Filter by source ujier (for reassignments)
-        document.getElementById('filter-ujier-origen')?.addEventListener('change', (e) => {
-            this.sourceUjier = e.target.value;
-            this.selectedNotifications.clear(); // Clear selection when changing filter
-            this.loadAssignedNotifications();
-        });
-
-        // Search reassignments
-        document.getElementById('search-reasignaciones')?.addEventListener('input', (e) => {
-            this.filterAssignedNotifications(e.target.value);
-        });
+    // Core Rendering
+    renderAll() {
+        this.renderNotifList();
+        this.renderUjierList();
+        this.updateUI();
     },
 
-    // Select all visible notifications
-    selectAll(context) {
-        const notifications = context === 'nuevas' ? this.currentFilteredNotifications : this.assignedNotifications;
+    renderNotifList() {
+        const isNuevas = this.state.currentTab === 'nuevas';
+        const containerId = isNuevas ? 'lista-pendientes' : 'lista-asignadas';
+        const countId = isNuevas ? 'count-pendientes' : 'count-asignadas';
+        const list = isNuevas ? this.state.filteredPendientes : this.state.filteredAsignadas;
 
-        if (notifications.length === 0) {
-            utils.showToast('No hay notificaciones para seleccionar', 'warning');
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        // Update count badge
+        const countBadge = document.getElementById(countId);
+        if (countBadge) countBadge.textContent = list.length;
+
+        if (list.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="empty-icon">${isNuevas ? '📭' : '📋'}</span>
+                    <p>${isNuevas ? 'No hay notificaciones pendientes' : 'No se encontraron notificaciones asignadas'}</p>
+                </div>`;
             return;
         }
 
-        notifications.forEach(n => this.selectedNotifications.add(n.id));
+        container.innerHTML = list.map(n => `
+            <div class="asignacion-item ${this.state.selectedIds.has(n.id) ? 'selected' : ''}" data-id="${n.id}">
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" class="notif-checkbox-dynamic" data-id="${n.id}" 
+                        ${this.state.selectedIds.has(n.id) ? 'checked' : ''}>
+                    <span class="checkbox-custom"></span>
+                </label>
+                <div class="asignacion-info">
+                    <span class="asignacion-expediente">${n.n_expediente || 'S/N'}</span>
+                    <span class="asignacion-tipo">${CONFIG.NOTIFICATION_TYPES[n.tipo_notificacion] || n.tipo_notificacion}</span>
+                    <span class="asignacion-destinatario">${n.destinatario_nombre || '-'}</span>
+                    ${!isNuevas ? `<span class="asignacion-ujier-actual">👤 ${n.ujier_nombre || 'Desconocido'}</span>` : ''}
+                    <span class="asignacion-zona badge-zona">${n.zona || '-'}</span>
+                </div>
+            </div>
+        `).join('');
 
-        if (context === 'nuevas') {
-            this.renderNotifications(this.currentFilteredNotifications);
-            this.updateAssignButton();
-        } else {
-            this.renderAssignedNotifications(this.assignedNotifications);
-            this.updateReassignButton();
-        }
+        // Attach listeners to dynamic items
+        container.querySelectorAll('.asignacion-item').forEach(item => {
+            // Click on the whole item toggles checkbox
+            item.addEventListener('click', (e) => {
+                if (e.target.tagName === 'INPUT') return; // let the checkbox handler do its thing
+                const checkbox = item.querySelector('input');
+                checkbox.checked = !checkbox.checked;
+                this.toggleSelection(checkbox.dataset.id, checkbox.checked);
+            });
+        });
 
-        this.updateSelectionCounter();
-        utils.showToast(`${notifications.length} notificaciones seleccionadas`, 'success');
+        container.querySelectorAll('.notif-checkbox-dynamic').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                this.toggleSelection(e.target.dataset.id, e.target.checked);
+            });
+        });
     },
 
-    // Deselect all
+    renderUjierList() {
+        const containerId = this.state.currentTab === 'nuevas' ? 'lista-ujieres-asign' : 'lista-ujieres-reasign';
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (this.state.ujieres.length === 0) {
+            container.innerHTML = '<p class="text-center p-4">No hay ujieres disponibles</p>';
+            return;
+        }
+
+        container.innerHTML = this.state.ujieres.map(u => `
+            <div class="ujier-card ${this.state.selectedUjierDestinoId === u.id ? 'selected' : ''}" data-id="${u.id}">
+                <div class="ujier-avatar">👤</div>
+                <div class="ujier-info">
+                    <span class="ujier-nombre">${u.nombre || u.email}</span>
+                    <span class="ujier-email">${u.email}</span>
+                </div>
+                <div class="ujier-stats">
+                    <span class="ujier-count">${u.pending_count || 0} pendientes</span>
+                </div>
+            </div>
+        `).join('');
+
+        // Attach listeners
+        container.querySelectorAll('.ujier-card').forEach(card => {
+            card.addEventListener('click', () => {
+                this.state.selectedUjierDestinoId = card.dataset.id;
+                this.renderUjierList(); // Re-render to show selection
+                this.updateUI();
+            });
+        });
+    },
+
+    toggleSelection(id, isSelected) {
+        if (isSelected) {
+            this.state.selectedIds.add(id);
+        } else {
+            this.state.selectedIds.delete(id);
+        }
+
+        // Update visual state of items without full re-render for performance
+        document.querySelectorAll(`.asignacion-item[data-id="${id}"]`).forEach(item => {
+            item.classList.toggle('selected', isSelected);
+            const cb = item.querySelector('input');
+            if (cb) cb.checked = isSelected;
+        });
+
+        this.updateUI();
+    },
+
+    selectAll(context) {
+        const list = context === 'nuevas' ? this.state.filteredPendientes : this.state.filteredAsignadas;
+        list.forEach(n => this.state.selectedIds.add(n.id));
+        this.renderNotifList();
+        this.updateUI();
+        utils.showToast(`Seleccionadas ${list.length} notificaciones`, 'success');
+    },
+
     selectNone() {
-        this.selectedNotifications.clear();
-
-        if (this.currentTab === 'nuevas') {
-            this.renderNotifications(this.currentFilteredNotifications);
-            this.updateAssignButton();
-        } else {
-            this.renderAssignedNotifications(this.assignedNotifications);
-            this.updateReassignButton();
-        }
-
-        this.updateSelectionCounter();
+        this.state.selectedIds.clear();
+        this.renderNotifList();
+        this.updateUI();
     },
 
-    // Update selection counter
-    updateSelectionCounter() {
-        const counterNuevas = document.getElementById('selection-counter-nuevas');
-        const counterReasign = document.getElementById('selection-counter-reasign');
-
-        const count = this.selectedNotifications.size;
+    updateUI() {
+        // Selection counters
+        const count = this.state.selectedIds.size;
         const text = count > 0 ? `${count} seleccionada${count > 1 ? 's' : ''}` : '';
 
+        const counterNuevas = document.getElementById('selection-counter-nuevas');
+        const counterReasign = document.getElementById('selection-counter-reasign');
         if (counterNuevas) counterNuevas.textContent = text;
         if (counterReasign) counterReasign.textContent = text;
+
+        // Action buttons
+        const btnAsignar = document.getElementById('btn-asignar-seleccion');
+        const btnReasignar = document.getElementById('btn-reasignar-seleccion');
+
+        const isNuevas = this.state.currentTab === 'nuevas';
+        const targetBtn = isNuevas ? btnAsignar : btnReasignar;
+        const otherBtn = isNuevas ? btnReasignar : btnAsignar;
+
+        if (targetBtn) {
+            const canExecute = count > 0 && this.state.selectedUjierDestinoId;
+            targetBtn.disabled = !canExecute;
+
+            if (canExecute) {
+                const ujier = this.state.ujieres.find(u => u.id === this.state.selectedUjierDestinoId);
+                const prefix = isNuevas ? '✅ Asignar' : '🔄 Reasignar';
+                targetBtn.textContent = `${prefix} ${count} a ${ujier?.nombre || 'ujier'}`;
+            } else if (count > 0) {
+                targetBtn.textContent = `⚠️ Seleccioná un ujier destino`;
+            } else {
+                targetBtn.textContent = isNuevas ? '✅ Asignar Seleccionados' : '🔄 Reasignar Seleccionados';
+            }
+        }
     },
 
-    // Load pending notifications (not assigned)
-    async loadPendingNotifications() {
-        const container = document.getElementById('lista-pendientes');
-        if (!container) return;
-
-        container.innerHTML = '<div class="loading-spinner">⏳ Cargando notificaciones...</div>';
-
-        const { data, error } = await db.getNotifications();
-
-        if (error) {
-            container.innerHTML = '<div class="error-message">❌ Error al cargar notificaciones</div>';
-            return;
-        }
-
-        // Filter only pending (not assigned or without ujier)
-        this.notifications = (data || []).filter(n =>
-            n.estado === 'pendiente' && !n.asignado_a
-        );
-
-        this.currentFilteredNotifications = this.notifications;
-
-        const countEl = document.getElementById('count-pendientes');
-        if (countEl) {
-            countEl.textContent = this.notifications.length;
-            countEl.style.display = this.notifications.length > 0 ? 'inline' : 'none';
-        }
-
-        this.renderNotifications(this.notifications);
-    },
-
-    // Load assigned notifications for reassignment
-    async loadAssignedNotifications() {
-        const container = document.getElementById('lista-asignadas');
-        if (!container) return;
-
-        container.innerHTML = '<div class="loading-spinner">⏳ Cargando notificaciones asignadas...</div>';
-
-        const { data, error } = await db.getNotifications();
-
-        if (error) {
-            container.innerHTML = '<div class="error-message">❌ Error al cargar notificaciones</div>';
-            return;
-        }
-
-        // Filter assigned notifications (with ujier, pending or in progress)
-        let assigned = (data || []).filter(n =>
-            n.asignado_a && (n.estado === 'pendiente' || n.estado === 'en_proceso')
-        );
-
-        // Filter by source ujier if selected
-        if (this.sourceUjier) {
-            assigned = assigned.filter(n => n.asignado_a === this.sourceUjier);
-        }
-
-        this.assignedNotifications = assigned;
-
-        const countEl = document.getElementById('count-asignadas');
-        if (countEl) {
-            countEl.textContent = assigned.length;
-            countEl.style.display = assigned.length > 0 ? 'inline' : 'none';
-        }
-
-        this.renderAssignedNotifications(assigned);
-    },
-
-    // Render notifications list
-    renderNotifications(notifications) {
-        const container = document.getElementById('lista-pendientes');
-        if (!container) return;
-
-        this.currentFilteredNotifications = notifications;
-
-        if (notifications.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <span class="empty-icon">📭</span>
-                    <p>No hay notificaciones pendientes de asignar</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = notifications.map(n => `
-            <div class="asignacion-item ${this.selectedNotifications.has(n.id) ? 'selected' : ''}" 
-                 data-id="${n.id}">
-                <label class="checkbox-wrapper">
-                    <input type="checkbox" class="notif-checkbox" data-id="${n.id}"
-                        ${this.selectedNotifications.has(n.id) ? 'checked' : ''}>
-                    <span class="checkbox-custom"></span>
-                </label>
-                <div class="asignacion-info">
-                    <span class="asignacion-expediente">${n.n_expediente || 'S/N'}</span>
-                    <span class="asignacion-tipo">${CONFIG.NOTIFICATION_TYPES[n.tipo_notificacion] || n.tipo_notificacion}</span>
-                    <span class="asignacion-destinatario">${n.destinatario_nombre || '-'}</span>
-                    <span class="asignacion-zona badge-zona">${n.zona || '-'}</span>
-                </div>
-            </div>
-        `).join('');
-
-        // Add click handlers
-        container.querySelectorAll('.notif-checkbox').forEach(cb => {
-            cb.addEventListener('change', (e) => {
-                const id = e.target.dataset.id;
-                if (e.target.checked) {
-                    this.selectedNotifications.add(id);
-                } else {
-                    this.selectedNotifications.delete(id);
-                }
-                this.updateAssignButton();
-                this.updateSelectionCounter();
-                e.target.closest('.asignacion-item').classList.toggle('selected', e.target.checked);
-            });
+    showLoading() {
+        const containers = ['lista-pendientes', 'lista-asignadas', 'lista-ujieres-asign', 'lista-ujieres-reasign'];
+        containers.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = '<div class="loading-spinner">⏳ Procesando datos...</div>';
         });
     },
 
-    // Render assigned notifications for reassignment
-    renderAssignedNotifications(notifications) {
-        const container = document.getElementById('lista-asignadas');
-        if (!container) return;
-
-        if (notifications.length === 0) {
-            const msg = this.sourceUjier
-                ? 'No hay notificaciones asignadas para este ujier'
-                : 'No hay notificaciones asignadas';
-            container.innerHTML = `
-                <div class="empty-state">
-                    <span class="empty-icon">📋</span>
-                    <p>${msg}</p>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = notifications.map(n => `
-            <div class="asignacion-item ${this.selectedNotifications.has(n.id) ? 'selected' : ''}" 
-                 data-id="${n.id}">
-                <label class="checkbox-wrapper">
-                    <input type="checkbox" class="notif-checkbox-reassign" data-id="${n.id}"
-                        ${this.selectedNotifications.has(n.id) ? 'checked' : ''}>
-                    <span class="checkbox-custom"></span>
-                </label>
-                <div class="asignacion-info">
-                    <span class="asignacion-expediente">${n.n_expediente || 'S/N'}</span>
-                    <span class="asignacion-tipo">${CONFIG.NOTIFICATION_TYPES[n.tipo_notificacion] || n.tipo_notificacion}</span>
-                    <span class="asignacion-destinatario">${n.destinatario_nombre || '-'}</span>
-                    <span class="asignacion-ujier-actual">👤 ${n.ujier_nombre || 'Sin nombre'}</span>
-                    <span class="asignacion-zona badge-zona">${n.zona || '-'}</span>
-                </div>
-            </div>
-        `).join('');
-
-        // Add click handlers
-        container.querySelectorAll('.notif-checkbox-reassign').forEach(cb => {
-            cb.addEventListener('change', (e) => {
-                const id = e.target.dataset.id;
-                if (e.target.checked) {
-                    this.selectedNotifications.add(id);
-                } else {
-                    this.selectedNotifications.delete(id);
-                }
-                this.updateReassignButton();
-                this.updateSelectionCounter();
-                e.target.closest('.asignacion-item').classList.toggle('selected', e.target.checked);
-            });
-        });
-    },
-
-    // Load ujieres
-    async loadUjieres() {
-        const container = document.getElementById('lista-ujieres-asign');
-        const containerReassign = document.getElementById('lista-ujieres-reasign');
-
-        const { data, error } = await db.getUjieres();
-
-        if (error || !data) {
-            const errorMsg = '<div class="error-message">❌ Error al cargar ujieres</div>';
-            if (container) container.innerHTML = errorMsg;
-            if (containerReassign) containerReassign.innerHTML = errorMsg;
-            return;
-        }
-
-        this.ujieres = data;
-
-        // Render for new assignments
-        if (container) {
-            container.innerHTML = data.map(u => `
-                <div class="ujier-card ${this.selectedUjier === u.id ? 'selected' : ''}" data-id="${u.id}">
-                    <div class="ujier-avatar">👤</div>
-                    <div class="ujier-info">
-                        <span class="ujier-nombre">${u.nombre || u.email}</span>
-                        <span class="ujier-email">${u.email}</span>
-                    </div>
-                    <div class="ujier-stats">
-                        <span class="ujier-count">${u.pending_count || 0} pendientes</span>
-                    </div>
-                </div>
-            `).join('');
-
-            // Add click handlers
-            container.querySelectorAll('.ujier-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    container.querySelectorAll('.ujier-card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    this.selectedUjier = card.dataset.id;
-                    this.updateAssignButton();
-                });
-            });
-        }
-
-        // Render for reassignments
-        if (containerReassign) {
-            containerReassign.innerHTML = data.map(u => `
-                <div class="ujier-card ${this.selectedUjier === u.id ? 'selected' : ''}" data-id="${u.id}">
-                    <div class="ujier-avatar">👤</div>
-                    <div class="ujier-info">
-                        <span class="ujier-nombre">${u.nombre || u.email}</span>
-                        <span class="ujier-email">${u.email}</span>
-                    </div>
-                    <div class="ujier-stats">
-                        <span class="ujier-count">${u.pending_count || 0} pendientes</span>
-                    </div>
-                </div>
-            `).join('');
-
-            // Add click handlers
-            containerReassign.querySelectorAll('.ujier-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    containerReassign.querySelectorAll('.ujier-card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    this.selectedUjier = card.dataset.id;
-                    this.updateReassignButton();
-                });
-            });
-        }
-
-        // Populate filter dropdowns
-        const filterSelect = document.getElementById('filter-ujier-asign');
-        if (filterSelect) {
-            filterSelect.innerHTML = '<option value="">Todos los ujieres</option>' +
-                data.map(u => `<option value="${u.id}">${u.nombre || u.email}</option>`).join('');
-        }
-
+    updateFilters() {
+        // Populate Destino Dropdowns (though they are now card grids)
+        // Populate Origen Dropdown
         const filterOrigen = document.getElementById('filter-ujier-origen');
         if (filterOrigen) {
             filterOrigen.innerHTML = '<option value="">📍 Ujier Origen: Todos</option>' +
-                data.map(u => `<option value="${u.id}">📍 ${u.nombre || u.email}</option>`).join('');
+                this.state.ujieres.map(u => `<option value="${u.id}" ${this.state.ujierOrigenId === u.id ? 'selected' : ''}>📍 ${u.nombre || u.email}</option>`).join('');
+        }
+
+        // Zone filter dropdown
+        const filterZona = document.getElementById('filter-zona-asign');
+        if (filterZona) {
+            const zones = [...new Set(this.state.notificacionesPendientes.map(n => n.zona).filter(Boolean))].sort();
+            filterZona.innerHTML = '<option value="">Todas las zonas</option>' +
+                zones.map(z => `<option value="${z}">${z}</option>`).join('');
         }
     },
 
-    // Update assign button state
-    updateAssignButton() {
-        const btn = document.getElementById('btn-asignar-seleccion');
-        if (btn) {
-            const canAssign = this.selectedNotifications.size > 0 && this.selectedUjier;
-            btn.disabled = !canAssign;
+    async executeAssignment() {
+        const count = this.state.selectedIds.size;
+        const ujierId = this.state.selectedUjierDestinoId;
 
-            if (canAssign) {
-                const ujier = this.ujieres.find(u => u.id === this.selectedUjier);
-                btn.textContent = `✅ Asignar ${this.selectedNotifications.size} a ${ujier?.nombre || 'ujier'}`;
-            } else if (this.selectedNotifications.size > 0) {
-                btn.textContent = `⚠️ Seleccioná un ujier destino`;
-            } else {
-                btn.textContent = '✅ Asignar Seleccionados';
-            }
-        }
-    },
+        if (count === 0 || !ujierId) return;
 
-    // Update reassign button state
-    updateReassignButton() {
-        const btn = document.getElementById('btn-reasignar-seleccion');
-        if (btn) {
-            const canReassign = this.selectedNotifications.size > 0 && this.selectedUjier;
-            btn.disabled = !canReassign;
+        const ujier = this.state.ujieres.find(u => u.id === ujierId);
+        const actionText = this.state.currentTab === 'nuevas' ? 'asignar' : 'reasignar';
 
-            if (canReassign) {
-                const ujier = this.ujieres.find(u => u.id === this.selectedUjier);
-                btn.textContent = `🔄 Reasignar ${this.selectedNotifications.size} a ${ujier?.nombre || 'ujier'}`;
-            } else if (this.selectedNotifications.size > 0) {
-                btn.textContent = `⚠️ Seleccioná un ujier destino`;
-            } else {
-                btn.textContent = '🔄 Reasignar Seleccionados';
-            }
-        }
-    },
-
-    // Assign selected notifications to selected ujier
-    async assignSelected() {
-        if (this.selectedNotifications.size === 0 || !this.selectedUjier) {
-            utils.showToast('Seleccioná notificaciones y un ujier', 'warning');
+        if (!confirm(`¿Confirmás ${actionText} ${count} notificaciones a ${ujier?.nombre || ujier?.email}?`)) {
             return;
         }
 
-        const ujierDestino = this.ujieres.find(u => u.id === this.selectedUjier);
-        const confirmMsg = `¿Asignar ${this.selectedNotifications.size} notificación(es) a ${ujierDestino?.nombre || ujierDestino?.email}?`;
+        this.state.loading = true;
+        const btn = this.state.currentTab === 'nuevas' ?
+            document.getElementById('btn-asignar-seleccion') :
+            document.getElementById('btn-reasignar-seleccion');
 
-        if (!confirm(confirmMsg)) return;
-
-        const btn = document.getElementById('btn-asignar-seleccion');
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = '⏳ Asignando...';
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⏳ Procesando...';
+        }
 
         let successCount = 0;
         let errorCount = 0;
 
-        for (const notifId of this.selectedNotifications) {
-            const { error } = await db.updateNotification(notifId, {
-                asignado_a: this.selectedUjier,
+        // Perform updates
+        const updatePromises = Array.from(this.state.selectedIds).map(notifId =>
+            db.updateNotification(notifId, {
+                asignado_a: ujierId,
                 fecha_asignacion: new Date().toISOString()
-            });
+            })
+        );
 
-            if (error) {
-                errorCount++;
-            } else {
-                successCount++;
-            }
-        }
+        const results = await Promise.all(updatePromises);
+
+        results.forEach(res => {
+            if (res.error) errorCount++;
+            else successCount++;
+        });
 
         if (successCount > 0) {
-            utils.showToast(`✅ ${successCount} notificación(es) asignadas correctamente`, 'success');
+            utils.showToast(`✅ ${successCount} notificaciones procesadas con éxito`, 'success');
         }
         if (errorCount > 0) {
-            utils.showToast(`❌ ${errorCount} notificación(es) no se pudieron asignar`, 'error');
+            utils.showToast(`❌ Error en ${errorCount} notificaciones`, 'error');
         }
 
-        // Reset and reload
-        this.selectedNotifications.clear();
-        this.selectedUjier = null;
-        this.updateSelectionCounter();
-        await this.loadPendingNotifications();
-        await this.loadUjieres();
-
-        btn.textContent = originalText;
-    },
-
-    // Reassign selected notifications to another ujier
-    async reassignSelected() {
-        if (this.selectedNotifications.size === 0 || !this.selectedUjier) {
-            utils.showToast('Seleccioná notificaciones y un ujier destino', 'warning');
-            return;
-        }
-
-        const ujierDestino = this.ujieres.find(u => u.id === this.selectedUjier);
-        const confirmMsg = `¿Reasignar ${this.selectedNotifications.size} notificación(es) a ${ujierDestino?.nombre || ujierDestino?.email}?`;
-
-        if (!confirm(confirmMsg)) return;
-
-        const btn = document.getElementById('btn-reasignar-seleccion');
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = '⏳ Reasignando...';
-
-        let successCount = 0;
-        let errorCount = 0;
-
-        for (const notifId of this.selectedNotifications) {
-            const { error } = await db.updateNotification(notifId, {
-                asignado_a: this.selectedUjier,
-                fecha_asignacion: new Date().toISOString()
-            });
-
-            if (error) {
-                errorCount++;
-            } else {
-                successCount++;
-            }
-        }
-
-        if (successCount > 0) {
-            utils.showToast(`✅ ${successCount} notificación(es) reasignadas correctamente`, 'success');
-        }
-        if (errorCount > 0) {
-            utils.showToast(`❌ ${errorCount} notificación(es) no se pudieron reasignar`, 'error');
-        }
-
-        // Reset and reload
-        this.selectedNotifications.clear();
-        this.selectedUjier = null;
-        this.updateSelectionCounter();
-        await this.loadAssignedNotifications();
-        await this.loadUjieres();
-
-        btn.textContent = originalText;
-    },
-
-    // Filter notifications by search
-    filterNotifications(query) {
-        const filtered = this.notifications.filter(n =>
-            (n.n_expediente || '').toLowerCase().includes(query.toLowerCase()) ||
-            (n.destinatario_nombre || '').toLowerCase().includes(query.toLowerCase()) ||
-            (n.zona || '').toLowerCase().includes(query.toLowerCase())
-        );
-        this.renderNotifications(filtered);
-    },
-
-    // Filter assigned notifications by search
-    filterAssignedNotifications(query) {
-        const filtered = this.assignedNotifications.filter(n =>
-            (n.n_expediente || '').toLowerCase().includes(query.toLowerCase()) ||
-            (n.destinatario_nombre || '').toLowerCase().includes(query.toLowerCase()) ||
-            (n.zona || '').toLowerCase().includes(query.toLowerCase()) ||
-            (n.ujier_nombre || '').toLowerCase().includes(query.toLowerCase())
-        );
-        this.renderAssignedNotifications(filtered);
-    },
-
-    // Filter by zone
-    filterByZone(zone) {
-        if (!zone) {
-            this.renderNotifications(this.notifications);
-            return;
-        }
-        const filtered = this.notifications.filter(n => n.zona === zone);
-        this.renderNotifications(filtered);
+        // Cleanup and Refresh
+        await this.refreshData();
+        this.state.selectedIds.clear();
+        this.state.selectedUjierDestinoId = null;
+        this.updateUI();
     }
 };
