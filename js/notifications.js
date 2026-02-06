@@ -286,12 +286,12 @@ const notifications = {
                             
                             ${v.observaciones ? `<div class="visit-notes-box">📝 ${v.observaciones}</div>` : ''}
                             
-                            ${v.audio_transcripcion ? `
+                            ${(v.transcripcion_audio || v.audio_transcripcion || v.transcripcion_observacion) ? `
                                 <div class="audio-transcription-box">
                                     <span class="audio-icon">🎤</span>
                                     <div class="audio-body">
                                         <span class="audio-label">Transcripción de voz:</span>
-                                        <p class="transcription-text">${v.audio_transcripcion}</p>
+                                        <p class="transcription-text">${v.transcripcion_audio || v.audio_transcripcion || v.transcripcion_observacion}</p>
                                     </div>
                                 </div>
                             ` : ''}
