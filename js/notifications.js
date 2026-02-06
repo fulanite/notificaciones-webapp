@@ -264,30 +264,41 @@ const notifications = {
         try {
             const visitasResp = await db.getVisitas(id);
             if (visitasResp.data && visitasResp.data.length > 0) {
-                visitasHtml = `
-                    <div class="detail-section">
-                        <h4>📋 Historial de Visitas (${visitasResp.data.length})</h4>
-                        <div class="visitas-list">
-                            ${visitasResp.data.map(v => `
-                                <div class="visita-item">
-                                    <div class="visita-header">
-                                        <span class="visita-fecha">${utils.formatDateTime(v.fecha)}${v.ujier_nombre ? ` - <strong>${v.ujier_nombre}</strong>` : ''}</span>
-                                        ${utils.getStatusBadge(v.resultado?.toLowerCase().replace(/ /g, '_') || 'pendiente')}
-                                    </div>
-                                    ${v.observaciones ? `<p class="visita-obs">📝 ${v.observaciones}</p>` : ''}
-                                    ${v.audio_transcripcion ? `<p class="visita-obs">🎤 <em>${v.audio_transcripcion}</em></p>` : ''}
-                                    ${v.ubicacion_lat && v.ubicacion_lng ? `
-                                        <a href="https://www.google.com/maps?q=${v.ubicacion_lat},${v.ubicacion_lng}" 
-                                           target="_blank" class="visita-ubicacion">
-                                            📍 Ver ubicación en Google Maps
-                                        </a>
-                                    ` : ''}
-                                    ${v.foto_url ? `<img src="${v.foto_url}" class="visita-foto" onclick="window.open('${v.foto_url}', '_blank')">` : ''}
-                                </div>
-                            `).join('')}
+                // Tactical Logistics Timeline (Shipping style)
+                visitasHtml = visitasResp.data.map((v, index) => `
+                    <div class="timeline-item-tactical">
+                        <div class="timeline-dot-box">
+                            <div class="timeline-dot-tactical completed"></div>
+                        </div>
+                        <div class="timeline-detail">
+                            <div class="timeline-header">
+                                <span class="timeline-step">Gestión #${visitasResp.data.length - index}</span>
+                                <span class="timeline-time">${utils.formatDateTime(v.fecha)}</span>
+                            </div>
+                            <div class="timeline-status">
+                                ${v.resultado ? `<strong>${v.resultado}</strong>` : '<em>Registrado</em>'}
+                            </div>
+                            
+                            ${v.observaciones ? `<p class="dashboard-notes mt-2" style="padding: 8px; font-size: 0.75rem;">📝 ${v.observaciones}</p>` : ''}
+                            
+                            ${v.audio_transcripcion ? `<p class="mt-1" style="font-size: 0.75rem; color: #4ade80;">🎤 <em>${v.audio_transcripcion}</em></p>` : ''}
+                            
+                            <div class="timeline-footer mt-2" style="display:flex; gap:10px;">
+                                ${v.ubicacion_lat && v.ubicacion_lng ? `
+                                    <a href="https://www.google.com/maps?q=${v.ubicacion_lat},${v.ubicacion_lng}" 
+                                       target="_blank" style="font-size: 10px; color: #6366f1; text-decoration:none;">
+                                        📍 Ubicación GPS
+                                    </a>
+                                ` : ''}
+                                ${v.foto_url ? `
+                                    <a href="${v.foto_url}" target="_blank" style="font-size: 10px; color: #a78bfa; text-decoration:none;">
+                                        📸 Foto Evidencia
+                                    </a>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
-                `;
+                `).join('');
             }
         } catch (e) {
             console.log('No se pudieron cargar visitas:', e);
@@ -296,135 +307,149 @@ const notifications = {
         // Create modal HTML
         const modalHtml = `
             <div class="modal-overlay" id="modal-detalle" onclick="notifications.closeModal(event)">
-                <div class="modal-content modal-panoramic" onclick="event.stopPropagation()">
-                    <div class="modal-header">
-                        <div class="header-info">
-                            <div class="header-main-title">
+                <div class="modal-content modal-panoramic-v2" onclick="event.stopPropagation()">
+                    <div class="modal-header-v2">
+                        <div class="header-main-left">
+                            <div class="header-title-container">
                                 <h2>📄 Detalle de Notificación</h2>
-                                <span class="badge-type-pill">${CONFIG.NOTIFICATION_TYPES[data.tipo_notificacion] || data.tipo_notificacion}</span>
+                                <div class="header-badges">
+                                    <span class="badge-type-pill-v2">${CONFIG.NOTIFICATION_TYPES[data.tipo_notificacion] || data.tipo_notificacion}</span>
+                                    <span class="header-id-pill">#${data.id.substring(0, 8)}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="header-status-pill">
+                        <div class="header-status-box">
                             ${utils.getStatusBadge(data.resultado_diligencia || data.estado)}
                         </div>
-                        <button class="modal-close" onclick="notifications.closeModal()">&times;</button>
+                        <button class="modal-close-v2" onclick="notifications.closeModal()">&times;</button>
                     </div>
 
                     <div class="modal-body p-0">
-                        <!-- Barra Maestra Superior: Info Crítica Expandida -->
-                        <div class="modal-master-bar">
-                            <div class="master-item">
-                                <span class="master-label">📍 Zona</span>
-                                <span class="master-value"><span class="badge-zona-lg">${data.zona || 'N/A'}</span></span>
-                            </div>
-                            <div class="master-item">
-                                <span class="master-label">🚶 Ujier</span>
-                                <div class="ujier-assigned-box">
-                                    <div class="ujier-avatar-mini">${data.ujier_nombre ? data.ujier_nombre.charAt(0) : '?'}</div>
-                                    <span class="master-value"><strong>${data.ujier_nombre || 'Sin asignar'}</strong></span>
+                        <!-- New Premium Master Bar -->
+                        <div class="master-premium-bar">
+                            <div class="premium-card zona-card">
+                                <div class="card-icon">📍</div>
+                                <div class="card-content">
+                                    <span class="card-label">Zona de Trabajo</span>
+                                    <span class="card-value">${data.zona || 'N/A'}</span>
                                 </div>
                             </div>
-                            <div class="master-item highlighted">
-                                <span class="master-label">👤 Destinatario</span>
-                                <span class="master-value"><strong>${data.destinatario_nombre}</strong></span>
+                            <div class="premium-card ujier-card">
+                                <div class="card-avatar">${data.ujier_nombre ? data.ujier_nombre.charAt(0) : '?'}</div>
+                                <div class="card-content">
+                                    <span class="card-label">Ujier Asignado</span>
+                                    <span class="card-value"><strong>${data.ujier_nombre || 'Sin asignar'}</strong></span>
+                                </div>
                             </div>
-                            <div class="master-item grow">
-                                <span class="master-label">🏠 Domicilio</span>
-                                <span class="master-value domicile-large">${data.domicilio}</span>
+                            <div class="premium-card dest-card">
+                                <div class="card-icon">👤</div>
+                                <div class="card-content">
+                                    <span class="card-label">Destinatario</span>
+                                    <span class="card-value"><strong>${data.destinatario_nombre}</strong></span>
+                                </div>
+                            </div>
+                            <div class="premium-card dom-card grow">
+                                <div class="card-icon">🏠</div>
+                                <div class="card-content">
+                                    <span class="card-label">Domicilio de Notificación</span>
+                                    <span class="card-value highlight">${data.domicilio}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="modal-detailed-grid mt-0">
-                            <!-- Columna Izquierda: Datos Legales Compactos -->
-                            <div class="modal-col-main">
-                                <div class="info-section-group">
-                                    <h4 class="info-group-title">⚖️ Información del Expediente</h4>
-                                    <table class="compact-info-table">
+                        <!-- Content Grid: 3 Main Sections -->
+                        <div class="modal-dashboard-grid">
+                            <!-- Col 1: Datos Legales -->
+                            <div class="dashboard-col">
+                                <div class="section-container">
+                                    <h4 class="section-title">⚖️ Información del Expediente</h4>
+                                    <table class="dashboard-table">
                                         <tr>
                                             <th>N° Expediente</th>
-                                            <td><span class="expediente-highlight">${data.n_expediente}</span></td>
+                                            <td class="val-xl">${data.n_expediente}</td>
                                         </tr>
                                         <tr>
                                             <th>Carátula</th>
-                                            <td class="text-secondary">${data.caratula}</td>
+                                            <td class="val-caratula">${data.caratula}</td>
                                         </tr>
                                         <tr>
-                                            <th>Organismo Origen</th>
+                                            <th>Organismo</th>
                                             <td>${data.origen || '-'}</td>
                                         </tr>
                                         <tr>
-                                            <th>Letrado Actuante</th>
+                                            <th>Letrado</th>
                                             <td>${data.letrado || '-'}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Col 2: Control y Pago + Otros -->
+                            <div class="dashboard-col">
+                                <div class="section-container">
+                                    <h4 class="section-title">🎫 Control y Gestión</h4>
+                                    <table class="dashboard-table">
+                                        <tr>
+                                            <th>N° Troquel</th>
+                                            <td class="val-highlight">${data.sin_troquel ? 'N/A' : (data.n_troquel || '-')}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Medio de Pago</th>
+                                            <td>${data.medio_pago || '-'}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Costo</th>
+                                            <td class="val-money">${utils.formatCurrency(data.costo)}</td>
                                         </tr>
                                         ${data.destinatario_especial ? `
                                             <tr>
-                                                <th>Destino Especial</th>
-                                                <td><span class="text-warning">${data.destinatario_especial}</span></td>
+                                                <th>Destino Esp.</th>
+                                                <td><span class="badge-dest-esp">${data.destinatario_especial}</span></td>
                                             </tr>
                                         ` : ''}
                                     </table>
                                 </div>
 
-                                <div class="info-section-group">
-                                    <h4 class="info-group-title">🎫 Control y Pago</h4>
-                                    <div class="control-badges">
-                                        <div class="control-tag">
-                                            <span class="tag-label">N° Troquel:</span>
-                                            <span class="tag-value">${data.sin_troquel ? 'No posee' : (data.n_troquel || '-')}</span>
-                                        </div>
-                                        <div class="control-tag">
-                                            <span class="tag-label">Medio Pago:</span>
-                                            <span class="tag-value">${data.medio_pago || '-'}</span>
-                                        </div>
-                                        <div class="control-tag">
-                                            <span class="tag-label">Costo:</span>
-                                            <span class="tag-value">${utils.formatCurrency(data.costo)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 ${data.observaciones_iniciales ? `
-                                    <div class="info-section-group notes-group">
-                                        <h4 class="info-group-title">📝 Notas de Carga</h4>
-                                        <div class="notes-content">${data.observaciones_iniciales}</div>
+                                    <div class="section-container mt-4">
+                                        <h4 class="section-title">📝 Notas de Carga</h4>
+                                        <div class="dashboard-notes">${data.observaciones_iniciales}</div>
                                     </div>
                                 ` : ''}
                             </div>
 
-                            <!-- Columna Derecha: Evidencia e Historial (Limpio) -->
-                            <div class="modal-col-side side-clean">
+                            <!-- Col 3: Sidebar con Timeline y Foto -->
+                            <div class="dashboard-sidebar">
                                 ${data.evidencia_foto ? `
-                                    <div class="side-panel-section mb-6">
-                                        <h4 class="side-title">📸 Evidencia</h4>
-                                        <div class="photo-frame-modern" onclick="window.open('${data.evidencia_foto}', '_blank')">
-                                            <img src="${data.evidencia_foto}" class="img-fluid">
-                                            <div class="photo-overlay">Ver pantalla completa 🔍</div>
+                                    <div class="sidebar-photo-box">
+                                        <h4 class="sidebar-title">📸 Evidencia</h4>
+                                        <div class="photo-container" onclick="window.open('${data.evidencia_foto}', '_blank')">
+                                            <img src="${data.evidencia_foto}">
+                                            <div class="photo-hint">Expandir Imagen</div>
                                         </div>
                                     </div>
                                 ` : ''}
 
-                                <div class="side-panel-section scrollable">
-                                    <h4 class="side-title">📜 Historial de Visitas</h4>
-                                    <div class="timeline-container">
-                                        ${visitasHtml || '<p class="text-muted text-center p-4">Sin registro de visitas</p>'}
+                                <div class="sidebar-timeline-box">
+                                    <h4 class="sidebar-title">📜 Historial de Gestión</h4>
+                                    <div class="logistics-timeline">
+                                        ${visitasHtml || '<div class="timeline-empty">Sin visitas registradas</div>'}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="modal-footer-modern">
-                        <div class="footer-meta-info">
-                            <span class="meta-item id-tag">ID: ${data.id}</span>
-                            <span class="meta-divider">|</span>
-                            <span class="meta-item">Carga: ${utils.formatDateTime(data.fecha_carga)}</span>
-                            <span class="meta-divider">|</span>
-                            <span class="meta-item">Por: <strong>${data.usuario_carga || '-'}</strong></span>
-                            ${data.migrated_from_glide ? '<span class="meta-divider">|</span><span class="badge-migrated-sutil">📦 Registro Migrado</span>' : ''}
+
+                    <!-- Enhanced Footer -->
+                    <div class="modal-footer-v2">
+                        <div class="footer-info-strip">
+                            <span class="info-tag carga-tag">📅 Carga: ${utils.formatDateTime(data.fecha_carga)}</span>
+                            <span class="info-tag user-tag">👤 Por: <strong>${data.usuario_carga || '-'}</strong></span>
+                            ${data.migrated_from_glide ? '<span class="badge-migrated-v2">📦 REGISTRO MIGRADO</span>' : ''}
                         </div>
-                        <div class="footer-actions">
-                            <button class="btn btn-secondary-outline" onclick="notifications.closeModal()">Cerrar</button>
-                            <button class="btn btn-primary btn-edit-detail" onclick="notifications.edit('${data.id}'); notifications.closeModal();">
+                        <div class="footer-main-actions">
+                            <button class="btn btn-glass" onclick="notifications.closeModal()">Cerrar</button>
+                            <button class="btn btn-primary btn-action-main" onclick="notifications.edit('${data.id}'); notifications.closeModal();">
                                 ✏️ Editar Diligencia
                             </button>
                         </div>
