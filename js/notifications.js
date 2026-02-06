@@ -8,11 +8,11 @@ const notifications = {
     filters: {
         estado: '',
         tipo: '',
-        fecha: '',
+        fecha: new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().split('T')[0],
         search: '',
         zona: '',
         year: '2026',
-        own_only: false
+        own_only: true
     },
 
     // Initialize notifications list
@@ -65,7 +65,6 @@ const notifications = {
             this.filters.own_only = filterPropio.value === 'true';
             if (this.filters.own_only) {
                 const today = new Date();
-                // Compensate for local timezone to get YYYY-MM-DD correctly
                 const offset = today.getTimezoneOffset();
                 const localToday = new Date(today.getTime() - (offset * 60 * 1000));
                 const dateStr = localToday.toISOString().split('T')[0];
@@ -73,6 +72,11 @@ const notifications = {
                 this.filters.fecha = dateStr;
                 if (filterFecha) filterFecha.value = dateStr;
                 utils.showToast(`Filtrando tus cargas de hoy (${dateStr})`, 'info');
+            } else {
+                // Clear date when going back to "All notifications"
+                this.filters.fecha = '';
+                if (filterFecha) filterFecha.value = '';
+                utils.showToast('Mostrando todas las notificaciones', 'info');
             }
             updateAndLoad();
         });
@@ -172,7 +176,7 @@ const notifications = {
         if (data.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <td colspan="11" style="text-align: center; padding: 40px; color: var(--text-muted);">
                         No se encontraron notificaciones
                     </td>
                 </tr>
@@ -180,30 +184,49 @@ const notifications = {
             return;
         }
 
-        tbody.innerHTML = data.map(notif => `
-            <tr class="stagger-item">
-                <td style="white-space: nowrap; font-size: 0.75rem;">${utils.formatDate(notif.fecha_carga)}</td>
-                <td title="${notif.origen}">${utils.truncate(notif.origen, 15)}</td>
-                <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 15)}</td>
-                <td><strong>${utils.truncate(notif.n_expediente, 15)}</strong></td>
-                <td title="${notif.destinatario_nombre}">${utils.truncate(notif.destinatario_nombre, 18)}</td>
-                <td title="${notif.domicilio}">${utils.truncate(notif.domicilio, 20)}</td>
-                <td><span class="badge-zona">${notif.zona || '-'}</span></td>
-                <td style="font-family: monospace; font-size: 0.75rem;">${notif.n_troquel || '-'}</td>
-                <td>${utils.getStatusBadge(notif.resultado_diligencia || notif.estado)}</td>
-                <td style="font-size: 0.75rem;">${notif.ujier_nombre ? notif.ujier_nombre.split(' ')[0] : '-'}</td>
-                <td>
-                    <div class="table-actions">
-                        <button class="action-btn" title="Ver detalles" onclick="notifications.viewDetails('${notif.id}')">
-                            👁️
-                        </button>
-                        <button class="action-btn" title="Editar" onclick="notifications.edit('${notif.id}')">
-                            ✏️
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+        let html = '';
+        let lastDate = '';
+
+        data.forEach(notif => {
+            const currentDate = notif.fecha_carga ? notif.fecha_carga.split(' ')[0] : '';
+
+            // Add date separator if grouping is active (own_only) or just as a general improvement
+            if (this.filters.own_only && currentDate !== lastDate) {
+                html += `
+                    <tr class="date-group-row">
+                        <td colspan="11">📅 ${utils.formatDate(currentDate)}</td>
+                    </tr>
+                `;
+                lastDate = currentDate;
+            }
+
+            html += `
+                <tr class="stagger-item">
+                    <td style="white-space: nowrap; font-size: 0.75rem;">${utils.formatDate(notif.fecha_carga)}</td>
+                    <td title="${notif.origen}">${utils.truncate(notif.origen, 15)}</td>
+                    <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 15)}</td>
+                    <td><strong>${utils.truncate(notif.n_expediente, 15)}</strong></td>
+                    <td title="${notif.destinatario_nombre}">${utils.truncate(notif.destinatario_nombre, 18)}</td>
+                    <td title="${notif.domicilio}">${utils.truncate(notif.domicilio, 20)}</td>
+                    <td><span class="badge-zona">${notif.zona || '-'}</span></td>
+                    <td style="font-family: monospace; font-size: 0.75rem;">${notif.n_troquel || '-'}</td>
+                    <td>${utils.getStatusBadge(notif.resultado_diligencia || notif.estado)}</td>
+                    <td style="font-size: 0.75rem;">${notif.ujier_nombre ? notif.ujier_nombre.split(' ')[0] : '-'}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="action-btn" title="Ver detalles" onclick="notifications.viewDetails('${notif.id}')">
+                                👁️
+                            </button>
+                            <button class="action-btn" title="Editar" onclick="notifications.edit('${notif.id}')">
+                                ✏️
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
     },
 
     // Update pagination

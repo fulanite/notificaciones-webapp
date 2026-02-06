@@ -1452,6 +1452,17 @@
     color: var(--text-base);
 }
 
+.date-group-row td {
+    background: rgba(59, 130, 246, 0.1) !important;
+    color: var(--primary-300) !important;
+    font-weight: 700;
+    font-size: 0.75rem !important;
+    padding: 8px 16px !important;
+    border-left: 4px solid var(--primary-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
 .view {
     padding: var(--space-2) var(--space-4);
     max-width: 100%;
