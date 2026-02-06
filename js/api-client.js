@@ -45,6 +45,8 @@ function initApiClient() {
         },
 
         get(endpoint, params = {}) {
+            // Add cache buster to all GET requests
+            params._t = Date.now();
             const queryString = new URLSearchParams(params).toString();
             const urlWithParams = queryString ? `${endpoint}?${queryString}` : endpoint;
             return this.request(urlWithParams, { method: 'GET' });

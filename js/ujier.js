@@ -267,8 +267,15 @@ const ujier = {
 
             if (error) throw error;
 
+            // Optimistic UI: remove from local list immediately
+            this.assignments = this.assignments.filter(a => a.id !== id);
+            this.renderAssignments();
+            await this.updateStats();
+
             utils.showToast(`Entregada: ${assignment.destinatario_nombre}`, 'success');
-            await this.loadAssignments();
+
+            // Refresh with small delay to ensure server consistency
+            setTimeout(() => this.loadAssignments(), 500);
 
         } catch (error) {
             console.error('Error en quickDeliver:', error);
