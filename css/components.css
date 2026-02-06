@@ -745,9 +745,14 @@
 
 .visita-item {
     padding: var(--space-4);
-    background: var(--bg-tertiary);
+    background: rgba(255, 255, 255, 0.03);
     border-radius: var(--radius-md);
-    border-left: 3px solid var(--primary-500);
+    border-left: 4px solid var(--primary-500);
+    transition: background 0.2s;
+}
+
+.visita-item:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .visita-header {
@@ -1355,5 +1360,192 @@
     .modal-actions .btn {
         padding: var(--space-4);
         font-size: 1rem;
+    }
+}
+
+/* === Panoramic Modal (Desktop Optimized) === */
+.modal-panoramic {
+    max-width: 1100px;
+    width: 95vw;
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-panoramic .modal-header {
+    background: var(--bg-card);
+    padding: var(--space-6) var(--space-8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.modal-panoramic .header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.modal-panoramic .header-id {
+    font-size: 0.85rem;
+    color: var(--primary-400);
+    font-weight: 500;
+}
+
+.modal-detailed-grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: var(--space-6);
+    padding: var(--space-6) var(--space-8);
+}
+
+.modal-col-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.modal-col-side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    background: rgba(0, 0, 0, 0.1);
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Detail Cards inside Grid */
+.detail-card {
+    background: rgba(255, 255, 255, 0.02);
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.detail-item.highlight .detail-value {
+    color: var(--primary-400);
+    font-size: 1.1rem;
+}
+
+.detail-text-obs {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    padding: var(--space-4);
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+}
+
+/* Media/Side content items */
+.image-preview-container {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.evidencia-foto-main {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+}
+
+.image-preview-container:hover .evidencia-foto-main {
+    transform: scale(1.03);
+}
+
+.image-overlay-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: var(--space-2);
+    font-size: 0.75rem;
+    text-align: center;
+    backdrop-filter: blur(4px);
+}
+
+.map-link-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--gradient-primary);
+    border-radius: var(--radius-lg);
+    color: white;
+    text-decoration: none;
+    transition: transform 0.2s;
+}
+
+.map-link-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.map-link-btn .icon {
+    font-size: 2rem;
+}
+
+.map-btn-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.map-btn-text strong {
+    font-size: 1rem;
+}
+
+.map-btn-text span {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.detail-meta-footer {
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .modal-detailed-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-col-side {
+        background: transparent;
+        padding: 0;
+        border: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .modal-panoramic .modal-header {
+        padding: var(--space-4) var(--space-6);
+    }
+
+    .modal-detailed-grid {
+        padding: var(--space-4) var(--space-6);
     }
 }
