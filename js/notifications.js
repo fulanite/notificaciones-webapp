@@ -300,140 +300,139 @@ const notifications = {
                     <div class="modal-header">
                         <div class="header-info">
                             <h2>📄 Detalle de Notificación</h2>
-                            <span class="header-id">#${data.n_expediente}</span>
+                            <span class="header-id">Expediente N° ${data.n_expediente}</span>
+                        </div>
+                        <div class="header-status-pill">
+                            ${utils.getStatusBadge(data.resultado_diligencia || data.estado)}
                         </div>
                         <button class="modal-close" onclick="notifications.closeModal()">&times;</button>
                     </div>
-                    <div class="modal-body">
-                        <div class="modal-detailed-grid">
-                            <!-- Columna Izquierda: Información Estática -->
+
+                    <div class="modal-body p-0">
+                        <!-- Barra Maestra Superior: Info Crítica -->
+                        <div class="modal-master-bar">
+                            <div class="master-item">
+                                <span class="master-label">📍 Zona de Trabajo</span>
+                                <span class="master-value"><span class="badge-zona-lg">${data.zona || 'N/A'}</span></span>
+                            </div>
+                            <div class="master-item highlighted">
+                                <span class="master-label">🚶 Ujier Asignado</span>
+                                <div class="ujier-assigned-box">
+                                    <div class="ujier-avatar-mini">${data.ujier_nombre ? data.ujier_nombre.charAt(0) : '?'}</div>
+                                    <span class="master-value"><strong>${data.ujier_nombre || 'Sin asignar'}</strong></span>
+                                </div>
+                            </div>
+                            <div class="master-item grow">
+                                <span class="master-label">🏠 Domicilio de Notificación</span>
+                                <span class="master-value domicile-large">${data.domicilio}</span>
+                            </div>
+                            ${data.destinatario_especial ? `
+                                <div class="master-item">
+                                    <span class="master-label">🏢 Destino Especial</span>
+                                    <span class="master-value">${data.destinatario_especial}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="modal-detailed-grid mt-0">
+                            <!-- Columna Izquierda: Datos Técnicos y Legales -->
                             <div class="modal-col-main">
-                                <!-- Estado Principal -->
-                                <div class="detail-status-banner ${data.estado?.toLowerCase().includes('atiende') ? 'status-success' : data.estado === 'Pendiente' ? 'status-pending' : 'status-warning'}">
-                                    <div class="status-info">
-                                        <span class="status-label">Estado Actual</span>
-                                        ${utils.getStatusBadge(data.resultado_diligencia || data.estado)}
-                                    </div>
-                                    ${data.fecha_diligencia ? `
-                                        <div class="status-info align-right">
-                                            <span class="status-label">Fecha Diligencia</span>
-                                            <span class="status-date">${utils.formatDateTime(data.fecha_diligencia)}</span>
-                                        </div>
-                                    ` : ''}
+                                <div class="info-section-group">
+                                    <h4 class="info-group-title">⚖️ Datos Legales</h4>
+                                    <table class="compact-info-table">
+                                        <tr>
+                                            <th>Tipo de Notific.</th>
+                                            <td>${CONFIG.NOTIFICATION_TYPES[data.tipo_notificacion] || data.tipo_notificacion}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Carátula</th>
+                                            <td>${data.caratula}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Organismo Origen</th>
+                                            <td>${data.origen || '-'}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Letrado Actuante</th>
+                                            <td>${data.letrado || '-'}</td>
+                                        </tr>
+                                    </table>
                                 </div>
 
-                                <div class="detail-card">
-                                    <h4 class="card-section-title">⚖️ Datos del Expediente</h4>
-                                    <div class="details-grid">
-                                        <div class="detail-item">
-                                            <span class="detail-label">Tipo</span>
-                                            <span class="detail-value">${CONFIG.NOTIFICATION_TYPES[data.tipo_notificacion] || data.tipo_notificacion}</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">N° Expediente</span>
-                                            <span class="detail-value highlight"><strong>${data.n_expediente}</strong></span>
-                                        </div>
-                                        <div class="detail-item full-width">
-                                            <span class="detail-label">Carátula</span>
-                                            <span class="detail-value">${data.caratula}</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Origen</span>
-                                            <span class="detail-value">${data.origen || '-'}</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Letrado</span>
-                                            <span class="detail-value">${data.letrado || '-'}</span>
-                                        </div>
-                                    </div>
+                                <div class="info-section-group">
+                                    <h4 class="info-group-title">👤 Destinatario</h4>
+                                    <table class="compact-info-table">
+                                        <tr>
+                                            <th>Nombre Completo</th>
+                                            <td><strong>${data.destinatario_nombre}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Identificador</th>
+                                            <td>${data.id}</td>
+                                        </tr>
+                                    </table>
                                 </div>
 
-                                <div class="detail-card">
-                                    <h4 class="card-section-title">👤 Información del Destinatario</h4>
-                                    <div class="details-grid">
-                                        <div class="detail-item full-width">
-                                            <span class="detail-label">Nombre Completo</span>
-                                            <span class="detail-value"><strong>${data.destinatario_nombre}</strong></span>
+                                <div class="info-section-group">
+                                    <h4 class="info-group-title">🎫 Control Interno</h4>
+                                    <div class="control-badges">
+                                        <div class="control-tag">
+                                            <span class="tag-label">Troquel:</span>
+                                            <span class="tag-value">${data.sin_troquel ? 'N/A' : (data.n_troquel || '-')}</span>
                                         </div>
-                                        <div class="detail-item full-width">
-                                            <span class="detail-label">Domicilio</span>
-                                            <span class="detail-value">${data.domicilio}</span>
+                                        <div class="control-tag">
+                                            <span class="tag-label">Medio Pago:</span>
+                                            <span class="tag-value">${data.medio_pago || '-'}</span>
                                         </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Zona</span>
-                                            <span class="detail-value"><span class="badge-zona">${data.zona || '-'}</span></span>
-                                        </div>
-                                        ${data.destinatario_especial ? `
-                                            <div class="detail-item">
-                                                <span class="detail-label">Destino Especial</span>
-                                                <span class="detail-value">${data.destinatario_especial}</span>
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                </div>
-
-                                <div class="detail-card">
-                                    <h4 class="card-section-title">🎫 Control y Pago</h4>
-                                    <div class="details-grid">
-                                        <div class="detail-item">
-                                            <span class="detail-label">N° Troquel</span>
-                                            <span class="detail-value">${data.sin_troquel ? '<em>Sin troquel</em>' : (data.n_troquel || '-')}</span>
-                                        </div>
-                                        <div class="detail-item">
-                                            <span class="detail-label">Cargado por</span>
-                                            <span class="detail-value">${data.usuario_carga || '-'}</span>
+                                        <div class="control-tag">
+                                            <span class="tag-label">Costo:</span>
+                                            <span class="tag-value">${utils.formatCurrency(data.costo)}</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 ${data.observaciones_iniciales ? `
-                                    <div class="detail-card info-card">
-                                        <h4 class="card-section-title">📝 Notas de Carga</h4>
-                                        <p class="detail-text-obs">${data.observaciones_iniciales}</p>
+                                    <div class="info-section-group notes-group">
+                                        <h4 class="info-group-title">📝 Notas de Carga</h4>
+                                        <div class="notes-content">${data.observaciones_iniciales}</div>
                                     </div>
                                 ` : ''}
                             </div>
 
-                            <!-- Columna Derecha: Evidencia y Actividad -->
+                            <!-- Columna Derecha: Multimedia e Historial -->
                             <div class="modal-col-side">
                                 ${data.evidencia_foto ? `
-                                    <div class="detail-card">
-                                        <h4 class="card-section-title">📸 Foto de Evidencia</h4>
-                                        <div class="image-preview-container">
-                                            <img src="${data.evidencia_foto}" class="evidencia-foto-main" onclick="window.open('${data.evidencia_foto}', '_blank')">
-                                            <div class="image-overlay-info">Click para ampliar</div>
+                                    <div class="side-panel-section">
+                                        <h4 class="side-title">📸 Evidencia Fotográfica</h4>
+                                        <div class="photo-frame" onclick="window.open('${data.evidencia_foto}', '_blank')">
+                                            <img src="${data.evidencia_foto}" class="img-fluid">
+                                            <div class="photo-hint">Expandir 🔍</div>
                                         </div>
                                     </div>
                                 ` : ''}
 
-                                ${data.ubicacion_lat && data.ubicacion_lng ? `
-                                    <div class="detail-card">
-                                        <h4 class="card-section-title">📍 Localización GPS</h4>
-                                        <a href="https://www.google.com/maps?q=${data.ubicacion_lat},${data.ubicacion_lng}" 
-                                           target="_blank" class="map-link-btn">
-                                            <span class="icon">🗺️</span>
-                                            <div class="map-btn-text">
-                                                <strong>Ver en Mapa</strong>
-                                                <span>Clic para abrir Google Maps</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                ` : ''}
-
-                                ${visitasHtml}
+                                <div class="side-panel-section scrollable">
+                                    <h4 class="side-title">📜 Historial de Visitas</h4>
+                                    ${visitasHtml || '<p class="text-muted text-center p-4">Sin visitas registradas</p>'}
+                                </div>
                                 
-                                <div class="detail-meta-footer">
-                                    <p>Identificador único: ${data.id}</p>
-                                    <p>Fecha de registro: ${utils.formatDateTime(data.fecha_carga)}</p>
+                                <div class="modal-system-footer">
+                                    <span>Cargado: ${utils.formatDateTime(data.fecha_carga)}</span>
+                                    <span>por ${data.usuario_carga || '-'}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary-outline" onclick="notifications.closeModal()">Cerrar</button>
-                        <button class="btn btn-primary btn-edit-detail" onclick="notifications.edit('${data.id}'); notifications.closeModal();">
-                            ✏️ Editar esta notificación
-                        </button>
+                        <div class="footer-left">
+                            ${data.migrated_from_glide ? '<span class="badge-migrated">📦 Registro Migrado</span>' : ''}
+                        </div>
+                        <div class="footer-actions">
+                            <button class="btn btn-secondary-outline" onclick="notifications.closeModal()">Cerrar</button>
+                            <button class="btn btn-primary btn-edit-detail" onclick="notifications.edit('${data.id}'); notifications.closeModal();">
+                                ✏️ Editar Diligencia
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
