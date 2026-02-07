@@ -10,13 +10,19 @@ const asignaciones = {
         currentUjierId: null,
         selectedIds: new Set(),
         loading: false,
-        searchTerm: ''
+        searchTerm: '',
+        initialized: false
     },
 
     async init() {
-        console.log('[Asignaciones] Initializing v40.0...');
+        if (this.state.initialized) {
+            await this.refreshData();
+            return;
+        }
+        console.log('[Asignaciones] Initializing v40.1...');
         this.setupEventListeners();
         await this.refreshData();
+        this.state.initialized = true;
     },
 
     setupEventListeners() {
@@ -177,9 +183,10 @@ const asignaciones = {
         }
 
         tbody.innerHTML = list.map(n => `
-            <tr class="${this.state.selectedIds.has(n.id) ? 'row-selected' : ''}" onclick="asignaciones.toggleSelection('${n.id}')">
-                <td>
-                    <label class="checkbox-wrapper" onclick="event.stopPropagation()">
+            <tr class="${this.state.selectedIds.has(n.id) ? 'row-selected' : ''}" 
+                onclick="asignaciones.handleRowClick(event, '${n.id}')">
+                <td onclick="event.stopPropagation()">
+                    <label class="checkbox-wrapper">
                         <input type="checkbox" ${this.state.selectedIds.has(n.id) ? 'checked' : ''} 
                             onchange="asignaciones.toggleSelection('${n.id}')">
                         <span class="checkbox-custom"></span>
@@ -195,6 +202,12 @@ const asignaciones = {
                 </td>
             </tr>
         `).join('');
+    },
+
+    handleRowClick(event, id) {
+        // If clicking a link or button inside the row, don't toggle
+        if (event.target.closest('a, button, label')) return;
+        this.toggleSelection(id);
     },
 
     toggleSelection(id) {
@@ -223,11 +236,14 @@ const asignaciones = {
         const otherUjieres = this.state.ujieres.filter(u => u.id !== this.state.currentUjierId);
 
         select.innerHTML = '<option value="">Reasignar a...</option>' +
-            this.state.ujieres.map(u => `
-                <option value="${u.id}" ${u.id === this.state.currentUjierId ? 'disabled' : ''}>
-                    👤 ${u.nombre || u.email}
-                </option>
-            `).join('');
+            this.state.ujieres.map(u => {
+                const isCurrent = String(u.id) === String(this.state.currentUjierId);
+                return `
+                    <option value="${u.id}" ${isCurrent ? 'disabled style="color: #94a3b8; background: #f1f5f9;"' : ''}>
+                        👤 ${u.nombre || u.email} ${isCurrent ? '(Origen - Deshabilitado)' : ''}
+                    </option>
+                `;
+            }).join('');
     },
 
     updateUI() {
@@ -240,7 +256,15 @@ const asignaciones = {
 
         if (btn) {
             const ujierDestino = select?.value;
+            const targetUjier = this.state.ujieres.find(u => String(u.id) === String(ujierDestino));
+
             btn.disabled = count === 0 || !ujierDestino;
+
+            if (count > 0 && ujierDestino) {
+                btn.innerHTML = `<span>🔄</span> Reasignar ${count} a ${targetUjier?.nombre || '...'}`;
+            } else {
+                btn.innerHTML = `<span>🔄</span> Confirmar Reasignación`;
+            }
         }
 
         // Handle select change to update button
@@ -259,15 +283,19 @@ const asignaciones = {
     async executeReassignment() {
         const count = this.state.selectedIds.size;
         const targetUjierId = document.getElementById('select-target-ujier').value;
-        const targetUjier = this.state.ujieres.find(u => u.id === targetUjierId);
+        const targetUjier = this.state.ujieres.find(u => String(u.id) === String(targetUjierId));
 
         if (count === 0 || !targetUjierId) return;
 
-        if (!confirm(`¿Estás seguro de reasignar ${count} notificaciones a ${targetUjier.nombre || targetUjier.email}?`)) {
+        if (!confirm(`¿Estás seguro de reasignar ${count} notificaciones a ${targetUjier?.nombre || targetUjier?.email}?`)) {
             return;
         }
 
-        utils.showLoading(`Reasignando ${count} notificaciones...`);
+        const btn = document.getElementById('btn-confirm-reasign');
+        const originalHTML = btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> Procesando...';
 
         let successCount = 0;
         let errorCount = 0;
@@ -279,24 +307,30 @@ const asignaciones = {
             })
         );
 
-        const results = await Promise.all(promises);
+        try {
+            const results = await Promise.all(promises);
 
-        results.forEach(res => {
-            if (res.error) errorCount++;
-            else successCount++;
-        });
+            results.forEach(res => {
+                if (res.error) errorCount++;
+                else successCount++;
+            });
 
-        utils.hideLoading();
+            if (successCount > 0) {
+                utils.showToast(`✅ ${successCount} notificaciones reasignadas con éxito`, 'success');
+            }
+            if (errorCount > 0) {
+                utils.showToast(`❌ Error en ${errorCount} notificaciones`, 'error');
+            }
 
-        if (successCount > 0) {
-            utils.showToast(`✅ ${successCount} notificaciones reasignadas con éxito`, 'success');
+            // Important: refresh data and state
+            await this.refreshData();
+            this.state.selectedIds.clear();
+            this.updateUI();
+        } catch (err) {
+            console.error('[Asignaciones] Error:', err);
+            utils.showToast('Error al procesar reasignación', 'error');
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
         }
-        if (errorCount > 0) {
-            utils.showToast(`❌ Error en ${errorCount} notificaciones`, 'error');
-        }
-
-        await this.refreshData();
-        this.state.selectedIds.clear();
-        this.updateUI();
     }
 };
