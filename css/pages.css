@@ -623,116 +623,119 @@
 /* === Devolución View === */
 .zones-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: var(--space-6);
-    margin-top: var(--space-6);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-8);
+    margin-top: var(--space-8);
+    padding: var(--space-4);
 }
 
-@media (min-width: 1400px) {
+@media (min-width: 1200px) {
     .zones-grid {
         grid-template-columns: repeat(4, 1fr);
     }
 }
 
-#view-devoluciones .dashboard-card {
-    transition: all 0.3s ease;
-}
-
-@media (min-width: 1200px) {
-    #view-devoluciones.view {
-        max-width: 1400px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    #view-devoluciones .data-table {
-        table-layout: auto;
-    }
-
-    #view-devoluciones .data-table th,
-    #view-devoluciones .data-table td {
-        padding: var(--space-4) var(--space-3);
-    }
-}
-
 .zone-premium-card {
     background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-xl);
-    padding: var(--space-6);
+    border: 3px solid var(--border-color);
+    border-radius: 24px;
+    padding: var(--space-8);
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 220px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: var(--shadow-lg);
     position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
+    background: linear-gradient(145deg, var(--bg-card), rgba(255, 255, 255, 0.03));
 }
 
 .zone-premium-card:hover {
     border-color: var(--primary-500);
-    box-shadow: var(--shadow-xl);
-    transform: translateY(-5px);
-}
-
-.zone-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    transform: translateY(-12px) scale(1.03);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+    z-index: 10;
 }
 
 .zone-icon {
-    font-size: 1.5rem;
-    background: rgba(59, 130, 246, 0.1);
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-lg);
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.4));
+    transition: transform 0.3s ease;
+}
+
+.zone-premium-card:hover .zone-icon {
+    transform: scale(1.1) rotate(5deg);
 }
 
 .zone-badge {
+    position: absolute;
+    top: -15px;
+    right: -15px;
     background: var(--primary-500);
     color: white;
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-full);
-    font-size: 0.875rem;
-    font-weight: 700;
-}
-
-.zone-card-body {
-    margin: var(--space-2) 0;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    font-weight: 900;
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.6);
+    border: 4px solid #0f172a;
+    /* Hardcoded dark theme matching bg */
 }
 
 .zone-name {
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: 1.75rem;
+    font-weight: 850;
     color: var(--text-primary);
-    margin-bottom: var(--space-1);
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.03em;
 }
 
 .zone-desc {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    opacity: 0.8;
 }
 
 .zone-card-footer {
-    border-top: 1px solid var(--border-color);
+    margin-top: var(--space-6);
     padding-top: var(--space-4);
-    font-size: 0.875rem;
+    border-top: 2px solid rgba(255, 255, 255, 0.07);
+    width: 100%;
+    font-size: 0.85rem;
     color: var(--primary-400);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Fix selection in the table */
+.data-table tbody tr.row-selected {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+    border-left: 6px solid var(--primary-500) !important;
+    transform: translateX(4px);
+    transition: all 0.2s ease;
+}
+
+.data-table tbody tr.row-selected td {
+    color: white !important;
     font-weight: 600;
 }
 
-/* Row Selection Improvements */
-.row-selected {
-    background: rgba(59, 130, 246, 0.08) !important;
-    border-left: 4px solid var(--primary-500) !important;
+.data-table tbody tr.row-selected .cell-truncate {
+    color: white;
 }
 
-.row-selected td {
-    color: var(--primary-300);
-    font-weight: 500;
+.data-table tbody tr.row-selected .cell-recipient {
+    color: var(--primary-200);
 }
 
 .badge-mini {
