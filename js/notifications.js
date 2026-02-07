@@ -8,7 +8,7 @@ const notifications = {
     filters: {
         estado: '',
         tipo: '',
-        fecha: new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().split('T')[0],
+        fecha: '',
         search: '',
         zona: '',
         year: '2026',
@@ -62,21 +62,27 @@ const notifications = {
         });
 
         filterPropio?.addEventListener('change', () => {
-            this.filters.own_only = filterPropio.value === 'true';
-            if (this.filters.own_only) {
+            const val = filterPropio.value;
+
+            if (val === 'mine-today') {
+                this.filters.own_only = true;
                 const today = new Date();
                 const offset = today.getTimezoneOffset();
                 const localToday = new Date(today.getTime() - (offset * 60 * 1000));
                 const dateStr = localToday.toISOString().split('T')[0];
-
                 this.filters.fecha = dateStr;
                 if (filterFecha) filterFecha.value = dateStr;
-                utils.showToast(`Filtrando tus cargas de hoy (${dateStr})`, 'info');
-            } else {
-                // Clear date when going back to "All notifications"
+                utils.showToast(`Tus cargas de hoy`, 'info');
+            } else if (val === 'mine-all') {
+                this.filters.own_only = true;
                 this.filters.fecha = '';
                 if (filterFecha) filterFecha.value = '';
-                utils.showToast('Mostrando todas las notificaciones', 'info');
+                utils.showToast('Todas tus cargas', 'info');
+            } else {
+                this.filters.own_only = false;
+                this.filters.fecha = '';
+                if (filterFecha) filterFecha.value = '';
+                utils.showToast('Todas las notificaciones', 'info');
             }
             updateAndLoad();
         });

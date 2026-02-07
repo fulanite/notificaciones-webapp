@@ -66,18 +66,51 @@ const app = {
         const savedZona = localStorage.getItem('sgnd-persist-zona');
         const savedUjier = localStorage.getItem('sgnd-persist-ujier');
 
+        const zonaSelect = document.getElementById('zona');
+        const persistZona = document.getElementById('persist-zona');
+        const fGroupZona = document.getElementById('f-group-zona');
+
         if (savedZona) {
-            const zonaSelect = document.getElementById('zona');
-            const persistZona = document.getElementById('persist-zona');
             if (zonaSelect) zonaSelect.value = savedZona;
             if (persistZona) persistZona.value = savedZona;
+            if (fGroupZona) fGroupZona.classList.add('hidden'); // Hide redundant field
+        } else {
+            if (fGroupZona) fGroupZona.classList.remove('hidden');
         }
 
+        const ujierSelect = document.getElementById('asignado-a');
+        const persistUjier = document.getElementById('persist-ujier');
+        const fGroupAsignar = document.getElementById('f-group-asignar');
+
         if (savedUjier) {
-            const ujierSelect = document.getElementById('asignado-a');
-            const persistUjier = document.getElementById('persist-ujier');
             if (ujierSelect) ujierSelect.value = savedUjier;
             if (persistUjier) persistUjier.value = savedUjier;
+            if (fGroupAsignar) fGroupAsignar.classList.add('hidden'); // Hide redundant field
+        } else {
+            if (fGroupAsignar) fGroupAsignar.classList.remove('hidden');
+        }
+    },
+
+    // Handle Troquel dropdown change (C, M, SIN)
+    handleTroquelChange(val) {
+        const tipoTroquelHidden = document.getElementById('tipo-troquel');
+        const sinTroquelCheck = document.getElementById('sin-troquel');
+        const nTroquelGroup = document.getElementById('grupo-n-troquel');
+        const nTroquelInput = document.getElementById('n-troquel');
+
+        if (val === 'SIN') {
+            if (tipoTroquelHidden) tipoTroquelHidden.value = '';
+            if (sinTroquelCheck) sinTroquelCheck.checked = true;
+            if (nTroquelGroup) nTroquelGroup.classList.add('hidden');
+            if (nTroquelInput) {
+                nTroquelInput.required = false;
+                nTroquelInput.value = '';
+            }
+        } else {
+            if (tipoTroquelHidden) tipoTroquelHidden.value = val;
+            if (sinTroquelCheck) sinTroquelCheck.checked = false;
+            if (nTroquelGroup) nTroquelGroup.classList.remove('hidden');
+            if (nTroquelInput) nTroquelInput.required = true;
         }
     },
 
@@ -91,7 +124,6 @@ const app = {
 
     // Handle notification type change - show/populate dynamic origin
     handleTipoNotificacionChange(tipo) {
-        const grupoJuzgado = document.getElementById('origen')?.closest('.form-group');
         const grupoDinamico = document.getElementById('grupo-origen-dinamico');
         const input = document.getElementById('origen-dinamico-input');
         const hidden = document.getElementById('origen-dinamico');
@@ -99,9 +131,30 @@ const app = {
         const label = document.getElementById('label-origen-dinamico');
         const grupoFixed = document.getElementById('origen')?.closest('.f-group');
 
+        const troquelSelect = document.getElementById('selector-troquel');
+
         if (!grupoDinamico || !input || !dropdown || !label) return;
 
-        // Clear previous
+        // Auto-set troquel type for Mandamientos
+        const isMandamiento = tipo.includes('mandamientos') && tipo !== 'cedulas_mandamientos_22172';
+        const isHabilitacion = tipo.includes('habilitacion');
+
+        if (tipo === 'mandamientos' || isHabilitacion) {
+            if (troquelSelect) {
+                troquelSelect.value = 'M';
+                this.handleTroquelChange('M');
+            }
+        } else if (tipo === 'cedulas' ||
+            tipo === 'cedulas_mandamientos_22172' ||
+            tipo === 'cedulas_correspondencia' ||
+            tipo.includes('urgentes')) {
+            if (troquelSelect) {
+                troquelSelect.value = 'C';
+                this.handleTroquelChange('C');
+            }
+        }
+
+        // Clear previous dynamic origin
         input.value = '';
         hidden.value = '';
         dropdown.innerHTML = '';
@@ -112,10 +165,10 @@ const app = {
 
         let options = [];
 
-        if (tipo === 'cedulas_mandamientos_22172') {
-            // Hide juzgado selector, show province selector
+        if (tipo === 'cedulas_mandamientos_22172' || tipo === 'mandamientos_22172') {
             grupoFixed?.classList.add('hidden');
             document.getElementById('origen').required = false;
+            document.getElementById('origen-input').required = false;
 
             grupoDinamico.classList.remove('hidden');
             newInput.required = true;
@@ -124,9 +177,9 @@ const app = {
             options = SGND_DATA.PROVINCIAS;
 
         } else if (tipo === 'cedulas_correspondencia') {
-            // Hide juzgado selector, show locality selector
             grupoFixed?.classList.add('hidden');
             document.getElementById('origen').required = false;
+            document.getElementById('origen-input').required = false;
 
             grupoDinamico.classList.remove('hidden');
             newInput.required = true;
@@ -135,16 +188,15 @@ const app = {
             options = SGND_DATA.LOCALIDADES_CATAMARCA;
 
         } else {
-            // Show juzgado selector, hide dynamic origin
             grupoFixed?.classList.remove('hidden');
             document.getElementById('origen').required = true;
+            document.getElementById('origen-input').required = true;
 
             grupoDinamico.classList.add('hidden');
             newInput.required = false;
             return;
         }
 
-        // Setup searchable select
         this.setupSearchableSelect(newInput, hidden, dropdown, options);
     },
 
@@ -375,6 +427,14 @@ const app = {
             }
         });
 
+        // Initialize Judicial Origin searchable select
+        const origenInput = document.getElementById('origen-input');
+        const origenHidden = document.getElementById('origen');
+        const origenDropdown = document.getElementById('origen-fijo-dropdown');
+        if (origenInput && origenHidden && origenDropdown) {
+            this.setupSearchableSelect(origenInput, origenHidden, origenDropdown, SGND_DATA.ORIGENES_JUDICIALES);
+        }
+
         // Tipo notificación change - show/hide dynamic destination field
         document.getElementById('tipo-notificacion')?.addEventListener('change', (e) => {
             this.handleTipoNotificacionChange(e.target.value);
@@ -546,6 +606,16 @@ const app = {
             document.getElementById('menu-auditor')?.classList.remove('hidden');
             document.getElementById('menu-admin')?.classList.remove('hidden'); // Auditors can see admin dashboard
             this.navigateTo('lista-notificaciones');
+        }
+
+        // Show/hide Global Action button (Nueva Notificación)
+        const btnNuevaNotif = document.getElementById('btn-open-nueva-notif');
+        if (btnNuevaNotif) {
+            if (rol === 'admin' || rol === 'administrativo' || rol === 'coordinador') {
+                btnNuevaNotif.classList.remove('hidden');
+            } else {
+                btnNuevaNotif.classList.add('hidden');
+            }
         }
     },
 
@@ -752,13 +822,22 @@ const app = {
                 form.reset();
                 notifications.editingId = null;
 
-                // Re-apply required logic for troquel after reset
-                document.getElementById('grupo-n-troquel')?.classList.remove('hidden');
-                document.getElementById('n-troquel').required = true;
+                // Reset selector-troquel and its effects
+                const troquelSelect = document.getElementById('selector-troquel');
+                if (troquelSelect) {
+                    troquelSelect.value = 'C';
+                    this.handleTroquelChange('C');
+                }
+
+                // Reset searchable inputs
+                const origenInput = document.getElementById('origen-input');
+                const origenHidden = document.getElementById('origen');
+                if (origenInput) origenInput.value = '';
+                if (origenHidden) origenHidden.value = '';
 
                 // Reset dynamic origin field
                 document.getElementById('grupo-origen-dinamico')?.classList.add('hidden');
-                document.getElementById('origen')?.closest('.f-group')?.classList.remove('hidden');
+                document.getElementById('grupo-origen-fijo')?.classList.remove('hidden');
 
                 // Close modal
                 const modal = document.getElementById('modal-nueva-notificacion');
