@@ -802,7 +802,7 @@ const app = {
         console.log('📤 Enviando datos a MySQL:', notificationData);
 
         // Prevent double submission
-        const submitBtn = form.querySelector('button[type="submit"]');
+        const submitBtn = document.getElementById('btn-save-nueva-notif');
         if (submitBtn.disabled) {
             console.log('⚠️ Ya se está procesando, ignorando submit duplicado');
             return;
