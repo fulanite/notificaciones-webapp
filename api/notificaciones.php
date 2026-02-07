@@ -40,7 +40,7 @@ try {
 
                 $sql = "SELECT * FROM notificaciones 
                         WHERE asignado_a = ? AND estado IN ($placeholders) AND devuelta_por_ujier = 0
-                        ORDER BY fecha_carga ASC";
+                        ORDER BY COALESCE(fecha_entrega_ujier, fecha_carga) ASC";
 
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute(array_merge([$_GET['asignado_a']], $estadosArr));
@@ -65,7 +65,7 @@ try {
                 }
 
                 if (!empty($_GET['fecha'])) {
-                    $where[] = "DATE(n.fecha_carga) = ?";
+                    $where[] = "DATE(COALESCE(n.fecha_entrega_ujier, n.fecha_carga)) = ?";
                     $params[] = $_GET['fecha'];
                 }
 
@@ -76,7 +76,7 @@ try {
 
                 if (!empty($_GET['year'])) {
                     $year = (int) $_GET['year'];
-                    $where[] = "YEAR(n.fecha_carga) = ?";
+                    $where[] = "YEAR(COALESCE(n.fecha_entrega_ujier, n.fecha_carga)) = ?";
                     $params[] = $year;
                 }
 
@@ -138,7 +138,7 @@ try {
                     LEFT JOIN usuarios u1 ON n.asignado_a = u1.id
                     LEFT JOIN usuarios u2 ON n.asignado_a = u2.dni
                     WHERE " . implode(" AND ", $where) . "
-                    ORDER BY n.fecha_carga DESC
+                    ORDER BY COALESCE(n.fecha_entrega_ujier, n.fecha_carga) DESC, n.created_at DESC
                     LIMIT $limit OFFSET $offset
                 ";
 
@@ -174,14 +174,14 @@ try {
             $id = Database::generateUUID();
             $stmt = $pdo->prepare("
                 INSERT INTO notificaciones (
-                    id, fecha_carga, usuario_carga, estado,
+                    id, fecha_carga, fecha_entrega_ujier, usuario_carga, estado,
                     tipo_notificacion, n_expediente, caratula, origen, letrado,
                     destinatario_especial, destinatario_nombre, domicilio, zona,
                     tipo_troquel, sin_troquel, n_troquel, medio_pago, costo,
                     asignado_a, fecha_asignacion, asignado_por,
                     observaciones_iniciales, created_at, updated_at
                 ) VALUES (
-                    ?, NOW(), ?, 'pendiente',
+                    ?, NOW(), ?, ?, 'pendiente',
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
@@ -192,6 +192,7 @@ try {
 
             $stmt->execute([
                 $id,
+                $data['fecha_entrega_ujier'] ?? date('Y-m-d'),
                 $data['usuario_carga'] ?? null,
                 Database::sanitize($data['tipo_notificacion']),
                 Database::sanitize($data['n_expediente']),
@@ -343,7 +344,8 @@ try {
                     'destinatario_nombre',
                     'domicilio',
                     'zona',
-                    'asignado_a'
+                    'asignado_a',
+                    'fecha_entrega_ujier'
                 ];
                 $updates = [];
                 $params = [];

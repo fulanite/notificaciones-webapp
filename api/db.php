@@ -49,6 +49,14 @@ class Database
                 $this->pdo->exec("ALTER TABLE notificaciones ADD COLUMN fecha_devolucion DATETIME NULL");
             } catch (PDOException $e) {
             }
+
+            // New: fecha_entrega_ujier for logistics
+            try {
+                $this->pdo->exec("ALTER TABLE notificaciones ADD COLUMN fecha_entrega_ujier DATETIME NULL AFTER fecha_carga");
+                // Backfill for transparency
+                $this->pdo->exec("UPDATE notificaciones SET fecha_entrega_ujier = fecha_carga WHERE fecha_entrega_ujier IS NULL");
+            } catch (PDOException $e) {
+            }
         } catch (PDOException $e) {
             $this->sendError('Database connection failed: ' . $e->getMessage(), 500);
         }

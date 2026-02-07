@@ -194,7 +194,7 @@ const notifications = {
         let lastDate = '';
 
         data.forEach(notif => {
-            const currentDate = notif.fecha_carga ? notif.fecha_carga.split(' ')[0] : '';
+            const currentDate = (notif.fecha_entrega_ujier || notif.fecha_carga || '').split(' ')[0];
 
             // Add date separator if grouping is active (own_only) or just as a general improvement
             if (this.filters.own_only && currentDate !== lastDate) {
@@ -210,7 +210,7 @@ const notifications = {
 
             html += `
                 <tr class="stagger-item">
-                    <td style="white-space: nowrap; font-size: 0.75rem;">${utils.formatDate(notif.fecha_carga)}</td>
+                    <td style="white-space: nowrap; font-size: 0.75rem;">${utils.formatDate(notif.fecha_entrega_ujier || notif.fecha_carga)}</td>
                     <td title="${notif.origen}">${utils.truncate(notif.origen, 25)}</td>
                     <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 30)}</td>
                     <td><strong style="font-size: 0.85rem;">${utils.truncate(notif.n_expediente, 25)}</strong></td>
@@ -572,6 +572,12 @@ const notifications = {
             document.getElementById('costo').value = data.costo || '';
             document.getElementById('asignado-a').value = data.asignado_a || '';
             document.getElementById('observaciones-iniciales').value = data.observaciones_iniciales || '';
+
+            // Populate delivery date
+            const fechaInput = document.getElementById('persist-fecha-entrega');
+            if (fechaInput && data.fecha_entrega_ujier) {
+                fechaInput.value = data.fecha_entrega_ujier.split(' ')[0];
+            }
 
             // Handle checkboxes
             const sinTroquel = document.getElementById('sin-troquel');

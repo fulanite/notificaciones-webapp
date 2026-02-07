@@ -65,6 +65,7 @@ const app = {
     applyPersistentSettings() {
         const savedZona = localStorage.getItem('sgnd-persist-zona');
         const savedUjier = localStorage.getItem('sgnd-persist-ujier');
+        const savedFecha = localStorage.getItem('sgnd-persist-fecha-entrega');
 
         const zonaSelect = document.getElementById('zona');
         const persistZona = document.getElementById('persist-zona');
@@ -88,6 +89,19 @@ const app = {
             if (fGroupAsignar) fGroupAsignar.classList.add('hidden'); // Hide redundant field
         } else {
             if (fGroupAsignar) fGroupAsignar.classList.remove('hidden');
+        }
+
+        const fechaInput = document.getElementById('persist-fecha-entrega');
+        if (fechaInput) {
+            if (savedFecha) {
+                fechaInput.value = savedFecha;
+            } else {
+                // Default to today in local timezone (YYYY-MM-DD)
+                const now = new Date();
+                const offset = now.getTimezoneOffset();
+                const localNow = new Date(now.getTime() - (offset * 60 * 1000));
+                fechaInput.value = localNow.toISOString().split('T')[0];
+            }
         }
     },
 
@@ -117,9 +131,11 @@ const app = {
     savePersistentSettings() {
         const zona = document.getElementById('persist-zona')?.value;
         const ujier = document.getElementById('persist-ujier')?.value;
+        const fecha = document.getElementById('persist-fecha-entrega')?.value;
 
         if (zona !== undefined) localStorage.setItem('sgnd-persist-zona', zona);
         if (ujier !== undefined) localStorage.setItem('sgnd-persist-ujier', ujier);
+        if (fecha !== undefined) localStorage.setItem('sgnd-persist-fecha-entrega', fecha);
     },
 
     // Handle notification type change - show/populate dynamic origin
@@ -471,6 +487,11 @@ const app = {
             }
         });
 
+        // Persistent settings changes
+        document.getElementById('persist-zona')?.addEventListener('change', () => this.savePersistentSettings());
+        document.getElementById('persist-ujier')?.addEventListener('change', () => this.savePersistentSettings());
+        document.getElementById('persist-fecha-entrega')?.addEventListener('change', () => this.savePersistentSettings());
+
         // Medio pago change
         document.getElementById('medio-pago')?.addEventListener('change', (e) => {
             const costoGroup = document.getElementById('grupo-costo');
@@ -790,6 +811,7 @@ const app = {
             destinatario_nombre: getVal('destinatario-nombre') || getVal('destinatario-especial'),
             domicilio: getVal('domicilio'),
             zona: getVal('zona'),
+            fecha_entrega_ujier: getVal('persist-fecha-entrega'),
             tipo_troquel: getVal('tipo-troquel'),
             sin_troquel: getCheck('sin-troquel'),
             n_troquel: getVal('n-troquel') || null,
