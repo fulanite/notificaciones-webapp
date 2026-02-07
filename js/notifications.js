@@ -194,26 +194,30 @@ const notifications = {
         let lastDate = '';
 
         data.forEach(notif => {
-            const currentDate = (notif.fecha_entrega_ujier || notif.fecha_carga || '').split(' ')[0];
+            // Grouping logic: Synchronize with what's shown in the "F. Entrega" column
+            // We use exactly the same logic to avoid group-row mismatch
+            const displayDate = notif.fecha_entrega_ujier ? notif.fecha_entrega_ujier.split(' ')[0] : 'Sin fecha';
 
             // Add date separator if grouping is active (own_only) or just as a general improvement
-            if (this.filters.own_only && currentDate !== lastDate) {
+            if (this.filters.own_only && displayDate !== lastDate) {
+                const headerLabel = notif.fecha_entrega_ujier ? `📅 ${utils.formatDate(notif.fecha_entrega_ujier)}` : '📅 Pendiente de Entrega';
                 html += `
                     <tr class="date-group-row">
-                        <td colspan="11">📅 ${utils.formatDate(currentDate)}</td>
+                        <td colspan="11">${headerLabel}</td>
                     </tr>
                 `;
-                lastDate = currentDate;
+                lastDate = displayDate;
             }
 
             const recipientDisplay = (notif.destinatario_nombre?.trim() || notif.destinatario_especial?.trim() || 'Sin destinatario');
 
             html += `
                 <tr class="stagger-item">
-                    <td style="white-space: nowrap; font-size: 0.75rem;">${utils.formatDate(notif.fecha_entrega_ujier || notif.fecha_carga)}</td>
+                    <td style="white-space: nowrap; font-size: 0.75rem;">${notif.fecha_entrega_ujier ? utils.formatDate(notif.fecha_entrega_ujier) : '<span style="color:var(--text-muted)">-</span>'}</td>
                     <td title="${notif.origen}">${utils.truncate(notif.origen, 25)}</td>
                     <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 30)}</td>
                     <td><strong style="font-size: 0.85rem;">${utils.truncate(notif.n_expediente, 25)}</strong></td>
+                    <td title="${notif.caratula || ''}">${utils.truncate(notif.caratula || '', 40)}</td>
                     <td title="${recipientDisplay}">${utils.truncate(recipientDisplay, 40)}</td>
                     <td title="${notif.domicilio}">${utils.truncate(notif.domicilio, 50)}</td>
                     <td><span class="badge-zona">${notif.zona || '-'}</span></td>
@@ -348,6 +352,7 @@ const notifications = {
                                 <div class="header-badges">
                                     <span class="badge-type-pill-v2">${CONFIG.NOTIFICATION_TYPES[data.tipo_notificacion] || data.tipo_notificacion}</span>
                                     <span class="header-id-pill">ID: ${data.id}</span>
+                                    <span class="header-date-pill" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 6px;">📅 Entrega: ${data.fecha_entrega_ujier ? utils.formatDate(data.fecha_entrega_ujier) : 'Pendiente'}</span>
                                 </div>
                             </div>
                         </div>
@@ -476,7 +481,8 @@ const notifications = {
                     <!-- Enhanced Footer -->
                     <div class="modal-footer-v2">
                         <div class="footer-info-strip">
-                            <span class="info-tag carga-tag">📅 Carga: ${utils.formatDateTime(data.fecha_carga)}</span>
+                            <span class="info-tag delivery-tag" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);">📅 Entrega: ${data.fecha_entrega_ujier ? utils.formatDate(data.fecha_entrega_ujier) : 'Pendiente'}</span>
+                            <span class="info-tag carga-tag">� Carga: ${utils.formatDateTime(data.fecha_carga)}</span>
                             <span class="info-tag user-tag">👤 Por: <strong>${data.usuario_carga || '-'}</strong></span>
                             ${data.migrated_from_glide ? '<span class="badge-migrated-v2">📦 REGISTRO MIGRADO</span>' : ''}
                         </div>
