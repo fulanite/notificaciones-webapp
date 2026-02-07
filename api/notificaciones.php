@@ -81,8 +81,13 @@ try {
                 }
 
                 if (isset($_GET['devuelta_por_ujier'])) {
-                    $where[] = "n.devuelta_por_ujier = ?";
-                    $params[] = (int) $_GET['devuelta_por_ujier'];
+                    $val = (int) $_GET['devuelta_por_ujier'];
+                    if ($val === 0) {
+                        $where[] = "(n.devuelta_por_ujier = 0 OR n.devuelta_por_ujier IS NULL)";
+                    } else {
+                        $where[] = "n.devuelta_por_ujier = ?";
+                        $params[] = $val;
+                    }
                 }
 
                 if (!empty($_GET['own_only']) && $_GET['own_only'] == '1' && !empty($_GET['user_email'])) {

@@ -11,14 +11,18 @@ const devoluciones = {
         zones: {},
         currentZone: null,
         selectedIds: new Set(),
-        loading: false
+        loading: false,
+        initialized: false
     },
 
     // Initialize the module
     async init() {
-        console.log('[Devoluciones] Initializing...');
+        console.log('[Devoluciones] Initializing view...');
         this.resetState();
-        this.setupStaticEventListeners();
+        if (!this.state.initialized) {
+            this.setupStaticEventListeners();
+            this.state.initialized = true;
+        }
         await this.refreshData();
     },
 
@@ -37,8 +41,7 @@ const devoluciones = {
         this.showLoading();
 
         try {
-            // Fetch all notifications that have NOT been returned yet
-            // We want to show everything that could be in a bailiff's hands
+            console.log('[Devoluciones] Fetching notifications with devuelta_por_ujier: 0...');
             const result = await db.getNotifications({
                 limit: 2000,
                 devuelta_por_ujier: 0
@@ -46,12 +49,25 @@ const devoluciones = {
 
             if (result.error) throw result.error;
 
-            this.state.notificacionesPendientes = result.data || [];
-            console.log(`[Devoluciones] Loaded ${this.state.notificacionesPendientes.length} notifications`);
+            const data = result.data || [];
+            this.state.notificacionesPendientes = Array.isArray(data) ? data : [];
+            console.log(`[Devoluciones] Data received:`, this.state.notificacionesPendientes.length, 'records');
+
             this.groupByZone();
             this.renderZones();
         } catch (err) {
             console.error('[Devoluciones] Error loading data:', err);
+            const grid = document.getElementById('devoluciones-zones-grid');
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="empty-state error-state" style="grid-column: 1/-1;">
+                        <span class="empty-icon">⚠️</span>
+                        <p>Error al cargar datos: ${err.message || err}</p>
+                        <button class="btn btn-secondary" onclick="devoluciones.refreshData()" style="margin-top: 1rem;">
+                            🔄 Reintentar
+                        </button>
+                    </div>`;
+            }
             utils.showToast('Error al cargar datos de devoluciones', 'error');
         } finally {
             this.state.loading = false;
@@ -110,19 +126,24 @@ const devoluciones = {
     },
 
     renderZones() {
+        console.log('[Devoluciones] renderZones called. Zones count:', Object.keys(this.state.zones).length);
         const grid = document.getElementById('devoluciones-zones-grid');
         const list = document.getElementById('devoluciones-list-container');
-        if (!grid) return;
+        if (!grid) {
+            console.error('[Devoluciones] Grid element not found');
+            return;
+        }
 
         // Ensure grid is visible and list is hidden
         grid.classList.remove('hidden');
         if (list) list.classList.add('hidden');
 
         if (Object.keys(this.state.zones).length === 0) {
+            console.log('[Devoluciones] No zones to display');
             grid.innerHTML = `
-                <div class="empty-state" style="grid-column: 1/-1;">
-                    <span class="empty-icon">✅</span>
-                    <p>Todas las notificaciones físicas han sido devueltas.</p>
+                <div class="empty-state" style="grid-column: 1/-1; padding: 4rem 2rem; text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+                    <p style="font-size: 1.1rem; color: var(--text-secondary);">Todas las notificaciones físicas han sido devueltas.</p>
                 </div>`;
             return;
         }
@@ -139,6 +160,8 @@ const devoluciones = {
                 </div>
             </div>
         `).join('');
+
+        console.log('[Devoluciones] Zones rendered successfully');
     },
 
     openZone(zonaName) {
