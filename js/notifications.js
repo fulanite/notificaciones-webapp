@@ -522,8 +522,14 @@ const notifications = {
         // Store the ID being edited
         this.editingId = id;
 
-        // Navigate to the form
-        app.navigateTo('nueva-notificacion');
+        // Open modal instead of navigating
+        const modal = document.getElementById('modal-nueva-notificacion');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            const modalTitle = modal.querySelector('.modal-title');
+            if (modalTitle) modalTitle.textContent = '📝 Editar Notificación';
+        }
 
         // Wait for DOM to be ready
         setTimeout(() => {
@@ -570,9 +576,6 @@ const notifications = {
                 }
             }
 
-            // Update form title to indicate editing
-            const pageTitle = document.getElementById('page-title');
-            if (pageTitle) pageTitle.textContent = 'Editar Notificación';
 
             utils.showToast('Editando notificación - Modificá los campos y guardá', 'info');
         }, 100);
@@ -621,6 +624,7 @@ const notifications = {
     // Load ujieres for assignment dropdown
     async loadUjieres() {
         const select = document.getElementById('asignado-a');
+        const persistSelect = document.getElementById('persist-ujier');
         if (!select) return;
 
         const { data: ujiers } = await db.getUsersByRole('ujier');
@@ -634,6 +638,13 @@ const notifications = {
                 <option value="">Sin asignar (pendiente)</option>
                 ${options}
             `;
+
+            if (persistSelect) {
+                persistSelect.innerHTML = `
+                    <option value="">No fijar</option>
+                    ${options}
+                `;
+            }
         }
     }
 };

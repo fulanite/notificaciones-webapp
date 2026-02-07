@@ -178,22 +178,16 @@
                         <span class="nav-section-title">Administración</span>
                         <ul class="nav-list">
                             <li class="nav-item">
-                                <a href="#" class="nav-link active" data-view="dashboard-home">
-                                    <span class="nav-icon">📊</span>
-                                    <span class="nav-text">Dashboard</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link" data-view="nueva-notificacion">
-                                    <span class="nav-icon">➕</span>
-                                    <span class="nav-text">Nueva Notificación</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link" data-view="lista-notificaciones">
+                                <a href="#" class="nav-link active" data-view="lista-notificaciones">
                                     <span class="nav-icon">📋</span>
                                     <span class="nav-text">Notificaciones</span>
                                     <span class="nav-badge" id="pending-count">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="dashboard-home">
+                                    <span class="nav-icon">📊</span>
+                                    <span class="nav-text">Dashboard</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -301,24 +295,14 @@
                     </div>
 
                     <div class="header-actions">
-                        <button class="header-btn" id="btn-theme-toggle" aria-label="Cambiar tema"
-                            onclick="app.toggleTheme()">
-                            <span class="header-icon">☀️</span>
-                        </button>
-                        <button class="header-btn" id="btn-notifications" aria-label="Notificaciones">
-                            <span class="header-icon">🔔</span>
-                            <span class="notification-dot hidden"></span>
-                        </button>
-                        <button class="header-btn" id="btn-sync" aria-label="Sincronizar">
-                            <span class="header-icon">🔄</span>
-                        </button>
+                        <!-- Removed theme, notifications, and sync buttons for cleaner space -->
                     </div>
                 </header>
 
                 <!-- Dynamic Content Views -->
                 <div class="content-area">
                     <!-- Dashboard Home View -->
-                    <section id="view-dashboard-home" class="view active">
+                    <section id="view-dashboard-home" class="view">
                         <div class="stats-grid">
                             <div class="stat-card stat-primary">
                                 <div class="stat-icon">📋</div>
@@ -402,265 +386,22 @@
                         </div>
                     </section>
 
-                    <!-- Nueva Notificación View -->
-                    <section id="view-nueva-notificacion" class="view">
-                        <div class="form-container">
-                            <form id="form-nueva-notificacion" class="notification-form">
-                                <div class="form-section">
-                                    <h3 class="section-title">
-                                        <span class="section-icon">📝</span>
-                                        Datos del Expediente
-                                    </h3>
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <label for="tipo-notificacion" class="form-label">Tipo de Notificación
-                                                *</label>
-                                            <select id="tipo-notificacion" name="tipo-notificacion" class="form-select"
-                                                required>
-                                                <option value="">Seleccionar tipo...</option>
-                                                <option value="cedulas">Cédulas</option>
-                                                <option value="cedulas_urgente_norte">Cédulas Urgente Norte</option>
-                                                <option value="cedulas_urgente_sur">Cédulas Urgente Sur</option>
-                                                <option value="cedulas_mandamientos_22172">Cédulas o Mandamientos Ley
-                                                    22172</option>
-                                                <option value="cedulas_correspondencia">Cédulas por Correspondencia
-                                                    (Interior)</option>
-                                                <option value="mandamientos">Mandamientos</option>
-                                                <option value="mandamientos_habilitacion_norte">Mandamientos con
-                                                    habilitación Norte</option>
-                                                <option value="mandamientos_habilitacion_sur">Mandamientos con
-                                                    habilitación Sur</option>
-                                            </select>
-                                        </div>
-
-                                        <!-- Dynamic origen field - appears for Ley 22.172 or Correspondencia -->
-                                        <!-- Replaces the juzgado selector, saves to mismo campo 'origen' -->
-                                        <div class="form-group hidden" id="grupo-origen-dinamico">
-                                            <label for="origen-dinamico-input" class="form-label"
-                                                id="label-origen-dinamico">Origen *</label>
-                                            <div class="searchable-select" id="searchable-origen">
-                                                <input type="text" id="origen-dinamico-input" class="form-input"
-                                                    placeholder="Escribí para buscar..." autocomplete="off">
-                                                <input type="hidden" id="origen-dinamico" name="origen-dinamico">
-                                                <div class="searchable-select-dropdown" id="origen-dropdown"></div>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="n-expediente" class="form-label">N° Expediente *</label>
-                                            <input type="text" id="n-expediente" name="n-expediente" class="form-input"
-                                                placeholder="Ej: 12345/2024" required>
-                                        </div>
-
-                                        <div class="form-group form-group-full">
-                                            <label for="caratula" class="form-label">Carátula *</label>
-                                            <input type="text" id="caratula" name="caratula" class="form-input"
-                                                placeholder="Nombre del expediente" required>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="origen" class="form-label">Origen (Juzgado/Fiscalía) *</label>
-                                            <select id="origen" name="origen" class="form-select" required>
-                                                <option value="">Seleccionar origen...</option>
-                                                <optgroup label="Asesorías">
-                                                    <option value="Asesoría de Menores e Incapaces">Asesoría de Menores
-                                                        e Incapaces</option>
-                                                </optgroup>
-                                                <optgroup label="Cámaras">
-                                                    <option value="Cámara Civil 1">Cámara Civil 1</option>
-                                                    <option value="Cámara Civil 2">Cámara Civil 2</option>
-                                                    <option value="Cámara Civil 3">Cámara Civil 3</option>
-                                                    <option value="Cámara de Apelaciones Penal y de Exhorto">Cámara de
-                                                        Apelaciones Penal y de Exhorto</option>
-                                                    <option value="Cámara en lo Criminal 1ª Nominación">Cámara en lo
-                                                        Criminal 1ª Nominación</option>
-                                                    <option value="Cámara en lo Criminal 2ª Nominación">Cámara en lo
-                                                        Criminal 2ª Nominación</option>
-                                                    <option value="Cámara en lo Criminal 3ª Nominación">Cámara en lo
-                                                        Criminal 3ª Nominación</option>
-                                                </optgroup>
-                                                <optgroup label="Centro de Mediación">
-                                                    <option value="Centro de Mediación Judicial">Centro de Mediación
-                                                        Judicial</option>
-                                                </optgroup>
-                                                <optgroup label="Corte de Justicia">
-                                                    <option value="Corte de Justicia - Secretaría Contencioso">Corte de
-                                                        Justicia - Secretaría Contencioso</option>
-                                                    <option value="Corte de Justicia - Secretaría de Personal">Corte de
-                                                        Justicia - Secretaría de Personal</option>
-                                                    <option
-                                                        value="Corte de Justicia - Secretaría de Recursos Ordinarios y Extraordinarios">
-                                                        Corte de Justicia - Secretaría de Recursos Ordinarios y
-                                                        Extraordinarios</option>
-                                                    <option value="Corte de Justicia - Secretaría de Sumarios">Corte de
-                                                        Justicia - Secretaría de Sumarios</option>
-                                                    <option value="Corte de Justicia - Secretaría Institucional">Corte
-                                                        de Justicia - Secretaría Institucional</option>
-                                                    <option value="Corte de Justicia - Secretaría Penal">Corte de
-                                                        Justicia - Secretaría Penal</option>
-                                                    <option value="Corte de Justicia - Secretaría Superintendencia">
-                                                        Corte de Justicia - Secretaría Superintendencia</option>
-                                                    <option value="Corte de Justicia - Sala de Recursos y Queja">Corte
-                                                        de Justicia - Sala de Recursos y Queja</option>
-                                                </optgroup>
-                                                <optgroup label="Defensorías">
-                                                    <option value="Defensoría Civil 1">Defensoría Civil 1</option>
-                                                    <option value="Defensoría Civil 2">Defensoría Civil 2</option>
-                                                    <option value="Defensoría Civil 3">Defensoría Civil 3</option>
-                                                    <option value="Defensoría Civil 4">Defensoría Civil 4</option>
-                                                    <option value="Defensoría Civil 5">Defensoría Civil 5</option>
-                                                </optgroup>
-                                                <optgroup label="Ejecución Fiscal">
-                                                    <option value="Ejecución Fiscal">Ejecución Fiscal</option>
-                                                </optgroup>
-                                                <optgroup label="Fiscalías">
-                                                    <option value="Fiscalía de Instrucción 1">Fiscalía de Instrucción 1
-                                                    </option>
-                                                    <option value="Fiscalía de Instrucción 2">Fiscalía de Instrucción 2
-                                                    </option>
-                                                    <option value="Fiscalía de Instrucción 3">Fiscalía de Instrucción 3
-                                                    </option>
-                                                    <option value="Fiscalía de Instrucción 4">Fiscalía de Instrucción 4
-                                                    </option>
-                                                    <option value="Fiscalía de Instrucción 5">Fiscalía de Instrucción 5
-                                                    </option>
-                                                    <option value="Fiscalía de Instrucción 6">Fiscalía de Instrucción 6
-                                                    </option>
-                                                    <option value="Fiscalía de Instrucción 7">Fiscalía de Instrucción 7
-                                                    </option>
-                                                    <option value="Fiscalía de Instrucción 8">Fiscalía de Instrucción 8
-                                                    </option>
-                                                    <option value="Fiscalía de Instrucción 9">Fiscalía de Instrucción 9
-                                                    </option>
-                                                    <option value="Fiscalía de Instrucción 10">Fiscalía de Instrucción
-                                                        10</option>
-                                                    <option value="Fiscalía Penal Juvenil">Fiscalía Penal Juvenil
-                                                    </option>
-                                                </optgroup>
-                                                <optgroup label="Juzgados Civiles">
-                                                    <option value="Juzgado Civil 1">Juzgado Civil 1</option>
-                                                    <option value="Juzgado Civil 2">Juzgado Civil 2</option>
-                                                    <option value="Juzgado Civil 3">Juzgado Civil 3</option>
-                                                    <option value="Juzgado Civil 4">Juzgado Civil 4</option>
-                                                    <option value="Juzgado Civil 5">Juzgado Civil 5</option>
-                                                </optgroup>
-                                                <optgroup label="Juzgados Comerciales">
-                                                    <option value="Juzgado Comercial 1/1">Juzgado Comercial 1/1</option>
-                                                    <option value="Juzgado Comercial 1/2">Juzgado Comercial 1/2</option>
-                                                    <option value="Juzgado Comercial 1/Quiebras">Juzgado Comercial
-                                                        1/Quiebras</option>
-                                                    <option value="Juzgado Comercial 2/1">Juzgado Comercial 2/1</option>
-                                                    <option value="Juzgado Comercial 2/2">Juzgado Comercial 2/2</option>
-                                                    <option value="Juzgado Comercial 2/Quiebras">Juzgado Comercial
-                                                        2/Quiebras</option>
-                                                    <option value="Juzgado Comercial 3">Juzgado Comercial 3</option>
-                                                    <option value="Juzgado Comercial 3/Quiebras">Juzgado Comercial
-                                                        3/Quiebras</option>
-                                                </optgroup>
-                                                <optgroup label="Juzgados Correccionales">
-                                                    <option value="Juzgado Correccional 1">Juzgado Correccional 1
-                                                    </option>
-                                                    <option value="Juzgado Correccional 2">Juzgado Correccional 2
-                                                    </option>
-                                                    <option value="Juzgado Correccional 3">Juzgado Correccional 3
-                                                    </option>
-                                                </optgroup>
-                                                <optgroup label="Juzgados de Ejecución Penal">
-                                                    <option value="Juzgado de Ejecución Penal 1">Juzgado de Ejecución
-                                                        Penal 1</option>
-                                                    <option value="Juzgado de Ejecución Penal 2">Juzgado de Ejecución
-                                                        Penal 2</option>
-                                                </optgroup>
-                                                <optgroup label="Juzgados de Familia">
-                                                    <option value="Juzgado de Familia 1">Juzgado de Familia 1</option>
-                                                    <option value="Juzgado de Familia 2">Juzgado de Familia 2</option>
-                                                    <option value="Juzgado de Familia 3">Juzgado de Familia 3</option>
-                                                </optgroup>
-                                                <optgroup label="Juzgados de Garantías">
-                                                    <option value="Juzgado de Garantías 1">Juzgado de Garantías 1
-                                                    </option>
-                                                    <option value="Juzgado de Garantías 2">Juzgado de Garantías 2
-                                                    </option>
-                                                    <option value="Juzgado de Garantías 3">Juzgado de Garantías 3
-                                                    </option>
-                                                    <option value="Juzgado de Garantías 4">Juzgado de Garantías 4
-                                                    </option>
-                                                </optgroup>
-                                                <optgroup label="Otros Juzgados">
-                                                    <option value="Juzgado Electoral y Minas">Juzgado Electoral y Minas
-                                                    </option>
-                                                </optgroup>
-                                                <optgroup label="Juzgados Laborales">
-                                                    <option value="Juzgado Laboral 1">Juzgado Laboral 1</option>
-                                                    <option value="Juzgado Laboral 2">Juzgado Laboral 2</option>
-                                                    <option value="Juzgado Laboral 3">Juzgado Laboral 3</option>
-                                                    <option value="Juzgado Laboral 4">Juzgado Laboral 4</option>
-                                                </optgroup>
-                                                <optgroup label="Ministerio Público">
-                                                    <option value="Ministerio Público">Ministerio Público</option>
-                                                    <option value="Procuración">Procuración</option>
-                                                </optgroup>
-                                                <optgroup label="Tribunales Penales Juveniles">
-                                                    <option value="Tribunal de Responsabilidad Penal Juvenil 1">Tribunal
-                                                        de Responsabilidad Penal Juvenil 1</option>
-                                                    <option value="Tribunal de Responsabilidad Penal Juvenil 2">Tribunal
-                                                        de Responsabilidad Penal Juvenil 2</option>
-                                                </optgroup>
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="letrado" class="form-label">Letrado</label>
-                                            <input type="text" id="letrado" name="letrado" class="form-input"
-                                                placeholder="Nombre del abogado">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-section">
-                                    <h3 class="section-title">
-                                        <span class="section-icon">👤</span>
-                                        Datos del Destinatario
-                                    </h3>
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <label for="destinatario-especial" class="form-label">Destinatario
-                                                Especial</label>
-                                            <select id="destinatario-especial" name="destinatario-especial"
-                                                class="form-select">
-                                                <option value="">No aplica</option>
-                                                <option value="ARCAT">ARCAT</option>
-                                                <option value="Juzgado Comercial 1/1">Juzgado Comercial 1/1</option>
-                                                <option value="Juzgado Comercial 1/2">Juzgado Comercial 1/2</option>
-                                                <option value="Juzgado Comercial 1/Quiebras">Juzgado Comercial
-                                                    1/Quiebras</option>
-                                                <option value="Juzgado Comercial 2/1">Juzgado Comercial 2/1</option>
-                                                <option value="Juzgado Comercial 2/2">Juzgado Comercial 2/2</option>
-                                                <option value="Juzgado Comercial 2/Quiebras">Juzgado Comercial
-                                                    2/Quiebras</option>
-                                                <option value="Juzgado Comercial 3">Juzgado Comercial 3</option>
-                                                <option value="Juzgado Comercial 3/Quiebras">Juzgado Comercial
-                                                    3/Quiebras</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="destinatario-nombre" class="form-label">Nombre del Destinatario
-                                                *</label>
-                                            <input type="text" id="destinatario-nombre" name="destinatario-nombre"
-                                                class="form-input" placeholder="Nombre completo" required>
-                                        </div>
-
-                                        <div class="form-group form-group-full">
-                                            <label for="domicilio" class="form-label">Domicilio *</label>
-                                            <input type="text" id="domicilio" name="domicilio" class="form-input"
-                                                placeholder="Dirección completa" required>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="zona" class="form-label">Zona *</label>
-                                            <select id="zona" name="zona" class="form-select" required>
-                                                <option value="">Seleccionar zona...</option>
+                    <!-- Notification Form Modal -->
+                    <div id="modal-nueva-notificacion" class="modal hidden">
+                        <div class="modal-overlay"></div>
+                        <div class="modal-container modal-xl">
+                            <div class="modal-header">
+                                <h2 class="modal-title">📦 Nueva Notificación</h2>
+                                <button class="btn-close-modal" id="btn-close-modal-nueva-notif">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="form-nueva-notificacion" class="compact-form">
+                                    <!-- Persistent Selections (Zone and Bailiff) -->
+                                    <div class="persistent-settings-bar">
+                                        <div class="p-setting">
+                                            <label>📍 Zona Fija:</label>
+                                            <select id="persist-zona" class="select-mini">
+                                                <option value="">No fijar</option>
                                                 <optgroup label="Zona A">
                                                     <option value="A1 - Cédulas">A1 - Cédulas</option>
                                                     <option value="A1 - Mandamientos">A1 - Mandamientos</option>
@@ -706,98 +447,367 @@
                                                 </optgroup>
                                             </select>
                                         </div>
+                                        <div class="p-setting">
+                                            <label>👤 Ujier Fijo:</label>
+                                            <select id="persist-ujier" class="select-mini">
+                                                <option value="">No fijar</option>
+                                                <!-- Dynamic ujieres -->
+                                            </select>
+                                        </div>
+                                        <div class="p-info">
+                                            <small>Se recordarán para tu próxima carga.</small>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="form-section">
-                                    <h3 class="section-title">
-                                        <span class="section-icon">🎫</span>
-                                        Troquel y Pago
-                                    </h3>
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <label for="tipo-troquel" class="form-label">Tipo de Troquel *</label>
-                                            <select id="tipo-troquel" name="tipo-troquel" class="form-select" required>
-                                                <option value="">Seleccionar...</option>
-                                                <option value="C">C - Cédula</option>
-                                                <option value="M">M - Mandamiento</option>
-                                            </select>
+                                    <div class="form-grid-compact">
+                                        <!-- Row 1: Type, Exp, Caratula -->
+                                        <div class="f-row">
+                                            <div class="f-group" style="width: 25%;">
+                                                <label>Tipo *</label>
+                                                <select id="tipo-notificacion" name="tipo-notificacion" required>
+                                                    <option value="cedulas">Cédulas</option>
+                                                    <option value="mandamientos">Mandamientos</option>
+                                                    <option value="cedulas_mandamientos_22172">Ley 22172</option>
+                                                    <option value="cedulas_correspondencia">Correspondencia</option>
+                                                </select>
+                                            </div>
+                                            <div class="f-group" style="width: 20%;">
+                                                <label>Expediente *</label>
+                                                <input type="text" id="n-expediente" name="n-expediente"
+                                                    placeholder="123/24" required>
+                                            </div>
+                                            <div class="f-group" style="width: 55%;">
+                                                <label>Carátula *</label>
+                                                <input type="text" id="caratula" name="caratula"
+                                                    placeholder="Nombre del expediente" required>
+                                            </div>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label class="form-label">
-                                                <input type="checkbox" id="sin-troquel" name="sin-troquel"
-                                                    class="form-checkbox">
-                                                Sin Troquel (Juzgados)
-                                            </label>
+                                        <!-- Row 2: Origen, Letrado -->
+                                        <div class="f-row">
+                                            <div class="f-group" style="flex: 2;">
+                                                <label>Origen (Juzgado/Fiscalía) *</label>
+                                                <select id="origen" name="origen" required>
+                                                    <option value="">Seleccionar origen...</option>
+                                                    <optgroup label="Asesorías">
+                                                        <option value="Asesoría de Menores e Incapaces">Asesoría de
+                                                            Menores e Incapaces</option>
+                                                    </optgroup>
+                                                    <optgroup label="Cámaras">
+                                                        <option value="Cámara Civil 1">Cámara Civil 1</option>
+                                                        <option value="Cámara Civil 2">Cámara Civil 2</option>
+                                                        <option value="Cámara Civil 3">Cámara Civil 3</option>
+                                                        <option value="Cámara de Apelaciones Penal y de Exhorto">Cámara
+                                                            de Apelaciones Penal y de Exhorto</option>
+                                                        <option value="Cámara en lo Criminal 1ª Nominación">Cámara en lo
+                                                            Criminal 1ª Nominación</option>
+                                                        <option value="Cámara en lo Criminal 2ª Nominación">Cámara en lo
+                                                            Criminal 2ª Nominación</option>
+                                                        <option value="Cámara en lo Criminal 3ª Nominación">Cámara en lo
+                                                            Criminal 3ª Nominación</option>
+                                                    </optgroup>
+                                                    <optgroup label="Centro de Mediación">
+                                                        <option value="Centro de Mediación Judicial">Centro de Mediación
+                                                            Judicial</option>
+                                                    </optgroup>
+                                                    <optgroup label="Corte de Justicia">
+                                                        <option value="Corte de Justicia - Secretaría Contencioso">Corte
+                                                            de Justicia - Secretaría Contencioso</option>
+                                                        <option value="Corte de Justicia - Secretaría de Personal">Corte
+                                                            de Justicia - Secretaría de Personal</option>
+                                                        <option
+                                                            value="Corte de Justicia - Secretaría de Recursos Ordinarios y Extraordinarios">
+                                                            Corte de Justicia - Secretaría de Recursos Ordinarios y
+                                                            Extraordinarios</option>
+                                                        <option value="Corte de Justicia - Secretaría de Sumarios">Corte
+                                                            de Justicia - Secretaría de Sumarios</option>
+                                                        <option value="Corte de Justicia - Secretaría Institucional">
+                                                            Corte de Justicia - Secretaría Institucional</option>
+                                                        <option value="Corte de Justicia - Secretaría Penal">Corte de
+                                                            Justicia - Secretaría Penal</option>
+                                                        <option value="Corte de Justicia - Secretaría Superintendencia">
+                                                            Corte de Justicia - Secretaría Superintendencia</option>
+                                                        <option value="Corte de Justicia - Sala de Recursos y Queja">
+                                                            Corte de Justicia - Sala de Recursos y Queja</option>
+                                                    </optgroup>
+                                                    <optgroup label="Defensorías">
+                                                        <option value="Defensoría Civil 1">Defensoría Civil 1</option>
+                                                        <option value="Defensoría Civil 2">Defensoría Civil 2</option>
+                                                        <option value="Defensoría Civil 3">Defensoría Civil 3</option>
+                                                        <option value="Defensoría Civil 4">Defensoría Civil 4</option>
+                                                        <option value="Defensoría Civil 5">Defensoría Civil 5</option>
+                                                    </optgroup>
+                                                    <optgroup label="Ejecución Fiscal">
+                                                        <option value="Ejecución Fiscal">Ejecución Fiscal</option>
+                                                    </optgroup>
+                                                    <optgroup label="Fiscalías">
+                                                        <option value="Fiscalía de Instrucción 1">Fiscalía de
+                                                            Instrucción 1</option>
+                                                        <option value="Fiscalía de Instrucción 2">Fiscalía de
+                                                            Instrucción 2</option>
+                                                        <option value="Fiscalía de Instrucción 3">Fiscalía de
+                                                            Instrucción 3</option>
+                                                        <option value="Fiscalía de Instrucción 4">Fiscalía de
+                                                            Instrucción 4</option>
+                                                        <option value="Fiscalía de Instrucción 5">Fiscalía de
+                                                            Instrucción 5</option>
+                                                        <option value="Fiscalía de Instrucción 6">Fiscalía de
+                                                            Instrucción 6</option>
+                                                        <option value="Fiscalía de Instrucción 7">Fiscalía de
+                                                            Instrucción 7</option>
+                                                        <option value="Fiscalía de Instrucción 8">Fiscalía de
+                                                            Instrucción 8</option>
+                                                        <option value="Fiscalía de Instrucción 9">Fiscalía de
+                                                            Instrucción 9</option>
+                                                        <option value="Fiscalía de Instrucción 10">Fiscalía de
+                                                            Instrucción 10</option>
+                                                        <option value="Fiscalía Penal Juvenil">Fiscalía Penal Juvenil
+                                                        </option>
+                                                    </optgroup>
+                                                    <optgroup label="Juzgados Civiles">
+                                                        <option value="Juzgado Civil 1">Juzgado Civil 1</option>
+                                                        <option value="Juzgado Civil 2">Juzgado Civil 2</option>
+                                                        <option value="Juzgado Civil 3">Juzgado Civil 3</option>
+                                                        <option value="Juzgado Civil 4">Juzgado Civil 4</option>
+                                                        <option value="Juzgado Civil 5">Juzgado Civil 5</option>
+                                                    </optgroup>
+                                                    <optgroup label="Juzgados Comerciales">
+                                                        <option value="Juzgado Comercial 1/1">Juzgado Comercial 1/1
+                                                        </option>
+                                                        <option value="Juzgado Comercial 1/2">Juzgado Comercial 1/2
+                                                        </option>
+                                                        <option value="Juzgado Comercial 1/Quiebras">Juzgado Comercial
+                                                            1/Quiebras</option>
+                                                        <option value="Juzgado Comercial 2/1">Juzgado Comercial 2/1
+                                                        </option>
+                                                        <option value="Juzgado Comercial 2/2">Juzgado Comercial 2/2
+                                                        </option>
+                                                        <option value="Juzgado Comercial 2/Quiebras">Juzgado Comercial
+                                                            2/Quiebras</option>
+                                                        <option value="Juzgado Comercial 3">Juzgado Comercial 3</option>
+                                                        <option value="Juzgado Comercial 3/Quiebras">Juzgado Comercial
+                                                            3/Quiebras</option>
+                                                    </optgroup>
+                                                    <optgroup label="Juzgados Correccionales">
+                                                        <option value="Juzgado Correccional 1">Juzgado Correccional 1
+                                                        </option>
+                                                        <option value="Juzgado Correccional 2">Juzgado Correccional 2
+                                                        </option>
+                                                        <option value="Juzgado Correccional 3">Juzgado Correccional 3
+                                                        </option>
+                                                    </optgroup>
+                                                    <optgroup label="Juzgados de Ejecución Penal">
+                                                        <option value="Juzgado de Ejecución Penal 1">Juzgado de
+                                                            Ejecución Penal 1</option>
+                                                        <option value="Juzgado de Ejecución Penal 2">Juzgado de
+                                                            Ejecución Penal 2</option>
+                                                    </optgroup>
+                                                    <optgroup label="Juzgados de Familia">
+                                                        <option value="Juzgado de Familia 1">Juzgado de Familia 1
+                                                        </option>
+                                                        <option value="Juzgado de Familia 2">Juzgado de Familia 2
+                                                        </option>
+                                                        <option value="Juzgado de Familia 3">Juzgado de Familia 3
+                                                        </option>
+                                                    </optgroup>
+                                                    <optgroup label="Juzgados de Garantías">
+                                                        <option value="Juzgado de Garantías 1">Juzgado de Garantías 1
+                                                        </option>
+                                                        <option value="Juzgado de Garantías 2">Juzgado de Garantías 2
+                                                        </option>
+                                                        <option value="Juzgado de Garantías 3">Juzgado de Garantías 3
+                                                        </option>
+                                                        <option value="Juzgado de Garantías 4">Juzgado de Garantías 4
+                                                        </option>
+                                                    </optgroup>
+                                                    <optgroup label="Otros Juzgados">
+                                                        <option value="Juzgado Electoral y Minas">Juzgado Electoral y
+                                                            Minas</option>
+                                                    </optgroup>
+                                                    <optgroup label="Juzgados Laborales">
+                                                        <option value="Juzgado Laboral 1">Juzgado Laboral 1</option>
+                                                        <option value="Juzgado Laboral 2">Juzgado Laboral 2</option>
+                                                        <option value="Juzgado Laboral 3">Juzgado Laboral 3</option>
+                                                        <option value="Juzgado Laboral 4">Juzgado Laboral 4</option>
+                                                    </optgroup>
+                                                    <optgroup label="Ministerio Público">
+                                                        <option value="Ministerio Público">Ministerio Público</option>
+                                                        <option value="Procuración">Procuración</option>
+                                                    </optgroup>
+                                                    <optgroup label="Tribunales Penales Juveniles">
+                                                        <option value="Tribunal de Responsabilidad Penal Juvenil 1">
+                                                            Tribunal de Responsabilidad Penal Juvenil 1</option>
+                                                        <option value="Tribunal de Responsabilidad Penal Juvenil 2">
+                                                            Tribunal de Responsabilidad Penal Juvenil 2</option>
+                                                    </optgroup>
+                                                </select>
+
+                                                <div id="grupo-origen-dinamico" class="hidden">
+                                                    <label id="label-origen-dinamico">Origen Público *</label>
+                                                    <div class="searchable-select">
+                                                        <input type="text" id="origen-dinamico-input"
+                                                            placeholder="Escribí para buscar..." autocomplete="off">
+                                                        <input type="hidden" id="origen-dinamico">
+                                                        <div id="origen-dropdown" class="searchable-select-dropdown">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="f-group" style="flex: 1;">
+                                                <label>Letrado</label>
+                                                <input type="text" id="letrado" name="letrado" placeholder="Abogado">
+                                            </div>
                                         </div>
 
-                                        <div class="form-group" id="grupo-n-troquel">
-                                            <label for="n-troquel" class="form-label">N° Troquel *</label>
-                                            <input type="number" id="n-troquel" name="n-troquel" class="form-input"
-                                                placeholder="Número de troquel" required>
+                                        <!-- Row 3: Destinatario, Especial, Zona -->
+                                        <div class="f-row">
+                                            <div class="f-group" style="width: 25%;">
+                                                <label>Dest. Especial</label>
+                                                <select id="destinatario-especial" name="destinatario-especial">
+                                                    <option value="">No aplica</option>
+                                                    <option value="ARCAT">ARCAT</option>
+                                                    <option value="Juzgado Comercial 1/1">Juzgado Comercial 1/1</option>
+                                                    <option value="Juzgado Comercial 1/2">Juzgado Comercial 1/2</option>
+                                                </select>
+                                            </div>
+                                            <div class="f-group" style="width: 50%;">
+                                                <label>Destinatario *</label>
+                                                <input type="text" id="destinatario-nombre" name="destinatario-nombre"
+                                                    required>
+                                            </div>
+                                            <div class="f-group" style="width: 25%;">
+                                                <label>Zona *</label>
+                                                <select id="zona" name="zona" required>
+                                                    <option value="">Zona...</option>
+                                                    <optgroup label="Zona A">
+                                                        <option value="A1 - Cédulas">A1 - Cédulas</option>
+                                                        <option value="A1 - Mandamientos">A1 - Mandamientos</option>
+                                                        <option value="A2 - Cédulas">A2 - Cédulas</option>
+                                                        <option value="A2 - Mandamientos">A2 - Mandamientos</option>
+                                                    </optgroup>
+                                                    <optgroup label="Zona B">
+                                                        <option value="B1 - Cédulas">B1 - Cédulas</option>
+                                                        <option value="B1 - Mandamientos">B1 - Mandamientos</option>
+                                                        <option value="B2 - Cédulas">B2 - Cédulas</option>
+                                                        <option value="B2 - Mandamientos">B2 - Mandamientos</option>
+                                                    </optgroup>
+                                                    <optgroup label="Zona C">
+                                                        <option value="C1 - Cédulas">C1 - Cédulas</option>
+                                                        <option value="C1 - Mandamientos">C1 - Mandamientos</option>
+                                                        <option value="C2 - Cédulas">C2 - Cédulas</option>
+                                                        <option value="C2 - Mandamientos">C2 - Mandamientos</option>
+                                                    </optgroup>
+                                                    <optgroup label="Zona D">
+                                                        <option value="D1 - Cédulas">D1 - Cédulas</option>
+                                                        <option value="D1 - Mandamientos">D1 - Mandamientos</option>
+                                                        <option value="D2 - Cédulas">D2 - Cédulas</option>
+                                                        <option value="D2 - Mandamientos">D2 - Mandamientos</option>
+                                                    </optgroup>
+                                                    <optgroup label="Urgentes">
+                                                        <option value="Urgente SUR - Cédulas">Urgente SUR - Cédulas
+                                                        </option>
+                                                        <option value="Urgente SUR - Mandamientos">Urgente SUR -
+                                                            Mandamientos</option>
+                                                        <option value="Urgente NORTE - Cédulas">Urgente NORTE - Cédulas
+                                                        </option>
+                                                        <option value="Urgente NORTE - Mandamientos">Urgente NORTE -
+                                                            Mandamientos</option>
+                                                    </optgroup>
+                                                    <optgroup label="Fuera de Radio">
+                                                        <option value="Fuera de Radio NORTE - Cédula">Fuera de Radio
+                                                            NORTE - Cédula</option>
+                                                        <option value="Fuera de Radio NORTE - Mandamientos">Fuera de
+                                                            Radio NORTE - Mandamientos</option>
+                                                        <option value="Fuera de Radio SUR - Cédula">Fuera de Radio SUR -
+                                                            Cédula</option>
+                                                        <option value="Fuera de Radio SUR - Mandamientos">Fuera de Radio
+                                                            SUR - Mandamientos</option>
+                                                    </optgroup>
+                                                </select>
+                                            </div>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="medio-pago" class="form-label">Medio de Pago *</label>
-                                            <select id="medio-pago" name="medio-pago" class="form-select" required>
-                                                <option value="">Seleccionar...</option>
-                                                <option value="gratuito">Gratuito</option>
-                                                <option value="efectivo">Efectivo</option>
-                                                <option value="transferencia">Transferencia</option>
-                                                <option value="qr">QR</option>
-                                            </select>
+                                        <!-- Row 4: Domicilio -->
+                                        <div class="f-row">
+                                            <div class="f-group" style="width: 100%;">
+                                                <label>Domicilio *</label>
+                                                <input type="text" id="domicilio" name="domicilio"
+                                                    placeholder="Calle, Número, Barrio" required>
+                                            </div>
                                         </div>
 
-                                        <div class="form-group" id="grupo-costo">
-                                            <label for="costo" class="form-label">Costo</label>
-                                            <div class="input-with-prefix">
-                                                <span class="input-prefix">$</span>
-                                                <input type="number" id="costo" name="costo" class="form-input"
-                                                    placeholder="0.00" step="0.01">
+                                        <!-- Row 5: Troquel, Pago, Costo -->
+                                        <div class="f-row" style="align-items: flex-end;">
+                                            <div class="f-group" style="width: 15%;">
+                                                <label>Troquel *</label>
+                                                <select id="tipo-troquel" name="tipo-troquel" required>
+                                                    <option value="C">C</option>
+                                                    <option value="M">M</option>
+                                                </select>
+                                            </div>
+                                            <div class="f-group" style="width: 20%;" id="grupo-n-troquel">
+                                                <label>N° Troquel *</label>
+                                                <input type="number" id="n-troquel" name="n-troquel" required>
+                                            </div>
+                                            <div class="f-group" style="padding-bottom: 5px;">
+                                                <label class="checkbox-wrapper-mini">
+                                                    <input type="checkbox" id="sin-troquel">
+                                                    <span>Sin Troquel</span>
+                                                </label>
+                                            </div>
+                                            <div class="f-group" style="width: 20%;">
+                                                <label>Pago *</label>
+                                                <select id="medio-pago" name="medio-pago" required>
+                                                    <option value="gratuito">Gratuito</option>
+                                                    <option value="efectivo">Efectivo</option>
+                                                </select>
+                                            </div>
+                                            <div class="f-group" style="width: 15%;" id="grupo-costo" class="hidden">
+                                                <label>Costo</label>
+                                                <input type="number" id="costo" name="costo" value="0" step="0.01">
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 6: Asignar, Observaciones -->
+                                        <div class="f-row">
+                                            <div class="f-group" style="width: 30%;">
+                                                <label>Asignar a Ujier</label>
+                                                <select id="asignado-a" name="asignado-a">
+                                                    <option value="">Pendiente...</option>
+                                                    <!-- Dynamic -->
+                                                </select>
+                                            </div>
+                                            <div class="f-group" style="width: 70%;">
+                                                <label>Observaciones</label>
+                                                <input type="text" id="observaciones-iniciales"
+                                                    name="observaciones-iniciales" placeholder="Notas internas...">
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="form-section">
-                                    <h3 class="section-title">
-                                        <span class="section-icon">📎</span>
-                                        Asignación y Observaciones
-                                    </h3>
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <label for="asignado-a" class="form-label">Asignar a Ujier</label>
-                                            <select id="asignado-a" name="asignado-a" class="form-select">
-                                                <option value="">Sin asignar (pendiente)</option>
-                                                <!-- Dynamic options -->
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group form-group-full">
-                                            <label for="observaciones-iniciales" class="form-label">Observaciones
-                                                Iniciales</label>
-                                            <textarea id="observaciones-iniciales" name="observaciones-iniciales"
-                                                class="form-textarea" rows="3"
-                                                placeholder="Ej: Requiere traslado, adjuntar croquis, etc."></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-actions">
-                                    <button type="button" class="btn btn-secondary" id="btn-limpiar-form">
-                                        <span>🗑️</span> Limpiar
-                                    </button>
-                                    <button type="submit" class="btn btn-primary">
-                                        <span>💾</span> Guardar Notificación
-                                    </button>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm"
+                                    id="btn-cancelar-nueva-notif">Cerrar</button>
+                                <button type="submit" form="form-nueva-notificacion" class="btn btn-primary"
+                                    id="btn-save-nueva-notif">
+                                    <span>💾</span> GUARDAR NOTIFICACIÓN
+                                </button>
+                            </div>
                         </div>
-                    </section>
+                    </div>
 
                     <!-- Lista de Notificaciones View -->
-                    <section id="view-lista-notificaciones" class="view">
+                    <section id="view-lista-notificaciones" class="view active">
+                        <div class="view-header-row">
+                            <div class="header-left">
+                                <h2 class="view-title">Notificaciones</h2>
+                                <p class="view-subtitle">Listado de todas las notificaciones</p>
+                            </div>
+                            <button id="btn-open-nueva-notif" class="btn btn-primary btn-lg">
+                                <span>➕</span> NUEVA NOTIFICACIÓN
+                            </button>
+                        </div>
                         <!-- Pestañas de Año -->
                         <div class="view-tabs">
                             <button class="tab-btn active" data-year="2026"

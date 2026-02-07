@@ -3,7 +3,7 @@
  */
 
 const app = {
-    currentView: 'dashboard-home',
+    currentView: 'lista-notificaciones',
 
     // Initialize application
     async init() {
@@ -61,6 +61,34 @@ const app = {
         utils.showToast(`Tema ${newTheme === 'dark' ? 'oscuro' : 'claro'} activado`, 'info');
     },
 
+    // Handle persistent settings for Zona/Ujier
+    applyPersistentSettings() {
+        const savedZona = localStorage.getItem('sgnd-persist-zona');
+        const savedUjier = localStorage.getItem('sgnd-persist-ujier');
+
+        if (savedZona) {
+            const zonaSelect = document.getElementById('zona');
+            const persistZona = document.getElementById('persist-zona');
+            if (zonaSelect) zonaSelect.value = savedZona;
+            if (persistZona) persistZona.value = savedZona;
+        }
+
+        if (savedUjier) {
+            const ujierSelect = document.getElementById('asignado-a');
+            const persistUjier = document.getElementById('persist-ujier');
+            if (ujierSelect) ujierSelect.value = savedUjier;
+            if (persistUjier) persistUjier.value = savedUjier;
+        }
+    },
+
+    savePersistentSettings() {
+        const zona = document.getElementById('persist-zona')?.value;
+        const ujier = document.getElementById('persist-ujier')?.value;
+
+        if (zona !== undefined) localStorage.setItem('sgnd-persist-zona', zona);
+        if (ujier !== undefined) localStorage.setItem('sgnd-persist-ujier', ujier);
+    },
+
     // Handle notification type change - show/populate dynamic origin
     handleTipoNotificacionChange(tipo) {
         const grupoJuzgado = document.getElementById('origen')?.closest('.form-group');
@@ -69,6 +97,7 @@ const app = {
         const hidden = document.getElementById('origen-dinamico');
         const dropdown = document.getElementById('origen-dropdown');
         const label = document.getElementById('label-origen-dinamico');
+        const grupoFixed = document.getElementById('origen')?.closest('.f-group');
 
         if (!grupoDinamico || !input || !dropdown || !label) return;
 
@@ -85,7 +114,7 @@ const app = {
 
         if (tipo === 'cedulas_mandamientos_22172') {
             // Hide juzgado selector, show province selector
-            grupoJuzgado?.classList.add('hidden');
+            grupoFixed?.classList.add('hidden');
             document.getElementById('origen').required = false;
 
             grupoDinamico.classList.remove('hidden');
@@ -96,7 +125,7 @@ const app = {
 
         } else if (tipo === 'cedulas_correspondencia') {
             // Hide juzgado selector, show locality selector
-            grupoJuzgado?.classList.add('hidden');
+            grupoFixed?.classList.add('hidden');
             document.getElementById('origen').required = false;
 
             grupoDinamico.classList.remove('hidden');
@@ -107,7 +136,7 @@ const app = {
 
         } else {
             // Show juzgado selector, hide dynamic origin
-            grupoJuzgado?.classList.remove('hidden');
+            grupoFixed?.classList.remove('hidden');
             document.getElementById('origen').required = true;
 
             grupoDinamico.classList.add('hidden');
@@ -396,6 +425,35 @@ const app = {
             document.getElementById('form-nueva-notificacion')?.reset();
         });
 
+        // Modal Nueva Notificación
+        const modalNuevaNotif = document.getElementById('modal-nueva-notificacion');
+
+        document.getElementById('btn-open-nueva-notif')?.addEventListener('click', () => {
+            modalNuevaNotif?.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent scroll
+
+            // Reset for new entry
+            document.getElementById('form-nueva-notificacion')?.reset();
+            notifications.editingId = null;
+            const modalTitle = modalNuevaNotif?.querySelector('.modal-title');
+            if (modalTitle) modalTitle.textContent = '📦 Nueva Notificación';
+
+            this.applyPersistentSettings();
+        });
+
+        const closeModal = () => {
+            modalNuevaNotif?.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        document.getElementById('btn-close-modal-nueva-notif')?.addEventListener('click', closeModal);
+        document.getElementById('btn-cancelar-nueva-notif')?.addEventListener('click', closeModal);
+        modalNuevaNotif?.querySelector('.modal-overlay')?.addEventListener('click', closeModal);
+
+        // Persistent settings change
+        document.getElementById('persist-zona')?.addEventListener('change', () => this.savePersistentSettings());
+        document.getElementById('persist-ujier')?.addEventListener('change', () => this.savePersistentSettings());
+
         // Close sidebar on mobile when clicking outside
         document.querySelector('.main-content')?.addEventListener('click', () => {
             if (window.innerWidth <= 1024) {
@@ -480,14 +538,14 @@ const app = {
 
         if (rol === 'admin' || rol === 'administrativo' || rol === 'coordinador') {
             document.getElementById('menu-admin')?.classList.remove('hidden');
-            this.navigateTo('dashboard-home');
+            this.navigateTo('lista-notificaciones');
         } else if (rol === 'ujier') {
             document.getElementById('menu-ujier')?.classList.remove('hidden');
             this.navigateTo('mis-asignaciones');
         } else if (rol === 'auditor') {
             document.getElementById('menu-auditor')?.classList.remove('hidden');
             document.getElementById('menu-admin')?.classList.remove('hidden'); // Auditors can see admin dashboard
-            this.navigateTo('dashboard-home');
+            this.navigateTo('lista-notificaciones');
         }
     },
 
@@ -549,7 +607,6 @@ const app = {
     updatePageTitle(viewId) {
         const titles = {
             'dashboard-home': { title: 'Dashboard', subtitle: 'Panel de control' },
-            'nueva-notificacion': { title: 'Nueva Notificación', subtitle: 'Registrar nueva cédula o mandamiento' },
             'lista-notificaciones': { title: 'Notificaciones', subtitle: 'Listado de todas las notificaciones' },
             'asignaciones': { title: 'Asignaciones', subtitle: 'Gestión de asignaciones a ujieres' },
             'usuarios': { title: 'Usuarios', subtitle: 'Gestión de usuarios del sistema' },
@@ -701,12 +758,17 @@ const app = {
 
                 // Reset dynamic origin field
                 document.getElementById('grupo-origen-dinamico')?.classList.add('hidden');
-                document.getElementById('origen')?.closest('.form-group')?.classList.remove('hidden');
+                document.getElementById('origen')?.closest('.f-group')?.classList.remove('hidden');
 
-                // Navigate to list
-                setTimeout(() => {
-                    this.navigateTo('lista-notificaciones');
-                }, 1000);
+                // Close modal
+                const modal = document.getElementById('modal-nueva-notificacion');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+
+                // Refresh list
+                notifications.loadNotifications();
             } else {
                 console.error('❌ Error en resultado:', result);
                 utils.showToast('Error al guardar notificación', 'error');
