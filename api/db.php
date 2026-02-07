@@ -37,6 +37,13 @@ class Database
             } catch (PDOException $e) {
             }
 
+            // Fix ENUM truncations
+            try {
+                $this->pdo->exec("ALTER TABLE notificaciones MODIFY COLUMN resultado_diligencia VARCHAR(100) NULL");
+                $this->pdo->exec("ALTER TABLE notificaciones MODIFY COLUMN destinatario_especial VARCHAR(255) NULL");
+            } catch (PDOException $e) {
+            }
+
             try {
                 $this->pdo->exec("ALTER TABLE notificaciones ADD COLUMN devuelta_por_ujier TINYINT(1) DEFAULT 0");
                 $this->pdo->exec("ALTER TABLE notificaciones ADD COLUMN fecha_devolucion DATETIME NULL");
