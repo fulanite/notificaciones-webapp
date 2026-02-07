@@ -529,25 +529,37 @@ const ujier = {
         // Reset form
         this.resetDiligenciaForm();
 
-        // Limit results for special recipients
+        // Limit results for special recipients vs particulars
         const resultSelect = document.getElementById('resultado-diligencia');
         if (resultSelect) {
-            if (assignment.destinatario_especial) {
-                // Only 'Atiende' (which means Entregado for these)
-                Array.from(resultSelect.options).forEach(opt => {
-                    if (opt.value !== '' && opt.value !== 'atiende') {
+            const isSpecial = !!assignment.destinatario_especial;
+
+            Array.from(resultSelect.options).forEach(opt => {
+                if (opt.value === '') return; // "Seleccionar..."
+
+                if (isSpecial) {
+                    // For special recipients: only show "Entregado"
+                    if (opt.value === 'entregado') {
+                        opt.disabled = false;
+                        opt.style.display = 'block';
+                    } else {
                         opt.disabled = true;
                         opt.style.display = 'none';
                     }
-                });
-                resultSelect.value = 'atiende';
-            } else {
-                // Show all
-                Array.from(resultSelect.options).forEach(opt => {
-                    opt.disabled = false;
-                    opt.style.display = 'block';
-                });
-            }
+                } else {
+                    // For regular recipients: hide "Entregado", show "Atiende" and the rest
+                    if (opt.value === 'entregado') {
+                        opt.disabled = true;
+                        opt.style.display = 'none';
+                    } else {
+                        opt.disabled = false;
+                        opt.style.display = 'block';
+                    }
+                }
+            });
+
+            // Auto-select entregado if special, otherwise force choice
+            resultSelect.value = isSpecial ? 'entregado' : '';
         }
 
         // Show modal

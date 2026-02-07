@@ -245,7 +245,7 @@ try {
 
                     case 'result':
                         // Register result (diligencia)
-                        $newEstado = 'Entregado';
+                        $newEstado = 'diligenciada';
                         if ($data['es_carga_diferida'] ?? false) {
                             $newEstado = 'diferida';
                         } elseif (($data['resultado'] ?? '') === 'pre_aviso') {

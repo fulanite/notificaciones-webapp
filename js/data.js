@@ -7,6 +7,7 @@ const SGND_DATA = {
     // Estados para el Ujier al registrar diligencia
     ESTADOS_DILIGENCIA: [
         { value: 'atiende', label: 'Atiende' },
+        { value: 'entregado', label: 'Entregado' },
         { value: 'no_atiende', label: 'No Atiende' },
         { value: 'pre_aviso', label: 'Pre Aviso' },
         { value: 'estrados', label: 'Estrados' },

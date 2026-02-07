@@ -307,7 +307,7 @@ const utils = {
             diferida: '<span class="status-badge status-deferred">⚠️ Diferida</span>',
             // Resultados del ujier
             entregado: '<span class="status-badge status-completed">✅ Entregado</span>',
-            atiende: '<span class="status-badge status-completed">✅ Entregado</span>',
+            atiende: '<span class="status-badge status-completed">🏘️ Atiende</span>',
             no_atiende: '<span class="status-badge status-deferred">🚪 No Atiende</span>',
             pre_aviso: '<span class="status-badge status-warning">📋 Pre Aviso</span>',
             estrados: '<span class="status-badge status-completed">🏛️ Estrados</span>',
