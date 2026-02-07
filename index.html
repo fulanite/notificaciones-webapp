@@ -509,7 +509,7 @@
                                                 </div>
                                             </div>
 
-                                            <div id="grupo-origen-dinamico" class="hidden">
+                                            <div id="grupo-origen-dinamico" class="hidden" style="flex: 2;">
                                                 <label id="label-origen-dinamico">Origen Público *</label>
                                                 <div class="searchable-select">
                                                     <input type="text" id="origen-dinamico-input"
@@ -519,512 +519,713 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="f-group" style="flex: 1;">
-                                            <label>Letrado</label>
-                                            <input type="text" id="letrado" name="letrado" placeholder="Abogado">
-                                        </div>
-                                    </div>
 
-                                    <!-- Row 3: Destinatario, Especial, Zona -->
-                                    <div class="f-row">
-                                        <div class="f-group" style="width: 25%;">
-                                            <label>Dest. Especial</label>
-                                            <select id="destinatario-especial" name="destinatario-especial">
-                                                <option value="">No aplica</option>
-                                                <option value="ARCAT">ARCAT</option>
-                                                <option value="Juzgado Comercial 1/1">Juzgado Comercial 1/1</option>
-                                                <option value="Juzgado Comercial 1/2">Juzgado Comercial 1/2</option>
-                                                <option value="Juzgado Comercial 1/Quiebras">Juzgado Comercial
-                                                    1/Quiebras</option>
-                                                <option value="Juzgado Comercial 2/1">Juzgado Comercial 2/1</option>
-                                                <option value="Juzgado Comercial 2/2">Juzgado Comercial 2/2</option>
-                                                <option value="Juzgado Comercial 2/Quiebras">Juzgado Comercial
-                                                    2/Quiebras</option>
-                                                <option value="Juzgado Comercial 3">Juzgado Comercial 3</option>
-                                                <option value="Juzgado Comercial 3/Quiebras">Juzgado Comercial
-                                                    3/Quiebras</option>
-                                            </select>
+                                            <div class="f-group" style="flex: 1.5;">
+                                                <label>Letrado</label>
+                                                <input type="text" id="letrado" name="letrado"
+                                                    placeholder="Dr. / Abogado">
+                                            </div>
                                         </div>
-                                        <div class="f-group" style="width: 50%;">
-                                            <label>Destinatario *</label>
-                                            <input type="text" id="destinatario-nombre" name="destinatario-nombre"
-                                                required>
-                                        </div>
-                                        <div class="f-group" id="f-group-zona" style="width: 25%;">
-                                            <label>Zona *</label>
-                                            <select id="zona" name="zona" required>
-                                                <option value="">Zona...</option>
-                                                <optgroup label="Zona A">
-                                                    <option value="A1 - Cédulas">A1 - Cédulas</option>
-                                                    <option value="A1 - Mandamientos">A1 - Mandamientos</option>
-                                                    <option value="A2 - Cédulas">A2 - Cédulas</option>
-                                                    <option value="A2 - Mandamientos">A2 - Mandamientos</option>
-                                                </optgroup>
-                                                <optgroup label="Zona B">
-                                                    <option value="B1 - Cédulas">B1 - Cédulas</option>
-                                                    <option value="B1 - Mandamientos">B1 - Mandamientos</option>
-                                                    <option value="B2 - Cédulas">B2 - Cédulas</option>
-                                                    <option value="B2 - Mandamientos">B2 - Mandamientos</option>
-                                                </optgroup>
-                                                <optgroup label="Zona C">
-                                                    <option value="C1 - Cédulas">C1 - Cédulas</option>
-                                                    <option value="C1 - Mandamientos">C1 - Mandamientos</option>
-                                                    <option value="C2 - Cédulas">C2 - Cédulas</option>
-                                                    <option value="C2 - Mandamientos">C2 - Mandamientos</option>
-                                                </optgroup>
-                                                <optgroup label="Zona D">
-                                                    <option value="D1 - Cédulas">D1 - Cédulas</option>
-                                                    <option value="D1 - Mandamientos">D1 - Mandamientos</option>
-                                                    <option value="D2 - Cédulas">D2 - Cédulas</option>
-                                                    <option value="D2 - Mandamientos">D2 - Mandamientos</option>
-                                                </optgroup>
-                                                <optgroup label="Urgentes">
-                                                    <option value="Urgente SUR - Cédulas">Urgente SUR - Cédulas
-                                                    </option>
-                                                    <option value="Urgente SUR - Mandamientos">Urgente SUR -
-                                                        Mandamientos</option>
-                                                    <option value="Urgente NORTE - Cédulas">Urgente NORTE - Cédulas
-                                                    </option>
-                                                    <option value="Urgente NORTE - Mandamientos">Urgente NORTE -
-                                                        Mandamientos</option>
-                                                </optgroup>
-                                                <optgroup label="Fuera de Radio">
-                                                    <option value="Fuera de Radio NORTE - Cédula">Fuera de Radio
-                                                        NORTE - Cédula</option>
-                                                    <option value="Fuera de Radio NORTE - Mandamientos">Fuera de
-                                                        Radio NORTE - Mandamientos</option>
-                                                    <option value="Fuera de Radio SUR - Cédula">Fuera de Radio SUR -
-                                                        Cédula</option>
-                                                    <option value="Fuera de Radio SUR - Mandamientos">Fuera de Radio
-                                                        SUR - Mandamientos</option>
-                                                </optgroup>
-                                            </select>
-                                        </div>
-                                    </div>
 
-                                    <!-- Row 4: Domicilio -->
-                                    <div class="f-row">
-                                        <div class="f-group" style="width: 100%;">
-                                            <label>Domicilio *</label>
-                                            <input type="text" id="domicilio" name="domicilio"
-                                                placeholder="Calle, Número, Barrio" required>
+                                        <!-- Row 3: Destinatario, Especial, Zona -->
+                                        <div class="f-row">
+                                            <div class="f-group" style="width: 25%;">
+                                                <label>Dest. Especial</label>
+                                                <select id="destinatario-especial" name="destinatario-especial">
+                                                    <option value="">No aplica</option>
+                                                    <option value="ARCAT">ARCAT</option>
+                                                    <option value="Juzgado Comercial 1/1">Juzgado Comercial 1/1</option>
+                                                    <option value="Juzgado Comercial 1/2">Juzgado Comercial 1/2</option>
+                                                    <option value="Juzgado Comercial 1/Quiebras">Juzgado Comercial
+                                                        1/Quiebras</option>
+                                                    <option value="Juzgado Comercial 2/1">Juzgado Comercial 2/1</option>
+                                                    <option value="Juzgado Comercial 2/2">Juzgado Comercial 2/2</option>
+                                                    <option value="Juzgado Comercial 2/Quiebras">Juzgado Comercial
+                                                        2/Quiebras</option>
+                                                    <option value="Juzgado Comercial 3">Juzgado Comercial 3</option>
+                                                    <option value="Juzgado Comercial 3/Quiebras">Juzgado Comercial
+                                                        3/Quiebras</option>
+                                                </select>
+                                            </div>
+                                            <div class="f-group" style="width: 50%;">
+                                                <label>Destinatario *</label>
+                                                <input type="text" id="destinatario-nombre" name="destinatario-nombre"
+                                                    required>
+                                            </div>
+                                            <div class="f-group" id="f-group-zona" style="width: 25%;">
+                                                <label>Zona *</label>
+                                                <select id="zona" name="zona" required>
+                                                    <option value="">Zona...</option>
+                                                    <optgroup label="Zona A">
+                                                        <option value="A1 - Cédulas">A1 - Cédulas</option>
+                                                        <option value="A1 - Mandamientos">A1 - Mandamientos</option>
+                                                        <option value="A2 - Cédulas">A2 - Cédulas</option>
+                                                        <option value="A2 - Mandamientos">A2 - Mandamientos</option>
+                                                    </optgroup>
+                                                    <optgroup label="Zona B">
+                                                        <option value="B1 - Cédulas">B1 - Cédulas</option>
+                                                        <option value="B1 - Mandamientos">B1 - Mandamientos</option>
+                                                        <option value="B2 - Cédulas">B2 - Cédulas</option>
+                                                        <option value="B2 - Mandamientos">B2 - Mandamientos</option>
+                                                    </optgroup>
+                                                    <optgroup label="Zona C">
+                                                        <option value="C1 - Cédulas">C1 - Cédulas</option>
+                                                        <option value="C1 - Mandamientos">C1 - Mandamientos</option>
+                                                        <option value="C2 - Cédulas">C2 - Cédulas</option>
+                                                        <option value="C2 - Mandamientos">C2 - Mandamientos</option>
+                                                    </optgroup>
+                                                    <optgroup label="Zona D">
+                                                        <option value="D1 - Cédulas">D1 - Cédulas</option>
+                                                        <option value="D1 - Mandamientos">D1 - Mandamientos</option>
+                                                        <option value="D2 - Cédulas">D2 - Cédulas</option>
+                                                        <option value="D2 - Mandamientos">D2 - Mandamientos</option>
+                                                    </optgroup>
+                                                    <optgroup label="Urgentes">
+                                                        <option value="Urgente SUR - Cédulas">Urgente SUR - Cédulas
+                                                        </option>
+                                                        <option value="Urgente SUR - Mandamientos">Urgente SUR -
+                                                            Mandamientos</option>
+                                                        <option value="Urgente NORTE - Cédulas">Urgente NORTE - Cédulas
+                                                        </option>
+                                                        <option value="Urgente NORTE - Mandamientos">Urgente NORTE -
+                                                            Mandamientos</option>
+                                                    </optgroup>
+                                                    <optgroup label="Fuera de Radio">
+                                                        <option value="Fuera de Radio NORTE - Cédula">Fuera de Radio
+                                                            NORTE - Cédula</option>
+                                                        <option value="Fuera de Radio NORTE - Mandamientos">Fuera de
+                                                            Radio NORTE - Mandamientos</option>
+                                                        <option value="Fuera de Radio SUR - Cédula">Fuera de Radio SUR -
+                                                            Cédula</option>
+                                                        <option value="Fuera de Radio SUR - Mandamientos">Fuera de Radio
+                                                            SUR - Mandamientos</option>
+                                                    </optgroup>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Row 5: Troquel, Pago, Costo -->
-                                    <div class="f-group" style="flex: 1;">
-                                        <label>Tipo Troquel *</label>
-                                        <select id="selector-troquel" name="selector-troquel" required
-                                            onchange="app.handleTroquelChange(this.value)">
-                                            <option value="C">C (Cédula)</option>
-                                            <option value="M">M (Mandamiento)</option>
-                                            <option value="SIN">SIN TROQUEL</option>
-                                        </select>
-                                        <input type="hidden" id="tipo-troquel" value="C">
-                                        <input type="checkbox" id="sin-troquel" class="hidden">
-                                    </div>
-                                    <div class="f-group" style="width: 20%;" id="grupo-n-troquel">
-                                        <label>N° Troquel *</label>
-                                        <input type="number" id="n-troquel" name="n-troquel" required>
-                                    </div>
-                                    <div class="f-group" style="width: 20%;">
-                                        <label>Pago *</label>
-                                        <select id="medio-pago" name="medio-pago" required>
-                                            <option value="gratuito">Gratuito</option>
-                                            <option value="efectivo">Efectivo</option>
-                                            <option value="transferencia">Transferencia</option>
-                                            <option value="qr">QR (Mercado Pago)</option>
-                                        </select>
-                                    </div>
-                                    <div class="f-group" style="width: 15%;" id="grupo-costo" class="hidden">
-                                        <label>Costo</label>
-                                        <input type="number" id="costo" name="costo" value="0" step="0.01">
-                                    </div>
+                                        <!-- Row 4: Domicilio -->
+                                        <div class="f-row">
+                                            <div class="f-group" style="width: 100%;">
+                                                <label>Domicilio *</label>
+                                                <input type="text" id="domicilio" name="domicilio"
+                                                    placeholder="Calle, Número, Barrio" required>
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 5: Troquel, Pago, Costo -->
+                                        <div class="f-row">
+                                            <div class="f-group" style="width: 25%;">
+                                                <label>Tipo Troquel *</label>
+                                                <select id="selector-troquel" name="selector-troquel" required
+                                                    onchange="app.handleTroquelChange(this.value)">
+                                                    <option value="C">C (Cédula)</option>
+                                                    <option value="M">M (Mandamiento)</option>
+                                                    <option value="SIN">SIN TROQUEL</option>
+                                                </select>
+                                                <input type="hidden" id="tipo-troquel" value="C">
+                                                <input type="checkbox" id="sin-troquel" class="hidden">
+                                            </div>
+                                            <div class="f-group" style="width: 20%;" id="grupo-n-troquel">
+                                                <label>N° Troquel *</label>
+                                                <input type="number" id="n-troquel" name="n-troquel" required>
+                                            </div>
+                                            <div class="f-group" style="width: 25%;">
+                                                <label>Pago *</label>
+                                                <select id="medio-pago" name="medio-pago" required>
+                                                    <option value="gratuito">Gratuito</option>
+                                                    <option value="efectivo">Efectivo</option>
+                                                    <option value="transferencia">Transferencia</option>
+                                                    <option value="qr">QR (Mercado Pago)</option>
+                                                </select>
+                                            </div>
+                                            <div class="f-group" style="width: 20%;" id="grupo-costo" class="hidden">
+                                                <label>Costo</label>
+                                                <input type="number" id="costo" name="costo" value="0" step="0.01">
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 6: Asignar, Observaciones -->
+                                        <div class="f-row">
+                                            <div class="f-group" id="f-group-asignar" style="width: 30%;">
+                                                <label>Asignar a Ujier</label>
+                                                <select id="asignado-a" name="asignado-a">
+                                                    <option value="">Pendiente...</option>
+                                                    <!-- Dynamic -->
+                                                </select>
+                                            </div>
+                                            <div class="f-group" style="width: 70%;">
+                                                <label>Observaciones</label>
+                                                <input type="text" id="observaciones-iniciales"
+                                                    name="observaciones-iniciales" placeholder="Notas internas...">
+                                            </div>
+                                        </div>
+                                    </div> <!-- form-grid-compact end -->
+                                </form>
+                            </div> <!-- modal-body end -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm"
+                                    id="btn-cancelar-nueva-notif">Cerrar</button>
+                                <button type="submit" form="form-nueva-notificacion" class="btn btn-primary"
+                                    id="btn-save-nueva-notif">
+                                    <span>💾</span> GUARDAR NOTIFICACIÓN
+                                </button>
+                            </div>
+                        </div> <!-- modal-container end -->
+                    </div> <!-- modal end -->
+
+                    <!-- Lista de Notificaciones View -->
+                    <section id="view-lista-notificaciones" class="view active">
+                        <!-- Pestañas de Año -->
+                        <div class="view-tabs">
+                            <button class="tab-btn active" data-year="2026"
+                                onclick="notifications.setYear('2026', this)">
+                                📅 2026 <span class="tab-badge" id="badge-2026">0</span>
+                            </button>
+                            <button class="tab-btn" data-year="2025" onclick="notifications.setYear('2025', this)">
+                                📅 2025 <span class="tab-badge" id="badge-2025">0</span>
+                            </button>
+                        </div>
+
+                        <div class="list-header">
+                            <div class="search-bar">
+                                <span class="search-icon">🚀</span>
+                                <input type="text" id="search-notificaciones" class="search-input"
+                                    placeholder="Super Buscador: escribí cualquier dato del expediente...">
+                                <button id="btn-refresh-list" class="action-btn-circle" title="Refrescar datos"
+                                    onclick="notifications.loadNotifications()">
+                                    <span>🔄</span>
+                                </button>
+                            </div>
+                            <div class="filter-bar">
+                                <select id="filter-propio" class="filter-select highlight">
+                                    <option value="none">🌎 Todas las notif.</option>
+                                    <option value="mine-today">👤 Mis cargas (Hoy)</option>
+                                    <option value="mine-all" selected>📂 Mis cargas (Gral.)</option>
+                                </select>
+                                <select id="filter-zona" class="filter-select">
+                                    <option value="">Todas las zonas</option>
+                                    <option value="NORTE">ZONA NORTE</option>
+                                    <option value="SUR">ZONA SUR</option>
+                                    <option value="CENTRO">ZONA CENTRO</option>
+                                    <option value="REBOTE">REBOTE</option>
+                                    <option value="INTERIOR">INTERIOR</option>
+                                </select>
+                                <select id="filter-estado" class="filter-select">
+                                    <option value="">Todos los estados</option>
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="diligenciada">Diligenciada</option>
+                                    <option value="diferida">Carga Diferida</option>
+                                </select>
+                                <select id="filter-tipo" class="filter-select">
+                                    <option value="">Todos los tipos</option>
+                                    <option value="cedulas">Cédulas</option>
+                                    <option value="mandamientos">Mandamientos</option>
+                                </select>
+                                <input type="date" id="filter-fecha" class="filter-input">
+                            </div>
+                        </div>
+
+                        <div class="notifications-table-container">
+                            <table class="notifications-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Origen</th>
+                                        <th>Letrado</th>
+                                        <th>Expediente</th>
+                                        <th>Destinatario</th>
+                                        <th>Domicilio</th>
+                                        <th>Zona</th>
+                                        <th>Troquel</th>
+                                        <th>Estado</th>
+                                        <th>Ujier</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-notificaciones">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pagination">
+                            <button class="pagination-btn" id="btn-prev-page">← Anterior</button>
+                            <span class="pagination-info" id="pagination-info">Página 1 de 1</span>
+                            <button class="pagination-btn" id="btn-next-page">Siguiente →</button>
+                        </div>
+                    </section>
+
+                    <!-- Mis Asignaciones (Ujier) View -->
+                    <section id="view-mis-asignaciones" class="view">
+                        <div class="ujier-header">
+                            <div class="date-info">
+                                <span class="date-icon">📅</span>
+                                <span id="current-date">--</span>
+                            </div>
+                            <div class="route-stats">
+                                <div class="route-stat">
+                                    <span class="stat-number" id="route-pending">0</span>
+                                    <span class="stat-text">Pendientes</span>
+                                </div>
+                                <div class="route-stat">
+                                    <span class="stat-number" id="route-completed">0</span>
+                                    <span class="stat-text">Completadas</span>
+                                </div>
+                                <button id="btn-refresh-assignments" class="btn-refresh" title="Refrescar asignaciones">
+                                    <span>🔄</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="view-toggle">
+                            <div class="view-mode-btns">
+                                <button class="toggle-btn active" data-view-mode="list">📋 Lista</button>
+                                <button class="toggle-btn" data-view-mode="map">🗺️ Mapa</button>
+                            </div>
+                            <button id="btn-reorder-toggle" class="btn-reorder-toggle">🔃 Reordenar</button>
+                        </div>
+
+                        <div id="assignments-list" class="assignments-list">
+                            <!-- Dynamic content -->
+                        </div>
+
+                        <div id="assignments-map" class="assignments-map hidden">
+                            <div id="map-container" class="map-container">
+                                <!-- Map will be rendered here -->
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Historial Ujier View -->
+                    <section id="view-historial-ujier" class="view">
+                        <div class="list-header">
+                            <div class="search-bar">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="search-historial" class="search-input"
+                                    placeholder="Buscar por nombre, domicilio, expediente...">
+                            </div>
+                            <div class="filter-group">
+                                <select id="filter-historial-estado" class="filter-input-select"
+                                    title="Filtrar por estado">
+                                    <option value="">📊 Todos los estados</option>
+                                    <option value="atiende">🏘️ Atiende</option>
+                                    <option value="entregado">✅ Entregado</option>
+                                    <option value="no_atiende">🏠 No Atiende</option>
+                                    <option value="pre_aviso">📝 Pre Aviso</option>
+                                    <option value="estrados">⚖️ Estrados</option>
+                                    <option value="domicilio_inexistente">❌ Inexistente</option>
+                                    <option value="diligenciador_ausente">🚶 Ausente</option>
+                                </select>
+                                <input type="date" id="filter-historial-fecha" class="filter-input-date"
+                                    title="Filtrar por fecha de visita">
+                            </div>
+                        </div>
+                        <div id="historial-list" class="historial-list">
+                            <!-- Dynamic history content -->
+                        </div>
+                    </section>
+
+                    <!-- Reportes View -->
+                    <section id="view-reportes" class="view">
+                        <div class="reports-grid">
+                            <div class="report-card">
+                                <div class="report-icon">📋</div>
+                                <h3 class="report-title">Planilla Diaria</h3>
+                                <p class="report-description">Generar planilla de trabajo del día</p>
+                                <div class="report-actions">
+                                    <input type="date" id="report-date" class="report-date-input">
+                                    <button class="btn btn-primary btn-sm" id="btn-report-daily">
+                                        📥 Descargar CSV
+                                    </button>
+                                </div>
                             </div>
 
-                            <!-- Row 6: Asignar, Observaciones -->
-                            <div class="f-row">
-                                <div class="f-group" id="f-group-asignar" style="width: 30%;">
-                                    <label>Asignar a Ujier</label>
-                                    <select id="asignado-a" name="asignado-a">
-                                        <option value="">Pendiente...</option>
-                                        <!-- Dynamic -->
+                            <div class="report-card">
+                                <div class="report-icon">📊</div>
+                                <h3 class="report-title">Informe Mensual</h3>
+                                <p class="report-description">Estadísticas completas del mes</p>
+                                <div class="report-actions">
+                                    <select id="report-month" class="report-select">
+                                        <option value="01">Enero</option>
+                                        <option value="02">Febrero</option>
+                                        <option value="03">Marzo</option>
+                                        <option value="04">Abril</option>
+                                        <option value="05">Mayo</option>
+                                        <option value="06">Junio</option>
+                                        <option value="07">Julio</option>
+                                        <option value="08">Agosto</option>
+                                        <option value="09">Septiembre</option>
+                                        <option value="10">Octubre</option>
+                                        <option value="11">Noviembre</option>
+                                        <option value="12">Diciembre</option>
                                     </select>
+                                    <button class="btn btn-primary btn-sm" id="btn-report-monthly">
+                                        📥 Descargar PDF
+                                    </button>
                                 </div>
-                                <div class="f-group" style="width: 70%;">
-                                    <label>Observaciones</label>
-                                    <input type="text" id="observaciones-iniciales" name="observaciones-iniciales"
-                                        placeholder="Notas internas...">
+                            </div>
+
+                            <div class="report-card">
+                                <div class="report-icon">👤</div>
+                                <h3 class="report-title">Rendimiento por Ujier</h3>
+                                <p class="report-description">Métricas individuales de rendimiento</p>
+                                <div class="report-actions">
+                                    <select id="report-ujier" class="report-select">
+                                        <option value="all">Todos los ujieres</option>
+                                    </select>
+                                    <button class="btn btn-primary btn-sm" id="btn-report-ujier">
+                                        📥 Generar Reporte
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="report-card">
+                                <div class="report-icon">⚠️</div>
+                                <h3 class="report-title">Cargas Diferidas</h3>
+                                <p class="report-description">Listado de diligencias con carga diferida</p>
+                                <div class="report-actions">
+                                    <button class="btn btn-warning btn-sm" id="btn-report-deferred">
+                                        📥 Descargar Reporte
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        </form>
+                    </section>
+
+                    <!-- Asignaciones View (Reassignment focus) -->
+                    <section id="view-asignaciones" class="view">
+                        <!-- Ujieres Premium Grid -->
+                        <div id="asignaciones-ujieres-grid" class="zones-grid">
+                            <!-- Dynamic ujier cards -->
+                        </div>
+
+                        <!-- Notification List for Reassignment -->
+                        <div id="asignaciones-list-container" class="dashboard-card hidden" style="width: 100%;">
+                            <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+                                <button id="btn-back-to-ujieres" class="btn btn-secondary btn-sm">
+                                    <span>⬅️</span> Volver
+                                </button>
+                                <h3 id="current-ujier-title" class="card-title">Ujier: -</h3>
+                                <div class="card-actions" style="display: flex; gap: 10px; align-items: center;">
+                                    <div class="search-bar mini">
+                                        <input type="text" id="search-notif-reasign" class="search-input"
+                                            placeholder="Filtrar listado...">
+                                    </div>
+                                    <button id="btn-select-all-reasign" class="btn btn-outline btn-sm">Seleccionar
+                                        Todo</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 40px;"></th>
+                                                <th>Expediente</th>
+                                                <th>Carátula</th>
+                                                <th>Destinatario</th>
+                                                <th>Troquel</th>
+                                                <th>Domicilio</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reasignaciones-table-body">
+                                            <!-- Dynamic content -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer"
+                                style="display: flex; justify-content: space-between; align-items: center; padding: 15px; flex-wrap: wrap; gap: 15px;">
+                                <div id="reasign-selected-count" class="selected-msg">0 seleccionadas</div>
+                                <div class="reasign-actions" style="display: flex; gap: 10px; align-items: center;">
+                                    <select id="select-target-ujier" class="filter-select" style="min-width: 200px;">
+                                        <option value="">Reasignar a...</option>
+                                    </select>
+                                    <button id="btn-confirm-reasign" class="btn btn-primary" disabled>
+                                        <span>🔄</span> Confirmar Reasignación
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Usuarios View -->
+                    <section id="view-usuarios" class="view">
+                        <div class="list-header">
+                            <div class="search-bar">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="search-usuarios" class="search-input"
+                                    placeholder="Buscar usuarios...">
+                            </div>
+                            <button class="btn btn-primary" id="btn-nuevo-usuario">
+                                ➕ Nuevo Usuario
+                            </button>
+                        </div>
+
+                        <div class="usuarios-table-container">
+                            <table class="usuarios-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Rol</th>
+                                        <th>Estado</th>
+                                        <th>Último Acceso</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usuarios-table-body">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- Modal: Nuevo/Editar Usuario -->
+                    <div id="modal-usuario" class="modal hidden">
+                        <div class="modal-overlay"></div>
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title" id="modal-usuario-title">Nuevo Usuario</h2>
+                                <button class="modal-close" id="btn-close-modal-usuario">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="form-usuario">
+                                    <div class="form-grid">
+                                        <div class="form-group">
+                                            <label for="usuario-nombre" class="form-label">Nombre Completo *</label>
+                                            <input type="text" id="usuario-nombre" class="form-input" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="usuario-email" class="form-label">Email *</label>
+                                            <input type="email" id="usuario-email" class="form-input" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="usuario-rol" class="form-label">Rol *</label>
+                                            <select id="usuario-rol" class="form-select" required>
+                                                <option value="">Seleccionar rol...</option>
+                                                <option value="admin">Administrador</option>
+                                                <option value="ujier">Ujier</option>
+                                                <option value="auditor">Auditor</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="usuario-password" class="form-label">Contraseña</label>
+                                            <input type="password" id="usuario-password" class="form-input"
+                                                placeholder="Dejar vacío para no cambiar">
+                                        </div>
+                                        <div class="form-group form-group-full">
+                                            <label class="checkbox-wrapper">
+                                                <input type="checkbox" id="usuario-activo" checked>
+                                                <span class="checkbox-custom"></span>
+                                                <span class="checkbox-label">Usuario activo</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="modal-actions">
+                                        <button type="button" class="btn btn-secondary" id="btn-cancelar-usuario">
+                                            Cancelar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            💾 Guardar Usuario
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm"
-                            id="btn-cancelar-nueva-notif">Cerrar</button>
-                        <button type="submit" form="form-nueva-notificacion" class="btn btn-primary"
-                            id="btn-save-nueva-notif">
-                            <span>💾</span> GUARDAR NOTIFICACIÓN
-                        </button>
-                    </div>
+
+                    <!-- Devolución View -->
+                    <section id="view-devoluciones" class="view">
+                        <div id="devoluciones-zones-grid" class="zones-grid">
+                            <!-- Dynamic zone cards -->
+                        </div>
+
+                        <div id="devoluciones-list-container" class="dashboard-card hidden" style="width: 100%;">
+                            <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+                                <button id="btn-back-to-zones" class="btn btn-secondary btn-sm">
+                                    <span>⬅️</span> Volver
+                                </button>
+                                <h3 id="current-zone-title" class="card-title">Zona: -</h3>
+                                <div class="card-actions">
+                                    <button id="btn-select-all-returns" class="btn btn-outline btn-sm">Seleccionar
+                                        Todo</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 40px;"></th>
+                                                <th>Expediente</th>
+                                                <th>Carátula</th>
+                                                <th>Destinatario</th>
+                                                <th>Troquel</th>
+                                                <th>Domicilio</th>
+                                                <th>Ujier</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="devoluciones-table-body">
+                                            <!-- Dynamic content -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer"
+                                style="display: flex; justify-content: space-between; align-items: center; padding: 15px;">
+                                <div id="selected-count-msg" class="selected-msg">0 seleccionadas</div>
+                                <button id="btn-confirm-return" class="btn btn-primary" disabled>
+                                    <span>🗸</span> Confirmar Devolución
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Additional views will be added dynamically -->
                 </div>
+            </main>
         </div>
 
-        <!-- Lista de Notificaciones View -->
-        <section id="view-lista-notificaciones" class="view active">
-            <!-- Pestañas de Año -->
-            <div class="view-tabs">
-                <button class="tab-btn active" data-year="2026" onclick="notifications.setYear('2026', this)">
-                    📅 2026 <span class="tab-badge" id="badge-2026">0</span>
-                </button>
-                <button class="tab-btn" data-year="2025" onclick="notifications.setYear('2025', this)">
-                    📅 2025 <span class="tab-badge" id="badge-2025">0</span>
-                </button>
-            </div>
+        <!-- Barra de navegación inferior (solo móvil) - FUERA del page-dashboard -->
+        <nav id="mobile-bottom-nav" class="mobile-bottom-nav"
+            style="position:fixed; bottom:0; left:0; right:0; z-index:9999;">
+            <button class="bottom-nav-item active" data-view="mis-asignaciones">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Mi Ruta</span>
+            </button>
+            <button class="bottom-nav-item" data-view="historial-ujier">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Historial</span>
+            </button>
+            <button class="bottom-nav-item" data-view="dashboard">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">Panel</span>
+            </button>
+            <button class="bottom-nav-item" id="btn-logout-mobile">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-label">Salir</span>
+            </button>
+        </nav>
 
-            <div class="list-header">
-                <div class="search-bar">
-                    <span class="search-icon">🚀</span>
-                    <input type="text" id="search-notificaciones" class="search-input"
-                        placeholder="Super Buscador: escribí cualquier dato del expediente...">
-                    <button id="btn-refresh-list" class="action-btn-circle" title="Refrescar datos"
-                        onclick="notifications.loadNotifications()">
-                        <span>🔄</span>
-                    </button>
-                </div>
-                <div class="filter-bar">
-                    <select id="filter-propio" class="filter-select highlight">
-                        <option value="none">🌎 Todas las notif.</option>
-                        <option value="mine-today">👤 Mis cargas (Hoy)</option>
-                        <option value="mine-all" selected>📂 Mis cargas (Gral.)</option>
-                    </select>
-                    <select id="filter-zona" class="filter-select">
-                        <option value="">Todas las zonas</option>
-                        <option value="NORTE">ZONA NORTE</option>
-                        <option value="SUR">ZONA SUR</option>
-                        <option value="CENTRO">ZONA CENTRO</option>
-                        <option value="REBOTE">REBOTE</option>
-                        <option value="INTERIOR">INTERIOR</option>
-                    </select>
-                    <select id="filter-estado" class="filter-select">
-                        <option value="">Todos los estados</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="diligenciada">Diligenciada</option>
-                        <option value="diferida">Carga Diferida</option>
-                    </select>
-                    <select id="filter-tipo" class="filter-select">
-                        <option value="">Todos los tipos</option>
-                        <option value="cedulas">Cédulas</option>
-                        <option value="mandamientos">Mandamientos</option>
-                    </select>
-                    <input type="date" id="filter-fecha" class="filter-input">
-                </div>
-            </div>
-
-            <div class="notifications-table-container">
-                <table class="notifications-table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Origen</th>
-                            <th>Letrado</th>
-                            <th>Expediente</th>
-                            <th>Destinatario</th>
-                            <th>Domicilio</th>
-                            <th>Zona</th>
-                            <th>Troquel</th>
-                            <th>Estado</th>
-                            <th>Ujier</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-notificaciones">
-                        <!-- Dynamic content -->
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="pagination">
-                <button class="pagination-btn" id="btn-prev-page">← Anterior</button>
-                <span class="pagination-info" id="pagination-info">Página 1 de 1</span>
-                <button class="pagination-btn" id="btn-next-page">Siguiente →</button>
-            </div>
-        </section>
-
-        <!-- Mis Asignaciones (Ujier) View -->
-        <section id="view-mis-asignaciones" class="view">
-            <div class="ujier-header">
-                <div class="date-info">
-                    <span class="date-icon">📅</span>
-                    <span id="current-date">--</span>
-                </div>
-                <div class="route-stats">
-                    <div class="route-stat">
-                        <span class="stat-number" id="route-pending">0</span>
-                        <span class="stat-text">Pendientes</span>
-                    </div>
-                    <div class="route-stat">
-                        <span class="stat-number" id="route-completed">0</span>
-                        <span class="stat-text">Completadas</span>
-                    </div>
-                    <button id="btn-refresh-assignments" class="btn-refresh" title="Refrescar asignaciones">
-                        <span>🔄</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="view-toggle">
-                <div class="view-mode-btns">
-                    <button class="toggle-btn active" data-view-mode="list">📋 Lista</button>
-                    <button class="toggle-btn" data-view-mode="map">🗺️ Mapa</button>
-                </div>
-                <button id="btn-reorder-toggle" class="btn-reorder-toggle">🔃 Reordenar</button>
-            </div>
-
-            <div id="assignments-list" class="assignments-list">
-                <!-- Dynamic content -->
-            </div>
-
-            <div id="assignments-map" class="assignments-map hidden">
-                <div id="map-container" class="map-container">
-                    <!-- Map will be rendered here -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Historial Ujier View -->
-        <section id="view-historial-ujier" class="view">
-            <div class="list-header">
-                <div class="search-bar">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="search-historial" class="search-input"
-                        placeholder="Buscar por nombre, domicilio, expediente...">
-                </div>
-                <div class="filter-group">
-                    <select id="filter-historial-estado" class="filter-input-select" title="Filtrar por estado">
-                        <option value="">📊 Todos los estados</option>
-                        <option value="atiende">🏘️ Atiende</option>
-                        <option value="entregado">✅ Entregado</option>
-                        <option value="no_atiende">🏠 No Atiende</option>
-                        <option value="pre_aviso">📝 Pre Aviso</option>
-                        <option value="estrados">⚖️ Estrados</option>
-                        <option value="domicilio_inexistente">❌ Inexistente</option>
-                        <option value="diligenciador_ausente">🚶 Ausente</option>
-                    </select>
-                    <input type="date" id="filter-historial-fecha" class="filter-input-date"
-                        title="Filtrar por fecha de visita">
-                </div>
-            </div>
-            <div id="historial-list" class="historial-list">
-                <!-- Dynamic history content -->
-            </div>
-        </section>
-
-        <!-- Reportes View -->
-        <section id="view-reportes" class="view">
-            <div class="reports-grid">
-                <div class="report-card">
-                    <div class="report-icon">📋</div>
-                    <h3 class="report-title">Planilla Diaria</h3>
-                    <p class="report-description">Generar planilla de trabajo del día</p>
-                    <div class="report-actions">
-                        <input type="date" id="report-date" class="report-date-input">
-                        <button class="btn btn-primary btn-sm" id="btn-report-daily">
-                            📥 Descargar CSV
-                        </button>
-                    </div>
-                </div>
-
-                <div class="report-card">
-                    <div class="report-icon">📊</div>
-                    <h3 class="report-title">Informe Mensual</h3>
-                    <p class="report-description">Estadísticas completas del mes</p>
-                    <div class="report-actions">
-                        <select id="report-month" class="report-select">
-                            <option value="01">Enero</option>
-                            <option value="02">Febrero</option>
-                            <option value="03">Marzo</option>
-                            <option value="04">Abril</option>
-                            <option value="05">Mayo</option>
-                            <option value="06">Junio</option>
-                            <option value="07">Julio</option>
-                            <option value="08">Agosto</option>
-                            <option value="09">Septiembre</option>
-                            <option value="10">Octubre</option>
-                            <option value="11">Noviembre</option>
-                            <option value="12">Diciembre</option>
-                        </select>
-                        <button class="btn btn-primary btn-sm" id="btn-report-monthly">
-                            📥 Descargar PDF
-                        </button>
-                    </div>
-                </div>
-
-                <div class="report-card">
-                    <div class="report-icon">👤</div>
-                    <h3 class="report-title">Rendimiento por Ujier</h3>
-                    <p class="report-description">Métricas individuales de rendimiento</p>
-                    <div class="report-actions">
-                        <select id="report-ujier" class="report-select">
-                            <option value="all">Todos los ujieres</option>
-                        </select>
-                        <button class="btn btn-primary btn-sm" id="btn-report-ujier">
-                            📥 Generar Reporte
-                        </button>
-                    </div>
-                </div>
-
-                <div class="report-card">
-                    <div class="report-icon">⚠️</div>
-                    <h3 class="report-title">Cargas Diferidas</h3>
-                    <p class="report-description">Listado de diligencias con carga diferida</p>
-                    <div class="report-actions">
-                        <button class="btn btn-warning btn-sm" id="btn-report-deferred">
-                            📥 Descargar Reporte
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Asignaciones View (Reassignment focus) -->
-        <section id="view-asignaciones" class="view">
-            <!-- Ujieres Premium Grid -->
-            <div id="asignaciones-ujieres-grid" class="zones-grid">
-                <!-- Dynamic ujier cards -->
-            </div>
-
-            <!-- Notification List for Reassignment -->
-            <div id="asignaciones-list-container" class="dashboard-card hidden" style="width: 100%;">
-                <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
-                    <button id="btn-back-to-ujieres" class="btn btn-secondary btn-sm">
-                        <span>⬅️</span> Volver
-                    </button>
-                    <h3 id="current-ujier-title" class="card-title">Ujier: -</h3>
-                    <div class="card-actions" style="display: flex; gap: 10px; align-items: center;">
-                        <div class="search-bar mini">
-                            <input type="text" id="search-notif-reasign" class="search-input"
-                                placeholder="Filtrar listado...">
-                        </div>
-                        <button id="btn-select-all-reasign" class="btn btn-outline btn-sm">Seleccionar
-                            Todo</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 40px;"></th>
-                                    <th>Expediente</th>
-                                    <th>Carátula</th>
-                                    <th>Destinatario</th>
-                                    <th>Troquel</th>
-                                    <th>Domicilio</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="reasignaciones-table-body">
-                                <!-- Dynamic content -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-footer"
-                    style="display: flex; justify-content: space-between; align-items: center; padding: 15px; flex-wrap: wrap; gap: 15px;">
-                    <div id="reasign-selected-count" class="selected-msg">0 seleccionadas</div>
-                    <div class="reasign-actions" style="display: flex; gap: 10px; align-items: center;">
-                        <select id="select-target-ujier" class="filter-select" style="min-width: 200px;">
-                            <option value="">Reasignar a...</option>
-                        </select>
-                        <button id="btn-confirm-reasign" class="btn btn-primary" disabled>
-                            <span>🔄</span> Confirmar Reasignación
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Usuarios View -->
-        <section id="view-usuarios" class="view">
-            <div class="list-header">
-                <div class="search-bar">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="search-usuarios" class="search-input" placeholder="Buscar usuarios...">
-                </div>
-                <button class="btn btn-primary" id="btn-nuevo-usuario">
-                    ➕ Nuevo Usuario
-                </button>
-            </div>
-
-            <div class="usuarios-table-container">
-                <table class="usuarios-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Email</th>
-                            <th>Rol</th>
-                            <th>Estado</th>
-                            <th>Último Acceso</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usuarios-table-body">
-                        <!-- Dynamic content -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Modal: Nuevo/Editar Usuario -->
-        <div id="modal-usuario" class="modal hidden">
+        <!-- Modal para Diligenciamiento -->
+        <div id="modal-diligenciar" class="modal hidden">
             <div class="modal-overlay"></div>
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title" id="modal-usuario-title">Nuevo Usuario</h2>
-                    <button class="modal-close" id="btn-close-modal-usuario">&times;</button>
+                    <h2 class="modal-title">Registrar Resultado</h2>
+                    <button class="modal-close" id="modal-close">×</button>
                 </div>
                 <div class="modal-body">
-                    <form id="form-usuario">
-                        <div class="form-grid">
+                    <form id="form-diligenciar">
+                        <input type="hidden" id="diligencia-id">
+
+                        <div class="notification-summary" id="notif-summary">
+                            <!-- Dynamic summary -->
+                        </div>
+
+                        <div class="form-section">
                             <div class="form-group">
-                                <label for="usuario-nombre" class="form-label">Nombre Completo *</label>
-                                <input type="text" id="usuario-nombre" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="usuario-email" class="form-label">Email *</label>
-                                <input type="email" id="usuario-email" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="usuario-rol" class="form-label">Rol *</label>
-                                <select id="usuario-rol" class="form-select" required>
-                                    <option value="">Seleccionar rol...</option>
-                                    <option value="admin">Administrador</option>
-                                    <option value="ujier">Ujier</option>
-                                    <option value="auditor">Auditor</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="usuario-password" class="form-label">Contraseña</label>
-                                <input type="password" id="usuario-password" class="form-input"
-                                    placeholder="Dejar vacío para no cambiar">
-                            </div>
-                            <div class="form-group form-group-full">
-                                <label class="checkbox-wrapper">
-                                    <input type="checkbox" id="usuario-activo" checked>
-                                    <span class="checkbox-custom"></span>
-                                    <span class="checkbox-label">Usuario activo</span>
+                                <label class="form-label">¿Sin Señal / Carga Diferida?</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="carga-diferida">
+                                    <span class="slider"></span>
                                 </label>
                             </div>
+
+                            <div id="motivo-falla-container" class="form-group hidden">
+                                <label for="motivo-falla" class="form-label">Motivo de Falla *</label>
+                                <select id="motivo-falla" class="form-select">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="sin_senal_domicilio">Falta de señal en domicilio</option>
+                                    <option value="falla_datos">Falla temporal de datos</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
                         </div>
+
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="resultado-diligencia" class="form-label">Resultado *</label>
+                                <select id="resultado-diligencia" class="form-select" required>
+                                    <option value="">Seleccionar resultado...</option>
+                                    <option value="atiende">Atiende</option>
+                                    <option value="entregado">Entregado</option>
+                                    <option value="no_atiende">No atiende</option>
+                                    <option value="pre_aviso">Pre aviso</option>
+                                    <option value="estrados">Estrados</option>
+                                    <option value="domicilio_inexistente">Domicilio inexistente</option>
+                                    <option value="diligenciador_ausente">Diligenciador ausente</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-subtitle">📍 Ubicación GPS</h4>
+                            <div class="gps-container" id="gps-container">
+                                <button type="button" class="btn btn-secondary btn-gps" id="btn-capture-gps">
+                                    <span>📍</span> Capturar Ubicación
+                                </button>
+                                <div class="gps-info hidden" id="gps-info">
+                                    <span class="gps-status">✅ Ubicación capturada</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="ubicacion-lat">
+                            <input type="hidden" id="ubicacion-lng">
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-subtitle">📷 Evidencia Fotográfica</h4>
+                            <div class="photo-container">
+                                <input type="file" id="evidencia-foto" accept="image/*" capture="environment"
+                                    class="hidden">
+                                <label for="evidencia-foto" class="photo-upload-btn">
+                                    <span class="upload-icon">📷</span>
+                                    <span class="upload-text">Tomar Foto</span>
+                                </label>
+                                <div id="photo-preview" class="photo-preview hidden">
+                                    <img id="preview-img" src="" alt="Vista previa">
+                                    <button type="button" class="btn-remove-photo" id="btn-remove-photo">×</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4 class="section-subtitle">🎤 Observación por Audio</h4>
+                            <div class="audio-container">
+                                <button type="button" class="btn btn-audio" id="btn-record-audio">
+                                    <span class="audio-icon">🎤</span>
+                                    <span class="audio-text">Grabar Audio</span>
+                                </button>
+                                <div id="audio-recording" class="audio-recording hidden">
+                                    <div class="recording-indicator">
+                                        <span class="pulse-dot"></span>
+                                        <span>Grabando...</span>
+                                    </div>
+                                    <button type="button" class="btn btn-stop" id="btn-stop-audio">⏹️ Detener</button>
+                                </div>
+                                <audio id="audio-playback" class="audio-playback hidden" controls></audio>
+                            </div>
+                            <textarea id="transcripcion-audio" class="form-textarea hidden" rows="2"
+                                placeholder="Transcripción automática..."></textarea>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="observaciones-resultado" class="form-label">Observaciones
+                                    Adicionales</label>
+                                <textarea id="observaciones-resultado" class="form-textarea" rows="3"
+                                    placeholder="Notas adicionales sobre la diligencia..."></textarea>
+                            </div>
+                        </div>
+
                         <div class="modal-actions">
-                            <button type="button" class="btn btn-secondary" id="btn-cancelar-usuario">
-                                Cancelar
-                            </button>
+                            <button type="button" class="btn btn-secondary" id="btn-cancel-diligencia">Cancelar</button>
                             <button type="submit" class="btn btn-primary">
-                                💾 Guardar Usuario
+                                <span>✅</span> Guardar Resultado
                             </button>
                         </div>
                     </form>
@@ -1032,224 +1233,28 @@
             </div>
         </div>
 
-        <!-- Devolución View -->
-        <section id="view-devoluciones" class="view">
-            <div id="devoluciones-zones-grid" class="zones-grid">
-                <!-- Dynamic zone cards -->
-            </div>
-
-            <div id="devoluciones-list-container" class="dashboard-card hidden" style="width: 100%;">
-                <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
-                    <button id="btn-back-to-zones" class="btn btn-secondary btn-sm">
-                        <span>⬅️</span> Volver
-                    </button>
-                    <h3 id="current-zone-title" class="card-title">Zona: -</h3>
-                    <div class="card-actions">
-                        <button id="btn-select-all-returns" class="btn btn-outline btn-sm">Seleccionar
-                            Todo</button>
-                    </div>
+        <!-- Full Image Viewer Modal -->
+        <div id="modal-image-viewer" class="modal hidden">
+            <div class="modal-overlay" onclick="ujier.closeImageViewer()"></div>
+            <div class="modal-content modal-image-content">
+                <div class="modal-header">
+                    <h3>Visualización de Evidencia</h3>
+                    <button class="modal-close" onclick="ujier.closeImageViewer()">✕</button>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 40px;"></th>
-                                    <th>Expediente</th>
-                                    <th>Carátula</th>
-                                    <th>Destinatario</th>
-                                    <th>Troquel</th>
-                                    <th>Domicilio</th>
-                                    <th>Ujier</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="devoluciones-table-body">
-                                <!-- Dynamic content -->
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="modal-body">
+                    <img id="full-image-display" src="" alt="Evidencia ampliada"
+                        style="width: 100%; height: auto; border-radius: var(--radius-lg);">
                 </div>
-                <div class="card-footer"
-                    style="display: flex; justify-content: space-between; align-items: center; padding: 15px;">
-                    <div id="selected-count-msg" class="selected-msg">0 seleccionadas</div>
-                    <button id="btn-confirm-return" class="btn btn-primary" disabled>
-                        <span>🗸</span> Confirmar Devolución
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="ujier.closeImageViewer()">
+                        <span>⬅️</span> Volver Atrás
                     </button>
                 </div>
             </div>
-        </section>
-
-        <!-- Additional views will be added dynamically -->
-    </div>
-    </main>
-    </div>
-
-    <!-- Barra de navegación inferior (solo móvil) - FUERA del page-dashboard -->
-    <nav id="mobile-bottom-nav" class="mobile-bottom-nav"
-        style="position:fixed; bottom:0; left:0; right:0; z-index:9999;">
-        <button class="bottom-nav-item active" data-view="mis-asignaciones">
-            <span class="nav-icon">📋</span>
-            <span class="nav-label">Mi Ruta</span>
-        </button>
-        <button class="bottom-nav-item" data-view="historial-ujier">
-            <span class="nav-icon">📊</span>
-            <span class="nav-label">Historial</span>
-        </button>
-        <button class="bottom-nav-item" data-view="dashboard">
-            <span class="nav-icon">📈</span>
-            <span class="nav-label">Panel</span>
-        </button>
-        <button class="bottom-nav-item" id="btn-logout-mobile">
-            <span class="nav-icon">🚪</span>
-            <span class="nav-label">Salir</span>
-        </button>
-    </nav>
-
-    <!-- Modal para Diligenciamiento -->
-    <div id="modal-diligenciar" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Registrar Resultado</h2>
-                <button class="modal-close" id="modal-close">×</button>
-            </div>
-            <div class="modal-body">
-                <form id="form-diligenciar">
-                    <input type="hidden" id="diligencia-id">
-
-                    <div class="notification-summary" id="notif-summary">
-                        <!-- Dynamic summary -->
-                    </div>
-
-                    <div class="form-section">
-                        <div class="form-group">
-                            <label class="form-label">¿Sin Señal / Carga Diferida?</label>
-                            <label class="switch">
-                                <input type="checkbox" id="carga-diferida">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-
-                        <div id="motivo-falla-container" class="form-group hidden">
-                            <label for="motivo-falla" class="form-label">Motivo de Falla *</label>
-                            <select id="motivo-falla" class="form-select">
-                                <option value="">Seleccionar...</option>
-                                <option value="sin_senal_domicilio">Falta de señal en domicilio</option>
-                                <option value="falla_datos">Falla temporal de datos</option>
-                                <option value="otro">Otro</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <div class="form-group">
-                            <label for="resultado-diligencia" class="form-label">Resultado *</label>
-                            <select id="resultado-diligencia" class="form-select" required>
-                                <option value="">Seleccionar resultado...</option>
-                                <option value="atiende">Atiende</option>
-                                <option value="entregado">Entregado</option>
-                                <option value="no_atiende">No atiende</option>
-                                <option value="pre_aviso">Pre aviso</option>
-                                <option value="estrados">Estrados</option>
-                                <option value="domicilio_inexistente">Domicilio inexistente</option>
-                                <option value="diligenciador_ausente">Diligenciador ausente</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h4 class="section-subtitle">📍 Ubicación GPS</h4>
-                        <div class="gps-container" id="gps-container">
-                            <button type="button" class="btn btn-secondary btn-gps" id="btn-capture-gps">
-                                <span>📍</span> Capturar Ubicación
-                            </button>
-                            <div class="gps-info hidden" id="gps-info">
-                                <span class="gps-status">✅ Ubicación capturada</span>
-                            </div>
-                        </div>
-                        <input type="hidden" id="ubicacion-lat">
-                        <input type="hidden" id="ubicacion-lng">
-                    </div>
-
-                    <div class="form-section">
-                        <h4 class="section-subtitle">📷 Evidencia Fotográfica</h4>
-                        <div class="photo-container">
-                            <input type="file" id="evidencia-foto" accept="image/*" capture="environment"
-                                class="hidden">
-                            <label for="evidencia-foto" class="photo-upload-btn">
-                                <span class="upload-icon">📷</span>
-                                <span class="upload-text">Tomar Foto</span>
-                            </label>
-                            <div id="photo-preview" class="photo-preview hidden">
-                                <img id="preview-img" src="" alt="Vista previa">
-                                <button type="button" class="btn-remove-photo" id="btn-remove-photo">×</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h4 class="section-subtitle">🎤 Observación por Audio</h4>
-                        <div class="audio-container">
-                            <button type="button" class="btn btn-audio" id="btn-record-audio">
-                                <span class="audio-icon">🎤</span>
-                                <span class="audio-text">Grabar Audio</span>
-                            </button>
-                            <div id="audio-recording" class="audio-recording hidden">
-                                <div class="recording-indicator">
-                                    <span class="pulse-dot"></span>
-                                    <span>Grabando...</span>
-                                </div>
-                                <button type="button" class="btn btn-stop" id="btn-stop-audio">⏹️ Detener</button>
-                            </div>
-                            <audio id="audio-playback" class="audio-playback hidden" controls></audio>
-                        </div>
-                        <textarea id="transcripcion-audio" class="form-textarea hidden" rows="2"
-                            placeholder="Transcripción automática..."></textarea>
-                    </div>
-
-                    <div class="form-section">
-                        <div class="form-group">
-                            <label for="observaciones-resultado" class="form-label">Observaciones
-                                Adicionales</label>
-                            <textarea id="observaciones-resultado" class="form-textarea" rows="3"
-                                placeholder="Notas adicionales sobre la diligencia..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" id="btn-cancel-diligencia">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">
-                            <span>✅</span> Guardar Resultado
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
-    </div>
 
-    <!-- Full Image Viewer Modal -->
-    <div id="modal-image-viewer" class="modal hidden">
-        <div class="modal-overlay" onclick="ujier.closeImageViewer()"></div>
-        <div class="modal-content modal-image-content">
-            <div class="modal-header">
-                <h3>Visualización de Evidencia</h3>
-                <button class="modal-close" onclick="ujier.closeImageViewer()">✕</button>
-            </div>
-            <div class="modal-body">
-                <img id="full-image-display" src="" alt="Evidencia ampliada"
-                    style="width: 100%; height: auto; border-radius: var(--radius-lg);">
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="ujier.closeImageViewer()">
-                    <span>⬅️</span> Volver Atrás
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Notifications -->
-    <div id="toast-container" class="toast-container"></div>
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
     </div>
 
     <!-- Chart.js -->

@@ -247,9 +247,13 @@ const app = {
             dropdown.classList.add('show');
         };
 
+        const normalize = (str) => {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        };
+
         const filterOptions = () => {
-            const query = input.value.toLowerCase();
-            const filtered = options.filter(opt => opt.toLowerCase().includes(query));
+            const query = normalize(input.value);
+            const filtered = options.filter(opt => normalize(opt).includes(query));
             showDropdown(filtered);
         };
 

@@ -1180,15 +1180,15 @@
     top: 100%;
     left: 0;
     right: 0;
-    max-height: 250px;
+    max-height: 300px;
     overflow-y: auto;
-    background: var(--bg-card);
-    border: 1px solid var(--primary-500);
+    background: #ffffff;
+    border: 1.5px solid var(--primary-500);
     border-top: none;
-    border-radius: 0 0 var(--radius-md) var(--radius-md);
-    z-index: 100;
+    border-radius: 0 0 8px 8px;
+    z-index: 1000;
     display: none;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .searchable-select-dropdown.show {
@@ -1196,11 +1196,12 @@
 }
 
 .searchable-select-item {
-    padding: var(--space-3) var(--space-4);
+    padding: 10px 16px;
     cursor: pointer;
-    transition: background 0.15s ease;
-    font-size: 0.9375rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .searchable-select-item:last-child {
@@ -1209,15 +1210,18 @@
 
 .searchable-select-item:hover,
 .searchable-select-item.highlighted {
-    background: var(--primary-600);
-    color: white;
+    background: #eff6ff;
+    color: var(--primary-700);
+    font-weight: 600;
 }
 
 .searchable-select-item mark {
-    background: rgba(245, 158, 11, 0.4);
-    color: inherit;
-    padding: 0 2px;
+    background: #fef08a;
+    /* Soft bright yellow mark */
+    color: #854d0e;
+    padding: 0 1px;
     border-radius: 2px;
+    font-weight: 700;
 }
 
 .searchable-select-empty {
@@ -2303,7 +2307,8 @@
 }
 
 .modal-xl {
-    max-width: 900px;
+    width: 95%;
+    max-width: 1100px;
 }
 
 @keyframes modalAppear {
@@ -2356,12 +2361,12 @@
 }
 
 .modal-footer {
-    padding: var(--space-4) var(--space-6);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 16px 24px;
+    border-top: 1.5px solid #e2e8f0;
     display: flex;
     justify-content: flex-end;
-    gap: var(--space-3);
-    background: rgba(255, 255, 255, 0.02);
+    gap: 12px;
+    background: #f8fafc;
 }
 
 /* === Compact Form & Grid === */
@@ -2386,12 +2391,15 @@
 }
 
 .select-mini {
-    padding: 2px 8px;
-    font-size: 0.75rem;
-    height: 28px;
+    padding: 2px 10px;
+    font-size: 0.85rem;
+    height: 38px;
+    min-width: 220px;
     border-radius: var(--radius-sm);
-    background: var(--bg-app);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    color: #1e293b;
+    font-weight: 500;
 }
 
 .p-info {
@@ -2415,7 +2423,8 @@
 .f-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+    min-width: 0;
 }
 
 .f-group label {
@@ -2428,19 +2437,21 @@
 
 .f-group input,
 .f-group select {
-    padding: 8px 12px;
-    font-size: 0.9rem;
+    padding: 10px 14px;
+    font-size: 0.95rem;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    color: #1e293b;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .f-group input:focus,
 .f-group select:focus {
     outline: none;
     border-color: var(--primary-500);
-    background: rgba(255, 255, 255, 0.08);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
 }
 
 .checkbox-wrapper-mini {
@@ -2507,18 +2518,29 @@
 }
 
 .persistent-settings-bar {
-    background: #f1f5f9 !important;
-    padding: 10px 15px !important;
-    border-radius: 8px !important;
-    margin-bottom: 20px !important;
+    background: #eff6ff !important;
+    padding: 12px 20px !important;
+    border-radius: 10px !important;
+    margin-bottom: 24px !important;
     display: flex !important;
-    gap: 20px !important;
+    gap: 32px !important;
     align-items: center !important;
-    border: 1px dashed #cbd5e1 !important;
+    border: 1.5px solid #bfdbfe !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .persistent-settings-bar label {
     font-weight: 700 !important;
-    font-size: 0.75rem !important;
-    color: #334155 !important;
+    font-size: 0.85rem !important;
+    color: #1e3a8a !important;
+    white-space: nowrap;
+}
+
+.view-tabs {
+    margin-bottom: 15px !important;
+}
+
+.list-header {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
 }
