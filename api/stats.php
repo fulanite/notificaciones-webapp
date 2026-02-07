@@ -24,7 +24,7 @@ try {
                 SELECT 
                     COUNT(*) as total,
                     SUM(CASE WHEN estado = 'pendiente' THEN 1 ELSE 0 END) as pendientes,
-                    SUM(CASE WHEN estado = 'diligenciada' THEN 1 ELSE 0 END) as diligenciadas,
+                    SUM(CASE WHEN estado IN ('diligenciada', 'Entregado') THEN 1 ELSE 0 END) as diligenciadas,
                     SUM(CASE WHEN estado = 'diferida' THEN 1 ELSE 0 END) as diferidas
                 FROM notificaciones
             ");
@@ -65,9 +65,9 @@ try {
                     u.id,
                     u.nombre,
                     COUNT(n.id) as total,
-                    SUM(CASE WHEN n.estado = 'diligenciada' THEN 1 ELSE 0 END) as completed,
+                    SUM(CASE WHEN n.estado IN ('diligenciada', 'Entregado') THEN 1 ELSE 0 END) as completed,
                     ROUND(
-                        SUM(CASE WHEN n.estado = 'diligenciada' THEN 1 ELSE 0 END) * 100.0 / 
+                        SUM(CASE WHEN n.estado IN ('diligenciada', 'Entregado') THEN 1 ELSE 0 END) * 100.0 / 
                         NULLIF(COUNT(n.id), 0), 
                         2
                     ) as percentage
@@ -87,7 +87,7 @@ try {
                     zona as zone,
                     COUNT(*) as total,
                     SUM(CASE WHEN estado = 'pendiente' THEN 1 ELSE 0 END) as pendientes,
-                    SUM(CASE WHEN estado = 'diligenciada' THEN 1 ELSE 0 END) as diligenciadas
+                    SUM(CASE WHEN estado IN ('diligenciada', 'Entregado') THEN 1 ELSE 0 END) as diligenciadas
                 FROM notificaciones
                 GROUP BY zona
                 ORDER BY total DESC
@@ -101,7 +101,7 @@ try {
                 SELECT 
                     DATE(fecha_carga) as date,
                     COUNT(*) as created,
-                    SUM(CASE WHEN estado = 'diligenciada' THEN 1 ELSE 0 END) as completed
+                    SUM(CASE WHEN estado IN ('diligenciada', 'Entregado') THEN 1 ELSE 0 END) as completed
                 FROM notificaciones
                 WHERE fecha_carga >= DATE_SUB(NOW(), INTERVAL 30 DAY)
                 GROUP BY DATE(fecha_carga)

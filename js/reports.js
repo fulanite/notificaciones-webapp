@@ -133,7 +133,7 @@ const reports = {
 
         const total = monthData.length;
         const pendientes = monthData.filter(n => n.estado === 'pendiente').length;
-        const diligenciadas = monthData.filter(n => n.estado === 'diligenciada').length;
+        const diligenciadas = monthData.filter(n => n.estado === 'diligenciada' || n.estado === 'Entregado').length;
         const diferidas = monthData.filter(n => n.estado === 'diferida').length;
 
         doc.setFontSize(11);

@@ -302,9 +302,12 @@ const utils = {
             // Estados del proceso
             pendiente: '<span class="status-badge status-pending">⏳ Pendiente</span>',
             diligenciada: '<span class="status-badge status-completed">✅ Diligenciada</span>',
+            Entregado: '<span class="status-badge status-completed">✅ Entregado</span>',
+            entregado: '<span class="status-badge status-completed">✅ Entregado</span>',
             diferida: '<span class="status-badge status-deferred">⚠️ Diferida</span>',
             // Resultados del ujier
-            atiende: '<span class="status-badge status-completed">✅ Atiende</span>',
+            entregado: '<span class="status-badge status-completed">✅ Entregado</span>',
+            atiende: '<span class="status-badge status-completed">✅ Entregado</span>',
             no_atiende: '<span class="status-badge status-deferred">🚪 No Atiende</span>',
             pre_aviso: '<span class="status-badge status-warning">📋 Pre Aviso</span>',
             estrados: '<span class="status-badge status-completed">🏛️ Estrados</span>',

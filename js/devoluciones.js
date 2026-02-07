@@ -25,6 +25,10 @@ const devoluciones = {
     resetState() {
         this.state.selectedIds.clear();
         this.state.currentZone = null;
+
+        // Reset visibility
+        document.getElementById('devoluciones-zones-grid')?.classList.remove('hidden');
+        document.getElementById('devoluciones-list-container')?.classList.add('hidden');
     },
 
     // Refresh data from database (only non-returned notifications)
@@ -43,6 +47,7 @@ const devoluciones = {
             if (result.error) throw result.error;
 
             this.state.notificacionesPendientes = result.data || [];
+            console.log(`[Devoluciones] Loaded ${this.state.notificacionesPendientes.length} notifications`);
             this.groupByZone();
             this.renderZones();
         } catch (err) {
@@ -58,6 +63,7 @@ const devoluciones = {
         const groups = {};
         this.state.notificacionesPendientes.forEach(n => {
             const zona = n.zona || 'Sin Zona';
+            console.log(`[Devoluciones] Grouping notification ${n.id} in zone ${zona}`);
             if (!groups[zona]) {
                 groups[zona] = {
                     name: zona,
@@ -105,7 +111,12 @@ const devoluciones = {
 
     renderZones() {
         const grid = document.getElementById('devoluciones-zones-grid');
+        const list = document.getElementById('devoluciones-list-container');
         if (!grid) return;
+
+        // Ensure grid is visible and list is hidden
+        grid.classList.remove('hidden');
+        if (list) list.classList.add('hidden');
 
         if (Object.keys(this.state.zones).length === 0) {
             grid.innerHTML = `
@@ -186,6 +197,8 @@ const devoluciones = {
         switch (estado) {
             case 'pendiente': return 'warning';
             case 'diligenciada': return 'success';
+            case 'Entregado': return 'success';
+            case 'entregado': return 'success';
             case 'en_proceso': return 'info';
             case 'pre_aviso': return 'info';
             case 'diferida': return 'error';
@@ -235,7 +248,7 @@ const devoluciones = {
         const userId = user ? user.id : 'sistema';
 
         this.state.loading = true;
-        utils.showGlobalLoading(`Procesando ${count} devoluciones...`);
+        utils.showLoading(`Procesando ${count} devoluciones...`);
 
         let successCount = 0;
         let errorCount = 0;
@@ -251,7 +264,7 @@ const devoluciones = {
             else successCount++;
         });
 
-        utils.hideGlobalLoading();
+        utils.hideLoading();
 
         if (successCount > 0) {
             utils.showToast(`✅ ${successCount} notificaciones marcadas como devueltas`, 'success');

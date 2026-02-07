@@ -1,0 +1,25 @@
+﻿id_cedula
+fecha_carga
+cargado_por
+id_usuario_carga
+zona_cedula
+domicilio
+destinatario
+estado_notificacion
+n_exp
+caratula
+origen
+letrado
+troquel
+costo
+Medio de pago
+observaciones
+tipo_not
+troquel_categoria
+ujier_suplente
+devuelta_por_ujier
+destino_especial
+Ujier_asignado
+monto_movilidad
+fecha_entrega_ujier
+archivada

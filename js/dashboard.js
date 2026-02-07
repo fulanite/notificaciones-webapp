@@ -243,6 +243,7 @@ const dashboard = {
         const icons = {
             pendiente: '📋',
             diligenciada: '✅',
+            Entregado: '✅',
             diferida: '⚠️'
         };
         return icons[estado] || '📋';
@@ -250,8 +251,8 @@ const dashboard = {
 
     // Get activity action text
     getActivityAction(notif) {
-        if (notif.estado === 'diligenciada') {
-            return `<strong>${notif.destinatario_nombre}</strong> fue diligenciada`;
+        if (notif.estado === 'diligenciada' || notif.estado === 'Entregado') {
+            return `<strong>${notif.destinatario_nombre || notif.destinatario_especial}</strong> fue diligenciada`;
         } else if (notif.estado === 'diferida') {
             return `Carga diferida para <strong>${notif.destinatario_nombre}</strong>`;
         }

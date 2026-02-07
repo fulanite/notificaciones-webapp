@@ -267,7 +267,7 @@ const ujier = {
             }
 
             const resultData = {
-                resultado: 'atiende', // 'Atiende' is the internal value for 'Entregado'
+                resultado: 'entregado', // 'entregado' is the preferred value for successful delivery
                 ubicacion_lat: lat,
                 ubicacion_lng: lng,
                 es_carga_diferida: false,

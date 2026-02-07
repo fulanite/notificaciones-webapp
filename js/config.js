@@ -40,7 +40,7 @@ const CONFIG = {
 
     // Result Options
     RESULT_OPTIONS: {
-        atiende: 'Atiende',
+        entregado: 'Entregado',
         no_atiende: 'No atiende',
         pre_aviso: 'Pre aviso',
         estrados: 'Estrados',

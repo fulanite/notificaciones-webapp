@@ -33,8 +33,13 @@ class Database
             }
 
             try {
-                $this->pdo->exec("ALTER TABLE visitas ADD COLUMN ubicacion_lat VARCHAR(50) NULL AFTER transcripcion_audio");
                 $this->pdo->exec("ALTER TABLE visitas ADD COLUMN ubicacion_lng VARCHAR(50) NULL AFTER ubicacion_lat");
+            } catch (PDOException $e) {
+            }
+
+            try {
+                $this->pdo->exec("ALTER TABLE notificaciones ADD COLUMN devuelta_por_ujier TINYINT(1) DEFAULT 0");
+                $this->pdo->exec("ALTER TABLE notificaciones ADD COLUMN fecha_devolucion DATETIME NULL");
             } catch (PDOException $e) {
             }
         } catch (PDOException $e) {
