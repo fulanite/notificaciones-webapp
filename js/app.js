@@ -478,7 +478,7 @@ const app = {
         document.getElementById('menu-ujier')?.classList.add('hidden');
         document.getElementById('menu-auditor')?.classList.add('hidden');
 
-        if (rol === 'admin' || rol === 'administrativo') {
+        if (rol === 'admin' || rol === 'administrativo' || rol === 'coordinador') {
             document.getElementById('menu-admin')?.classList.remove('hidden');
             this.navigateTo('dashboard-home');
         } else if (rol === 'ujier') {
@@ -495,11 +495,15 @@ const app = {
     async initializeModules() {
         const rol = auth.currentUser?.rol;
 
-        if (rol === 'admin' || rol === 'administrativo' || rol === 'auditor') {
+        if (rol === 'admin' || rol === 'administrativo' || rol === 'auditor' || rol === 'coordinador') {
             await dashboard.init();
             await notifications.init();
             await notifications.loadUjieres();
             reports.init();
+        }
+
+        if (rol === 'coordinador') {
+            await devoluciones.init();
         }
 
         if (rol === 'ujier') {
@@ -555,7 +559,8 @@ const app = {
             'sincronizar': { title: 'Sincronizar', subtitle: 'Gestión de datos offline' },
             'auditoria': { title: 'Panel de Auditoría', subtitle: 'Control y seguimiento de operaciones' },
             'cargas-diferidas': { title: 'Cargas Diferidas', subtitle: 'Notificaciones con carga diferida' },
-            'estadisticas': { title: 'Estadísticas', subtitle: 'Análisis de rendimiento' }
+            'estadisticas': { title: 'Estadísticas', subtitle: 'Análisis de rendimiento' },
+            'devoluciones': { title: 'Retorno de Notificaciones', subtitle: 'Control de documentos devueltos por ujieres' }
         };
 
         const pageInfo = titles[viewId] || { title: 'SGND', subtitle: '' };
@@ -609,6 +614,11 @@ const app = {
                 case 'usuarios':
                     loadPromise = typeof usuarios !== 'undefined' && usuarios.init
                         ? usuarios.init()
+                        : Promise.resolve();
+                    break;
+                case 'devoluciones':
+                    loadPromise = typeof devoluciones !== 'undefined' && devoluciones.init
+                        ? devoluciones.init()
                         : Promise.resolve();
                     break;
                 default:

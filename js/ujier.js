@@ -123,6 +123,7 @@ const ujier = {
 
             // Filter by search query - expanded to all fields
             const searchTargets = [
+                visit.notificacion_id,
                 visit.destinatario_nombre,
                 visit.domicilio,
                 visit.tipo_notificacion,
@@ -218,7 +219,7 @@ const ujier = {
                         ${isSpecial ? '<span class="badge-special">⭐ Especial</span>' : ''}
                     </div>
                     ${assignment.caratula ? `<div class="assignment-caratula">📄 ${assignment.caratula}</div>` : ''}
-                    <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || '-'}</strong></div>
+                    <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || assignment.destinatario_especial || '-'}</strong></div>
                     <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
                 </div>
                 
@@ -246,7 +247,8 @@ const ujier = {
         const assignment = this.assignments.find(a => a.id === id);
         if (!assignment) return;
 
-        const confirmMsg = `¿Confirmar entrega rápida a ${assignment.destinatario_nombre}?`;
+        const recipientName = assignment.destinatario_nombre || assignment.destinatario_especial || 'el destinatario';
+        const confirmMsg = `¿Confirmar entrega rápida a ${recipientName}?`;
         if (!confirm(confirmMsg)) return;
 
         utils.showLoading('Procesando entrega rápida...');

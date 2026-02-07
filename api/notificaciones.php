@@ -39,7 +39,7 @@ try {
                 $placeholders = implode(',', array_fill(0, count($estadosArr), '?'));
 
                 $sql = "SELECT * FROM notificaciones 
-                        WHERE asignado_a = ? AND estado IN ($placeholders)
+                        WHERE asignado_a = ? AND estado IN ($placeholders) AND devuelta_por_ujier = 0
                         ORDER BY fecha_carga ASC";
 
                 $stmt = $pdo->prepare($sql);
@@ -80,6 +80,11 @@ try {
                     $params[] = $year;
                 }
 
+                if (isset($_GET['devuelta_por_ujier'])) {
+                    $where[] = "n.devuelta_por_ujier = ?";
+                    $params[] = (int) $_GET['devuelta_por_ujier'];
+                }
+
                 if (!empty($_GET['own_only']) && $_GET['own_only'] == '1' && !empty($_GET['user_email'])) {
                     $where[] = "n.usuario_carga = ?";
                     $params[] = $_GET['user_email'];
@@ -88,6 +93,8 @@ try {
                 if (!empty($_GET['search'])) {
                     $search = "%" . $_GET['search'] . "%";
                     $where[] = "(
+                        n.id LIKE ? OR 
+                        n.glide_id_cedula LIKE ? OR 
                         n.n_expediente LIKE ? OR 
                         n.destinatario_nombre LIKE ? OR 
                         n.caratula LIKE ? OR 
@@ -101,8 +108,8 @@ try {
                         n.observaciones_resultado LIKE ? OR 
                         n.destinatario_especial LIKE ?
                     )";
-                    // Add params for each field (12 fields)
-                    for ($i = 0; $i < 12; $i++) {
+                    // Add params for each field (14 fields now)
+                    for ($i = 0; $i < 14; $i++) {
                         $params[] = $search;
                     }
                 }
@@ -296,6 +303,22 @@ try {
                             $data['ubicacion_lng'] ?? null,
                             $data['evidencia_foto'] ?? null,
                             $data['observacion_audio'] ?? null
+                        ]);
+                        break;
+
+                    case 'return':
+                        // Mark as returned by ujier
+                        $stmt = $pdo->prepare("
+                            UPDATE notificaciones SET
+                                devuelta_por_ujier = 1,
+                                fecha_devolucion = NOW(),
+                                updated_at = NOW(),
+                                updated_by = ?
+                            WHERE id = ?
+                        ");
+                        $stmt->execute([
+                            $data['user_id'],
+                            $data['id']
                         ]);
                         break;
 

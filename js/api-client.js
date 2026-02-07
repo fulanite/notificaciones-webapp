@@ -153,6 +153,7 @@ const db = {
         }
         if (options.page) params.page = options.page;
         if (options.limit) params.limit = options.limit;
+        if (options.devuelta_por_ujier !== undefined) params.devuelta_por_ujier = options.devuelta_por_ujier;
 
         const result = await apiClient.get('notificaciones.php', params);
 
@@ -236,6 +237,15 @@ const db = {
             action: 'assign',
             asignado_a: ujierId,
             asignado_por: assignedBy
+        });
+    },
+
+    async returnNotification(id, userId) {
+        if (!apiClient) return { data: null, error: null };
+        return apiClient.put('notificaciones.php', {
+            id,
+            action: 'return',
+            user_id: userId
         });
     },
 

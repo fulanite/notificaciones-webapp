@@ -63,6 +63,7 @@ const CONFIG = {
     ROLES: {
         admin: 'Administrador',
         administrativo: 'Administrativo',
+        coordinador: 'Coordinador',
         ujier: 'Ujier',
         auditor: 'Auditor'
     },

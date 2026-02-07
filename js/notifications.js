@@ -206,7 +206,7 @@ const notifications = {
                     <td title="${notif.origen}">${utils.truncate(notif.origen, 25)}</td>
                     <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 30)}</td>
                     <td><strong style="font-size: 0.85rem;">${utils.truncate(notif.n_expediente, 25)}</strong></td>
-                    <td title="${notif.destinatario_nombre}">${utils.truncate(notif.destinatario_nombre, 40)}</td>
+                    <td title="${notif.destinatario_nombre || notif.destinatario_especial || ''}">${utils.truncate(notif.destinatario_nombre || notif.destinatario_especial || '-', 40)}</td>
                     <td title="${notif.domicilio}">${utils.truncate(notif.domicilio, 50)}</td>
                     <td><span class="badge-zona">${notif.zona || '-'}</span></td>
                     <td style="font-family: monospace; font-size: 0.75rem;">${notif.n_troquel || '-'}</td>
@@ -358,7 +358,7 @@ const notifications = {
                                 <div class="card-icon">👤</div>
                                 <div class="card-content">
                                     <span class="card-label">Destinatario</span>
-                                    <span class="card-value"><strong>${data.destinatario_nombre}</strong></span>
+                                    <span class="card-value"><strong>${data.destinatario_nombre || data.destinatario_especial || '-'}</strong></span>
                                 </div>
                             </div>
                             <div class="premium-card dom-card grow">

@@ -203,6 +203,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="devoluciones">
+                                    <span class="nav-icon">🗸</span>
+                                    <span class="nav-text">Devolución</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="#" class="nav-link" data-view="usuarios">
                                     <span class="nav-icon">👥</span>
                                     <span class="nav-text">Usuarios</span>
@@ -1216,6 +1222,56 @@
                         </div>
                     </div>
 
+                    <!-- Devolución View -->
+                    <section id="view-devoluciones" class="view">
+                        <div class="view-header">
+                            <h2 class="view-title">Retorno de Notificaciones Físicas</h2>
+                            <p class="view-subtitle">Marcar notificaciones devueltas por los ujieres</p>
+                        </div>
+
+                        <div id="devoluciones-zones-grid" class="zones-grid">
+                            <!-- Dynamic zone cards -->
+                        </div>
+
+                        <div id="devoluciones-list-container" class="dashboard-card hidden" style="width: 100%;">
+                            <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+                                <button id="btn-back-to-zones" class="btn btn-secondary btn-sm">
+                                    <span>⬅️</span> Volver
+                                </button>
+                                <h3 id="current-zone-title" class="card-title">Zona: -</h3>
+                                <div class="card-actions">
+                                    <button id="btn-select-all-returns" class="btn btn-outline btn-sm">Seleccionar
+                                        Todo</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 40px;"></th>
+                                                <th>Expediente</th>
+                                                <th>Destinatario</th>
+                                                <th>Ujier Asignado</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="devoluciones-table-body">
+                                            <!-- Dynamic content -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer"
+                                style="display: flex; justify-content: space-between; align-items: center; padding: 15px;">
+                                <div id="selected-count-msg" class="selected-msg">0 seleccionadas</div>
+                                <button id="btn-confirm-return" class="btn btn-primary" disabled>
+                                    <span>🗸</span> Confirmar Devolución
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
                     <!-- Additional views will be added dynamically -->
                 </div>
             </main>
@@ -1414,6 +1470,7 @@
     <script src="js/reports.js?v=37.0"></script>
     <script src="js/asignaciones.js?v=37.0"></script>
     <script src="js/usuarios.js?v=37.0"></script>
+    <script src="js/devoluciones.js?v=37.0"></script>
     <script src="js/app.js?v=37.0"></script>
 
     <!-- Service Worker Registration -->

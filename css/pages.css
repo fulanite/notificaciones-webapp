@@ -620,6 +620,65 @@
     color: var(--text-muted);
 }
 
+/* === Devolución View === */
+.zones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+}
+
+.clickable-card {
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.clickable-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-500);
+}
+
+.clickable-card:active {
+    transform: translateY(-2px);
+}
+
+.card-footer-action {
+    margin-top: var(--space-4);
+    font-size: 0.875rem;
+    color: var(--primary-400);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-weight: 600;
+}
+
+.row-selected {
+    background: rgba(59, 130, 246, 0.1) !important;
+}
+
+.selected-msg {
+    font-weight: 600;
+    color: var(--primary-400);
+    font-size: 1rem;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--primary-500);
+    color: var(--primary-400);
+}
+
+.btn-outline:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.dashboard-card.hidden {
+    display: none;
+}
+
 /* === Reports === */
 .reports-grid {
     display: grid;
