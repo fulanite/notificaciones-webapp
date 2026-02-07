@@ -94,6 +94,7 @@ const asignaciones = {
             grid.classList.add('hidden');
             list.classList.remove('hidden');
             this.renderList();
+            this.populateTargetUjieres(); // <--- Refresh dropdown to update disabled states
         } else {
             grid.classList.remove('hidden');
             list.classList.add('hidden');
@@ -233,6 +234,7 @@ const asignaciones = {
         const select = document.getElementById('select-target-ujier');
         if (!select) return;
 
+        const currentValue = select.value;
         const otherUjieres = this.state.ujieres.filter(u => u.id !== this.state.currentUjierId);
 
         select.innerHTML = '<option value="">Reasignar a...</option>' +
@@ -244,6 +246,13 @@ const asignaciones = {
                     </option>
                 `;
             }).join('');
+
+        // Reset selection if the current target is no longer available (because it's now the source)
+        if (String(currentValue) === String(this.state.currentUjierId)) {
+            select.value = '';
+        } else {
+            select.value = currentValue;
+        }
     },
 
     updateUI() {
