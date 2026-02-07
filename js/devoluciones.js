@@ -149,14 +149,17 @@ const devoluciones = {
         }
 
         grid.innerHTML = Object.values(this.state.zones).map(z => `
-            <div class="stat-card stat-info clickable-card" onclick="devoluciones.openZone('${z.name}')">
-                <div class="stat-icon">📍</div>
-                <div class="stat-content">
-                    <span class="stat-value">${z.count}</span>
-                    <span class="stat-label">${z.name}</span>
+            <div class="zone-premium-card clickable-card" onclick="devoluciones.openZone('${z.name}')">
+                <div class="zone-card-header">
+                    <div class="zone-icon">📍</div>
+                    <div class="zone-badge">${z.count}</div>
                 </div>
-                <div class="card-footer-action">
-                    <span>Ver detalles →</span>
+                <div class="zone-card-body">
+                    <h3 class="zone-name">${z.name}</h3>
+                    <p class="zone-desc">Notificaciones pendientes</p>
+                </div>
+                <div class="zone-card-footer">
+                    <span>Ver lista de retorno →</span>
                 </div>
             </div>
         `).join('');
@@ -184,7 +187,7 @@ const devoluciones = {
         const list = this.state.filteredNotificaciones;
 
         if (list.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay notificaciones en esta zona</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay notificaciones en esta zona</td></tr>';
             return;
         }
 
@@ -197,20 +200,18 @@ const devoluciones = {
                         <span class="checkbox-custom"></span>
                     </label>
                 </td>
+                <td><strong class="cell-primary">${n.n_expediente || 'S/N'}</strong></td>
+                <td title="${n.caratula || ''}" class="cell-truncate">${utils.truncate(n.caratula || '-', 35)}</td>
+                <td class="cell-recipient">${n.destinatario_nombre || n.destinatario_especial || '-'}</td>
+                <td style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
+                <td title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
                 <td>
-                    <div class="cell-info">
-                        <span class="cell-primary">${n.n_expediente || 'S/N'}</span>
-                        <span class="cell-secondary">${n.caratula ? n.caratula.substring(0, 30) + (n.caratula.length > 30 ? '...' : '') : '-'}</span>
+                    <div class="cell-ujier-brief">
+                        <span>👤 ${n.ujier_nombre ? n.ujier_nombre.split(' ')[0] : '-'}</span>
                     </div>
                 </td>
-                <td>${n.destinatario_nombre || n.destinatario_especial || '-'}</td>
                 <td>
-                    <div class="cell-info">
-                        <span class="cell-primary">👤 ${n.ujier_nombre || 'No asignado'}</span>
-                    </div>
-                </td>
-                <td>
-                    <span class="badge badge-${this.getStatusClass(n.estado)}">${n.estado.toUpperCase()}</span>
+                    <span class="badge-mini status-${this.getStatusClass(n.estado)}">${n.estado.toUpperCase()}</span>
                 </td>
             </tr>
         `).join('');
