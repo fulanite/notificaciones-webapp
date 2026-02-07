@@ -656,7 +656,7 @@ const app = {
             origen: origenDinamico || origenJuzgado,
             letrado: getVal('letrado'),
             destinatario_especial: getVal('destinatario-especial') || null,
-            destinatario_nombre: getVal('destinatario-nombre'),
+            destinatario_nombre: getVal('destinatario-nombre') || getVal('destinatario-especial'),
             domicilio: getVal('domicilio'),
             zona: getVal('zona'),
             tipo_troquel: getVal('tipo-troquel'),

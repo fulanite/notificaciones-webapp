@@ -200,17 +200,19 @@ const notifications = {
                 lastDate = currentDate;
             }
 
+            const recipientDisplay = (notif.destinatario_nombre?.trim() || notif.destinatario_especial?.trim() || 'Sin destinatario');
+
             html += `
                 <tr class="stagger-item">
                     <td style="white-space: nowrap; font-size: 0.75rem;">${utils.formatDate(notif.fecha_carga)}</td>
                     <td title="${notif.origen}">${utils.truncate(notif.origen, 25)}</td>
                     <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 30)}</td>
                     <td><strong style="font-size: 0.85rem;">${utils.truncate(notif.n_expediente, 25)}</strong></td>
-                    <td title="${notif.destinatario_nombre || notif.destinatario_especial || ''}">${utils.truncate(notif.destinatario_nombre || notif.destinatario_especial || '-', 40)}</td>
+                    <td title="${recipientDisplay}">${utils.truncate(recipientDisplay, 40)}</td>
                     <td title="${notif.domicilio}">${utils.truncate(notif.domicilio, 50)}</td>
                     <td><span class="badge-zona">${notif.zona || '-'}</span></td>
                     <td style="font-family: monospace; font-size: 0.75rem;">${notif.n_troquel || '-'}</td>
-                    <td>${utils.getStatusBadge(notif.resultado_diligencia || notif.estado)}</td>
+                    <td>${this.getEnhancedStatusBadge(notif)}</td>
                     <td style="font-size: 0.75rem;">${notif.ujier_nombre ? notif.ujier_nombre.split(' ')[0] : '-'}</td>
                     <td>
                         <div class="table-actions">
@@ -227,6 +229,18 @@ const notifications = {
         });
 
         tbody.innerHTML = html;
+    },
+
+    // Enhanced status badge that handles special recipients logic
+    getEnhancedStatusBadge(notif) {
+        let status = notif.resultado_diligencia || notif.estado;
+
+        // If it's a special recipient and status is 'atiende', show as 'entregado'
+        if ((notif.destinatario_especial) && status === 'atiende') {
+            status = 'entregado';
+        }
+
+        return utils.getStatusBadge(status);
     },
 
     // Update pagination
@@ -332,7 +346,7 @@ const notifications = {
                             </div>
                         </div>
                         <div class="header-status-box">
-                            ${utils.getStatusBadge(data.resultado_diligencia || data.estado)}
+                            ${this.getEnhancedStatusBadge(data)}
                         </div>
                         <button class="modal-close-v2" onclick="notifications.closeModal()">&times;</button>
                     </div>
@@ -358,7 +372,7 @@ const notifications = {
                                 <div class="card-icon">👤</div>
                                 <div class="card-content">
                                     <span class="card-label">Destinatario</span>
-                                    <span class="card-value"><strong>${data.destinatario_nombre || data.destinatario_especial || '-'}</strong></span>
+                                    <span class="card-value"><strong>${data.destinatario_nombre || data.destinatario_especial || 'Sin nombre'}</strong></span>
                                 </div>
                             </div>
                             <div class="premium-card dom-card grow">
