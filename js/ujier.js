@@ -217,6 +217,7 @@ const ujier = {
                         <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
                         ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
                         ${isSpecial ? '<span class="badge-special">⭐ Especial</span>' : ''}
+                        ${assignment.devuelta_por_ujier ? '<span class="badge-returned" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; font-size:0.7rem; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:auto;">📦 RENDIDA</span>' : ''}
                     </div>
                     ${assignment.caratula ? `<div class="assignment-caratula">📄 ${assignment.caratula}</div>` : ''}
                     <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || assignment.destinatario_especial || '-'}</strong></div>
@@ -477,6 +478,7 @@ const ujier = {
                     <div class="summary-header">
                         <span class="summary-tipo">${tipoLabel}</span>
                         <span class="summary-zona">${assignment.zona || ''}</span>
+                        ${assignment.devuelta_por_ujier ? '<span class="badge-returned-summary" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; font-size:0.75rem; padding:4px 8px; border-radius:6px; font-weight:bold;">📦 RENDIDA</span>' : ''}
                     </div>
                     <div class="summary-body">
                         <div class="summary-row">
@@ -560,6 +562,43 @@ const ujier = {
 
             // Auto-select entregado if special, otherwise force choice
             resultSelect.value = isSpecial ? 'entregado' : '';
+        }
+
+        // BLOCKING LOGIC: If already returned, disable form
+        const isReturned = assignment.devuelta_por_ujier == 1;
+        const form = document.getElementById('form-diligenciar');
+        const submitBtn = form?.querySelector('button[type="submit"]');
+        const warningEl = document.getElementById('returned-warning');
+
+        if (isReturned) {
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '🔒 No editable (Ya devuelta)';
+            }
+            if (!warningEl) {
+                const warning = document.createElement('div');
+                warning.id = 'returned-warning';
+                warning.className = 'alert alert-error mb-4';
+                warning.style = 'background: #fef2f2; border: 1.5px solid #fee2e2; color: #b91c1c; padding: 12px; border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 8px;';
+                warning.innerHTML = '<span>⚠️</span> Esta notificación ya fue devuelta físicamente. No se pueden registrar más visitas.';
+                summary.prepend(warning);
+            }
+            // Disable all inputs in the form
+            const inputs = form?.querySelectorAll('input, select, textarea, button:not(#modal-close):not(#btn-cancel-diligencia)');
+            inputs?.forEach(input => input.disabled = true);
+        } else {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '💾 Guardar Resultado';
+            }
+            warningEl?.remove();
+            // Re-enable inputs
+            const inputs = form?.querySelectorAll('input, select, textarea, button');
+            inputs?.forEach(input => {
+                if (!input.classList.contains('reorder-btn-mini')) {
+                    input.disabled = false;
+                }
+            });
         }
 
         // Show modal
@@ -1258,6 +1297,7 @@ const ujier = {
                         <div class="historial-footer">
                             <span class="resultado-badge resultado-${status}">${(visit.resultado || 'PENDIENTE').replace(/_/g, ' ').toUpperCase()}</span>
                             ${visit.zona ? `<span class="historial-zona">${visit.zona}</span>` : ''}
+                            ${visit.devuelta_por_ujier ? '<span class="badge-returned-mini" style="background:#f0fdf4; color:#166534; font-size:0.65rem; padding:1px 5px; border-radius:3px; margin-left:5px;">📦 RENDIDA</span>' : ''}
                         </div>
                     </div>
                     <div class="assignment-arrow">›</div>

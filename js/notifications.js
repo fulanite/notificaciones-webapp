@@ -272,7 +272,14 @@ const notifications = {
             status = 'entregado';
         }
 
-        return utils.getStatusBadge(status);
+        let badge = utils.getStatusBadge(status);
+
+        // Add return icon if handled
+        if (notif.devuelta_por_ujier == 1) {
+            badge = `<div style="display:flex; align-items:center; gap:4px;">${badge}<span title="Devuelta físicamente" style="font-size: 1rem;">📦</span></div>`;
+        }
+
+        return badge;
     },
 
     // Update pagination
@@ -460,7 +467,15 @@ const notifications = {
                                         </tr>
                                         <tr>
                                             <th>Costo</th>
-                                            <td class="val-money">${utils.formatCurrency(data.costo)}</td>
+                                             <td class="val-money">${utils.formatCurrency(data.costo)}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Estado Físico</th>
+                                            <td>
+                                                ${data.devuelta_por_ujier ?
+                '<span class="badge-mini status-success">✅ DEVUELTA AL DEPTO.</span>' :
+                '<span class="badge-mini status-warning">⏳ EN PODER DEL UJIER</span>'}
+                                            </td>
                                         </tr>
                                         ${data.destinatario_especial ? `
                                             <tr>
@@ -504,9 +519,10 @@ const notifications = {
                     <!-- Enhanced Footer -->
                     <div class="modal-footer-v2">
                         <div class="footer-info-strip">
-                            <span class="info-tag delivery-tag" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);">📅 Entrega: ${data.fecha_entrega_ujier ? utils.formatDate(data.fecha_entrega_ujier) : 'Pendiente'}</span>
-                            <span class="info-tag carga-tag">� Carga: ${utils.formatDateTime(data.fecha_carga)}</span>
+                             <span class="info-tag delivery-tag" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);">📅 Entrega: ${data.fecha_entrega_ujier ? utils.formatDate(data.fecha_entrega_ujier) : 'Pendiente'}</span>
+                            <span class="info-tag carga-tag">🕒 Carga: ${utils.formatDateTime(data.fecha_carga)}</span>
                             <span class="info-tag user-tag">👤 Por: <strong>${data.usuario_carga || '-'}</strong></span>
+                            ${data.devuelta_por_ujier ? `<span class="info-tag return-tag" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">📦 Rendida: ${utils.formatDate(data.fecha_devolucion)}</span>` : ''}
                             ${data.migrated_from_glide ? '<span class="badge-migrated-v2">📦 REGISTRO MIGRADO</span>' : ''}
                         </div>
                         <div class="footer-main-actions">
