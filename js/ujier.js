@@ -1130,76 +1130,8 @@ const ujier = {
         this.capturedPhoto = null;
     },
 
-    // Start audio recording
-    async startAudioRecording() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Audio recording functions removed
 
-            this.mediaRecorder = new MediaRecorder(stream);
-            this.audioChunks = [];
-
-            this.mediaRecorder.ondataavailable = (e) => {
-                this.audioChunks.push(e.data);
-            };
-
-            this.mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-                this.capturedAudio = audioBlob;
-
-                const audioEl = document.getElementById('audio-playback');
-                audioEl.src = URL.createObjectURL(audioBlob);
-                audioEl?.classList.remove('hidden');
-
-                document.getElementById('audio-recording')?.classList.add('hidden');
-
-                // Show transcription field for manual entry/keyboard dictation
-                const transcriptionField = document.getElementById('transcripcion-audio');
-                if (transcriptionField) {
-                    transcriptionField.classList.remove('hidden');
-                    transcriptionField.placeholder = 'Escribí o dictá el contenido del audio aquí...';
-                    transcriptionField.focus();
-                }
-
-                // Stop all tracks
-                stream.getTracks().forEach(track => track.stop());
-            };
-
-            this.mediaRecorder.start();
-
-            // UI Updates
-            document.getElementById('btn-record-audio')?.classList.add('hidden');
-            document.getElementById('audio-recording')?.classList.remove('hidden');
-
-            // Hide previous playback if any
-            document.getElementById('audio-playback')?.classList.add('hidden');
-
-            // Ensure text area is hidden during recording to avoid confusion/conflict
-            // document.getElementById('transcripcion-audio')?.classList.add('hidden'); 
-
-            utils.showToast('Grabando audio...', 'info');
-
-            // Auto stop after max duration
-            setTimeout(() => {
-                if (this.mediaRecorder?.state === 'recording') {
-                    this.stopAudioRecording();
-                }
-            }, CONFIG.AUDIO_MAX_DURATION);
-
-        } catch (error) {
-            console.error('Mic Error:', error);
-            utils.showToast('Error al acceder al micrófono. Verificá los permisos.', 'error');
-        }
-    },
-
-    // Old SpeechRecognition removed as per user request to use native keyboard dictation instead.
-
-    // Stop audio recording
-    stopAudioRecording() {
-        if (this.mediaRecorder?.state === 'recording') {
-            this.mediaRecorder.stop();
-        }
-        document.getElementById('btn-record-audio')?.classList.remove('hidden');
-    },
 
     // Submit diligencia
     async submitDiligencia(event) {
@@ -1243,7 +1175,7 @@ const ujier = {
             // Prepare result data
             const commonData = {
                 observaciones: document.getElementById('observaciones-resultado').value,
-                transcripcion_audio: document.getElementById('transcripcion-audio').value,
+                // audio removed
             };
 
             let resultData = { ...commonData };
@@ -1275,15 +1207,7 @@ const ujier = {
                     }
                 }
 
-                if (this.capturedAudio) {
-                    console.log('🎤 Subiendo audio...');
-                    const { url, error: audioErr } = await db.uploadAudio(this.capturedAudio, this.currentAssignment.id);
-                    if (audioErr) {
-                        console.error('Error al subir audio:', audioErr);
-                    } else {
-                        resultData.observacion_audio = url;
-                    }
-                }
+                // Audio upload removed
             }
 
             // Save result

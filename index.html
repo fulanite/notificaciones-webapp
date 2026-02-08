@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="css/animations.css?v=40.0">
 
     <style>
-        /* Hotfix for modal actions wrapping on small screens */
+        /* Hotfix foVerify modal structure for audio removal.l screens */
         .modal-actions {
             flex-wrap: wrap !important;
             gap: 10px !important;
@@ -1432,32 +1432,10 @@
                             </div>
 
                             <div class="form-section">
-                                <h4 class="section-subtitle">🎤 Observación por Audio</h4>
-                                <div class="audio-container">
-                                    <button type="button" class="btn btn-audio" id="btn-record-audio">
-                                        <span class="audio-icon">🎤</span>
-                                        <span class="audio-text">Grabar Audio</span>
-                                    </button>
-                                    <div id="audio-recording" class="audio-recording hidden">
-                                        <div class="recording-indicator">
-                                            <span class="pulse-dot"></span>
-                                            <span>Grabando...</span>
-                                        </div>
-                                        <button type="button" class="btn btn-stop" id="btn-stop-audio">⏹️
-                                            Detener</button>
-                                    </div>
-                                    <audio id="audio-playback" class="audio-playback hidden" controls></audio>
-                                </div>
-                                <textarea id="transcripcion-audio" class="form-textarea hidden" rows="2"
-                                    placeholder="Transcripción automática..."></textarea>
-                            </div>
-
-                            <div class="form-section">
                                 <div class="form-group">
-                                    <label for="observaciones-resultado" class="form-label">Observaciones
-                                        Adicionales</label>
-                                    <textarea id="observaciones-resultado" class="form-textarea" rows="3"
-                                        placeholder="Notas adicionales sobre la diligencia..."></textarea>
+                                    <label for="observaciones-resultado" class="form-label">Observaciones</label>
+                                    <textarea id="observaciones-resultado" class="form-textarea" rows="4"
+                                        placeholder="Ingresá detalles, observaciones o dictá con el micrófono del teclado..."></textarea>
                                 </div>
                             </div>
 
