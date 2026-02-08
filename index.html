@@ -214,6 +214,12 @@
                                     <span class="nav-text">Reportes</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="planillas">
+                                    <span class="nav-icon">📝</span>
+                                    <span class="nav-text">Planilla Diaria</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
@@ -897,6 +903,61 @@
                         </div>
                     </section>
 
+                    <!-- Planillas View -->
+                    <section id="view-planillas" class="view">
+                        <div class="list-header">
+                            <div class="filter-bar">
+                                <select id="planilla-zona" class="filter-select">
+                                    <option value="">Seleccionar Zona...</option>
+                                    <optgroup label="Zona A">
+                                        <option value="A1">Zona A1</option>
+                                        <option value="A2">Zona A2</option>
+                                    </optgroup>
+                                    <optgroup label="Zona B">
+                                        <option value="B1">Zona B1</option>
+                                        <option value="B2">Zona B2</option>
+                                    </optgroup>
+                                    <optgroup label="Zona C">
+                                        <option value="C1">Zona C1</option>
+                                        <option value="C2">Zona C2</option>
+                                    </optgroup>
+                                    <optgroup label="Zona D">
+                                        <option value="D1">Zona D1</option>
+                                        <option value="D2">Zona D2</option>
+                                    </optgroup>
+                                </select>
+                                <select id="planilla-ujier" class="filter-select">
+                                    <option value="">Todos los Ujieres</option>
+                                </select>
+                                <input type="date" id="planilla-fecha" class="filter-input">
+                                <button id="btn-generar-planilla" class="btn btn-primary">
+                                    <span>🖨️</span> Generar PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="notifications-table-container">
+                            <table class="notifications-table" id="tabla-planillas-preview">
+                                <thead>
+                                    <tr>
+                                        <th>N°</th>
+                                        <th>Expediente</th>
+                                        <th>Carátula</th>
+                                        <th>Origen</th>
+                                        <th>Tipo</th>
+                                        <th>Destinatario</th>
+                                        <th>Domicilio</th>
+                                        <th>Troquel</th>
+                                        <th>Ujier</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Preview content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
                     <!-- Asignaciones View (Reassignment focus) -->
                     <section id="view-asignaciones" class="view">
                         <!-- Ujieres Premium Grid -->
@@ -1289,6 +1350,7 @@
     <script src="js/asignaciones.js?v=40.0"></script>
     <script src="js/usuarios.js?v=40.0"></script>
     <script src="js/devoluciones.js?v=40.0"></script>
+    <script src="js/planillas.js?v=40.0"></script>
     <script src="js/app.js?v=40.0"></script>
 
     <!-- Service Worker Registration -->
