@@ -597,9 +597,22 @@ const ujier = {
 
         // BLOCKING LOGIC: If already returned, disable form
         const isReturned = assignment.devuelta_por_ujier == 1;
+        const isCompleted = !!assignment.resultado_diligencia;
         const form = document.getElementById('form-diligenciar');
         const submitBtn = form?.querySelector('button[type="submit"]');
         const warningEl = document.getElementById('returned-warning');
+
+        // Reset mode
+        this.isUpdateMode = false;
+        if (warningEl) warningEl.remove();
+
+        // Re-enable inputs first
+        const inputs = form?.querySelectorAll('input, select, textarea, button');
+        inputs?.forEach(input => {
+            if (!input.classList.contains('reorder-btn-mini')) {
+                input.disabled = false;
+            }
+        });
 
         if (isReturned) {
             if (submitBtn) {
@@ -615,21 +628,66 @@ const ujier = {
                 summary.prepend(warning);
             }
             // Disable all inputs in the form
-            const inputs = form?.querySelectorAll('input, select, textarea, button:not(#modal-close):not(#btn-cancel-diligencia)');
             inputs?.forEach(input => input.disabled = true);
+        } else if (isCompleted) {
+            // EDIT MODE
+            this.isUpdateMode = true;
+
+            if (submitBtn) {
+                submitBtn.innerHTML = '📝 Actualizar Datos (Foto/Obs)';
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-warning');
+            }
+
+            // Pre-fill data
+            if (resultSelect) {
+                resultSelect.value = assignment.resultado_diligencia;
+                resultSelect.disabled = true; // No cambiar resultado principal
+            }
+
+            // Fill observations
+            const obsField = document.getElementById('observaciones-resultado');
+            if (obsField) obsField.value = assignment.observaciones_resultado || '';
+
+            // Fill transcription
+            const transField = document.getElementById('transcripcion-audio');
+            if (transField) {
+                transField.value = assignment.transcripcion_audio || '';
+                transField.classList.remove('hidden');
+            }
+
+            // Hide/Disable GPS and Troquel as they are part of the core result
+            document.getElementById('gps-wrapper')?.classList.add('hidden');
+            document.querySelector('.troquel-selection')?.parentElement.classList.add('hidden');
+            document.getElementById('carga-diferida')?.parentElement.parentElement.classList.add('hidden'); // Hide toggle
+
+            // Show existing photo if any (optional, or just allow adding new)
+            if (assignment.evidencia_foto) {
+                const previewImg = document.getElementById('preview-img');
+                const previewContainer = document.getElementById('photo-preview');
+                if (previewImg && previewContainer) {
+                    previewImg.src = assignment.evidencia_foto;
+                    previewContainer.classList.remove('hidden');
+                }
+            }
+
+            // Add info alert
+            const info = document.createElement('div');
+            info.id = 'returned-warning'; // reuse ID for simplified toggle logic
+            info.style = 'background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.9rem;';
+            info.innerHTML = '<strong>Modo Edición:</strong> Podés corregir observaciones, transcripción y foto. El resultado y ubicación no se modificarán.';
+            summary.prepend(info);
+
         } else {
+            // NORMAL MODE
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '💾 Guardar Resultado';
+                submitBtn.classList.add('btn-primary');
+                submitBtn.classList.remove('btn-warning');
             }
-            warningEl?.remove();
-            // Re-enable inputs
-            const inputs = form?.querySelectorAll('input, select, textarea, button');
-            inputs?.forEach(input => {
-                if (!input.classList.contains('reorder-btn-mini')) {
-                    input.disabled = false;
-                }
-            });
+            document.querySelector('.troquel-selection')?.parentElement.classList.remove('hidden');
+            document.getElementById('carga-diferida')?.parentElement.parentElement.classList.remove('hidden');
         }
 
         // Show modal
@@ -1181,6 +1239,7 @@ const ujier = {
             this.mediaRecorder.stop();
         }
         document.getElementById('btn-record-audio')?.classList.remove('hidden');
+        document.getElementById('transcripcion-audio')?.classList.remove('hidden');
     },
 
     // Submit diligencia
@@ -1197,58 +1256,69 @@ const ujier = {
         const motivoFalla = document.getElementById('motivo-falla').value;
 
         // Validations
-        if (!resultado) {
-            utils.showToast('Selecciona un resultado', 'warning');
-            return;
-        }
+        if (!this.isUpdateMode) {
+            if (!resultado) {
+                utils.showToast('Selecciona un resultado', 'warning');
+                return;
+            }
 
-        if (!esCargaDiferida) {
-            const lat = document.getElementById('ubicacion-lat').value;
-            const lng = document.getElementById('ubicacion-lng').value;
+            if (!esCargaDiferida) {
+                const lat = document.getElementById('ubicacion-lat').value;
+                const lng = document.getElementById('ubicacion-lng').value;
 
-            if (!lat || !lng) {
-                // Double check if deferred is checked again just in case
-                if (!document.getElementById('carga-diferida').checked) {
-                    utils.showToast('La ubicación GPS es obligatoria para guardar', 'warning');
-                    return;
+                if (!lat || !lng) {
+                    // Double check if deferred is checked again just in case
+                    if (!document.getElementById('carga-diferida').checked) {
+                        utils.showToast('La ubicación GPS es obligatoria para guardar', 'warning');
+                        return;
+                    }
                 }
             }
         }
 
         // Show loading state
         btnSubmit.disabled = true;
-        btnSubmit.innerHTML = '<div class="btn-spinner"></div> Guardando...';
+        btnSubmit.innerHTML = '<div class="btn-spinner"></div> ' + (this.isUpdateMode ? 'Actualizando...' : 'Guardando...');
 
         try {
-            // Include Troquel Data
-            const tipoTroquel = document.getElementById('tipo-troquel-diligencia')?.value;
-            const nTroquel = document.getElementById('n-troquel-diligencia')?.value;
-
             // Prepare result data
-            const resultData = {
-                resultado,
-                ubicacion_lat: esCargaDiferida ? null : (document.getElementById('ubicacion-lat').value || null),
-                ubicacion_lng: esCargaDiferida ? null : (document.getElementById('ubicacion-lng').value || null),
-                es_carga_diferida: esCargaDiferida,
-                motivo_falla_senal: motivoFalla || null,
+            const commonData = {
                 observaciones: document.getElementById('observaciones-resultado').value,
                 transcripcion_audio: document.getElementById('transcripcion-audio').value,
-                tipo_troquel: tipoTroquel || null,
-                n_troquel: nTroquel || null
             };
 
-            console.log('📦 Preparando diligencia:', resultData);
+            let resultData = { ...commonData };
+
+            if (!this.isUpdateMode) {
+                // Include all fields for new registration
+                const tipoTroquel = document.getElementById('tipo-troquel-diligencia')?.value;
+                const nTroquel = document.getElementById('n-troquel-diligencia')?.value;
+
+                Object.assign(resultData, {
+                    resultado,
+                    ubicacion_lat: esCargaDiferida ? null : (document.getElementById('ubicacion-lat').value || null),
+                    ubicacion_lng: esCargaDiferida ? null : (document.getElementById('ubicacion-lng').value || null),
+                    es_carga_diferida: esCargaDiferida,
+                    motivo_falla_senal: motivoFalla || null,
+                    tipo_troquel: tipoTroquel || null,
+                    n_troquel: nTroquel || null
+                });
+            }
+
+            console.log(this.isUpdateMode ? '📦 Actualizando diligencia:' : '📦 Preparando diligencia:', resultData);
 
             // Upload files if online
             if (utils.isOnline()) {
                 if (this.capturedPhoto) {
                     console.log('📸 Subiendo foto...');
+                    // Note: uploadPhoto usually takes File/Blob.
                     const { url, error: photoErr } = await db.uploadPhoto(this.capturedPhoto, this.currentAssignment.id);
                     if (photoErr) {
                         console.error('Error al subir foto:', photoErr);
-                        utils.showToast('Error al subir la foto, se guardará sin imagen', 'warning');
+                        utils.showToast('Error al subir la foto', 'warning');
+                    } else {
+                        resultData.evidencia_foto = url;
                     }
-                    resultData.evidencia_foto = url;
                 }
 
                 if (this.capturedAudio) {
@@ -1256,38 +1326,64 @@ const ujier = {
                     const { url, error: audioErr } = await db.uploadAudio(this.capturedAudio, this.currentAssignment.id);
                     if (audioErr) {
                         console.error('Error al subir audio:', audioErr);
+                    } else {
+                        resultData.observacion_audio = url;
                     }
-                    resultData.observacion_audio = url;
                 }
             }
 
             // Save result
+            let response;
             if (!utils.isOnline()) {
                 console.log('📶 Modo Offline: Guardando en cola local');
-                offline.addToQueue('register_result', {
+                const actionType = this.isUpdateMode ? 'update_result' : 'register_result';
+                offline.addToQueue(actionType, {
                     id: this.currentAssignment.id,
-                    result: resultData,
+                    result: resultData, // For update, this contains updates. For new, full data.
                     userId: auth.currentUser?.id
                 });
                 utils.showToast('Guardado localmente. Se sincronizará cuando haya conexión.', 'warning');
+                response = { data: true }; // Fake success
             } else {
-                console.log('🌐 Guardando en Supabase...');
-                const { error } = await db.registerResult(
-                    this.currentAssignment.id,
-                    resultData,
-                    auth.currentUser?.id
-                );
-
-                if (error) {
-                    throw error;
+                if (this.isUpdateMode) {
+                    response = await db.updateResult(
+                        this.currentAssignment.id,
+                        resultData,
+                        auth.currentUser?.id
+                    );
+                } else {
+                    response = await db.registerResult(
+                        this.currentAssignment.id,
+                        resultData,
+                        auth.currentUser?.id
+                    );
                 }
             }
 
-            utils.showToast('Diligencia registrada exitosamente', 'success');
+            // Handle response
+            if (response.error) {
+                throw new Error(response.error);
+            }
 
-            // Close modal and refresh
+            // Success
+            utils.showToast(this.isUpdateMode ? 'Datos actualizados correctamente' : 'Diligencia guardada correctamente', 'success');
             this.closeDiligencia();
+
+            // Refresh visuals
+            if (this.isUpdateMode) {
+                // Maybe just refresh list if needed?
+                // Update the current assignment object in memory to avoid full reload if possible?
+                // But loadAssignments() is safer.
+            } else {
+                // Remove from 'pending' if it was pending?
+            }
+
             await this.loadAssignments();
+
+            // Also refresh history if open?
+            if (document.getElementById('historial-ujier')?.classList.contains('active')) { // Check if view active?
+                // Doesn't matter, just let user navigate.
+            }
 
         } catch (error) {
             console.error('❌ Error fatal al guardar diligencia:', error);

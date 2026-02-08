@@ -214,6 +214,21 @@ const db = {
             transcripcion_audio: resultData.transcripcion_audio,
             es_carga_diferida: resultData.es_carga_diferida,
             motivo_falla_senal: resultData.motivo_falla_senal,
+            tipo_troquel: resultData.tipo_troquel,
+            n_troquel: resultData.n_troquel,
+            user_id: userId
+        });
+    },
+
+    async updateResult(id, updates, userId) {
+        if (!apiClient) return { data: null, error: null };
+        return apiClient.put('notificaciones.php', {
+            id,
+            action: 'update_result',
+            observaciones: updates.observaciones,
+            transcripcion_audio: updates.transcripcion_audio,
+            evidencia_foto: updates.evidencia_foto,
+            observacion_audio: updates.observacion_audio,
             user_id: userId
         });
     },

@@ -335,6 +335,46 @@ try {
                         ]);
                         break;
 
+                    case 'update_result':
+                        // Update existing result (diligencia) without creating new visit
+                        $stmt = $pdo->prepare("
+                            UPDATE notificaciones SET
+                                observaciones_resultado = ?,
+                                transcripcion_audio = ?,
+                                evidencia_foto = COALESCE(?, evidencia_foto),
+                                observacion_audio = COALESCE(?, observacion_audio),
+                                updated_at = NOW(),
+                                updated_by = ?
+                            WHERE id = ?
+                        ");
+                        $stmt->execute([
+                            $data['observaciones'] ?? null,
+                            $data['transcripcion_audio'] ?? null,
+                            $data['evidencia_foto'] ?? null,
+                            $data['observacion_audio'] ?? null,
+                            $data['user_id'],
+                            $data['id']
+                        ]);
+
+                        // Update the latest visit log for this notification to maintain consistency
+                        $stmtVisita = $pdo->prepare("
+                            UPDATE visitas SET 
+                                observaciones = ?, 
+                                transcripcion_audio = ?,
+                                foto_url = COALESCE(?, foto_url),
+                                audio_url = COALESCE(?, audio_url)
+                            WHERE notificacion_id = ? 
+                            ORDER BY fecha DESC LIMIT 1
+                        ");
+                        $stmtVisita->execute([
+                            $data['observaciones'] ?? null,
+                            $data['transcripcion_audio'] ?? null,
+                            $data['evidencia_foto'] ?? null,
+                            $data['observacion_audio'] ?? null,
+                            $data['id']
+                        ]);
+                        break;
+
                     case 'return':
                         // Mark as returned by ujier
                         $stmt = $pdo->prepare("
