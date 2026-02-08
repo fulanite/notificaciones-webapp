@@ -268,7 +268,7 @@ const planillas = {
                     item.n_troquel || '',
                     item.costo ? `$${item.costo}` : '',
                     pago,
-                    '', // Observaciones
+                    item.observaciones_iniciales || item.observaciones || '', // Observaciones
                     ''  // Devuelta
                 ]);
             });
