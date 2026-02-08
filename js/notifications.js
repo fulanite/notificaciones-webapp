@@ -234,7 +234,7 @@ const notifications = {
             const recipientDisplay = (notif.destinatario_nombre?.trim() || notif.destinatario_especial?.trim() || 'Sin destinatario');
 
             html += `
-                <tr class="stagger-item">
+                <tr class="stagger-item row-hover-effect" style="cursor: pointer;" onclick="notifications.viewDetails('${notif.id}')">
                     <td style="white-space: nowrap; font-size: 0.75rem;">${notif.fecha_entrega_ujier ? utils.formatDate(notif.fecha_entrega_ujier) : '<span style="color:var(--text-muted)">-</span>'}</td>
                     <td title="${notif.origen}">${utils.truncate(notif.origen, 25)}</td>
                     <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 30)}</td>
@@ -246,16 +246,6 @@ const notifications = {
                     <td style="font-family: monospace; font-size: 0.75rem;">${notif.n_troquel || '-'}</td>
                     <td>${this.getEnhancedStatusBadge(notif)}</td>
                     <td style="font-size: 0.75rem;">${notif.ujier_nombre ? notif.ujier_nombre.split(' ')[0] : '-'}</td>
-                    <td>
-                        <div class="table-actions">
-                            <button class="action-btn" title="Ver detalles" onclick="notifications.viewDetails('${notif.id}')">
-                                👁️
-                            </button>
-                            <button class="action-btn" title="Editar" onclick="notifications.edit('${notif.id}')">
-                                ✏️
-                            </button>
-                        </div>
-                    </td>
                 </tr>
             `;
         });

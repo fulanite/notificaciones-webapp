@@ -775,11 +775,40 @@
     color: #6b7280;
 }
 
+/* Compact Table Layout */
+.notifications-table th,
+.notifications-table td {
+    padding: 6px 8px;
+    /* Reduced from var(--space-2) var(--space-3) */
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
+    /* Prevent wrapping to save vertical space too */
+}
+
+.notifications-table th {
+    font-size: 0.7rem;
+    /* Smaller headers */
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.notifications-table td {
+    font-size: 0.8rem;
+    /* Smaller content */
+}
+
 .cell-truncate {
-    max-width: 200px;
+    max-width: 140px;
+    /* Reduced from 200px */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: block;
+    /* Ensure width is respected */
 }
 
 .cell-recipient {
