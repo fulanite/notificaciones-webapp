@@ -292,110 +292,259 @@
 @media (min-width: 1025px) {
     .sidebar {
         position: fixed;
-        /* Fixed sidebar */
         top: 0;
         left: 0;
         bottom: 0;
-        width: 220px;
-        /* Fixed width */
+        width: 72px;
+        /* Collapsed width */
         height: 100vh;
         display: flex;
         flex-direction: column;
-        /* Vertical layout */
-        align-items: stretch;
+        align-items: center;
+        /* Center items in collapsed mode */
         padding: 0;
         background: var(--bg-card);
         border-right: 1px solid rgba(0, 0, 0, 0.06);
         border-bottom: none;
         z-index: 1000;
+        overflow-x: hidden;
         overflow-y: auto;
-        /* Scrollable */
-        box-shadow: var(--shadow-lg);
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-sm);
     }
 
+    .sidebar:hover {
+        width: 260px;
+        /* Expanded width */
+        align-items: stretch;
+        /* Stretch items in expanded mode */
+        box-shadow: var(--shadow-2xl);
+    }
+
+    /* === Header === */
     .sidebar-header {
-        padding: var(--space-6) var(--space-4);
+        width: 100%;
+        padding: var(--space-4);
         margin-right: 0;
         border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        display: flex;
+        justify-content: center;
+        /* Center logo initially */
+        align-items: center;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .sidebar:hover .sidebar-header {
+        justify-content: flex-start;
+        /* Align left on hover */
+        padding-left: var(--space-6);
+    }
+
+    .sidebar-logo .logo-text {
+        opacity: 0;
+        width: 0;
+        transition: opacity 0.2s;
+        margin-left: 0;
+    }
+
+    .sidebar:hover .sidebar-logo .logo-text {
+        opacity: 1;
+        width: auto;
+        margin-left: var(--space-3);
     }
 
     .sidebar-toggle {
         display: none;
     }
 
+    /* === User Profile === */
     .sidebar-user {
-        margin: var(--space-4);
-        padding: var(--space-3);
-        border-right: none;
-        background: rgba(0, 0, 0, 0.02);
+        margin: var(--space-2) var(--space-2);
+        padding: var(--space-2);
+        background: transparent;
         border-radius: var(--radius-lg);
+        justify-content: center;
+        border-right: none;
+        transition: all 0.2s;
+        overflow: hidden;
+        white-space: nowrap;
     }
 
+    .sidebar:hover .sidebar-user {
+        margin: var(--space-4);
+        padding: var(--space-3);
+        background: rgba(0, 0, 0, 0.02);
+        justify-content: flex-start;
+    }
+
+    .user-info {
+        opacity: 0;
+        width: 0;
+        display: none;
+        /* Hide fully to avoid layout issues */
+    }
+
+    .sidebar:hover .user-info {
+        display: flex;
+        opacity: 1;
+        width: auto;
+        margin-left: var(--space-3);
+        animation: fadeIn 0.3s forwards;
+    }
+
+    /* === Navigation === */
     .sidebar-nav {
         flex: 1;
+        width: 100%;
         display: flex;
         flex-direction: column;
-        /* Vertical nav items */
         gap: var(--space-1);
-        padding: 0 var(--space-3);
-        overflow-x: hidden;
-        overflow-y: visible;
+        padding: var(--space-2) 0;
+    }
+
+    .sidebar:hover .sidebar-nav {
+        padding: var(--space-2) var(--space-3);
     }
 
     .nav-section {
         display: flex;
         flex-direction: column;
-        /* Vertical sections */
+        margin-bottom: var(--space-2);
+        width: 100%;
+        align-items: center;
+    }
+
+    .sidebar:hover .nav-section {
+        align-items: stretch;
         margin-bottom: var(--space-4);
     }
 
     .nav-section-title {
-        display: block;
-        /* Show titles in sidebar */
+        display: none;
+        /* Hide titles when collapsed */
         padding: var(--space-4) var(--space-3) var(--space-2);
         font-size: 0.75rem;
         font-weight: 700;
         color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+
+    .sidebar:hover .nav-section-title {
+        display: block;
+        animation: fadeIn 0.3s forwards;
     }
 
     .nav-list {
         display: flex;
         flex-direction: column;
         gap: var(--space-1);
+        width: 100%;
+        align-items: center;
     }
 
-    /* Estilos normales para nav-links en desktop vertical */
+    .sidebar:hover .nav-list {
+        align-items: stretch;
+    }
+
     .nav-link {
+        padding: var(--space-3);
+        justify-content: center;
+        width: 90%;
+        /* Center nicely */
+        border-radius: var(--radius-lg);
+    }
+
+    .sidebar:hover .nav-link {
         padding: var(--space-3) var(--space-4);
-        gap: var(--space-3);
+        justify-content: flex-start;
         width: 100%;
+        gap: var(--space-3);
     }
 
     .nav-icon {
-        font-size: 1.1rem;
+        font-size: 1.25rem;
+        min-width: 24px;
+        /* Ensure icon stability */
+        text-align: center;
     }
 
     .nav-text {
+        display: none;
         font-size: 0.9rem;
+        white-space: nowrap;
     }
 
+    .sidebar:hover .nav-text {
+        display: block;
+        animation: fadeIn 0.2s forwards;
+    }
+
+    /* Nav Badge logic for collapsed/expanded */
+    .nav-badge {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 16px;
+        height: 16px;
+        font-size: 0.6rem;
+        padding: 0;
+    }
+
+    .sidebar:hover .nav-badge {
+        position: static;
+        /* Flow naturally in expanded */
+        width: auto;
+        height: 20px;
+        padding: 0 6px;
+        font-size: 0.75rem;
+        margin-left: auto;
+    }
+
+    /* Ensure relative positioning for badge in collapsed mode */
+    .nav-link {
+        position: relative;
+    }
+
+    /* === Footer === */
     .sidebar-footer {
+        width: 100%;
         margin-top: auto;
         padding: var(--space-4);
         border-top: 1px solid rgba(0, 0, 0, 0.03);
+        display: flex;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .sidebar:hover .sidebar-footer {
+        justify-content: flex-start;
     }
 
     .btn-logout {
         display: flex;
         align-items: center;
-        gap: var(--space-3);
-        padding: var(--space-3) var(--space-4);
+        justify-content: center;
+        padding: var(--space-3);
         width: 100%;
-        justify-content: flex-start;
         color: var(--text-muted);
         font-size: 0.9rem;
+    }
+
+    .sidebar:hover .btn-logout {
+        justify-content: flex-start;
+        padding: var(--space-3) var(--space-4);
+        gap: var(--space-3);
+    }
+
+    .btn-logout span:last-child {
+        display: none;
+    }
+
+    .sidebar:hover .btn-logout span:last-child {
+        display: inline;
     }
 
     .btn-logout:hover {
@@ -483,14 +632,18 @@
     z-index: 400;
 }
 
-/* === Main Content Adjustments for Desktop Sidebar === */
+/* === Main Content Adjustments for Hover Sidebar === */
 @media (min-width: 1025px) {
     .main-content {
-        margin-left: 220px;
-        /* Push content */
-        width: calc(100% - 220px);
+        margin-left: 72px;
+        /* Default collapsed width */
+        width: calc(100% - 72px);
         min-height: 100vh;
+        transition: margin-left 0.3s ease, width 0.3s ease;
     }
+
+    /* Note: We DO NOT expand margin-left on hover, 
+       because the sidebar floats OVER the content to prevent layout shifts */
 
     .top-header {
         position: sticky;
@@ -498,8 +651,8 @@
         right: 0;
         width: 100%;
         padding: var(--space-3) var(--space-6);
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(8px);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         z-index: 900;
     }
