@@ -50,7 +50,8 @@ try {
                 Database::sendResponse($stmt->fetchAll());
             } elseif (isset($_GET['view']) && $_GET['view'] === 'references') {
                 // Get all "public" visits (excluding special recipients) for logistic references
-                $searchTerm = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : null;
+                $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+                $searchTerm = $search !== '' ? '%' . $search . '%' : null;
 
                 $sql = "
                     SELECT v.*, 
@@ -68,14 +69,14 @@ try {
                 ";
 
                 if ($searchTerm) {
-                    $sql .= " AND (n.domicilio LIKE ? OR n.destinatario_nombre LIKE ? OR n.n_expediente LIKE ?)";
+                    $sql .= " AND (n.domicilio LIKE :q OR n.destinatario_nombre LIKE :q OR n.n_expediente LIKE :q)";
                 }
 
                 $sql .= " ORDER BY v.fecha DESC LIMIT 2000";
 
                 $stmt = $pdo->prepare($sql);
                 if ($searchTerm) {
-                    $stmt->execute([$searchTerm, $searchTerm, $searchTerm]);
+                    $stmt->execute([':q' => $searchTerm]);
                 } else {
                     $stmt->execute();
                 }

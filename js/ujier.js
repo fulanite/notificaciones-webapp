@@ -1331,15 +1331,18 @@ const ujier = {
         const btnSearch = document.getElementById('btn-search-references');
         const inputSearch = document.getElementById('search-references');
 
-        if (btnSearch && !btnSearch.onclick) {
+        if (btnSearch) {
             btnSearch.onclick = () => this.loadReferences();
         }
 
-        if (inputSearch && !inputSearch.onkeyup) {
+        if (inputSearch) {
             inputSearch.onkeyup = (e) => {
                 if (e.key === 'Enter') this.loadReferences();
             };
         }
+
+        // Carga inicial (ver todo)
+        this.loadReferences();
     },
 
     // Load references from API

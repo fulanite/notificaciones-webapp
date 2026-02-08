@@ -778,7 +778,7 @@ const app = {
                         ? ujier.loadHistory()
                         : Promise.resolve();
                     break;
-                case 'referencias-ujier':
+                case 'referencias-gral':
                     loadPromise = typeof ujier !== 'undefined' && ujier.initReferences
                         ? ujier.initReferences()
                         : Promise.resolve();
