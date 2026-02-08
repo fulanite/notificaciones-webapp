@@ -105,12 +105,16 @@ const reports = {
             dateInput.value = new Date().toISOString().split('T')[0];
         }
 
-        const monthSelect = document.getElementById('report-month');
-        if (monthSelect) {
+        const monthSelect = document.getElementById('report-select-month');
+        const yearSelect = document.getElementById('report-select-year');
+
+        if (monthSelect && yearSelect) {
             const today = new Date();
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
-            monthSelect.value = `${yyyy}-${mm}`; // Expecting input type="month"
+
+            monthSelect.value = mm;
+            yearSelect.value = yyyy.toString();
         }
     },
 
@@ -176,20 +180,20 @@ const reports = {
 
     // Generate monthly report (PDF)
     async generateMonthlyReport() {
-        const monthInput = document.getElementById('report-month');
-        const yyyy_mm = monthInput?.value; // Expecting YYYY-MM
+        const monthSelect = document.getElementById('report-select-month');
+        const yearSelect = document.getElementById('report-select-year');
 
-        if (!yyyy_mm) {
-            utils.showToast('Seleccione un mes', 'warning');
+        const month = parseInt(monthSelect?.value || '0');
+        const year = parseInt(yearSelect?.value || '0');
+
+        if (!month || !year) {
+            utils.showToast('Seleccione un mes y año válidos', 'warning');
             return;
         }
 
-        utils.showToast('Generando informe mensual...', 'info');
+        const yyyy_mm = `${year}-${String(month).padStart(2, '0')}`;
 
-        // Parse selected month
-        const [yearStr, monthStr] = yyyy_mm.split('-');
-        const year = parseInt(yearStr);
-        const month = parseInt(monthStr);
+        utils.showToast('Generando informe mensual...', 'info');
 
         // Get all notifications for the month
         // We filter by 'fecha_entrega_ujier' as per user requirement "tomas las notificaciones que tienen fecha de entrega de ese mes"
