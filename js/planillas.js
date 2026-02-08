@@ -403,7 +403,7 @@ const planillas = {
                 head: [['Nº', 'Nº expte.', 'Carátula', 'Origen', 'Tipo Not.', 'Letrado', 'Destinatario', 'Domicilio', 'Troquel', 'Costo', 'Medio de pago', 'Observaciones', 'Devuelta']],
                 body: tableBody,
                 styles: {
-                    fontSize: 8,
+                    fontSize: 7.5, // Reducido de 8 para mejor ajuste
                     cellPadding: 2,
                     textColor: [0, 0, 0], // Black text
                     lineColor: [200, 200, 200], // Light gray borders
@@ -419,19 +419,20 @@ const planillas = {
                     lineColor: [0, 0, 0] // Black borders for header
                 },
                 columnStyles: {
-                    0: { cellWidth: 8 },  // Nº
-                    1: { cellWidth: 18 }, // Nº expte
-                    2: { cellWidth: 35 }, // Carátula
-                    3: { cellWidth: 25 }, // Origen
-                    4: { cellWidth: 18 }, // Tipo Not
-                    5: { cellWidth: 22 }, // Letrado
-                    6: { cellWidth: 25 }, // Destinatario
-                    7: { cellWidth: 35 }, // Domicilio
-                    8: { cellWidth: 12 }, // Troquel
-                    9: { cellWidth: 15 }, // Costo
-                    10: { cellWidth: 20 }, // Medio de pago
-                    11: { cellWidth: 25 }, // Observaciones
-                    12: { cellWidth: 15, halign: 'center' } // Devuelta
+                    0: { cellWidth: 7 },   // Nº - reducido de 8
+                    1: { cellWidth: 16 },  // Nº expte - reducido de 18
+                    2: { cellWidth: 32 },  // Carátula - reducido de 35
+                    3: { cellWidth: 23 },  // Origen - reducido de 25
+                    4: { cellWidth: 16 },  // Tipo Not - reducido de 18
+                    5: { cellWidth: 20 },  // Letrado - reducido de 22
+                    6: { cellWidth: 23 },  // Destinatario - reducido de 25
+                    7: { cellWidth: 32 },  // Domicilio - reducido de 35
+                    8: { cellWidth: 11 },  // Troquel - reducido de 12
+                    9: { cellWidth: 13 },  // Costo - reducido de 15
+                    10: { cellWidth: 18 }, // Medio de pago - reducido de 20
+                    11: { cellWidth: 23 }, // Observaciones - reducido de 25
+                    12: { cellWidth: 13, halign: 'center' } // Devuelta - reducido de 15
+                    // Total: 247 unidades (cabe cómodamente en ~265 disponibles)
                 },
                 theme: 'grid', // Grid theme for borders
                 didDrawCell: (data) => {
