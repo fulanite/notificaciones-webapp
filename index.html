@@ -1213,22 +1213,37 @@
         <!-- Barra de navegación inferior (solo móvil) - FUERA del page-dashboard -->
         <nav id="mobile-bottom-nav" class="mobile-bottom-nav"
             style="position:fixed; bottom:0; left:0; right:0; z-index:9999;">
-            <button class="bottom-nav-item active" data-view="mis-asignaciones">
+
+            <!-- Ujier Items -->
+            <button class="bottom-nav-item role-ujier" data-view="mis-asignaciones">
                 <span class="nav-icon">📋</span>
                 <span class="nav-label">Mi Ruta</span>
             </button>
-            <button class="bottom-nav-item" data-view="historial-ujier">
-                <span class="nav-icon">📊</span>
+            <button class="bottom-nav-item role-ujier" data-view="historial-ujier">
+                <span class="nav-icon">📜</span>
                 <span class="nav-label">Historial</span>
             </button>
+
+            <!-- Admin Items -->
+            <button class="bottom-nav-item role-admin" data-view="lista-notificaciones">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Listado</span>
+            </button>
+            <button class="bottom-nav-item role-admin" data-view="asignaciones">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Asignar</span>
+            </button>
+            <button class="bottom-nav-item role-admin" data-view="dashboard-home">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Panel</span>
+            </button>
+
+            <!-- Shared/Common Items -->
             <button class="bottom-nav-item" data-view="referencias-gral">
                 <span class="nav-icon">🔍</span>
                 <span class="nav-label">Explorador</span>
             </button>
-            <button class="bottom-nav-item" data-view="dashboard">
-                <span class="nav-icon">📈</span>
-                <span class="nav-label">Panel</span>
-            </button>
+
             <button class="bottom-nav-item" id="btn-logout-mobile">
                 <span class="nav-icon">🚪</span>
                 <span class="nav-label">Salir</span>

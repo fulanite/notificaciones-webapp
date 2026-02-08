@@ -653,12 +653,31 @@ const app = {
         }
 
         // Show/hide Global Action button (Nueva Notificación)
+        // Show/hide Global Action button (Nueva Notificación)
         const btnNuevaNotif = document.getElementById('btn-open-nueva-notif');
         if (btnNuevaNotif) {
             if (rol === 'admin' || rol === 'administrativo' || rol === 'coordinador') {
                 btnNuevaNotif.classList.remove('hidden');
             } else {
                 btnNuevaNotif.classList.add('hidden');
+            }
+        }
+
+        // --- Mobile Bottom Nav Logic ---
+        const mobileNav = document.getElementById('mobile-bottom-nav');
+        if (mobileNav) {
+            const adminItems = mobileNav.querySelectorAll('.role-admin');
+            const ujierItems = mobileNav.querySelectorAll('.role-ujier');
+
+            // Hide all first
+            adminItems.forEach(el => el.style.display = 'none');
+            ujierItems.forEach(el => el.style.display = 'none');
+
+            if (rol === 'ujier') {
+                ujierItems.forEach(el => el.style.display = 'flex');
+            } else {
+                // Admin, Administrativo, Coordinador, Auditor
+                adminItems.forEach(el => el.style.display = 'flex');
             }
         }
     },
