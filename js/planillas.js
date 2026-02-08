@@ -259,8 +259,19 @@ const planillas = {
         const fecha = document.getElementById('planilla-fecha').value;
         const formattedDate = fecha.split('-').reverse().join('/');
 
-        const ujierSelect = document.getElementById('planilla-ujier');
-        const ujierName = ujierSelect.options[ujierSelect.selectedIndex].text;
+        // Deduce Ujier form data
+        const uniqueUjieres = new Set();
+        data.forEach(item => {
+            const name = item.ujier_nombre || (item.usuarios ? item.usuarios.nombre : null);
+            if (name) uniqueUjieres.add(name);
+        });
+
+        let ujierName = 'Sin asignar';
+        if (uniqueUjieres.size === 1) {
+            ujierName = [...uniqueUjieres][0];
+        } else if (uniqueUjieres.size > 1) {
+            ujierName = 'Varios';
+        }
 
         // --- HEADER ---
         doc.setTextColor(0, 0, 0); // Black
@@ -470,7 +481,8 @@ const planillas = {
         doc.text(`Total: ${data.length}`, 14, finalY + 10);
 
         // Signature line
-        if (ujierSelect.value) { // If a specific Ujier is selected (value is not empty)
+        if (ujierName && ujierName !== 'Sin asignar' && ujierName !== 'Varios') {
+            // If a specific, single Ujier was found in the data
             doc.text(`Firma (${ujierName}): ______________________________`, 14, finalY + 18);
         } else {
             doc.text(`Firma Ujier / Receptor: ______________________________`, 14, finalY + 18);
