@@ -91,7 +91,18 @@ const reports = {
 
     // Setup event listeners
     setupEventListeners() {
-        document.getElementById('btn-report-monthly')?.addEventListener('click', () => this.generateMonthlyReport());
+        const btnMonthly = document.getElementById('btn-report-monthly');
+        console.log('🔍 Reports: Buscando botón btn-report-monthly:', btnMonthly);
+
+        if (btnMonthly) {
+            console.log('✅ Reports: Botón encontrado, agregando listener');
+            btnMonthly.addEventListener('click', () => {
+                console.log('🖱️ Reports: Click detectado en btn-report-monthly');
+                this.generateMonthlyReport();
+            });
+        } else {
+            console.warn('⚠️ Reports: Botón btn-report-monthly NO encontrado en el DOM');
+        }
     },
 
     // Set default dates
@@ -116,12 +127,15 @@ const reports = {
 
     // Generate monthly report (PDF)
     async generateMonthlyReport() {
+        console.log('📊 Reports: Ejecutando generateMonthlyReport()');
 
         const monthSelect = document.getElementById('report-select-month');
         const yearSelect = document.getElementById('report-select-year');
 
         const month = parseInt(monthSelect?.value || '0');
         const year = parseInt(yearSelect?.value || '0');
+
+        console.log('📅 Reports: Mes seleccionado:', month, 'Año:', year);
 
         if (!month || !year) {
             utils.showToast('Seleccione un mes y año válidos', 'warning');
