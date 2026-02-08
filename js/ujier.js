@@ -1484,6 +1484,7 @@ const ujier = {
         // Clear previous layers
         if (this.mapLayer) {
             this.mapInstance.removeLayer(this.mapLayer);
+            this.mapLayer = null;
         }
 
         const { data, error } = await db.getUserLocations(auth.currentUser.id, date);
@@ -1494,43 +1495,110 @@ const ujier = {
             return;
         }
 
+        // Timeline Container
+        let timelineContainer = document.getElementById('ujier-timeline-container');
+        if (!timelineContainer) {
+            timelineContainer = document.createElement('div');
+            timelineContainer.id = 'ujier-timeline-container';
+            timelineContainer.className = 'timeline-container';
+            // Insert after map container
+            const mapContainer = document.getElementById('ujier-map-container');
+            if (mapContainer) mapContainer.parentNode.insertBefore(timelineContainer, mapContainer.nextSibling);
+        }
+        timelineContainer.innerHTML = ''; // Clear previous timeline
+
         if (!data || data.length === 0) {
             utils.showToast('No hay registros de GPS para esta fecha', 'info');
             document.getElementById('map-stat-visits').textContent = '0';
             document.getElementById('map-stat-distance').textContent = '0 km';
+            timelineContainer.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">Sin actividad registrada</p>';
             return;
         }
 
         // Process markers and path
         const markers = L.layerGroup();
         const latlngs = [];
+        let totalDist = 0;
 
-        data.forEach(point => {
+        // Custom Icon Generator
+        const createNumberedIcon = (number, color) => {
+            return L.divIcon({
+                className: 'custom-map-icon',
+                html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${number}</div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+        };
+
+        const getStatusColor = (status) => {
+            if (!status) return '#6c757d'; // Grey default
+            const s = status.toLowerCase().replace(/_/g, ' ').trim();
+            if (['atiende', 'entregado', 'positivo'].includes(s)) return '#10b981'; // Green
+            if (['no atiende', 'domicilio inexistente', 'negativo', 'rechazado'].includes(s)) return '#ef4444'; // Red
+            if (['pre aviso', 'estrados', 'pre_aviso'].includes(s)) return '#f59e0b'; // Orange/Amber
+            if (['diligenciador ausente', 'ausente'].includes(s)) return '#6b7280'; // Grey
+            return '#3b82f6'; // Blue fallback
+        };
+
+        // Timeline HTML Builder
+        let timelineHTML = '<div class="timeline-title">⏱️ Secuencia de Visitas</div><div class="timeline-steps">';
+
+        data.forEach((point, index) => {
             if (point.lat && point.lng) {
                 const coord = [parseFloat(point.lat), parseFloat(point.lng)];
                 latlngs.push(coord);
 
-                const statusColor = point.resultado === 'entregado' || point.resultado === 'atiende' ? 'green' : 'red';
+                const statusColor = getStatusColor(point.resultado);
+                const visitNumber = index + 1;
+
+                // Popup Content
+                const photoHtml = point.foto_url
+                    ? `<div style="margin-top:5px; width:100%; height:120px; background-image:url('${point.foto_url}'); background-size:cover; background-position:center; border-radius:4px; cursor:pointer;" onclick="window.open('${point.foto_url}', '_blank')"></div>`
+                    : '';
 
                 const popupContent = `
-                    <strong>${point.destinatario || 'Desconocido'}</strong><br>
-                    ${point.domicilio}<br>
-                    <small>${utils.formatDateTime(point.fecha)}</small><br>
-                    <em>${(point.resultado || '').replace('_', ' ')}</em>
+                    <div style="min-width:200px;">
+                        <strong>#${visitNumber} ${point.destinatario || 'Desconocido'}</strong><br>
+                        <span style="font-size:0.9em; color:#555;">${point.domicilio}</span><br>
+                        <div style="margin-top:4px; margin-bottom:4px;">
+                            <span style="background:${statusColor}; color:white; padding:2px 6px; border-radius:4px; font-size:0.8em;">${(point.resultado || 'PENDIENTE').toUpperCase()}</span>
+                            <span style="font-size:0.8em; color:#777; margin-left:5px;">${utils.formatTime(point.fecha)}</span>
+                        </div>
+                        ${photoHtml}
+                    </div>
                 `;
 
-                L.circleMarker(coord, {
-                    color: statusColor,
-                    fillColor: statusColor,
-                    fillOpacity: 0.5,
-                    radius: 8
-                }).bindPopup(popupContent).addTo(markers);
+                L.marker(coord, { icon: createNumberedIcon(visitNumber, statusColor) })
+                    .bindPopup(popupContent)
+                    .addTo(markers);
+
+                // Add to Timeline
+                timelineHTML += `
+                    <div class="timeline-step">
+                        <div class="step-marker" style="background:${statusColor};">${visitNumber}</div>
+                        <div class="step-content">
+                            <div class="step-header">
+                                <span class="step-time">${utils.formatTime(point.fecha)}</span>
+                                <span class="step-status" style="color:${statusColor}">${(point.resultado || '-').toUpperCase()}</span>
+                            </div>
+                            <div class="step-address">${point.domicilio}</div>
+                        </div>
+                    </div>
+                `;
             }
         });
 
+        timelineHTML += '</div>';
+        timelineContainer.innerHTML = timelineHTML;
+
         // Add Path (Polyline)
         if (latlngs.length > 1) {
-            L.polyline(latlngs, { color: 'blue', weight: 3, opacity: 0.7, dashArray: '5, 10' }).addTo(markers);
+            L.polyline(latlngs, { color: '#3b82f6', weight: 4, opacity: 0.6 }).addTo(markers);
+
+            // Calculate Total Distance
+            for (let i = 0; i < latlngs.length - 1; i++) {
+                totalDist += this.calculateDistance(latlngs[i][0], latlngs[i][1], latlngs[i + 1][0], latlngs[i + 1][1]);
+            }
         }
 
         // Add to map
@@ -1539,17 +1607,11 @@ const ujier = {
 
         // Fit bounds
         if (latlngs.length > 0) {
-            this.mapInstance.fitBounds(latlngs);
+            this.mapInstance.fitBounds(latlngs, { padding: [50, 50] });
         }
 
         // Update Stats
         document.getElementById('map-stat-visits').textContent = data.length;
-
-        // Simple distance Calc
-        let totalDist = 0;
-        for (let i = 0; i < latlngs.length - 1; i++) {
-            totalDist += this.calculateDistance(latlngs[i][0], latlngs[i][1], latlngs[i + 1][0], latlngs[i + 1][1]);
-        }
         document.getElementById('map-stat-distance').textContent = totalDist.toFixed(2) + ' km';
     },
 

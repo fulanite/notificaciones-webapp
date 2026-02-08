@@ -159,3 +159,125 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Timeline Styles */
+.timeline-container {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.timeline-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timeline-steps {
+    position: relative;
+    padding-left: 10px;
+    /* Ensure line connects steps */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Vertical line connecting steps */
+.timeline-steps::before {
+    content: '';
+    position: absolute;
+    left: 23px;
+    /* Center of the marker (10px padding + 13px radius) */
+    top: 15px;
+    bottom: 30px;
+    width: 2px;
+    background: var(--border-color);
+    z-index: 0;
+}
+
+.timeline-step {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Circle Number Marker */
+.step-marker {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    /* Background color set inline by JS */
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 2px solid var(--bg-card);
+    /* White border to separate from line */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.step-content {
+    background: var(--bg-body);
+    padding: 12px 15px;
+    border-radius: 8px;
+    flex-grow: 1;
+    border: 1px solid var(--border-color);
+}
+
+.step-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    align-items: baseline;
+}
+
+.step-time {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
+.step-status {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+}
+
+.step-address {
+    font-size: 0.95rem;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+/* Map Icon Fixes */
+.custom-map-icon {
+    background: transparent;
+    border: none;
+}
+
+/* Ensure timeline is responsive */
+@media (max-width: 480px) {
+    .timeline-container {
+        padding: 15px;
+    }
+
+    .step-content {
+        padding: 10px;
+    }
+
+    .step-address {
+        font-size: 0.85rem;
+    }
+}

@@ -91,7 +91,7 @@ try {
                 }
 
                 $stmt = $pdo->prepare("
-                    SELECT v.fecha, v.resultado, v.ubicacion_lat as lat, v.ubicacion_lng as lng,
+                    SELECT v.fecha, LOWER(TRIM(v.resultado)) as resultado, v.ubicacion_lat as lat, v.ubicacion_lng as lng, v.foto_url,
                            n.destinatario_nombre as destinatario, n.domicilio
                     FROM visitas v
                     LEFT JOIN notificaciones n ON v.notificacion_id = n.id
