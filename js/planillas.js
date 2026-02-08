@@ -7,6 +7,7 @@ const planillas = {
         this.setupEventListeners();
         this.loadUjieres();
         this.setDefaultDate();
+        this.populateZones();
     },
 
     setupEventListeners() {
@@ -19,10 +20,44 @@ const planillas = {
     },
 
     setDefaultDate() {
+        // Set default date to today
         const dateInput = document.getElementById('planilla-fecha');
         if (dateInput) {
-            dateInput.value = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            // Format to YYYY-MM-DD in local time
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            dateInput.value = `${year}-${month}-${day}`;
         }
+    },
+
+    populateZones() {
+        const select = document.getElementById('planilla-zona');
+        if (!select) return;
+
+        // Define zones structure
+        const zones = {
+            'Zona A': ['A1', 'A2'],
+            'Zona B': ['B1', 'B2'],
+            'Zona C': ['C1', 'C2'],
+            'Zona D': ['D1', 'D2'],
+            'Urgentes': ['Urgente NORTE', 'Urgente SUR'],
+            'Fuera de Radio': ['Fuera de Radio NORTE', 'Fuera de Radio SUR']
+        };
+
+        let html = '<option value="">Todas las Zonas</option>';
+
+        Object.entries(zones).forEach(([group, items]) => {
+            html += `<optgroup label="${group}">`;
+            items.forEach(item => {
+                html += `<option value="${item}">${item}</option>`;
+            });
+            html += `</optgroup>`;
+        });
+
+        select.innerHTML = html;
+        select.addEventListener('change', () => this.updatePreview());
     },
 
     async loadUjieres() {
@@ -32,6 +67,9 @@ const planillas = {
         try {
             const { data: ujieres } = await db.getUsersByRole('ujier');
             if (ujieres && ujieres.length > 0) {
+                // Clear existing options except the first one "Todos los Ujieres"
+                select.innerHTML = '<option value="">Todos los Ujieres</option>';
+
                 const options = ujieres.map(u =>
                     `<option value="${u.id}">${u.nombre}</option>`
                 ).join('');
@@ -71,10 +109,26 @@ const planillas = {
 
         // Client-side filtering if API returns broader dataset
         if (zona) {
-            // Check if zona matches start of string if using optgroups with prefixes
-            // Or exact match. 'item.zona' typically contains "A1 - Cédulas" etc.
-            // If filter is "A1", we should match "A1 - ..."
-            filteredData = filteredData.filter(n => n.zona && n.zona.startsWith(zona));
+            filteredData = filteredData.filter(n => {
+                if (!n.zona) return false;
+                // Normalize and check for containment, handling formatted vs raw values
+                // Example: 'A1' filters 'A1 - Cédulas'
+                const zNorm = n.zona.toLowerCase();
+                const filterNorm = zona.toLowerCase();
+
+                // Urgentes handling
+                if (filterNorm.includes('urgente')) {
+                    return zNorm.includes(filterNorm);
+                }
+
+                // Fuera de radio handling
+                if (filterNorm.includes('fuera de radio')) {
+                    return zNorm.includes(filterNorm);
+                }
+
+                // Standard zones A1, B1 etc.
+                return zNorm.startsWith(filterNorm);
+            });
         }
         if (ujierId) {
             filteredData = filteredData.filter(n => n.ujier_asignado_id == ujierId || (n.usuarios && n.usuarios.id == ujierId));

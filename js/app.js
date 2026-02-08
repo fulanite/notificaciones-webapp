@@ -652,6 +652,7 @@ const app = {
             await dashboard.init();
             await notifications.init();
             await notifications.loadUjieres();
+            planillas.init();
             reports.init();
         }
 
@@ -771,6 +772,11 @@ const app = {
                 case 'devoluciones':
                     loadPromise = typeof devoluciones !== 'undefined' && devoluciones.init
                         ? devoluciones.init()
+                        : Promise.resolve();
+                    break;
+                case 'planillas':
+                    loadPromise = typeof planillas !== 'undefined' && planillas.init
+                        ? Promise.resolve(planillas.init())
                         : Promise.resolve();
                     break;
                 default:
