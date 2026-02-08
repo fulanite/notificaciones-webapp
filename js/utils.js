@@ -331,5 +331,47 @@ const utils = {
             month: 'long',
             year: 'numeric'
         });
+    },
+
+    // Normalize labels for system matching (ignores accents, case, and plural/singular)
+    normalizeLabel(label) {
+        if (!label) return '';
+        return label.toString()
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // Remove all accents
+            .replace(/mandamiento$/g, 'mandamientos') // pluralize common terms
+            .replace(/cedula$/g, 'cedulas')
+            .replace(/especial$/g, 'especiales')
+            .replace(/ ley 22\.?172/g, ' ley 22.172') // standardize law name
+            .replace(/\s+/g, ' '); // remove double spaces
+    },
+
+    // Set a select value by matching its options' text or value normalized
+    setSelectByText(selectId, text) {
+        if (!text) return;
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        const normalizedInput = this.normalizeLabel(text);
+
+        // First try exact value match
+        if (Array.from(select.options).some(opt => opt.value === text)) {
+            select.value = text;
+            return true;
+        }
+
+        // Then try normalized match (against both text and value)
+        const found = Array.from(select.options).find(opt => {
+            return this.normalizeLabel(opt.text) === normalizedInput ||
+                this.normalizeLabel(opt.value) === normalizedInput;
+        });
+
+        if (found) {
+            select.value = found.value;
+            return true;
+        }
+        return false;
     }
 };

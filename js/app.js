@@ -63,6 +63,11 @@ const app = {
 
     // Handle persistent settings for Zona/Ujier
     applyPersistentSettings() {
+        // Skip persistent settings if we are in edit mode
+        if (typeof notifications !== 'undefined' && notifications.editingId) {
+            return;
+        }
+
         const savedZona = localStorage.getItem('sgnd-persist-zona');
         const savedUjier = localStorage.getItem('sgnd-persist-ujier');
         const savedFecha = localStorage.getItem('sgnd-persist-fecha-entrega');
@@ -74,7 +79,8 @@ const app = {
         if (savedZona) {
             if (zonaSelect) zonaSelect.value = savedZona;
             if (persistZona) persistZona.value = savedZona;
-            if (fGroupZona) fGroupZona.classList.add('hidden'); // Hide redundant field
+            // Hide field in form if it's already fixed at top to avoid visual duplication
+            if (fGroupZona) fGroupZona.classList.add('hidden');
         } else {
             if (fGroupZona) fGroupZona.classList.remove('hidden');
         }
@@ -86,7 +92,8 @@ const app = {
         if (savedUjier) {
             if (ujierSelect) ujierSelect.value = savedUjier;
             if (persistUjier) persistUjier.value = savedUjier;
-            if (fGroupAsignar) fGroupAsignar.classList.add('hidden'); // Hide redundant field
+            // Hide field in form if it's already fixed at top to avoid visual duplication
+            if (fGroupAsignar) fGroupAsignar.classList.add('hidden');
         } else {
             if (fGroupAsignar) fGroupAsignar.classList.remove('hidden');
         }
@@ -136,6 +143,9 @@ const app = {
         if (zona !== undefined) localStorage.setItem('sgnd-persist-zona', zona);
         if (ujier !== undefined) localStorage.setItem('sgnd-persist-ujier', ujier);
         if (fecha !== undefined) localStorage.setItem('sgnd-persist-fecha-entrega', fecha);
+
+        // Re-apply to sync UI (like hiding/showing form fields)
+        this.applyPersistentSettings();
     },
 
     // Handle notification type change - show/populate dynamic origin
@@ -542,6 +552,7 @@ const app = {
         // Persistent settings change
         document.getElementById('persist-zona')?.addEventListener('change', () => this.savePersistentSettings());
         document.getElementById('persist-ujier')?.addEventListener('change', () => this.savePersistentSettings());
+        document.getElementById('persist-fecha-entrega')?.addEventListener('change', () => this.savePersistentSettings());
 
         // Close sidebar on mobile when clicking outside
         document.querySelector('.main-content')?.addEventListener('click', () => {

@@ -570,28 +570,30 @@ const notifications = {
             const modalTitle = modal.querySelector('.modal-title');
             if (modalTitle) modalTitle.textContent = '📝 Editar Notificación';
 
-            // Hide persistent settings bar during edit to avoid conflicts
+            // Hide persistent settings bar during edit
             const pBar = document.getElementById('persistent-settings-container');
             if (pBar) pBar.classList.add('hidden-important');
+
+            // Force visibility of form-specific fields during edit (they might be hidden by persistent settings)
+            const fGroupZona = document.getElementById('f-group-zona');
+            const fGroupAsignar = document.getElementById('f-group-asignar');
+            if (fGroupZona) fGroupZona.classList.remove('hidden');
+            if (fGroupAsignar) fGroupAsignar.classList.remove('hidden');
         }
 
         // Wait for DOM to be ready
         setTimeout(() => {
-            // Populate form fields
-            const selectTipo = document.getElementById('tipo-notificacion');
-            let tipoVal = data.tipo_notificacion || '';
+            // Populate form fields with smart normalization
+            const tipoVal = data.tipo_notificacion || '';
+            utils.setSelectByText('tipo-notificacion', tipoVal);
 
-            // Handle labels from migrated notifications
-            if (tipoVal && !Array.from(selectTipo.options).some(opt => opt.value === tipoVal)) {
-                const foundLabel = Array.from(selectTipo.options).find(opt => opt.text === tipoVal);
-                if (foundLabel) tipoVal = foundLabel.value;
-            }
-            selectTipo.value = tipoVal;
+            // Re-fetch standardized value from select (in case it matched by label)
+            const standardizedTipo = document.getElementById('tipo-notificacion').value;
 
             // Trigger tipo change to set up correct origin field
-            if (tipoVal === 'cedulas_mandamientos_22172' ||
-                tipoVal === 'cedulas_correspondencia') {
-                app.handleTipoNotificacionChange(tipoVal);
+            if (standardizedTipo === 'cedulas_mandamientos_22172' ||
+                standardizedTipo === 'cedulas_correspondencia') {
+                app.handleTipoNotificacionChange(standardizedTipo);
                 // Wait a bit for the searchable select to be set up, then populate
                 setTimeout(() => {
                     const input = document.getElementById('origen-dinamico-input');
@@ -602,7 +604,7 @@ const notifications = {
                     }
                 }, 150);
             } else {
-                app.handleTipoNotificacionChange(tipoVal || 'cedulas');
+                app.handleTipoNotificacionChange(standardizedTipo || 'cedulas');
                 const iFixed = document.getElementById('origen-input');
                 const hFixed = document.getElementById('origen');
                 if (iFixed && hFixed) {
@@ -617,7 +619,12 @@ const notifications = {
             document.getElementById('destinatario-especial').value = data.destinatario_especial || '';
             document.getElementById('destinatario-nombre').value = data.destinatario_nombre || '';
             document.getElementById('domicilio').value = data.domicilio || '';
-            document.getElementById('zona').value = data.zona || '';
+
+            // Smart normalization for Zone
+            utils.setSelectByText('zona', data.zona);
+
+            // Populate Assignee (ID match first, then name)
+            utils.setSelectByText('asignado-a', data.asignado_a);
             document.getElementById('tipo-troquel').value = data.tipo_troquel || '';
             document.getElementById('n-troquel').value = data.n_troquel || '';
             document.getElementById('medio-pago').value = data.medio_pago || '';
