@@ -595,34 +595,6 @@ const ujier = {
             resultSelect.value = isSpecial ? 'entregado' : '';
         }
 
-        // --- TROQUEL LOGIC (FIXED) ---
-        const troquelType = assignment.tipo_troquel || (assignment.tipo_notificacion?.toLowerCase().includes('cedula') ? 'C' :
-            (assignment.tipo_notificacion?.toLowerCase().includes('mandamiento') ? 'M' : 'SIN'));
-
-        // Disable radios and set value
-        const radios = document.querySelectorAll('input[name="troquel_opcion"]');
-        radios.forEach(r => {
-            r.checked = (r.value === troquelType);
-            r.disabled = true; // Ujier cannot change type
-        });
-
-        // Update hidden input and toggle number field
-        const hiddenInput = document.getElementById('tipo-troquel-diligencia');
-        if (hiddenInput) hiddenInput.value = troquelType;
-
-        const nTroquelContainer = document.getElementById('n-troquel-container');
-        if (nTroquelContainer) {
-            if (troquelType === 'C' || troquelType === 'M') {
-                nTroquelContainer.classList.remove('hidden');
-                // Pre-fill number if exists
-                if (assignment.n_troquel) {
-                    document.getElementById('n-troquel-diligencia').value = assignment.n_troquel;
-                }
-            } else {
-                nTroquelContainer.classList.add('hidden');
-            }
-        }
-
         // BLOCKING LOGIC: If already returned, disable form
         const isReturned = assignment.devuelta_por_ujier == 1;
         // Pre-aviso NO cuenta como completado final, permite registrar nueva visita
@@ -1241,6 +1213,7 @@ const ujier = {
 
             this.transcriptionText += finalTranscript;
 
+            // Update UI immediately
             const field = document.getElementById('transcripcion-audio');
             if (field) {
                 field.value = this.transcriptionText + interimTranscript;
@@ -1248,7 +1221,7 @@ const ujier = {
         };
 
         this.recognition.onerror = (event) => {
-            console.log('Error en reconocimiento de voz:', event.error);
+            console.warn('Speech Recognition Error:', event.error);
         };
 
         try {
@@ -1330,17 +1303,12 @@ const ujier = {
 
             if (!this.isUpdateMode) {
                 // Include all fields for new registration
-                const tipoTroquel = document.getElementById('tipo-troquel-diligencia')?.value;
-                const nTroquel = document.getElementById('n-troquel-diligencia')?.value;
-
                 Object.assign(resultData, {
                     resultado,
                     ubicacion_lat: esCargaDiferida ? null : (document.getElementById('ubicacion-lat').value || null),
                     ubicacion_lng: esCargaDiferida ? null : (document.getElementById('ubicacion-lng').value || null),
                     es_carga_diferida: esCargaDiferida,
-                    motivo_falla_senal: motivoFalla || null,
-                    tipo_troquel: tipoTroquel || null,
-                    n_troquel: nTroquel || null
+                    motivo_falla_senal: motivoFalla || null
                 });
             }
 

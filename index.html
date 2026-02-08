@@ -35,6 +35,21 @@
     <link rel="stylesheet" href="css/layout.css?v=40.0">
     <link rel="stylesheet" href="css/pages.css?v=40.0">
     <link rel="stylesheet" href="css/animations.css?v=40.0">
+
+    <style>
+        /* Hotfix for modal actions wrapping on small screens */
+        .modal-actions {
+            flex-wrap: wrap !important;
+            gap: 10px !important;
+        }
+
+        @media (max-width: 400px) {
+            .modal-actions button {
+                width: 100% !important;
+                margin: 0 !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -1376,98 +1391,74 @@
                                     <option value="pre_aviso">Pre aviso</option>
                                     <option value="estrados">Estrados</option>
                                     <option value="domicilio_inexistente">Domicilio inexistente</option>
-                                    <option value="diligenciador_ausente">Diligenciador ausente</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h4 class="section-subtitle">🎫 Troquel</h4>
-                            <div class="troquel-selection" style="display:flex; gap:15px; margin-bottom:10px;">
-                                <label class="radio-label">
-                                    <input type="radio" name="troquel_opcion" id="radio-troquel-c" value="C"> C
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="troquel_opcion" id="radio-troquel-m" value="M"> M
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="troquel_opcion" id="radio-troquel-sin" value="SIN"
-                                        checked> SIN
-                                </label>
-                                <input type="hidden" id="tipo-troquel-diligencia" name="tipo_troquel">
                             </div>
 
-                            <div id="n-troquel-container" class="form-group hidden">
-                                <label for="n-troquel-diligencia" class="form-label">N° Troquel *</label>
-                                <input type="number" id="n-troquel-diligencia" class="form-input"
-                                    placeholder="Ej: 123456">
-                            </div>
-                        </div>
-
-                        <div id="gps-wrapper" class="form-section">
-                            <h4 class="section-subtitle">📍 Ubicación GPS</h4>
-                            <div class="gps-container" id="gps-container">
-                                <button type="button" class="btn btn-secondary btn-gps" id="btn-capture-gps">
-                                    <span>📍</span> Capturar Ubicación
-                                </button>
-                                <div class="gps-info hidden" id="gps-info">
-                                    <span class="gps-status">✅ Ubicación capturada</span>
-                                </div>
-                            </div>
-                            <input type="hidden" id="ubicacion-lat">
-                            <input type="hidden" id="ubicacion-lng">
-                        </div>
-
-                        <div class="form-section">
-                            <h4 class="section-subtitle">📷 Fotografía</h4>
-                            <div class="photo-container">
-                                <input type="file" id="evidencia-foto" accept="image/*" class="hidden">
-                                <label for="evidencia-foto" class="photo-upload-btn">
-                                    <span class="upload-icon">📷</span>
-                                    <span class="upload-text">Agregar Foto</span>
-                                </label>
-                                <div id="photo-preview" class="photo-preview hidden">
-                                    <img id="preview-img" src="" alt="Vista previa">
-                                    <button type="button" class="btn-remove-photo" id="btn-remove-photo">×</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h4 class="section-subtitle">🎤 Observación por Audio</h4>
-                            <div class="audio-container">
-                                <button type="button" class="btn btn-audio" id="btn-record-audio">
-                                    <span class="audio-icon">🎤</span>
-                                    <span class="audio-text">Grabar Audio</span>
-                                </button>
-                                <div id="audio-recording" class="audio-recording hidden">
-                                    <div class="recording-indicator">
-                                        <span class="pulse-dot"></span>
-                                        <span>Grabando...</span>
+                            <div id="gps-wrapper" class="form-section">
+                                <h4 class="section-subtitle">📍 Ubicación GPS</h4>
+                                <div class="gps-container" id="gps-container">
+                                    <button type="button" class="btn btn-secondary btn-gps" id="btn-capture-gps">
+                                        <span>📍</span> Capturar Ubicación
+                                    </button>
+                                    <div class="gps-info hidden" id="gps-info">
+                                        <span class="gps-status">✅ Ubicación capturada</span>
                                     </div>
-                                    <button type="button" class="btn btn-stop" id="btn-stop-audio">⏹️ Detener</button>
                                 </div>
-                                <audio id="audio-playback" class="audio-playback hidden" controls></audio>
+                                <input type="hidden" id="ubicacion-lat">
+                                <input type="hidden" id="ubicacion-lng">
                             </div>
-                            <textarea id="transcripcion-audio" class="form-textarea hidden" rows="2"
-                                placeholder="Transcripción automática..."></textarea>
-                        </div>
 
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label for="observaciones-resultado" class="form-label">Observaciones
-                                    Adicionales</label>
-                                <textarea id="observaciones-resultado" class="form-textarea" rows="3"
-                                    placeholder="Notas adicionales sobre la diligencia..."></textarea>
+                            <div class="form-section">
+                                <h4 class="section-subtitle">📷 Fotografía</h4>
+                                <div class="photo-container">
+                                    <input type="file" id="evidencia-foto" accept="image/*" class="hidden">
+                                    <label for="evidencia-foto" class="photo-upload-btn">
+                                        <span class="upload-icon">📷</span>
+                                        <span class="upload-text">Agregar Foto</span>
+                                    </label>
+                                    <div id="photo-preview" class="photo-preview hidden">
+                                        <img id="preview-img" src="" alt="Vista previa">
+                                        <button type="button" class="btn-remove-photo" id="btn-remove-photo">×</button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="modal-actions">
-                            <button type="button" class="btn btn-secondary" id="btn-cancel-diligencia">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">
-                                <span>✅</span> Guardar Resultado
-                            </button>
-                        </div>
+                            <div class="form-section">
+                                <h4 class="section-subtitle">🎤 Observación por Audio</h4>
+                                <div class="audio-container">
+                                    <button type="button" class="btn btn-audio" id="btn-record-audio">
+                                        <span class="audio-icon">🎤</span>
+                                        <span class="audio-text">Grabar Audio</span>
+                                    </button>
+                                    <div id="audio-recording" class="audio-recording hidden">
+                                        <div class="recording-indicator">
+                                            <span class="pulse-dot"></span>
+                                            <span>Grabando...</span>
+                                        </div>
+                                        <button type="button" class="btn btn-stop" id="btn-stop-audio">⏹️
+                                            Detener</button>
+                                    </div>
+                                    <audio id="audio-playback" class="audio-playback hidden" controls></audio>
+                                </div>
+                                <textarea id="transcripcion-audio" class="form-textarea hidden" rows="2"
+                                    placeholder="Transcripción automática..."></textarea>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="form-group">
+                                    <label for="observaciones-resultado" class="form-label">Observaciones
+                                        Adicionales</label>
+                                    <textarea id="observaciones-resultado" class="form-textarea" rows="3"
+                                        placeholder="Notas adicionales sobre la diligencia..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-secondary"
+                                    id="btn-cancel-diligencia">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <span>✅</span> Guardar Resultado
+                                </button>
+                            </div>
                     </form>
                 </div>
             </div>
