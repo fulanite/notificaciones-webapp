@@ -142,6 +142,13 @@ const planillas = {
             filteredData = filteredData.filter(n => n.ujier_asignado_id == ujierId || (n.usuarios && n.usuarios.id == ujierId));
         }
 
+        // Sort by fecha_carga ascending (oldest first)
+        filteredData.sort((a, b) => {
+            const dateA = new Date(a.fecha_carga || 0);
+            const dateB = new Date(b.fecha_carga || 0);
+            return dateA - dateB;
+        });
+
         return filteredData;
     },
 
@@ -173,6 +180,22 @@ const planillas = {
         sortedZones.forEach(zonaName => {
             const items = groupedData[zonaName];
 
+            // Separar items normales de destinos especiales
+            const specialDestinations = ['estrados', 'arcat', 'secretaria', 'juzgado'];
+
+            const normalItems = [];
+            const specialItems = [];
+
+            items.forEach(item => {
+                const isSpecial = item.destinatario_especial ||
+                    (item.destinatario_nombre && specialDestinations.includes(item.destinatario_nombre.toLowerCase()));
+                if (isSpecial) {
+                    specialItems.push(item);
+                } else {
+                    normalItems.push(item);
+                }
+            });
+
             // Add Group Header with Count
             const headerRow = `
                 <tr style="background-color: var(--bg-hover); font-weight: bold;">
@@ -183,23 +206,42 @@ const planillas = {
             `;
             tbody.innerHTML += headerRow;
 
-            // Add items for this zone
-            items.forEach((item, index) => {
-                const row = `
-                    <tr>
-                        <td style="padding-left: 20px;">${index + 1}</td>
-                        <td>${item.n_expediente || ''}</td>
-                        <td>${item.caratula || ''}</td>
-                        <td>${item.origen || ''}</td>
-                        <td>${item.tipo_notificacion || ''}</td>
-                        <td>${item.destinatario_nombre || ''}</td>
-                        <td>${item.domicilio || ''}</td>
-                        <td>${item.n_troquel || '-'}</td>
-                        <td>${item.ujier_nombre || (item.usuarios ? item.usuarios.nombre : 'Sin asignar')}</td>
+            let zoneIndex = 1;
+
+            const renderRows = (itemList) => {
+                itemList.forEach(item => {
+                    const row = `
+                        <tr>
+                            <td style="padding-left: 20px;">${zoneIndex++}</td>
+                            <td>${item.n_expediente || ''}</td>
+                            <td>${item.caratula || ''}</td>
+                            <td>${item.origen || ''}</td>
+                            <td>${item.tipo_notificacion || ''}</td>
+                            <td>${item.destinatario_nombre || ''}</td>
+                            <td>${item.domicilio || ''}</td>
+                            <td>${item.n_troquel || '-'}</td>
+                            <td>${item.ujier_nombre || (item.usuarios ? item.usuarios.nombre : 'Sin asignar')}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            };
+
+            // Render Items Normales
+            renderRows(normalItems);
+
+            // Render Destinos Especiales
+            if (specialItems.length > 0) {
+                const specialHeader = `
+                    <tr style="background-color: #f0f0f0; font-weight: bold;">
+                        <td colspan="9" style="padding: 8px 10px; text-align: left; color: #555;">
+                            DESTINOS ESPECIALES
+                        </td>
                     </tr>
                 `;
-                tbody.innerHTML += row;
-            });
+                tbody.innerHTML += specialHeader;
+                renderRows(specialItems);
+            }
         });
     },
 
@@ -427,14 +469,11 @@ const planillas = {
         doc.setFontSize(10);
         doc.text(`Total: ${data.length}`, 14, finalY + 10);
 
-        // Get selected ujier name if any
-        const ujierSelect = document.getElementById('planilla-ujier');
-        const ujierName = ujierSelect.selectedIndex > 0 ? ujierSelect.options[ujierSelect.selectedIndex].text : '';
-
-        if (ujierName) {
-            doc.text(`Ujier / Receptor: ${ujierName}`, 14, finalY + 18);
+        // Signature line
+        if (ujierSelect.value) { // If a specific Ujier is selected (value is not empty)
+            doc.text(`Firma (${ujierName}): ______________________________`, 14, finalY + 18);
         } else {
-            doc.text(`Ujier / Receptor: ______________________________`, 14, finalY + 18);
+            doc.text(`Firma Ujier / Receptor: ______________________________`, 14, finalY + 18);
         }
 
         // Save
