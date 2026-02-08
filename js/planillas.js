@@ -7,7 +7,6 @@ const planillas = {
 
     init() {
         this.setupEventListeners();
-        this.loadUjieres();
         this.setDefaultDate();
         this.populateZones();
     },
@@ -18,7 +17,7 @@ const planillas = {
         document.getElementById('btn-generar-planilla')?.addEventListener('click', () => this.generatePDF());
 
         // Update preview on filter change
-        ['planilla-zona', 'planilla-ujier', 'planilla-fecha'].forEach(id => {
+        ['planilla-zona', 'planilla-fecha'].forEach(id => {
             document.getElementById(id)?.addEventListener('change', () => this.updatePreview());
         });
 
@@ -84,30 +83,8 @@ const planillas = {
         // Listener removed here as it is handled in setupEventListeners
     },
 
-    async loadUjieres() {
-        const select = document.getElementById('planilla-ujier');
-        if (!select) return;
-
-        try {
-            const { data: ujieres } = await db.getUsersByRole('ujier');
-            if (ujieres && ujieres.length > 0) {
-                // Clear existing options except the first one "Todos los Ujieres"
-                select.innerHTML = '<option value="">Todos los Ujieres</option>';
-
-                const options = ujieres.map(u =>
-                    `<option value="${u.id}">${u.nombre}</option>`
-                ).join('');
-                select.innerHTML += options;
-            }
-        } catch (error) {
-            console.error('Error loading ujieres:', error);
-            utils.showToast('Error cargando ujieres', 'error');
-        }
-    },
-
     async fetchData() {
         const zona = document.getElementById('planilla-zona').value;
-        const ujierId = document.getElementById('planilla-ujier').value;
         const fecha = document.getElementById('planilla-fecha')?.value;
 
         if (!fecha) {
@@ -137,9 +114,6 @@ const planillas = {
                 // Exact match or contains for flexibility incase of minor typos in DB vs List
                 return n.zona.toLowerCase().includes(zona.toLowerCase());
             });
-        }
-        if (ujierId) {
-            filteredData = filteredData.filter(n => n.ujier_asignado_id == ujierId || (n.usuarios && n.usuarios.id == ujierId));
         }
 
         // Sort by fecha_carga ascending (oldest first)
