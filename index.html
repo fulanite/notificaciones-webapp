@@ -324,6 +324,10 @@
                         <span class="nav-icon">🚪</span>
                         <span class="nav-text">Cerrar Sesión</span>
                     </button>
+                    <div id="app-version" class="app-version" onclick="window.location.reload(true)"
+                        style="text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 15px; cursor: pointer; padding: 5px;">
+                        v1.2 - Actualizar ↻
+                    </div>
                 </div>
             </aside>
             <div class="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('open')"></div>
@@ -1306,7 +1310,7 @@
         </div>
 
         <!-- Barra de navegación inferior (solo móvil) - FUERA del page-dashboard -->
-        <nav id="mobile-bottom-nav" class="mobile-bottom-nav"
+        <nav id="mobile-bottom-nav" class="mobile-bottom-nav hidden"
             style="position:fixed; bottom:0; left:0; right:0; z-index:9999;">
 
             <!-- Ujier Items -->
@@ -1516,9 +1520,30 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('SW registrado:', reg.scope))
-                    .catch(err => console.error('SW error:', err));
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    // Check for updates every time page loads
+                    reg.update();
+
+                    reg.onupdatefound = () => {
+                        const installingWorker = reg.installing;
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed') {
+                                if (navigator.serviceWorker.controller) {
+                                    // New update available
+                                    const toast = document.createElement('div');
+                                    toast.className = 'update-toast';
+                                    toast.innerHTML = `
+                                        <span>🚀 Nueva versión disponible</span>
+                                        <button onclick="window.location.reload(true)">ACTUALIZAR</button>
+                                    `;
+                                    toast.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:12px 20px; border-radius:30px; display:flex; gap:15px; align-items:center; z-index:10000; box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+                                    toast.querySelector('button').style.cssText = 'background:#2563eb; color:white; border:none; padding:5px 12px; border-radius:15px; font-weight:bold; cursor:pointer;';
+                                    document.body.appendChild(toast);
+                                }
+                            }
+                        };
+                    };
+                }).catch(err => console.error('SW error:', err));
             });
         }
     </script>

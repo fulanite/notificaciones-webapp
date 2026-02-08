@@ -666,6 +666,7 @@ const app = {
         // --- Mobile Bottom Nav Logic ---
         const mobileNav = document.getElementById('mobile-bottom-nav');
         if (mobileNav) {
+            mobileNav.classList.remove('hidden'); // SHOW NAV
             const adminItems = mobileNav.querySelectorAll('.role-admin');
             const ujierItems = mobileNav.querySelectorAll('.role-ujier');
 
