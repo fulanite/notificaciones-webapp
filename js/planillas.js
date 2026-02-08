@@ -11,6 +11,27 @@ const planillas = {
         this.populateZones();
     },
 
+    // Switch between tabs (Planilla Diaria / Informe Mensual)
+    switchTab(tabName, buttonElement) {
+        // Update tab buttons
+        document.querySelectorAll('[data-planilla-tab]').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        buttonElement.classList.add('active');
+
+        // Show/hide tab content
+        const diariaContent = document.getElementById('planilla-diaria-content');
+        const mensualContent = document.getElementById('planilla-mensual-content');
+
+        if (tabName === 'diaria') {
+            diariaContent.style.display = 'block';
+            mensualContent.style.display = 'none';
+        } else if (tabName === 'mensual') {
+            diariaContent.style.display = 'none';
+            mensualContent.style.display = 'block';
+        }
+    },
+
     setupEventListeners() {
         if (this.listenersAttached) return;
 
