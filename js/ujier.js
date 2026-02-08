@@ -1377,6 +1377,7 @@ const ujier = {
     initReferences() {
         const btnSearch = document.getElementById('btn-search-references');
         const inputSearch = document.getElementById('search-references');
+        const listContainer = document.getElementById('references-list');
 
         if (btnSearch) {
             btnSearch.onclick = () => this.loadReferences();
@@ -1386,18 +1387,33 @@ const ujier = {
             inputSearch.onkeyup = (e) => {
                 if (e.key === 'Enter') this.loadReferences();
             };
+            // Optional: focus input
+            setTimeout(() => inputSearch.focus(), 100);
         }
 
-        // Carga inicial (ver todo)
-        this.loadReferences();
+        // Mostrar mensaje inicial en lugar de cargar todo
+        if (listContainer) {
+            listContainer.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1; padding: 40px;">
+                    <div class="empty-icon" style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+                    <h3 style="margin-bottom: 8px;">Explorador de Referencias</h3>
+                    <p style="color: var(--text-muted);">Ingresa un nombre, dirección o expediente para buscar en el historial.</p>
+                </div>
+            `;
+        }
     },
 
     // Load references from API
     async loadReferences() {
         const listContainer = document.getElementById('references-list');
-        const query = document.getElementById('search-references')?.value || '';
+        const query = document.getElementById('search-references')?.value?.trim() || '';
 
         if (!listContainer) return;
+
+        // Si la búsqueda está vacía y el usuario hace clic, quizás quiera ver recientes.
+        // Pero para ser estrictos con "no cargar al vicio", podríamos pedir al menos 1 caracter.
+        // Por ahora, permitiremos búsqueda vacía si es explícita (clic en botón), 
+        // pero la carga inicial automática ya fue eliminada.
 
         listContainer.innerHTML = `
             <div style="text-align: center; padding: 40px; grid-column: 1 / -1;">
