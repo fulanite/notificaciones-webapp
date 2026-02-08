@@ -597,7 +597,10 @@ const ujier = {
 
         // BLOCKING LOGIC: If already returned, disable form
         const isReturned = assignment.devuelta_por_ujier == 1;
-        const isCompleted = !!assignment.resultado_diligencia;
+        // Pre-aviso NO cuenta como completado final, permite registrar nueva visita
+        const isCompleted = !!assignment.resultado_diligencia && assignment.resultado_diligencia !== 'pre_aviso';
+        const isPreAviso = assignment.resultado_diligencia === 'pre_aviso';
+
         const form = document.getElementById('form-diligenciar');
         const submitBtn = form?.querySelector('button[type="submit"]');
         const warningEl = document.getElementById('returned-warning');
@@ -688,6 +691,14 @@ const ujier = {
             }
             document.querySelector('.troquel-selection')?.parentElement.classList.remove('hidden');
             document.getElementById('carga-diferida')?.parentElement.parentElement.classList.remove('hidden');
+
+            if (isPreAviso) {
+                const info = document.createElement('div');
+                info.id = 'returned-warning';
+                info.style = 'background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.9rem;';
+                info.innerHTML = '<strong>📝 Seguimiento de Pre-Aviso:</strong> Registrá la nueva visita a continuación. La anterior quedará en el historial.';
+                summary.prepend(info);
+            }
         }
 
         // Show modal
