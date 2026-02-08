@@ -630,8 +630,12 @@ const ujier = {
                 warning.innerHTML = '<span>⚠️</span> Esta notificación ya fue devuelta físicamente. No se pueden registrar más visitas.';
                 summary.prepend(warning);
             }
-            // Disable all inputs in the form
-            inputs?.forEach(input => input.disabled = true);
+            // Disable all inputs in the form EXCEPT cancel button
+            inputs?.forEach(input => {
+                if (input.id !== 'btn-cancel-diligencia' && !input.classList.contains('modal-close')) {
+                    input.disabled = true;
+                }
+            });
         } else if (isCompleted) {
             // EDIT MODE
             this.isUpdateMode = true;
@@ -1148,25 +1152,29 @@ const ujier = {
 
                 document.getElementById('audio-recording')?.classList.add('hidden');
 
-                // Show transcription field
+                // Show transcription field for manual entry/keyboard dictation
                 const transcriptionField = document.getElementById('transcripcion-audio');
-                transcriptionField?.classList.remove('hidden');
-                transcriptionField.placeholder = 'Transcribiendo audio...';
+                if (transcriptionField) {
+                    transcriptionField.classList.remove('hidden');
+                    transcriptionField.placeholder = 'Escribí o dictá el contenido del audio aquí...';
+                    transcriptionField.focus();
+                }
 
                 // Stop all tracks
                 stream.getTracks().forEach(track => track.stop());
-
-                // Try automatic transcription with Speech Recognition
-                this.transcribeAudio();
             };
 
             this.mediaRecorder.start();
 
-            // Start speech recognition in parallel
-            this.startSpeechRecognition();
-
+            // UI Updates
             document.getElementById('btn-record-audio')?.classList.add('hidden');
             document.getElementById('audio-recording')?.classList.remove('hidden');
+
+            // Hide previous playback if any
+            document.getElementById('audio-playback')?.classList.add('hidden');
+
+            // Ensure text area is hidden during recording to avoid confusion/conflict
+            // document.getElementById('transcripcion-audio')?.classList.add('hidden'); 
 
             utils.showToast('Grabando audio...', 'info');
 
@@ -1178,72 +1186,12 @@ const ujier = {
             }, CONFIG.AUDIO_MAX_DURATION);
 
         } catch (error) {
-            utils.showToast('Error al acceder al micrófono', 'error');
+            console.error('Mic Error:', error);
+            utils.showToast('Error al acceder al micrófono. Verificá los permisos.', 'error');
         }
     },
 
-    // Start speech recognition for live transcription
-    startSpeechRecognition() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-        if (!SpeechRecognition) {
-            console.log('Speech Recognition no soportado en este navegador');
-            return;
-        }
-
-        this.recognition = new SpeechRecognition();
-        this.recognition.continuous = true;
-        this.recognition.interimResults = true;
-        this.recognition.lang = 'es-AR';
-
-        this.transcriptionText = '';
-
-        this.recognition.onresult = (event) => {
-            let finalTranscript = '';
-            let interimTranscript = '';
-
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript + ' ';
-                } else {
-                    interimTranscript += transcript;
-                }
-            }
-
-            this.transcriptionText += finalTranscript;
-
-            // Update UI immediately
-            const field = document.getElementById('transcripcion-audio');
-            if (field) {
-                field.value = this.transcriptionText + interimTranscript;
-            }
-        };
-
-        this.recognition.onerror = (event) => {
-            console.warn('Speech Recognition Error:', event.error);
-        };
-
-        try {
-            this.recognition.start();
-        } catch (e) {
-            console.log('No se pudo iniciar reconocimiento de voz');
-        }
-    },
-
-    // Finalize transcription
-    transcribeAudio() {
-        if (this.recognition) {
-            try {
-                this.recognition.stop();
-            } catch (e) { }
-        }
-
-        const field = document.getElementById('transcripcion-audio');
-        if (field && !field.value) {
-            field.placeholder = 'Escribí la transcripción manualmente...';
-        }
-    },
+    // Old SpeechRecognition removed as per user request to use native keyboard dictation instead.
 
     // Stop audio recording
     stopAudioRecording() {
@@ -1251,7 +1199,6 @@ const ujier = {
             this.mediaRecorder.stop();
         }
         document.getElementById('btn-record-audio')?.classList.remove('hidden');
-        document.getElementById('transcripcion-audio')?.classList.remove('hidden');
     },
 
     // Submit diligencia
