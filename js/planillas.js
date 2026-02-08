@@ -217,6 +217,9 @@ const planillas = {
         const fecha = document.getElementById('planilla-fecha').value;
         const formattedDate = fecha.split('-').reverse().join('/');
 
+        const ujierSelect = document.getElementById('planilla-ujier');
+        const ujierName = ujierSelect.options[ujierSelect.selectedIndex].text;
+
         // --- HEADER ---
         doc.setTextColor(0, 0, 0); // Black
         doc.setFont('helvetica', 'bold');
@@ -236,6 +239,9 @@ const planillas = {
         // "Fecha: [Date]" right aligned
         doc.text(`Fecha: ${formattedDate}`, doc.internal.pageSize.width - 14, 30, { align: 'right' });
 
+        // "Ujier: [Name]" left aligned below Zona
+        doc.text(`Ujier: ${ujierName}`, 14, 36);
+
         // --- TABLE ---
         const tableBody = [];
 
@@ -250,39 +256,122 @@ const planillas = {
         const sortedZones = Object.keys(groupedData).sort();
 
         sortedZones.forEach(zonaName => {
+            const items = groupedData[zonaName];
+
+            // Separar items normales de destinos especiales
+            const specialDestinations = ['estrados', 'arcat', 'secretaria', 'juzgado']; // Palabras clave comunes, o verificar si el campo tiene valor
+
+            const normalItems = [];
+            const specialItems = [];
+
+            items.forEach(item => {
+                // Verificar campo destinatario_especial o si el destinatario es una palabra clave
+                const isSpecial = item.destinatario_especial ||
+                    (item.destinatario_nombre && specialDestinations.includes(item.destinatario_nombre.toLowerCase()));
+
+                if (isSpecial) {
+                    specialItems.push(item);
+                } else {
+                    normalItems.push(item);
+                }
+            });
+
             // Add Separator Row for Zone
-            tableBody.push([{ content: `${zonaName} (${groupedData[zonaName].length})`, colSpan: 13, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', halign: 'left' } }]);
+            // Total count
+            tableBody.push([{ content: `${zonaName} (${items.length})`, colSpan: 13, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', halign: 'left' } }]);
 
-            groupedData[zonaName].forEach((item, index) => {
-                // Format "Tipo Not."
-                let tipo = item.tipo_notificacion || '';
-                if (tipo === 'cedulas') tipo = 'Cédulas';
-                if (tipo === 'mandamientos') tipo = 'Mandamientos';
+            let zoneIndex = 1;
 
-                // Format "Medio de Pago"
-                let pago = item.medio_pago || '';
-                if (pago) pago = pago.charAt(0).toUpperCase() + pago.slice(1);
+            const addRows = (itemList) => {
+                itemList.forEach(item => {
+                    // Format "Tipo Not."
+                    let tipo = item.tipo_notificacion || '';
+                    if (tipo === 'cedulas') tipo = 'Cédulas';
+                    if (tipo === 'mandamientos') tipo = 'Mandamientos';
+
+                    // Format "Medio de Pago"
+                    let pago = item.medio_pago || '';
+                    if (pago) pago = pago.charAt(0).toUpperCase() + pago.slice(1);
+
+                    // Devolver campo Observaciones correctamente
+                    const obs = item.observaciones_iniciales || item.observaciones || '';
+
+                    tableBody.push([
+                        zoneIndex++,
+                        item.n_expediente || '',
+                        item.caratula || '',
+                        item.origen || '',
+                        tipo,
+                        item.letrado || '',
+                        item.destinatario_nombre || '',
+                        item.domicilio || '',
+                        item.n_troquel || '',
+                        item.costo ? `$${item.costo}` : '',
+                        pago,
+                        obs,
+                        ''  // Devuelta
+                    ]);
+                });
+            };
+
+            // 1. Items Normales
+            addRows(normalItems);
+
+            // 2. Destinos Especiales
+            if (specialItems.length > 0) {
+                // Header "DESTINOS ESPECIALES"
+                tableBody.push([{
+                    content: 'DESTINOS ESPECIALES',
+                    colSpan: 13,
+                    styles: {
+                        fillColor: [255, 255, 255],
+                        textColor: [0, 0, 0],
+                        fontStyle: 'bold',
+                        halign: 'left',
+                        fontSize: 11,
+                        cellPadding: { top: 5, bottom: 2 }
+                    }
+                }]);
+
+                // Repetir encabezados de columna
+                const headers = ['Nº', 'Nº expte.', 'Carátula', 'Origen', 'Tipo Not.', 'Letrado', 'Destinatario', 'Domicilio', 'Troquel', 'Costo', 'Medio de pago', 'Observaciones', 'Devuelta'];
+
+                // Mapear headers a objetos cell con estilo
+                const headerRow = headers.map(h => ({
+                    content: h,
+                    styles: {
+                        fillColor: [200, 200, 200], // Gris claro para diferenciar o standard
+                        textColor: [0, 0, 0],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    }
+                }));
+                //tableBody.push(headerRow); // jspdf autoTable espera array de arrays o objetos.
+                // Sin embargo, si usamor 'head' option, el estilo por defecto es diferente.
+                // Vamos a usar un estilo simple gris.
 
                 tableBody.push([
-                    index + 1,
-                    item.n_expediente || '',
-                    item.caratula || '',
-                    item.origen || '',
-                    tipo,
-                    item.letrado || '',
-                    item.destinatario_nombre || '',
-                    item.domicilio || '',
-                    item.n_troquel || '',
-                    item.costo ? `$${item.costo}` : '',
-                    pago,
-                    item.observaciones_iniciales || item.observaciones || '', // Observaciones
-                    ''  // Devuelta
+                    { content: 'Nº', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Nº expte.', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Carátula', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Origen', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Tipo Not.', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Letrado', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Destinatario', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Domicilio', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Troquel', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Costo', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Medio de pago', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Observaciones', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
+                    { content: 'Devuelta', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } }
                 ]);
-            });
+
+                addRows(specialItems);
+            }
         });
 
         doc.autoTable({
-            startY: 35,
+            startY: 42,
             head: [['Nº', 'Nº expte.', 'Carátula', 'Origen', 'Tipo Not.', 'Letrado', 'Destinatario', 'Domicilio', 'Troquel', 'Costo', 'Medio de pago', 'Observaciones', 'Devuelta']],
             body: tableBody,
             styles: {
