@@ -775,41 +775,72 @@
     color: #6b7280;
 }
 
-/* Compact Table Layout */
+/* Responsiveness - Smart Table Layout */
 .notifications-table th,
 .notifications-table td {
     padding: 6px 8px;
-    /* Reduced from var(--space-2) var(--space-3) */
+    /* Compact padding */
     text-align: left;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    white-space: nowrap;
-    /* Prevent wrapping to save vertical space too */
+    vertical-align: middle;
 }
 
 .notifications-table th {
     font-size: 0.7rem;
-    /* Smaller headers */
     font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.02em;
     background: rgba(255, 255, 255, 0.02);
+    white-space: nowrap;
 }
 
 .notifications-table td {
     font-size: 0.8rem;
-    /* Smaller content */
 }
 
+/* Base Truncate Class - Mobile Optimized */
 .cell-truncate {
-    max-width: 140px;
-    /* Reduced from 200px */
+    display: block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    display: block;
-    /* Ensure width is respected */
+    max-width: 100px;
+    /* Default small screens */
+    transition: max-width 0.3s ease;
 }
+
+/* Tablet / Small Desktop */
+@media (min-width: 1024px) {
+    .cell-truncate {
+        max-width: 120px;
+    }
+}
+
+/* Standard Desktop */
+@media (min-width: 1366px) {
+    .cell-truncate {
+        max-width: 180px;
+    }
+}
+
+/* Large Monitors */
+@media (min-width: 1600px) {
+    .cell-truncate {
+        max-width: 250px;
+    }
+}
+
+/* Ultra Wide */
+@media (min-width: 1920px) {
+    .cell-truncate {
+        max-width: 350px;
+    }
+}
+
+/* Specific Column Tuning (Optional) */
+/* Allow Caratula/Recipient/Domicilio more space relative to others? */
+/* Not necessary if all use generic .cell-truncate, simpler is better for now */
 
 .cell-recipient {
     font-weight: 600;

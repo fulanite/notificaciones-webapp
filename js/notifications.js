@@ -236,12 +236,12 @@ const notifications = {
             html += `
                 <tr class="stagger-item row-hover-effect" style="cursor: pointer;" onclick="notifications.viewDetails('${notif.id}')">
                     <td style="white-space: nowrap; font-size: 0.75rem;">${notif.fecha_entrega_ujier ? utils.formatDate(notif.fecha_entrega_ujier) : '<span style="color:var(--text-muted)">-</span>'}</td>
-                    <td title="${notif.origen}">${utils.truncate(notif.origen, 25)}</td>
-                    <td title="${notif.letrado || '-'}">${utils.truncate(notif.letrado || '-', 30)}</td>
-                    <td><strong style="font-size: 0.85rem;">${utils.truncate(notif.n_expediente, 25)}</strong></td>
-                    <td title="${notif.caratula || ''}">${utils.truncate(notif.caratula || '', 40)}</td>
-                    <td title="${recipientDisplay}">${utils.truncate(recipientDisplay, 40)}</td>
-                    <td title="${notif.domicilio}">${utils.truncate(notif.domicilio, 50)}</td>
+                    <td title="${notif.origen}"><div class="cell-truncate">${notif.origen}</div></td>
+                    <td title="${notif.letrado || '-'}"><div class="cell-truncate">${notif.letrado || '-'}</div></td>
+                    <td><strong style="font-size: 0.85rem; white-space: nowrap;">${notif.n_expediente}</strong></td>
+                    <td title="${notif.caratula || ''}"><div class="cell-truncate">${notif.caratula || ''}</div></td>
+                    <td title="${recipientDisplay}"><div class="cell-truncate">${recipientDisplay}</div></td>
+                    <td title="${notif.domicilio}"><div class="cell-truncate">${notif.domicilio}</div></td>
                     <td><span class="badge-zona">${notif.zona || '-'}</span></td>
                     <td style="font-family: monospace; font-size: 0.75rem;">${notif.n_troquel || '-'}</td>
                     <td>${this.getEnhancedStatusBadge(notif)}</td>
