@@ -1365,8 +1365,10 @@
         <div id="modal-diligenciar" class="modal hidden">
             <div class="modal-overlay"></div>
             <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">Registrar Resultado</h2>
+                <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <button type="button" onclick="ujier.closeDiligencia()"
+                        style="background:none; border:none; font-size: 1.5rem; cursor: pointer; margin-right: 15px; line-height: 1;">⬅️</button>
+                    <h2 class="modal-title" style="flex-grow: 1;">Registrar Resultado</h2>
                     <button class="modal-close" id="modal-close">×</button>
                 </div>
                 <div class="modal-body">
@@ -1408,6 +1410,7 @@
                                     <option value="pre_aviso">Pre aviso</option>
                                     <option value="estrados">Estrados</option>
                                     <option value="domicilio_inexistente">Domicilio inexistente</option>
+                                </select>
                             </div>
 
                             <div id="gps-wrapper" class="form-section">
@@ -1463,8 +1466,10 @@
         <div id="modal-image-viewer" class="modal hidden">
             <div class="modal-overlay" onclick="ujier.closeImageViewer()"></div>
             <div class="modal-content modal-image-content">
-                <div class="modal-header">
-                    <h3>Visualización de Evidencia</h3>
+                <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <button type="button" onclick="ujier.closeImageViewer()"
+                        style="background:none; border:none; font-size: 1.5rem; cursor: pointer; margin-right: 15px; line-height: 1;">⬅️</button>
+                    <h3 style="flex-grow: 1;">Visualización de Evidencia</h3>
                     <button class="modal-close" onclick="ujier.closeImageViewer()">✕</button>
                 </div>
                 <div class="modal-body">
