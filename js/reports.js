@@ -2,6 +2,86 @@
  * SGND - Reports Module
  */
 
+const JUZGADOS_PENALES_MAP = new Map([
+    ['Fiscalía de Instrucción', [/^Fiscalía de Instrucción/i]],
+    ['Fiscalía Penal Juvenil', [/^Fiscalía Penal Juvenil$/i]],
+    ['Cámaras Penales', [/^Cámara de Apelaciones Penal y de Exhorto$/i, /^Cámara en lo Criminal/i]],
+    ['Juzgados Correcionales', [/^Juzgado Correcional/i]],
+    ['Control y garantías', [/^Juzgado de Garantías/i]],
+    ['Ejecución Penal', [/^Juzgado de Ejecución Penal/i]],
+]);
+
+const DEMAS_JUZGADOS_MAP = new Map([
+    ['Corte de justicia', [/^Corte de Justicia - Secretaría/i]],
+    ['Cámara de apelaciones', [/^Cámara Civil/i]],
+    ['Civiles', [/^Juzgado Civil/i]],
+    ['Comercial y Ejecución', [/^Juzgado Comercial/i]],
+    ['Ejecución Fiscal', [/^Ejecución Fiscal$/i]],
+    ['Electoral y Minas', [/^Juzgado Electoral y Minas$/i]],
+    ['Familia', [/^Juzgado de Familia/i]],
+    ['Centro de Mediación Judicial', [/^Centro de Mediación Judicial$/i]],
+    ['Defensorías Civiles', [/^Defensoría Civil/i]],
+    ['Juzgados del interior', [/^Andalgalá$/i, /^Belén$/i, /^Tinogasta$/i, /^Santa Maria$/i, /^Recreo$/i]],
+    ['De otras provincias', [/^(Buenos Aires|Catamarca|Chaco|Chubut|Ciudad Autónoma de Buenos Aires \(CABA\)|Córdoba|Corrientes|Entre Ríos|Formosa|Jujuy|La Pampa|La Rioja|Mendoza|Misiones|Neuquén|Río Negro|Salta|San Juan|San Luis|Santa Cruz|Santa Fe|Santiago del Estero|Tierra del Fuego, Antártida e Islas del Atlántico Sur|Tucumán)$/i]],
+    ['Asesorías de menores', [/^Asesoría de Menores e Incapaces$/i]],
+    ['Tribunal Penal Juvenil', [/^Tribunal de Responsabilidad Penal Juvenil/i]],
+    ['Laborales', [/^Juzgado Laboral/i]],
+    ['Ministerio Público', [/^Ministerio Público$/i]],
+    ['Procuración', [/^Procuración$/i]],
+]);
+
+function getCategory(origen, categoryMap) {
+    for (const [category, patterns] of categoryMap.entries()) {
+        for (const pattern of patterns) {
+            if (pattern.test(origen)) {
+                return category;
+            }
+        }
+    }
+    return null;
+}
+
+function categorizeAndCount(rows) {
+    const counts = {
+        tipos: new Map(),
+        juzgadosPenales: new Map(),
+        demasJuzgados: new Map(),
+    };
+
+    rows.forEach(row => {
+        // Dynamic categorization based on 'tipoNotificacion'
+        const tipoNot = (row.tipo_notificacion || '').trim() || 'No especificado';
+        // Map common types to display names if needed (e.g. 'cedulas' -> 'Cédulas')
+        let displayTipo = tipoNot;
+        if (tipoNot === 'cedulas') displayTipo = 'Cédulas';
+        if (tipoNot === 'mandamientos') displayTipo = 'Mandamientos';
+
+        counts.tipos.set(displayTipo, (counts.tipos.get(displayTipo) || 0) + 1);
+
+        // Categorization by 'origen'
+        const origen = (row.origen || '').trim();
+        let category = getCategory(origen, JUZGADOS_PENALES_MAP);
+        if (category) {
+            counts.juzgadosPenales.set(category, (counts.juzgadosPenales.get(category) || 0) + 1);
+            return;
+        }
+
+        category = getCategory(origen, DEMAS_JUZGADOS_MAP);
+        if (category) {
+            counts.demasJuzgados.set(category, (counts.demasJuzgados.get(category) || 0) + 1);
+        }
+    });
+
+    return counts;
+}
+
+function getMonthInfo(yyyy_mm) {
+    const [year, month] = yyyy_mm.split('-');
+    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, 15);
+    const monthName = new Intl.DateTimeFormat("es-AR", { month: "long" }).format(date);
+    return { monthName: monthName.charAt(0).toUpperCase() + monthName.slice(1), year };
+}
+
 const reports = {
     // Initialize reports module
     init() {
@@ -27,7 +107,10 @@ const reports = {
 
         const monthSelect = document.getElementById('report-month');
         if (monthSelect) {
-            monthSelect.value = String(new Date().getMonth() + 1).padStart(2, '0');
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            monthSelect.value = `${yyyy}-${mm}`; // Expecting input type="month"
         }
     },
 
@@ -93,118 +176,153 @@ const reports = {
 
     // Generate monthly report (PDF)
     async generateMonthlyReport() {
-        const monthSelect = document.getElementById('report-month');
-        const month = monthSelect?.value || '01';
-        const year = new Date().getFullYear();
+        const monthInput = document.getElementById('report-month');
+        const yyyy_mm = monthInput?.value; // Expecting YYYY-MM
+
+        if (!yyyy_mm) {
+            utils.showToast('Seleccione un mes', 'warning');
+            return;
+        }
 
         utils.showToast('Generando informe mensual...', 'info');
 
+        // Parse selected month
+        const [yearStr, monthStr] = yyyy_mm.split('-');
+        const year = parseInt(yearStr);
+        const month = parseInt(monthStr);
+
         // Get all notifications for the month
-        const startDate = new Date(year, parseInt(month) - 1, 1);
-        const endDate = new Date(year, parseInt(month), 0);
+        // We filter by 'fecha_entrega_ujier' as per user requirement "tomas las notificaciones que tienen fecha de entrega de ese mes"
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0); // Last day of month
 
-        const { data } = await db.getNotifications({});
+        // Fetch all (filtering locally for simplicity, or use API range filter if available, assume getNotifications returns all for simplicity then filter)
+        // Ideally API should support range, but 'api-client.js' seems simple. 
+        // We'll fetch a larger set or filter on client side if API doesn't support date range directly on 'fecha_entrega_ujier'.
+        // 'db.getNotifications' supports 'fecha' param which usually filters by specific date.
+        // Let's assume we fetch all and filter client side for now to be safe with complex logic.
+        // OR better: use the dateField logic we implemented recently if available, but passing a range is tricky without range support.
+        // Let's rely on fetching reasonable amount of data. The user mentions "tomas las notificaciones que tienen fecha de entrega de ese mes".
 
-        // Filter for the month
+        const { data, error } = await db.getNotifications({ limit: 5000 }); // Increase limit to ensure we get month's data
+
+        if (error) {
+            utils.showToast('Error al obtener datos', 'error');
+            return;
+        }
+
+        // Filter by month on fecha_entrega_ujier
         const monthData = (data || []).filter(n => {
-            const date = new Date(n.fecha_carga);
-            return date >= startDate && date <= endDate;
+            if (!n.fecha_entrega_ujier) return false;
+            const date = new Date(n.fecha_entrega_ujier);
+            // Adjust for timezone potentially, but here we check month/year match
+            // Be careful with UTC vs Local. fecha_entrega_ujier comes as 'YYYY-MM-DD'.
+            // Simple string comparison is safer for YYYY-MM-DD
+            return n.fecha_entrega_ujier.startsWith(yyyy_mm);
         });
 
-        // Generate PDF
+        if (monthData.length === 0) {
+            utils.showToast('No hay datos para el mes seleccionado', 'warning');
+            return;
+        }
+
+        // --- PDF Generation Logic ---
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const doc = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
+        const { monthName, year: reportYear } = getMonthInfo(yyyy_mm);
+        const today = new Intl.DateTimeFormat("es-AR", {
+            timeZone: "America/Argentina/Buenos_Aires",
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }).format(new Date());
 
-        // Header
-        doc.setFontSize(18);
-        doc.setTextColor(30, 58, 95);
-        doc.text('SGND - Informe Mensual', 105, 20, { align: 'center' });
+        const pageHeight = doc.internal.pageSize.getHeight();
+        let finalY = 0;
 
-        doc.setFontSize(12);
-        doc.setTextColor(100);
-        const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        doc.text(`${monthNames[parseInt(month) - 1]} ${year}`, 105, 30, { align: 'center' });
-
-        // Statistics
-        doc.setFontSize(14);
-        doc.setTextColor(0);
-        doc.text('Resumen Estadístico', 14, 45);
-
-        const total = monthData.length;
-        const pendientes = monthData.filter(n => n.estado === 'pendiente').length;
-        const diligenciadas = monthData.filter(n => n.estado === 'diligenciada' || n.estado === 'Entregado').length;
-        const diferidas = monthData.filter(n => n.estado === 'diferida').length;
-
+        // --- HEADER ---
+        doc.setFont("helvetica", "normal");
         doc.setFontSize(11);
-        doc.text(`Total de Notificaciones: ${total}`, 14, 55);
-        doc.text(`Pendientes: ${pendientes}`, 14, 62);
-        doc.text(`Diligenciadas: ${diligenciadas}`, 14, 69);
-        doc.text(`Diferidas: ${diferidas}`, 14, 76);
+        doc.text(`San Fernando del Valle de Catamarca, ${today}`, 40, 50);
 
-        // Results breakdown
-        const results = {};
-        monthData.forEach(n => {
-            if (n.resultado_diligencia) {
-                results[n.resultado_diligencia] = (results[n.resultado_diligencia] || 0) + 1;
+        // --- ADDRESSEE ---
+        doc.setFont("helvetica", "bold");
+        doc.text("OFICINA DE MANDAMIENTOS Y NOTIFICACIONES", 40, 100);
+        doc.text("SAN FERNANDO DEL VALLE DE CATAMARCA", 40, 115);
+        doc.setFont("helvetica", "normal");
+        doc.text("SEÑOR SECRETARIO", 40, 150);
+        doc.text("DE PLANEAMIENTO DE LA CORTE DE JUSTICIA", 40, 165);
+        doc.setFont("helvetica", "bold");
+        doc.text("SU DESPACHO:", 40, 180);
+
+        // --- BODY ---
+        doc.setFont("helvetica", "normal");
+        const introText = `Me dirijo a Ud. a los efectos de remitir la Estadística Mensual de las diligencias realizadas en esta Oficina de Mandamientos y Notificaciones durante el mes de ${monthName} de ${reportYear}.`;
+        const splitIntro = doc.splitTextToSize(introText, 480);
+        doc.text(splitIntro, 50, 220);
+
+        const counts = categorizeAndCount(monthData);
+        const tableOptions = {
+            theme: 'grid',
+            styles: { fontSize: 10, cellPadding: 5, font: "helvetica" },
+            headStyles: { fillColor: [238, 238, 238], textColor: 20, fontStyle: "bold" },
+            margin: { left: 50, right: 50 },
+            columnStyles: { 0: { fontStyle: 'bold' } },
+        };
+
+        // --- TABLE 1: Dynamic Notification Types ---
+        const tiposBody = Array.from(counts.tipos.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+        doc.autoTable({
+            ...tableOptions,
+            startY: 260,
+            head: [['Tipo de Notificación', 'Cantidad']],
+            body: tiposBody,
+        });
+        finalY = doc.lastAutoTable.finalY;
+
+        // --- TABLE 2: Juzgados Penales ---
+        if (counts.juzgadosPenales.size > 0) {
+            doc.autoTable({
+                ...tableOptions,
+                startY: finalY + 20,
+                head: [['JUZGADOS PENALES', 'Cantidad']],
+                body: Array.from(counts.juzgadosPenales.entries()).sort((a, b) => a[0].localeCompare(b[0])),
+            });
+            finalY = doc.lastAutoTable.finalY;
+        }
+
+        // --- TABLE 3: Demás Juzgados ---
+        if (counts.demasJuzgados.size > 0) {
+            const demasBody = Array.from(counts.demasJuzgados.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+            if (finalY + (demasBody.length * 25) > pageHeight - 50) {
+                doc.addPage();
+                finalY = 50;
             }
-        });
-
-        doc.text('Resultados de Diligencias:', 14, 90);
-        let yPos = 97;
-        Object.entries(results).forEach(([key, count]) => {
-            doc.text(`  • ${CONFIG.RESULT_OPTIONS[key] || key}: ${count}`, 14, yPos);
-            yPos += 7;
-        });
-
-        // Table with notifications
-        if (monthData.length > 0) {
-            doc.addPage();
-            doc.setFontSize(14);
-            doc.text('Detalle de Notificaciones', 14, 20);
-
-            const tableData = monthData.map(n => [
-                utils.formatDate(n.fecha_carga),
-                utils.truncate(CONFIG.NOTIFICATION_TYPES[n.tipo_notificacion] || '', 20),
-                utils.truncate(n.n_expediente || '', 15),
-                utils.truncate(n.destinatario_nombre || '', 20),
-                n.estado
-            ]);
 
             doc.autoTable({
-                startY: 30,
-                head: [['Fecha', 'Tipo', 'Expediente', 'Destinatario', 'Estado']],
-                body: tableData,
-                styles: {
-                    fontSize: 8,
-                    cellPadding: 3
-                },
-                headStyles: {
-                    fillColor: [30, 58, 95],
-                    textColor: 255
-                },
-                alternateRowStyles: {
-                    fillColor: [245, 247, 250]
-                }
+                ...tableOptions,
+                startY: finalY + 20,
+                head: [['DEMÁS JUZGADOS', 'Cantidad']],
+                body: demasBody,
             });
+            finalY = doc.lastAutoTable.finalY;
         }
 
-        // Footer
-        const pageCount = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= pageCount; i++) {
-            doc.setPage(i);
-            doc.setFontSize(8);
-            doc.setTextColor(150);
-            doc.text(
-                `Generado el ${utils.formatDateTime(new Date())} - Página ${i} de ${pageCount}`,
-                105,
-                doc.internal.pageSize.height - 10,
-                { align: 'center' }
-            );
+        // --- FINAL TOTAL ---
+        if (finalY > pageHeight - 50) {
+            doc.addPage();
+            finalY = 50;
         }
 
-        doc.save(`informe_mensual_${month}_${year}.pdf`);
-        utils.showToast('Informe mensual descargado', 'success');
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        const totalGeneral = Array.from(counts.tipos.values()).reduce((sum, count) => sum + count, 0);
+        doc.text(`TOTAL GENERAL DE DILIGENCIAS: ${totalGeneral}`, doc.internal.pageSize.getWidth() / 2, finalY + 40, { align: "center" });
+
+        const filename = `informe_mensual_${yyyy_mm}.pdf`;
+        doc.save(filename);
+
+        utils.showToast('Informe mensual generado con éxito', 'success');
     },
 
     // Generate ujier performance report
