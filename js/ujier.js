@@ -534,6 +534,12 @@ const ujier = {
                             <span class="summary-value">${assignment.letrado}</span>
                         </div>
                         ` : ''}
+                        ${(assignment.tipo_troquel || assignment.n_troquel) ? `
+                        <div class="summary-row">
+                            <span class="summary-label">🎫 Troquel:</span>
+                            <span class="summary-value">${assignment.tipo_troquel || ''} ${assignment.n_troquel || ''}</span>
+                        </div>
+                        ` : ''}
                         ${assignment.observaciones_iniciales ? `
                         <div class="summary-obs">
                             <span class="summary-label">📝 Observaciones:</span>
