@@ -216,14 +216,13 @@ const ujier = {
 
         listContainer.innerHTML = this.assignments.map((assignment, index) => {
             const isSelected = this.selectedCardId === assignment.id;
-
             const isPreAviso = assignment.estado === 'pre_aviso';
             const isSpecial = !!assignment.destinatario_especial;
 
             return `
             <div class="assignment-card stagger-item ${isSelected ? 'selected' : ''}" 
                  data-id="${assignment.id}" 
-                 onclick="${this.reorderMode ? '' : `ujier.openDiligencia('${assignment.id}')`}">
+                 onclick="ujier.reorderMode ? '' : ujier.openDiligencia('${assignment.id}')">
                 
                 ${this.reorderMode ? `
                 <div class="reorder-controls-vertical" onclick="event.stopPropagation()">
@@ -232,16 +231,22 @@ const ujier = {
                 </div>
                 ` : `<div class="assignment-number ${isPreAviso ? 'is-pre-aviso' : ''}">${index + 1}</div>`}
 
-                <div class="assignment-info">
-                    <div class="assignment-header-row">
-                        <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
-                        ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
-                        ${isSpecial ? '<span class="badge-special">⭐ Especial</span>' : ''}
+                <div class="assignment-info" style="gap: 8px;">
+                    <div class="assignment-header-row" style="margin-bottom: 4px;">
+                        ${assignment.zona ? `<span class="assignment-zona" style="font-size: 0.85rem; padding: 2px 8px;">${assignment.zona}</span>` : ''}
+                        ${isSpecial ? '<span class="badge-special" style="font-size: 0.8rem;">⭐ Especial</span>' : ''}
                         ${assignment.devuelta_por_ujier ? '<span class="badge-returned" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; font-size:0.7rem; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:auto;">📦 DEVUELTA</span>' : ''}
                     </div>
-                    ${assignment.caratula ? `<div class="assignment-caratula">📄 ${assignment.caratula}</div>` : ''}
-                    <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || assignment.destinatario_especial || '-'}</strong></div>
-                    <div class="assignment-address">🏠 ${assignment.domicilio || '-'}</div>
+                    
+                    <div class="assignment-recipient" style="font-size: 1.25rem; line-height: 1.3;">
+                        👤 <strong>${assignment.destinatario_nombre || assignment.destinatario_especial || '-'}</strong>
+                    </div>
+                    
+                    <div class="assignment-address" style="font-size: 1.15rem; line-height: 1.3; color: var(--text-main); margin-top: 4px;">
+                        🏠 ${assignment.domicilio || '-'}
+                    </div>
+                    
+                    ${assignment.caratula ? `<div class="assignment-caratula" style="font-size: 0.9rem; margin-top: 6px;">📄 ${assignment.caratula}</div>` : ''}
                 </div>
                 
                 ${this.reorderMode ? `
@@ -250,9 +255,9 @@ const ujier = {
                     <div class="assignment-actions-quick" onclick="event.stopPropagation()">
                         ${isSpecial ? `
                         <button class="btn-quick-deliver" onclick="ujier.quickDeliver('${assignment.id}')" title="Entrega rápida">
-                            ⚡ Entregar
+                            ⚡
                         </button>
-                        ` : '<div class="assignment-arrow">›</div>'}
+                        ` : `<div class="assignment-arrow" style="font-size: 1.8rem; color: var(--primary);">›</div>`}
                     </div>
                 `}
             </div>

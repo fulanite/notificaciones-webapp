@@ -793,42 +793,25 @@
 
                     <!-- Mis Asignaciones (Ujier) View -->
                     <section id="view-mis-asignaciones" class="view">
-                        <div class="ujier-header">
-                            <div class="date-info">
-                                <span class="date-icon">📅</span>
-                                <span id="current-date">--</span>
-                            </div>
-                            <div class="route-stats">
+                        <div class="ujier-header header-simplified">
+                            <div class="route-stats simplified-stats">
                                 <div class="route-stat">
                                     <span class="stat-number" id="route-pending">0</span>
                                     <span class="stat-text">Pendientes</span>
                                 </div>
-                                <div class="route-stat">
-                                    <span class="stat-number" id="route-completed">0</span>
-                                    <span class="stat-text">Completadas</span>
-                                </div>
-                                <button id="btn-refresh-assignments" class="btn-refresh" title="Refrescar asignaciones">
-                                    <span>🔄</span>
+                                <button id="btn-refresh-assignments" class="btn-refresh-text"
+                                    title="Refrescar asignaciones">
+                                    <span>🔄 Actualizar datos</span>
                                 </button>
                             </div>
                         </div>
 
-                        <div class="view-toggle">
-                            <div class="view-mode-btns">
-                                <button class="toggle-btn active" data-view-mode="list">📋 Lista</button>
-                                <button class="toggle-btn" data-view-mode="map">🗺️ Mapa</button>
-                            </div>
+                        <div class="view-toggle" style="justify-content: flex-end;">
                             <button id="btn-reorder-toggle" class="btn-reorder-toggle">🔃 Reordenar</button>
                         </div>
 
                         <div id="assignments-list" class="assignments-list">
                             <!-- Dynamic content -->
-                        </div>
-
-                        <div id="assignments-map" class="assignments-map hidden">
-                            <div id="map-container" class="map-container">
-                                <!-- Map will be rendered here -->
-                            </div>
                         </div>
                     </section>
 
