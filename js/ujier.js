@@ -217,7 +217,7 @@ const ujier = {
                         <span class="assignment-type">${CONFIG.NOTIFICATION_TYPES?.[assignment.tipo_notificacion] || assignment.tipo_notificacion || 'Sin tipo'}</span>
                         ${assignment.zona ? `<span class="assignment-zona">${assignment.zona}</span>` : ''}
                         ${isSpecial ? '<span class="badge-special">⭐ Especial</span>' : ''}
-                        ${assignment.devuelta_por_ujier ? '<span class="badge-returned" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; font-size:0.7rem; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:auto;">📦 RENDIDA</span>' : ''}
+                        ${assignment.devuelta_por_ujier ? '<span class="badge-returned" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; font-size:0.7rem; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:auto;">📦 DEVUELTA</span>' : ''}
                     </div>
                     ${assignment.caratula ? `<div class="assignment-caratula">📄 ${assignment.caratula}</div>` : ''}
                     <div class="assignment-recipient">👤 <strong>${assignment.destinatario_nombre || assignment.destinatario_especial || '-'}</strong></div>
@@ -478,7 +478,7 @@ const ujier = {
                     <div class="summary-header">
                         <span class="summary-tipo">${tipoLabel}</span>
                         <span class="summary-zona">${assignment.zona || ''}</span>
-                        ${assignment.devuelta_por_ujier ? '<span class="badge-returned-summary" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; font-size:0.75rem; padding:4px 8px; border-radius:6px; font-weight:bold;">📦 RENDIDA</span>' : ''}
+                        ${assignment.devuelta_por_ujier ? '<span class="badge-returned-summary" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; font-size:0.75rem; padding:4px 8px; border-radius:6px; font-weight:bold;">📦 DEVUELTA</span>' : ''}
                     </div>
                     <div class="summary-body">
                         <div class="summary-row">
@@ -1297,7 +1297,7 @@ const ujier = {
                         <div class="historial-footer">
                             <span class="resultado-badge resultado-${status}">${(visit.resultado || 'PENDIENTE').replace(/_/g, ' ').toUpperCase()}</span>
                             ${visit.zona ? `<span class="historial-zona">${visit.zona}</span>` : ''}
-                            ${visit.devuelta_por_ujier ? '<span class="badge-returned-mini" style="background:#f0fdf4; color:#166534; font-size:0.65rem; padding:1px 5px; border-radius:3px; margin-left:5px;">📦 RENDIDA</span>' : ''}
+                            ${visit.devuelta_por_ujier ? '<span class="badge-returned-mini" style="background:#f0fdf4; color:#166534; font-size:0.65rem; padding:1px 5px; border-radius:3px; margin-left:5px;">📦 DEVUELTA</span>' : ''}
                         </div>
                     </div>
                     <div class="assignment-arrow">›</div>
