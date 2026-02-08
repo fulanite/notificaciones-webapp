@@ -2537,10 +2537,17 @@
 }
 
 .view-tabs {
-    margin-bottom: 15px !important;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0 !important;
+}
+
+.compact-tabs .tab-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
 }
 
 .list-header {
-    margin-top: 0 !important;
+    margin-top: 5px !important;
     padding-top: 0 !important;
 }

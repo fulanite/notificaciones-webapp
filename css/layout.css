@@ -295,7 +295,7 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 64px;
+        height: 52px;
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -431,7 +431,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-4);
-    padding: var(--space-4) var(--space-8);
+    padding: var(--space-2) var(--space-8);
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -441,7 +441,7 @@
 @media (min-width: 1025px) {
     .top-header {
         /* On desktop, keep it as second bar for page info or merge */
-        top: 64px;
+        top: 52px;
         /* below sticky nav */
         padding: var(--space-2) var(--space-6);
         background: transparent;
@@ -475,6 +475,7 @@
 }
 
 .header-subtitle {
+    display: none;
     font-size: 0.8rem;
     color: var(--text-muted);
 }
@@ -514,7 +515,7 @@
 
 .content-area {
     flex: 1;
-    padding: var(--space-6) var(--space-8);
+    padding: var(--space-3) var(--space-6);
 }
 
 /* === Views === */
@@ -530,12 +531,10 @@
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 

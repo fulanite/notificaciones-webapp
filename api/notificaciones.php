@@ -65,8 +65,13 @@ try {
                 }
 
                 if (!empty($_GET['fecha'])) {
-                    $where[] = "DATE(COALESCE(n.fecha_entrega_ujier, n.fecha_carga)) = ?";
+                    $where[] = "DATE(n.fecha_entrega_ujier) = ?";
                     $params[] = $_GET['fecha'];
+                }
+
+                if (!empty($_GET['fecha_carga'])) {
+                    $where[] = "DATE(n.fecha_carga) = ?";
+                    $params[] = $_GET['fecha_carga'];
                 }
 
                 if (!empty($_GET['zona'])) {

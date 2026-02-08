@@ -680,18 +680,18 @@
 
                     <!-- Lista de Notificaciones View -->
                     <section id="view-lista-notificaciones" class="view active">
-                        <!-- Pestañas de Año -->
-                        <div class="view-tabs">
-                            <button class="tab-btn active" data-year="2026"
-                                onclick="notifications.setYear('2026', this)">
-                                📅 2026 <span class="tab-badge" id="badge-2026">0</span>
-                            </button>
-                            <button class="tab-btn" data-year="2025" onclick="notifications.setYear('2025', this)">
-                                📅 2025 <span class="tab-badge" id="badge-2025">0</span>
-                            </button>
-                        </div>
-
                         <div class="list-header">
+                            <!-- Pestañas de Año Movidas Aquí -->
+                            <div class="view-tabs compact-tabs">
+                                <button class="tab-btn active" data-year="2026"
+                                    onclick="notifications.setYear('2026', this)">
+                                    📅 2026 <span class="tab-badge" id="badge-2026">0</span>
+                                </button>
+                                <button class="tab-btn" data-year="2025" onclick="notifications.setYear('2025', this)">
+                                    📅 2025 <span class="tab-badge" id="badge-2025">0</span>
+                                </button>
+                            </div>
+
                             <div class="search-bar">
                                 <span class="search-icon">🚀</span>
                                 <input type="text" id="search-notificaciones" class="search-input"
@@ -704,7 +704,6 @@
                             <div class="filter-bar">
                                 <select id="filter-propio" class="filter-select highlight">
                                     <option value="none">🌎 Todas las notif.</option>
-                                    <option value="mine-today">👤 Mis cargas (Hoy)</option>
                                     <option value="mine-all" selected>📂 Mis cargas (Gral.)</option>
                                 </select>
                                 <select id="filter-zona" class="filter-select">

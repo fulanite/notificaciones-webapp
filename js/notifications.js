@@ -63,26 +63,12 @@ const notifications = {
 
         filterPropio?.addEventListener('change', () => {
             const val = filterPropio.value;
-
-            if (val === 'mine-today') {
+            if (val === 'mine-all') {
                 this.filters.own_only = true;
-                const today = new Date();
-                const offset = today.getTimezoneOffset();
-                const localToday = new Date(today.getTime() - (offset * 60 * 1000));
-                const dateStr = localToday.toISOString().split('T')[0];
-                this.filters.fecha = dateStr;
-                if (filterFecha) filterFecha.value = dateStr;
-                utils.showToast(`Tus cargas de hoy`, 'info');
-            } else if (val === 'mine-all') {
-                this.filters.own_only = true;
-                this.filters.fecha = '';
-                if (filterFecha) filterFecha.value = '';
-                utils.showToast('Todas tus cargas', 'info');
+                utils.showToast('Mostrando tus cargas', 'info');
             } else {
                 this.filters.own_only = false;
-                this.filters.fecha = '';
-                if (filterFecha) filterFecha.value = '';
-                utils.showToast('Todas las notificaciones', 'info');
+                utils.showToast('Mostrando todas las notificaciones', 'info');
             }
             updateAndLoad();
         });
@@ -343,8 +329,9 @@ const notifications = {
 
         // Create modal HTML
         const modalHtml = `
-            <div class="modal-overlay" id="modal-detalle" onclick="notifications.closeModal(event)">
-                <div class="modal-content modal-panoramic-v2 light-theme" onclick="event.stopPropagation()">
+            <div class="modal" id="modal-detalle-wrapper" style="display: flex;">
+                <div class="modal-overlay" id="modal-detalle" onclick="notifications.closeModal(event)">
+                    <div class="modal-content modal-panoramic-v2 light-theme" onclick="event.stopPropagation()">
                     <div class="modal-header-v2">
                         <div class="header-main-left">
                             <div class="header-title-container">
@@ -497,8 +484,9 @@ const notifications = {
             </div>
         `;
 
-        // Insert modal into DOM
+        // Insert modal into DOM and prevent body scroll
         document.body.insertAdjacentHTML('beforeend', modalHtml);
+        document.body.style.overflow = 'hidden';
 
         // Add escape key listener
         document.addEventListener('keydown', this.handleModalEscape);
@@ -507,10 +495,14 @@ const notifications = {
     // Close modal
     closeModal(event) {
         if (event && event.target !== event.currentTarget) return;
-        const modal = document.getElementById('modal-detalle');
+        const modal = document.getElementById('modal-detalle-wrapper');
         if (modal) {
-            modal.classList.add('fade-out');
-            setTimeout(() => modal.remove(), 200);
+            const overlay = document.getElementById('modal-detalle');
+            if (overlay) overlay.classList.add('fade-out');
+            setTimeout(() => {
+                modal.remove();
+                document.body.style.overflow = '';
+            }, 200);
         }
         document.removeEventListener('keydown', this.handleModalEscape);
     },
