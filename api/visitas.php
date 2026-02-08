@@ -69,14 +69,14 @@ try {
                 ";
 
                 if ($searchTerm) {
-                    $sql .= " AND (n.domicilio LIKE :q OR n.destinatario_nombre LIKE :q OR n.n_expediente LIKE :q)";
+                    $sql .= " AND (n.domicilio LIKE ? OR n.destinatario_nombre LIKE ? OR n.n_expediente LIKE ?)";
                 }
 
                 $sql .= " ORDER BY v.fecha DESC LIMIT 2000";
 
                 $stmt = $pdo->prepare($sql);
                 if ($searchTerm) {
-                    $stmt->execute([':q' => $searchTerm]);
+                    $stmt->execute([$searchTerm, $searchTerm, $searchTerm]);
                 } else {
                     $stmt->execute();
                 }

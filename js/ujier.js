@@ -1417,6 +1417,11 @@ const ujier = {
                                 ${visit.observaciones}
                             </div>
                         ` : ''}
+                        ${visit.transcripcion_audio ? `
+                            <div class="reference-transcription">
+                                🎤 "${visit.transcripcion_audio}"
+                            </div>
+                        ` : ''}
                     </div>
                     <div class="reference-footer">
                         <div class="reference-ujier">

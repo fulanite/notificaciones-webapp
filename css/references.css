@@ -108,6 +108,20 @@
     line-height: 1.4;
 }
 
+.reference-transcription {
+    font-size: 0.85rem;
+    color: var(--text-main);
+    background: #fdf2f8;
+    /* Light pink background to differentiate */
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 3px solid #db2777;
+    /* Pink border */
+    margin: 5px 0;
+    line-height: 1.4;
+    font-style: italic;
+}
+
 .reference-footer {
     padding: 12px 15px;
     border-top: 1px solid var(--border-color);
