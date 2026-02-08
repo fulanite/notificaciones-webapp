@@ -141,24 +141,47 @@ async function generateFix() {
         sqlStatements.push(`-- Generado: ${new Date().toISOString()}`);
         sqlStatements.push('SET SQL_SAFE_UPDATES = 0;');
 
+        const missingDates = [];
+
         cedulas.forEach(cedula => {
             const idCedula = cedula['id_cedula'];
-            const fechaEntrega = parseDate(cedula['fecha_entrega_ujier']);
+            const fechaEntregaStr = cedula['fecha_entrega_ujier'];
+            const fechaEntrega = parseDate(fechaEntregaStr);
 
-            if (idCedula && fechaEntrega) {
-                const sql = `UPDATE notificaciones SET fecha_entrega_ujier = ${escapeSQL(fechaEntrega)} WHERE glide_id_cedula = ${escapeSQL(idCedula)};`;
-                sqlStatements.push(sql);
-                updatesCount++;
+            if (idCedula) {
+                if (fechaEntrega) {
+                    const sql = `UPDATE notificaciones SET fecha_entrega_ujier = ${escapeSQL(fechaEntrega)} WHERE glide_id_cedula = ${escapeSQL(idCedula)};`;
+                    sqlStatements.push(sql);
+                    updatesCount++;
+                } else {
+                    missingDates.push({ id: idCedula, raw: fechaEntregaStr });
+                }
             }
         });
 
         sqlStatements.push('SET SQL_SAFE_UPDATES = 1;');
 
+        // Agregar consulta de auditoría al final del script SQL
+        sqlStatements.push('\n-- Auditoría: Verificar si quedaron filas sin fecha de entrega (que no estaban en el CSV o fallaron)');
+        sqlStatements.push('SELECT id, glide_id_cedula, fecha_carga, fecha_entrega_ujier FROM notificaciones WHERE fecha_entrega_ujier IS NULL AND migrated_from_glide = 1;');
+
         const outputFile = path.join(config.outputDir, 'fix_fechas_entrega.sql');
         fs.writeFileSync(outputFile, sqlStatements.join('\n'), 'utf-8');
 
         console.log(`✓ Se generaron ${updatesCount} sentencias UPDATE.`);
-        console.log(`→ Archivo SQL guardado en: ${outputFile}\n`);
+
+        if (missingDates.length > 0) {
+            console.log(`\n⚠ ATENCIÓN: Se encontraron ${missingDates.length} registros sin fecha de entrega en el CSV:`);
+            console.log('Estos registros NO se actualizarán y quedarán con fecha NULL si no se corrige manualmenten.');
+            // Mostrar los primeros 10 como ejemplo
+            missingDates.slice(0, 10).forEach(m => console.log(`  - ID: ${m.id} (Valor original: "${m.raw || ''}")`));
+            if (missingDates.length > 10) console.log(`  ... y ${missingDates.length - 10} más.`);
+        } else {
+            console.log('\n✓ Todos los registros en el CSV tienen fecha de entrega válida.');
+        }
+
+        console.log(`\n→ Archivo SQL guardado en: ${outputFile}\n`);
+        console.log('Nota: El archivo SQL incluye al final una consulta SELECT para listar cualquier fila que quede con fecha NULL después de correr el script.');
 
     } catch (error) {
         console.error('Error:', error);

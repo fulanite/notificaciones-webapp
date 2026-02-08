@@ -1,5 +1,5 @@
 -- Corrección de fechas de entrega migración Glide
--- Generado: 2026-02-08T01:27:03.972Z
+-- Generado: 2026-02-08T01:29:20.107Z
 SET SQL_SAFE_UPDATES = 0;
 UPDATE notificaciones SET fecha_entrega_ujier = '2025-10-01 00:00:00' WHERE glide_id_cedula = '97842b8a-5f16-41bd-a0e7-13c09afa68cb';
 UPDATE notificaciones SET fecha_entrega_ujier = '2025-10-01 00:00:00' WHERE glide_id_cedula = 'ab8771d4-06ac-4cae-bc0c-cc611ec9d4cc';
@@ -7214,3 +7214,6 @@ UPDATE notificaciones SET fecha_entrega_ujier = '2025-12-30 00:00:00' WHERE glid
 UPDATE notificaciones SET fecha_entrega_ujier = '2025-12-30 00:00:00' WHERE glide_id_cedula = '90b85805-b40f-45fa-90c9-8fb31c93e62d';
 UPDATE notificaciones SET fecha_entrega_ujier = '2025-12-30 00:00:00' WHERE glide_id_cedula = '8163378e-c2a6-45f3-8c19-4949272a4b35';
 SET SQL_SAFE_UPDATES = 1;
+
+-- Auditoría: Verificar si quedaron filas sin fecha de entrega (que no estaban en el CSV o fallaron)
+SELECT id, glide_id_cedula, fecha_carga, fecha_entrega_ujier FROM notificaciones WHERE fecha_entrega_ujier IS NULL AND migrated_from_glide = 1;
