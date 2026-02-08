@@ -42,3 +42,6 @@ UPDATE notificaciones SET tipo_notificacion = 'mandamientos' WHERE tipo_notifica
 
 -- 5. Limpieza genérica de espacios dobles
 UPDATE notificaciones SET zona = TRIM(REPLACE(zona, '  ', ' '));
+UPDATE notificaciones SET zona = 'ZONA SUR'      WHERE zona = 'sur';
+UPDATE notificaciones SET zona = 'ZONA NORTE'    WHERE zona = 'norte';
+UPDATE notificaciones SET zona = 'ZONA CENTRO'   WHERE zona = 'centro';

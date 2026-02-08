@@ -2376,15 +2376,16 @@
 
 /* === Compact Form & Grid === */
 .persistent-settings-bar {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: var(--radius-md);
-    padding: var(--space-2) var(--space-4);
-    margin-bottom: var(--space-4);
-    display: flex;
-    align-items: center;
-    gap: var(--space-6);
-    flex-wrap: wrap;
+    background: #eff6ff !important;
+    border: 1.5px solid #bfdbfe !important;
+    border-radius: 12px !important;
+    padding: 10px 20px !important;
+    margin-bottom: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 24px !important;
+    flex-wrap: wrap !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 
 .p-setting {
@@ -2522,23 +2523,11 @@
     align-items: flex-start !important;
 }
 
-.persistent-settings-bar {
-    background: #eff6ff !important;
-    padding: 12px 20px !important;
-    border-radius: 10px !important;
-    margin-bottom: 24px !important;
-    display: flex !important;
-    gap: 32px !important;
-    align-items: center !important;
-    border: 1.5px solid #bfdbfe !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.persistent-settings-bar label {
-    font-weight: 700 !important;
-    font-size: 0.85rem !important;
-    color: #1e3a8a !important;
-    white-space: nowrap;
+.p-info {
+    font-size: 0.75rem;
+    color: #475569;
+    font-style: italic;
+    margin-left: auto;
 }
 
 .view-tabs {

@@ -62,6 +62,11 @@ $normalization_map = [
     'C2 - Mandamiento' => 'C2 - Mandamientos',
     'D1 - Mandamiento' => 'D1 - Mandamientos',
     'D2 - Mandamiento' => 'D2 - Mandamientos',
+
+    // Lowercase variants
+    'sur' => 'ZONA SUR',
+    'norte' => 'ZONA NORTE',
+    'centro' => 'ZONA CENTRO',
 ];
 
 try {

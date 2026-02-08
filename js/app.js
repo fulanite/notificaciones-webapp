@@ -99,15 +99,19 @@ const app = {
         }
 
         const fechaInput = document.getElementById('persist-fecha-entrega');
+        const fGroupFecha = document.getElementById('f-group-fecha-entrega');
         if (fechaInput) {
             if (savedFecha) {
                 fechaInput.value = savedFecha;
+                // If persistent date is set, hide the individual form field to avoid duplication
+                if (fGroupFecha) fGroupFecha.classList.add('hidden');
             } else {
                 // Default to today in local timezone (YYYY-MM-DD)
                 const now = new Date();
                 const offset = now.getTimezoneOffset();
                 const localNow = new Date(now.getTime() - (offset * 60 * 1000));
                 fechaInput.value = localNow.toISOString().split('T')[0];
+                if (fGroupFecha) fGroupFecha.classList.remove('hidden');
             }
         }
     },
@@ -837,7 +841,7 @@ const app = {
             destinatario_nombre: getVal('destinatario-nombre') || getVal('destinatario-especial'),
             domicilio: getVal('domicilio'),
             zona: getVal('zona'),
-            fecha_entrega_ujier: getVal('persist-fecha-entrega'),
+            fecha_entrega_ujier: getVal('fecha-entrega') || getVal('persist-fecha-entrega'),
             tipo_troquel: getVal('tipo-troquel'),
             sin_troquel: getCheck('sin-troquel'),
             n_troquel: getVal('n-troquel') || null,

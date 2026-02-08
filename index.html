@@ -462,7 +462,7 @@
                                             <input type="date" id="persist-fecha-entrega" class="select-mini">
                                         </div>
                                         <div class="p-info">
-                                            <small>Se recordarán para tu próxima carga.</small>
+                                            Se recordarán para tu próxima carga.
                                         </div>
                                     </div>
 
@@ -651,16 +651,20 @@
                                             </div>
                                         </div>
 
-                                        <!-- Row 6: Asignar, Observaciones -->
+                                        <!-- Row 6: Asignar, Fecha, Observaciones -->
                                         <div class="f-row">
-                                            <div class="f-group" id="f-group-asignar" style="width: 30%;">
+                                            <div class="f-group" id="f-group-asignar" style="width: 25%;">
                                                 <label>Asignar a Ujier</label>
                                                 <select id="asignado-a" name="asignado-a">
                                                     <option value="">Pendiente...</option>
                                                     <!-- Dynamic -->
                                                 </select>
                                             </div>
-                                            <div class="f-group" style="width: 70%;">
+                                            <div class="f-group" id="f-group-fecha-entrega" style="width: 20%;">
+                                                <label>Fecha de Entrega</label>
+                                                <input type="date" id="fecha-entrega" name="fecha-entrega">
+                                            </div>
+                                            <div class="f-group" style="width: 55%;">
                                                 <label>Observaciones</label>
                                                 <input type="text" id="observaciones-iniciales"
                                                     name="observaciones-iniciales" placeholder="Notas internas...">

@@ -577,8 +577,10 @@ const notifications = {
             // Force visibility of form-specific fields during edit (they might be hidden by persistent settings)
             const fGroupZona = document.getElementById('f-group-zona');
             const fGroupAsignar = document.getElementById('f-group-asignar');
+            const fGroupFecha = document.getElementById('f-group-fecha-entrega');
             if (fGroupZona) fGroupZona.classList.remove('hidden');
             if (fGroupAsignar) fGroupAsignar.classList.remove('hidden');
+            if (fGroupFecha) fGroupFecha.classList.remove('hidden');
         }
 
         // Wait for DOM to be ready
@@ -632,10 +634,13 @@ const notifications = {
             document.getElementById('asignado-a').value = data.asignado_a || '';
             document.getElementById('observaciones-iniciales').value = data.observaciones_iniciales || '';
 
-            // Populate delivery date
+            // Populate delivery date in BOTH places for consistency
             const fechaInput = document.getElementById('persist-fecha-entrega');
-            if (fechaInput && data.fecha_entrega_ujier) {
-                fechaInput.value = data.fecha_entrega_ujier.split(' ')[0];
+            const fechaForm = document.getElementById('fecha-entrega');
+            if (data.fecha_entrega_ujier) {
+                const dateOnly = data.fecha_entrega_ujier.split(' ')[0];
+                if (fechaInput) fechaInput.value = dateOnly;
+                if (fechaForm) fechaForm.value = dateOnly;
             }
 
             // Handle checkboxes

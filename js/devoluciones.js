@@ -268,7 +268,7 @@ const devoluciones = {
             return;
         }
 
-        const user = auth.getCurrentUser();
+        const user = auth.currentUser;
         const userId = user ? user.id : 'sistema';
 
         this.state.loading = true;
