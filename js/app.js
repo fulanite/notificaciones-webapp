@@ -775,9 +775,14 @@ const app = {
                         : Promise.resolve();
                     break;
                 case 'planillas':
-                    loadPromise = typeof planillas !== 'undefined' && planillas.init
-                        ? Promise.resolve(planillas.init())
-                        : Promise.resolve();
+                    loadPromise = Promise.all([
+                        typeof planillas !== 'undefined' && planillas.init
+                            ? Promise.resolve(planillas.init())
+                            : Promise.resolve(),
+                        typeof reports !== 'undefined' && reports.init
+                            ? Promise.resolve(reports.init())
+                            : Promise.resolve()
+                    ]);
                     break;
                 default:
                     loadPromise = Promise.resolve();
