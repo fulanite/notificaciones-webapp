@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="css/variables.css?v=40.0">
     <link rel="stylesheet" href="css/base.css?v=40.0">
     <link rel="stylesheet" href="css/components.css?v=40.0">
+    <link rel="stylesheet" href="css/references.css?v=40.0">
     <link rel="stylesheet" href="css/layout.css?v=40.0">
     <link rel="stylesheet" href="css/pages.css?v=40.0">
     <link rel="stylesheet" href="css/animations.css?v=40.0">
@@ -214,6 +215,12 @@
                                     <span class="nav-text">Planillas e Informes</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="referencias-gral">
+                                    <span class="nav-icon">🔍</span>
+                                    <span class="nav-text">Explorador de Ref.</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
@@ -232,6 +239,12 @@
                                 <a href="#" class="nav-link" data-view="historial-ujier">
                                     <span class="nav-icon">📜</span>
                                     <span class="nav-text">Mi Historial</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="referencias-gral">
+                                    <span class="nav-icon">🔍</span>
+                                    <span class="nav-text">Explorador de Ref.</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -844,6 +857,32 @@
                         </div>
                         <div id="historial-list" class="historial-list">
                             <!-- Dynamic history content -->
+                        </div>
+                    </section>
+
+                    <!-- Referencias View (Compartida) -->
+                    <section id="view-referencias-gral" class="view">
+                        <div class="list-header" style="flex-direction: column; align-items: stretch; gap: 15px;">
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                <h2 style="font-size: 1.2rem; margin: 0;">🧭 Explorador de Referencias</h2>
+                                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Buscá domicilios
+                                    visitados por compañeros para ver fotos y ubicación.</p>
+                            </div>
+                            <div class="search-bar" style="width: 100%; max-width: none;">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="search-references" class="search-input"
+                                    placeholder="Buscá por calle, barrio, nombre o expediente...">
+                                <button id="btn-search-references" class="btn btn-primary btn-sm"
+                                    style="padding: 0 20px;">Buscar</button>
+                            </div>
+                        </div>
+                        <div id="references-list" class="references-grid">
+                            <!-- Dynamic references content -->
+                            <div class="empty-state">
+                                <div class="empty-icon">🏠</div>
+                                <h3>Ingresá una dirección para buscar</h3>
+                                <p>Podés buscar por calle o cualquier dato del domicilio.</p>
+                            </div>
                         </div>
                     </section>
 

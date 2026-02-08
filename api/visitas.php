@@ -48,8 +48,40 @@ try {
                 ");
                 $stmt->execute([$_GET['ujier_id'], $_GET['ujier_id']]);
                 Database::sendResponse($stmt->fetchAll());
+            } elseif (isset($_GET['view']) && $_GET['view'] === 'references') {
+                // Get all "public" visits (excluding special recipients) for logistic references
+                $searchTerm = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : null;
+
+                $sql = "
+                    SELECT v.*, 
+                           n.n_expediente, 
+                           n.destinatario_nombre, 
+                           n.tipo_notificacion,
+                           n.caratula,
+                           n.domicilio,
+                           n.zona,
+                           u.nombre as ujier_nombre
+                    FROM visitas v
+                    LEFT JOIN notificaciones n ON v.notificacion_id = n.id
+                    LEFT JOIN usuarios u ON (v.ujier_id = u.id OR v.ujier_id = u.dni)
+                    WHERE (n.destinatario_especial IS NULL OR n.destinatario_especial = '')
+                ";
+
+                if ($searchTerm) {
+                    $sql .= " AND (n.domicilio LIKE ? OR n.destinatario_nombre LIKE ? OR n.n_expediente LIKE ?)";
+                }
+
+                $sql .= " ORDER BY v.fecha DESC LIMIT 2000";
+
+                $stmt = $pdo->prepare($sql);
+                if ($searchTerm) {
+                    $stmt->execute([$searchTerm, $searchTerm, $searchTerm]);
+                } else {
+                    $stmt->execute();
+                }
+                Database::sendResponse($stmt->fetchAll());
             } else {
-                // Get all recent visits
+                // Get all recent visits (standard view)
                 $stmt = $pdo->query("
                     SELECT v.*, 
                            COALESCE(u1.nombre, u2.nombre) as ujier_nombre, 

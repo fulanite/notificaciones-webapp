@@ -778,6 +778,11 @@ const app = {
                         ? ujier.loadHistory()
                         : Promise.resolve();
                     break;
+                case 'referencias-ujier':
+                    loadPromise = typeof ujier !== 'undefined' && ujier.initReferences
+                        ? ujier.initReferences()
+                        : Promise.resolve();
+                    break;
                 case 'asignaciones':
                     loadPromise = typeof asignaciones !== 'undefined' && asignaciones.init
                         ? asignaciones.init()

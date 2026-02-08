@@ -233,6 +233,13 @@ const db = {
         return apiClient.get('visitas.php', { ujier_id: userId });
     },
 
+    async getReferences(search = '') {
+        if (!apiClient) return { data: [], error: null };
+        const params = { view: 'references' };
+        if (search) params.search = search;
+        return apiClient.get('visitas.php', params);
+    },
+
     async assignNotification(id, ujierId, assignedBy) {
         if (!apiClient) return { data: null, error: null };
         return apiClient.put('notificaciones.php', {

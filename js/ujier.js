@@ -1324,5 +1324,112 @@ const ujier = {
                 </div>
             `;
         }).join('');
+    },
+
+    // Initialize References View (Shared by all roles)
+    initReferences() {
+        const btnSearch = document.getElementById('btn-search-references');
+        const inputSearch = document.getElementById('search-references');
+
+        if (btnSearch && !btnSearch.onclick) {
+            btnSearch.onclick = () => this.loadReferences();
+        }
+
+        if (inputSearch && !inputSearch.onkeyup) {
+            inputSearch.onkeyup = (e) => {
+                if (e.key === 'Enter') this.loadReferences();
+            };
+        }
+    },
+
+    // Load references from API
+    async loadReferences() {
+        const listContainer = document.getElementById('references-list');
+        const query = document.getElementById('search-references')?.value || '';
+
+        if (!listContainer) return;
+
+        listContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; grid-column: 1 / -1;">
+                <div class="spinner"></div>
+                <p style="margin-top: 16px; color: var(--text-muted);">Buscando referencias...</p>
+            </div>
+        `;
+
+        const { data, error } = await db.getReferences(query);
+
+        if (error) {
+            listContainer.innerHTML = `<div class="error-msg" style="grid-column: 1 / -1;">Error: ${error}</div>`;
+            return;
+        }
+
+        this.renderReferences(data || []);
+    },
+
+    // Render references cards
+    renderReferences(visits) {
+        const listContainer = document.getElementById('references-list');
+        if (!listContainer) return;
+
+        if (visits.length === 0) {
+            listContainer.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="empty-icon">📂</div>
+                    <h3>No se encontraron resultados</h3>
+                    <p>Intentá con otra dirección o palabra clave.</p>
+                </div>
+            `;
+            return;
+        }
+
+        listContainer.innerHTML = visits.map(visit => {
+            const hasPhoto = !!visit.foto_url;
+            const hasGPS = visit.ubicacion_lat && visit.ubicacion_lng;
+            const mapUrl = hasGPS ? `https://www.google.com/maps?q=${visit.ubicacion_lat},${visit.ubicacion_lng}` : '#';
+
+            return `
+                <div class="reference-card">
+                    <div class="reference-photo-container">
+                        ${hasPhoto ?
+                    `<img src="${visit.foto_url}" class="reference-photo" alt="Fachada" loading="lazy" onclick="window.open(this.src, '_blank')">` :
+                    `<div class="reference-no-photo"><span>📷</span> Sin foto disponible</div>`
+                }
+                        <span class="reference-badge-zona">${visit.zona || 'SIN ZONA'}</span>
+                    </div>
+                    <div class="reference-content">
+                        <div class="reference-address">
+                            <span>📍</span>
+                            ${visit.domicilio || 'Sin domicilio registrado'}
+                        </div>
+                        <div class="reference-info-row">
+                            <span>👤 Destinatario:</span>
+                            <strong>${visit.destinatario_nombre || '-'}</strong>
+                        </div>
+                        <div class="reference-info-row">
+                            <span>⚖️ Exp:</span>
+                            <strong>${visit.n_expediente || '-'}</strong>
+                        </div>
+                        ${visit.observaciones ? `
+                            <div class="reference-obs">
+                                ${visit.observaciones}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="reference-footer">
+                        <div class="reference-ujier">
+                            <span>👤</span> ${visit.ujier_nombre || 'Compañero'}
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span class="reference-date">${utils.formatDate(visit.fecha)}</span>
+                            ${hasGPS ? `
+                                <a href="${mapUrl}" target="_blank" class="btn btn-primary btn-map-ref">
+                                    <span>🗺️</span> Mapa
+                                </a>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 };
