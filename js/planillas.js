@@ -253,50 +253,8 @@ const planillas = {
         }
 
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'landscape', format: 'a4' });
-
-        const zona = document.getElementById('planilla-zona').value || 'Generales';
         const fecha = document.getElementById('planilla-fecha').value;
         const formattedDate = fecha.split('-').reverse().join('/');
-
-        // Deduce Ujier form data
-        const uniqueUjieres = new Set();
-        data.forEach(item => {
-            const name = item.ujier_nombre || (item.usuarios ? item.usuarios.nombre : null);
-            if (name) uniqueUjieres.add(name);
-        });
-
-        let ujierName = 'Sin asignar';
-        if (uniqueUjieres.size === 1) {
-            ujierName = [...uniqueUjieres][0];
-        } else if (uniqueUjieres.size > 1) {
-            ujierName = 'Varios';
-        }
-
-        // --- HEADER ---
-        doc.setTextColor(0, 0, 0); // Black
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(16);
-        doc.text('PODER JUDICIAL DE CATAMARCA', doc.internal.pageSize.width / 2, 12, { align: 'center' });
-
-        doc.setFontSize(14);
-        doc.text('OFICINA DE MANDAMIENTOS Y NOTIFICACIONES', doc.internal.pageSize.width / 2, 19, { align: 'center' });
-
-        // Subheader Info
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'normal');
-
-        // "Zona: [Zona]" left aligned
-        doc.text(`Zona: ${zona}`, 14, 30);
-
-        // "Fecha: [Date]" right aligned
-        doc.text(`Fecha: ${formattedDate}`, doc.internal.pageSize.width - 14, 30, { align: 'right' });
-
-        // "Ujier: [Name]" left aligned below Zona
-        doc.text(`Ujier: ${ujierName}`, 14, 36);
-
-        // --- TABLE ---
-        const tableBody = [];
 
         // Group data by Zona
         const groupedData = data.reduce((acc, item) => {
@@ -310,15 +268,54 @@ const planillas = {
 
         sortedZones.forEach(zonaName => {
             const items = groupedData[zonaName];
+            const doc = new jsPDF({ orientation: 'landscape', format: 'a4' });
+
+            // Deduce Ujier for THIS zone
+            const uniqueUjieres = new Set();
+            items.forEach(item => {
+                const name = item.ujier_nombre || (item.usuarios ? item.usuarios.nombre : null);
+                if (name) uniqueUjieres.add(name);
+            });
+
+            let ujierName = 'Sin asignar';
+            if (uniqueUjieres.size === 1) {
+                ujierName = [...uniqueUjieres][0];
+            } else if (uniqueUjieres.size > 1) {
+                ujierName = 'Varios';
+            }
+
+            // --- HEADER ---
+            doc.setTextColor(0, 0, 0); // Black
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.text('PODER JUDICIAL DE CATAMARCA', doc.internal.pageSize.width / 2, 12, { align: 'center' });
+
+            doc.setFontSize(14);
+            doc.text('OFICINA DE MANDAMIENTOS Y NOTIFICACIONES', doc.internal.pageSize.width / 2, 19, { align: 'center' });
+
+            // Subheader Info
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+
+            // "Zona: [Zona]" left aligned
+            doc.text(`Zona: ${zonaName}`, 14, 30);
+
+            // "Fecha: [Date]" right aligned
+            doc.text(`Fecha: ${formattedDate}`, doc.internal.pageSize.width - 14, 30, { align: 'right' });
+
+            // "Ujier: [Name]" left aligned below Zona
+            doc.text(`Ujier: ${ujierName}`, 14, 36);
+
+            // --- TABLE ---
+            const tableBody = [];
 
             // Separar items normales de destinos especiales
-            const specialDestinations = ['estrados', 'arcat', 'secretaria', 'juzgado']; // Palabras clave comunes, o verificar si el campo tiene valor
+            const specialDestinations = ['estrados', 'arcat', 'secretaria', 'juzgado'];
 
             const normalItems = [];
             const specialItems = [];
 
             items.forEach(item => {
-                // Verificar campo destinatario_especial o si el destinatario es una palabra clave
                 const isSpecial = item.destinatario_especial ||
                     (item.destinatario_nombre && specialDestinations.includes(item.destinatario_nombre.toLowerCase()));
 
@@ -329,9 +326,9 @@ const planillas = {
                 }
             });
 
-            // Add Separator Row for Zone
-            // Total count
-            tableBody.push([{ content: `${zonaName} (${items.length})`, colSpan: 13, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', halign: 'left' } }]);
+            // Add Separator Row for Zone (Optional now since we have one PDF per zone, but keeping for consistency or maybe just remove header row inside table since title is at top)
+            // Actually, user wants individual PDFs. The Header "Zona: ..." is already at the top. 
+            // We can skip the table row header for the Zone name or keep it. Let's keep it clean and maybe just start with items.
 
             let zoneIndex = 1;
 
@@ -377,32 +374,16 @@ const planillas = {
                     content: 'DESTINOS ESPECIALES',
                     colSpan: 13,
                     styles: {
-                        fillColor: [255, 255, 255],
+                        fillColor: [240, 240, 240], // Light gray background
                         textColor: [0, 0, 0],
                         fontStyle: 'bold',
                         halign: 'left',
-                        fontSize: 11,
+                        fontSize: 10,
                         cellPadding: { top: 5, bottom: 2 }
                     }
                 }]);
 
-                // Repetir encabezados de columna
-                const headers = ['Nº', 'Nº expte.', 'Carátula', 'Origen', 'Tipo Not.', 'Letrado', 'Destinatario', 'Domicilio', 'Troquel', 'Costo', 'Medio de pago', 'Observaciones', 'Devuelta'];
-
-                // Mapear headers a objetos cell con estilo
-                const headerRow = headers.map(h => ({
-                    content: h,
-                    styles: {
-                        fillColor: [200, 200, 200], // Gris claro para diferenciar o standard
-                        textColor: [0, 0, 0],
-                        fontStyle: 'bold',
-                        halign: 'center'
-                    }
-                }));
-                //tableBody.push(headerRow); // jspdf autoTable espera array de arrays o objetos.
-                // Sin embargo, si usamor 'head' option, el estilo por defecto es diferente.
-                // Vamos a usar un estilo simple gris.
-
+                // Repetir encabezados de columna - Manualmente agregar una fila que parezca header
                 tableBody.push([
                     { content: 'Nº', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
                     { content: 'Nº expte.', styles: { fillColor: [220, 220, 220], fontStyle: 'bold' } },
@@ -421,77 +402,86 @@ const planillas = {
 
                 addRows(specialItems);
             }
-        });
 
-        doc.autoTable({
-            startY: 42,
-            head: [['Nº', 'Nº expte.', 'Carátula', 'Origen', 'Tipo Not.', 'Letrado', 'Destinatario', 'Domicilio', 'Troquel', 'Costo', 'Medio de pago', 'Observaciones', 'Devuelta']],
-            body: tableBody,
-            styles: {
-                fontSize: 8,
-                cellPadding: 2,
-                textColor: [0, 0, 0], // Black text
-                lineColor: [200, 200, 200], // Light gray borders
-                lineWidth: 0.1,
-                overflow: 'linebreak', // Wrap text
-                valign: 'middle'
-            },
-            headStyles: {
-                fillColor: [255, 255, 255], // White background for header to save ink
-                textColor: [0, 0, 0], // Black text header
-                fontStyle: 'bold',
-                lineWidth: 0.1,
-                lineColor: [0, 0, 0] // Black borders for header
-            },
-            columnStyles: {
-                0: { cellWidth: 8 },  // Nº
-                1: { cellWidth: 18 }, // Nº expte
-                2: { cellWidth: 35 }, // Carátula
-                3: { cellWidth: 25 }, // Origen
-                4: { cellWidth: 18 }, // Tipo Not
-                5: { cellWidth: 22 }, // Letrado
-                6: { cellWidth: 25 }, // Destinatario
-                7: { cellWidth: 35 }, // Domicilio
-                8: { cellWidth: 12 }, // Troquel
-                9: { cellWidth: 15 }, // Costo
-                10: { cellWidth: 20 }, // Medio de pago
-                11: { cellWidth: 25 }, // Observaciones
-                12: { cellWidth: 15, halign: 'center' } // Devuelta
-            },
-            theme: 'grid', // Grid theme for borders
-            didDrawCell: (data) => {
-                // Draw square checkbox for 'Devuelta' column
-                if (data.section === 'body' && data.column.index === 12) {
-                    const size = 5; // Checkbox size
-                    const x = data.cell.x + (data.cell.width - size) / 2;
-                    const y = data.cell.y + (data.cell.height - size) / 2;
+            doc.autoTable({
+                startY: 42,
+                head: [['Nº', 'Nº expte.', 'Carátula', 'Origen', 'Tipo Not.', 'Letrado', 'Destinatario', 'Domicilio', 'Troquel', 'Costo', 'Medio de pago', 'Observaciones', 'Devuelta']],
+                body: tableBody,
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 2,
+                    textColor: [0, 0, 0], // Black text
+                    lineColor: [200, 200, 200], // Light gray borders
+                    lineWidth: 0.1,
+                    overflow: 'linebreak', // Wrap text
+                    valign: 'middle'
+                },
+                headStyles: {
+                    fillColor: [255, 255, 255], // White background for header to save ink
+                    textColor: [0, 0, 0], // Black text header
+                    fontStyle: 'bold',
+                    lineWidth: 0.1,
+                    lineColor: [0, 0, 0] // Black borders for header
+                },
+                columnStyles: {
+                    0: { cellWidth: 8 },  // Nº
+                    1: { cellWidth: 18 }, // Nº expte
+                    2: { cellWidth: 35 }, // Carátula
+                    3: { cellWidth: 25 }, // Origen
+                    4: { cellWidth: 18 }, // Tipo Not
+                    5: { cellWidth: 22 }, // Letrado
+                    6: { cellWidth: 25 }, // Destinatario
+                    7: { cellWidth: 35 }, // Domicilio
+                    8: { cellWidth: 12 }, // Troquel
+                    9: { cellWidth: 15 }, // Costo
+                    10: { cellWidth: 20 }, // Medio de pago
+                    11: { cellWidth: 25 }, // Observaciones
+                    12: { cellWidth: 15, halign: 'center' } // Devuelta
+                },
+                theme: 'grid', // Grid theme for borders
+                didDrawCell: (data) => {
+                    // Draw square checkbox for 'Devuelta' column
+                    if (data.section === 'body' && data.column.index === 12) {
+                        // Avoid drawing on sub-headers (which have text content or object content)
+                        const cellRaw = data.cell.raw;
+                        // If it's a header object with content or non-empty string, skip
+                        if (cellRaw && (typeof cellRaw === 'object' || (typeof cellRaw === 'string' && cellRaw.trim() !== ''))) {
+                            return;
+                        }
 
-                    doc.setDrawColor(0); // Black border
-                    doc.setLineWidth(0.1);
-                    doc.rect(x, y, size, size);
+                        const size = 5; // Checkbox size
+                        const x = data.cell.x + (data.cell.width - size) / 2;
+                        const y = data.cell.y + (data.cell.height - size) / 2;
+
+                        doc.setDrawColor(0); // Black border
+                        doc.setLineWidth(0.1);
+                        doc.rect(x, y, size, size);
+                    }
                 }
+            });
+
+            // --- FOOTER ---
+            const finalY = doc.lastAutoTable.finalY || 40;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.text(`Total: ${items.length}`, 14, finalY + 10);
+
+            // Signature line
+            if (ujierName && ujierName !== 'Sin asignar' && ujierName !== 'Varios') {
+                // If a specific, single Ujier was found in the data
+                doc.text(`Firma (${ujierName}): ______________________________`, 14, finalY + 18);
+            } else {
+                doc.text(`Firma Ujier / Receptor: ______________________________`, 14, finalY + 18);
             }
+
+            // Save PDF per zone
+            // Clean filename
+            const safeZonaName = zonaName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            const fileName = `planilla_${safeZonaName}_${formattedDate.replace(/\//g, '-')}.pdf`;
+            doc.save(fileName);
         });
 
-        // --- FOOTER ---
-        const finalY = doc.lastAutoTable.finalY || 40;
-
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.text(`Total: ${data.length}`, 14, finalY + 10);
-
-        // Signature line
-        if (ujierName && ujierName !== 'Sin asignar' && ujierName !== 'Varios') {
-            // If a specific, single Ujier was found in the data
-            doc.text(`Firma (${ujierName}): ______________________________`, 14, finalY + 18);
-        } else {
-            doc.text(`Firma Ujier / Receptor: ______________________________`, 14, finalY + 18);
-        }
-
-        // Save
-        const fileName = `planilla_${zona.replace(/\s+/g, '_')}_${fecha}.pdf`;
-        doc.save(fileName);
-
-        utils.showToast('Planilla generada con éxito', 'success');
+        utils.showToast('Planillas generadas con éxito', 'success');
     }
 };
