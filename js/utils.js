@@ -32,6 +32,16 @@ const utils = {
         });
     },
 
+    // Format just time (HH:mm)
+    formatTime(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        return d.toLocaleTimeString('es-AR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    },
+
     // Format relative time (e.g., "hace 5 minutos")
     formatRelativeTime(date) {
         if (!date) return '';
