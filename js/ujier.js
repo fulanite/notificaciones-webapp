@@ -1437,7 +1437,138 @@ const ujier = {
                         </div>
                     </div>
                 </div>
+                </div>
             `;
         }).join('');
+    },
+
+    // --- MAP & STATS MODULE ---
+    mapInstance: null,
+    mapLayer: null,
+
+    initMap() {
+        const mapContainer = document.getElementById('ujier-map-container');
+        if (!mapContainer) return;
+
+        // Set default date to today if empty
+        const dateInput = document.getElementById('map-date-filter');
+        if (dateInput && !dateInput.value) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+
+        // Initialize Map if not exists
+        if (!this.mapInstance) {
+            this.mapInstance = L.map('ujier-map-container').setView([-27.4692131, -58.8306349], 13); // Default Corrientes
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(this.mapInstance);
+        }
+
+        // Refresh button listener
+        document.getElementById('btn-refresh-map')?.addEventListener('click', () => this.loadMapData());
+        document.getElementById('map-date-filter')?.addEventListener('change', () => this.loadMapData());
+
+        // Load initial data
+        this.loadMapData();
+
+        // Force map resize calc after tab switch
+        setTimeout(() => {
+            if (this.mapInstance) this.mapInstance.invalidateSize();
+        }, 300);
+    },
+
+    async loadMapData() {
+        const date = document.getElementById('map-date-filter')?.value;
+        if (!date || !auth.currentUser) return;
+
+        // Clear previous layers
+        if (this.mapLayer) {
+            this.mapInstance.removeLayer(this.mapLayer);
+        }
+
+        const { data, error } = await db.getUserLocations(auth.currentUser.id, date);
+
+        if (error) {
+            console.error('Error loading locations:', error);
+            utils.showToast('No se pudieron cargar las ubicaciones', 'error');
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            utils.showToast('No hay registros de GPS para esta fecha', 'info');
+            document.getElementById('map-stat-visits').textContent = '0';
+            document.getElementById('map-stat-distance').textContent = '0 km';
+            return;
+        }
+
+        // Process markers and path
+        const markers = L.layerGroup();
+        const latlngs = [];
+
+        data.forEach(point => {
+            if (point.lat && point.lng) {
+                const coord = [parseFloat(point.lat), parseFloat(point.lng)];
+                latlngs.push(coord);
+
+                const statusColor = point.resultado === 'entregado' || point.resultado === 'atiende' ? 'green' : 'red';
+
+                const popupContent = `
+                    <strong>${point.destinatario || 'Desconocido'}</strong><br>
+                    ${point.domicilio}<br>
+                    <small>${utils.formatDateTime(point.fecha)}</small><br>
+                    <em>${(point.resultado || '').replace('_', ' ')}</em>
+                `;
+
+                L.circleMarker(coord, {
+                    color: statusColor,
+                    fillColor: statusColor,
+                    fillOpacity: 0.5,
+                    radius: 8
+                }).bindPopup(popupContent).addTo(markers);
+            }
+        });
+
+        // Add Path (Polyline)
+        if (latlngs.length > 1) {
+            L.polyline(latlngs, { color: 'blue', weight: 3, opacity: 0.7, dashArray: '5, 10' }).addTo(markers);
+        }
+
+        // Add to map
+        this.mapLayer = markers;
+        this.mapInstance.addLayer(this.mapLayer);
+
+        // Fit bounds
+        if (latlngs.length > 0) {
+            this.mapInstance.fitBounds(latlngs);
+        }
+
+        // Update Stats
+        document.getElementById('map-stat-visits').textContent = data.length;
+
+        // Simple distance Calc
+        let totalDist = 0;
+        for (let i = 0; i < latlngs.length - 1; i++) {
+            totalDist += this.calculateDistance(latlngs[i][0], latlngs[i][1], latlngs[i + 1][0], latlngs[i + 1][1]);
+        }
+        document.getElementById('map-stat-distance').textContent = totalDist.toFixed(2) + ' km';
+    },
+
+    // Haversine formula
+    calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of the earth in km
+        const dLat = this.deg2rad(lat2 - lat1);
+        const dLon = this.deg2rad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const d = R * c;
+        return d;
+    },
+
+    deg2rad(deg) {
+        return deg * (Math.PI / 180);
     }
+
 };

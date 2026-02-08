@@ -327,5 +327,15 @@ const db = {
     async uploadAudio(blob, notificationId) {
         if (!apiClient) return { url: null, error: null };
         return apiClient.uploadFile(blob, notificationId, 'audio');
+    },
+
+    // ==================== MAPS ====================
+    async getUserLocations(userId, date) {
+        if (!apiClient) return { data: [], error: 'API not initialized' };
+        return apiClient.get('visitas.php', {
+            view: 'locations',
+            user_id: userId,
+            date: date
+        });
     }
 };

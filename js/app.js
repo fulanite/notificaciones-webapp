@@ -792,6 +792,15 @@ const app = {
                         ? ujier.loadAssignments()
                         : Promise.resolve();
                     break;
+                case 'ubicaciones-ujier':
+                    loadPromise = typeof ujier !== 'undefined' && ujier.initMap
+                        ? ujier.initMap()
+                        : Promise.resolve();
+                    break;
+                    loadPromise = typeof ujier !== 'undefined' && ujier.loadAssignments
+                        ? ujier.loadAssignments()
+                        : Promise.resolve();
+                    break;
                 case 'historial-ujier':
                     loadPromise = typeof ujier !== 'undefined' && ujier.loadHistory
                         ? ujier.loadHistory()
