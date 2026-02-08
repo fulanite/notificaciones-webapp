@@ -3,6 +3,8 @@
  */
 
 const planillas = {
+    listenersAttached: false,
+
     init() {
         this.setupEventListeners();
         this.loadUjieres();
@@ -11,16 +13,20 @@ const planillas = {
     },
 
     setupEventListeners() {
+        if (this.listenersAttached) return;
+
         document.getElementById('btn-generar-planilla')?.addEventListener('click', () => this.generatePDF());
 
         // Update preview on filter change
         ['planilla-zona', 'planilla-ujier', 'planilla-fecha'].forEach(id => {
             document.getElementById(id)?.addEventListener('change', () => this.updatePreview());
         });
+
+        this.listenersAttached = true;
     },
 
     setDefaultDate() {
-        // Set default date to today
+        // ... (rest of function unchanged, just context for match)
         const dateInput = document.getElementById('planilla-fecha');
         if (dateInput) {
             const today = new Date();
@@ -75,7 +81,7 @@ const planillas = {
         });
 
         select.innerHTML = html;
-        select.addEventListener('change', () => this.updatePreview());
+        // Listener removed here as it is handled in setupEventListeners
     },
 
     async loadUjieres() {
