@@ -11,6 +11,7 @@ const ujier = {
     audioChunks: [],
     reorderMode: false,
     historyData: [], // Almacenar historial completo para filtrado local
+    selectedHistoryYear: 2026,
 
     // Initialize ujier view
     async init() {
@@ -112,9 +113,15 @@ const ujier = {
         const filterDate = document.getElementById('filter-historial-fecha')?.value || '';
         const filterStatus = document.getElementById('filter-historial-estado')?.value || '';
 
+        const filterYear = this.selectedHistoryYear;
+
         const filtered = this.historyData.filter(visit => {
-            // Filter by date (YYYY-MM-DD)
+            // Filter by year
             const visitDateStr = visit.fecha ? visit.fecha.split(' ')[0] : '';
+            const visitYear = visitDateStr ? parseInt(visitDateStr.split('-')[0]) : null;
+            if (visitYear !== filterYear) return false;
+
+            // Filter by date (YYYY-MM-DD)
             const matchesDate = !filterDate || visitDateStr === filterDate;
 
             // Filter by status
@@ -140,6 +147,19 @@ const ujier = {
         });
 
         this.renderHistory(filtered);
+    },
+
+    // Switch history year tab
+    switchHistoryYear(year, btn) {
+        this.selectedHistoryYear = year;
+
+        // Update active tab UI
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Apply filtering (data is already loaded, we just filter it)
+        this.filterHistory();
     },
 
     // Load user's assignments

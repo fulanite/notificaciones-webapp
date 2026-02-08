@@ -29,6 +29,7 @@ try {
                 Database::sendResponse($stmt->fetchAll());
             } elseif (isset($_GET['ujier_id'])) {
                 // Get visits by ujier with full notification info
+                // Use LEFT JOIN with usuarios to support both UUID and DNI in 'ujier_id' column
                 $stmt = $pdo->prepare("
                     SELECT v.*, 
                            n.n_expediente, 
@@ -36,12 +37,14 @@ try {
                            n.tipo_notificacion,
                            n.caratula,
                            n.domicilio,
-                           n.zona
+                           n.zona,
+                           n.devuelta_por_ujier
                     FROM visitas v
                     LEFT JOIN notificaciones n ON v.notificacion_id = n.id
-                    WHERE v.ujier_id = ? OR (v.ujier_id IS NULL AND n.asignado_a = ?)
+                    LEFT JOIN usuarios u ON (v.ujier_id = u.id OR v.ujier_id = u.dni)
+                    WHERE u.id = ? OR (v.ujier_id IS NULL AND n.asignado_a = ?)
                     ORDER BY v.fecha DESC
-                    LIMIT 1000
+                    LIMIT 2000
                 ");
                 $stmt->execute([$_GET['ujier_id'], $_GET['ujier_id']]);
                 Database::sendResponse($stmt->fetchAll());
