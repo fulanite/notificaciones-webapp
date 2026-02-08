@@ -51,10 +51,40 @@ function categorizeAndCount(rows) {
     rows.forEach(row => {
         // Dynamic categorization based on 'tipoNotificacion'
         const tipoNot = (row.tipo_notificacion || '').trim() || 'No especificado';
-        // Map common types to display names if needed (e.g. 'cedulas' -> 'Cédulas')
+
+        // Map all notification types to their display names
         let displayTipo = tipoNot;
-        if (tipoNot === 'cedulas') displayTipo = 'Cédulas';
-        if (tipoNot === 'mandamientos') displayTipo = 'Mandamientos';
+
+        // Mapeo completo de tipos según CONFIG.NOTIFICATION_TYPES
+        switch (tipoNot) {
+            case 'cedulas':
+                displayTipo = 'Cédulas';
+                break;
+            case 'cedulas_urgente_norte':
+                displayTipo = 'Cédulas Urgente Norte';
+                break;
+            case 'cedulas_urgente_sur':
+                displayTipo = 'Cédulas Urgente Sur';
+                break;
+            case 'cedulas_mandamientos_22172':
+                displayTipo = 'Cédulas o Mandamientos Ley 22172';
+                break;
+            case 'cedulas_correspondencia':
+                displayTipo = 'Cédulas por Correspondencia (Interior)';
+                break;
+            case 'mandamientos':
+                displayTipo = 'Mandamientos';
+                break;
+            case 'mandamientos_habilitacion_norte':
+                displayTipo = 'Mandamientos con habilitación Norte';
+                break;
+            case 'mandamientos_habilitacion_sur':
+                displayTipo = 'Mandamientos con habilitación Sur';
+                break;
+            default:
+                // Si no coincide con ninguno, usar el valor tal cual con primera letra mayúscula
+                displayTipo = tipoNot.charAt(0).toUpperCase() + tipoNot.slice(1);
+        }
 
         counts.tipos.set(displayTipo, (counts.tipos.get(displayTipo) || 0) + 1);
 
