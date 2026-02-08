@@ -143,7 +143,10 @@ const db = {
         if (options.estado) params.estado = options.estado;
         if (options.tipo) params.tipo = options.tipo;
         if (options.asignado_a) params.asignado_a = options.asignado_a;
-        if (options.fecha) params.fecha = options.fecha;
+        if (options.fecha) {
+            params.fecha = options.fecha;
+            if (options.dateField) params.date_field = options.dateField; // Support custom date field
+        }
         if (options.search) params.search = options.search;
         if (options.zona) params.zona = options.zona;
         if (options.year) params.year = options.year;

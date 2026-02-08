@@ -117,7 +117,8 @@ const planillas = {
 
         const filters = {
             fecha: fecha,
-            limit: 1000
+            limit: 1000,
+            dateField: 'fecha_entrega_ujier' // Filter by delivery date, not creation date
         };
 
         const { data, error } = await db.getNotifications(filters);
