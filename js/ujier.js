@@ -595,6 +595,34 @@ const ujier = {
             resultSelect.value = isSpecial ? 'entregado' : '';
         }
 
+        // --- TROQUEL LOGIC (FIXED) ---
+        const troquelType = assignment.tipo_troquel || (assignment.tipo_notificacion?.toLowerCase().includes('cedula') ? 'C' :
+            (assignment.tipo_notificacion?.toLowerCase().includes('mandamiento') ? 'M' : 'SIN'));
+
+        // Disable radios and set value
+        const radios = document.querySelectorAll('input[name="troquel_opcion"]');
+        radios.forEach(r => {
+            r.checked = (r.value === troquelType);
+            r.disabled = true; // Ujier cannot change type
+        });
+
+        // Update hidden input and toggle number field
+        const hiddenInput = document.getElementById('tipo-troquel-diligencia');
+        if (hiddenInput) hiddenInput.value = troquelType;
+
+        const nTroquelContainer = document.getElementById('n-troquel-container');
+        if (nTroquelContainer) {
+            if (troquelType === 'C' || troquelType === 'M') {
+                nTroquelContainer.classList.remove('hidden');
+                // Pre-fill number if exists
+                if (assignment.n_troquel) {
+                    document.getElementById('n-troquel-diligencia').value = assignment.n_troquel;
+                }
+            } else {
+                nTroquelContainer.classList.add('hidden');
+            }
+        }
+
         // BLOCKING LOGIC: If already returned, disable form
         const isReturned = assignment.devuelta_por_ujier == 1;
         // Pre-aviso NO cuenta como completado final, permite registrar nueva visita
