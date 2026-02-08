@@ -36,14 +36,32 @@ const planillas = {
         const select = document.getElementById('planilla-zona');
         if (!select) return;
 
-        // Define zones structure
+        // Detailed zones list from user request
         const zones = {
-            'Zona A': ['A1', 'A2'],
-            'Zona B': ['B1', 'B2'],
-            'Zona C': ['C1', 'C2'],
-            'Zona D': ['D1', 'D2'],
-            'Urgentes': ['Urgente NORTE', 'Urgente SUR'],
-            'Fuera de Radio': ['Fuera de Radio NORTE', 'Fuera de Radio SUR']
+            'Zona A': [
+                'A1 - Cédulas', 'A1 - Mandamientos',
+                'A2 - Cédulas', 'A2 - Mandamientos'
+            ],
+            'Zona B': [
+                'B1 - Cédulas', 'B1 - Mandamientos',
+                'B2 - Cédulas', 'B2 - Mandamientos'
+            ],
+            'Zona C': [
+                'C1 - Cédulas', 'C1 - Mandamientos',
+                'C2 - Cédulas', 'C2 - Mandamientos'
+            ],
+            'Zona D': [
+                'D1 - Cédulas', 'D1 - Mandamientos',
+                'D2 - Cédulas', 'D2 - Mandamientos'
+            ],
+            'Urgentes': [
+                'Urgente SUR - Cédulas', 'Urgente SUR - Mandamientos',
+                'Urgente NORTE - Cédulas', 'Urgente NORTE - Mandamiento'
+            ],
+            'Fuera de Radio': [
+                'Fuera de Radio NORTE - Cèdula', 'Fuera de Radio NORTE - Mandamientos',
+                'Fuera de Radio SUR - Cédula', 'Fuera de Radio SUR - Mandamientos'
+            ]
         };
 
         let html = '<option value="">Todas las Zonas</option>';
@@ -91,11 +109,9 @@ const planillas = {
             return null;
         }
 
-        // Prepare filters
-        // Using common filters. Ensure backend supports filtering by date/zone/assignee
         const filters = {
             fecha: fecha,
-            limit: 1000 // Get all for the day
+            limit: 1000
         };
 
         const { data, error } = await db.getNotifications(filters);
@@ -107,27 +123,12 @@ const planillas = {
 
         let filteredData = data || [];
 
-        // Client-side filtering if API returns broader dataset
+        // Client-side filtering
         if (zona) {
             filteredData = filteredData.filter(n => {
                 if (!n.zona) return false;
-                // Normalize and check for containment, handling formatted vs raw values
-                // Example: 'A1' filters 'A1 - Cédulas'
-                const zNorm = n.zona.toLowerCase();
-                const filterNorm = zona.toLowerCase();
-
-                // Urgentes handling
-                if (filterNorm.includes('urgente')) {
-                    return zNorm.includes(filterNorm);
-                }
-
-                // Fuera de radio handling
-                if (filterNorm.includes('fuera de radio')) {
-                    return zNorm.includes(filterNorm);
-                }
-
-                // Standard zones A1, B1 etc.
-                return zNorm.startsWith(filterNorm);
+                // Exact match or contains for flexibility incase of minor typos in DB vs List
+                return n.zona.toLowerCase().includes(zona.toLowerCase());
             });
         }
         if (ujierId) {
@@ -151,21 +152,47 @@ const planillas = {
             return;
         }
 
-        data.forEach((item, index) => {
-            const row = `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.n_expediente || ''}</td>
-                    <td>${item.caratula || ''}</td>
-                    <td>${item.origen || ''}</td>
-                    <td>${item.tipo_notificacion || ''}</td>
-                    <td>${item.destinatario_nombre || ''}</td>
-                    <td>${item.domicilio || ''}</td>
-                    <td>${item.n_troquel || '-'}</td>
-                    <td>${item.usuarios ? item.usuarios.nombre : 'Sin asignar'}</td>
+        // Group data by Zona
+        const groupedData = data.reduce((acc, item) => {
+            const z = item.zona || 'Sin Zona';
+            if (!acc[z]) acc[z] = [];
+            acc[z].push(item);
+            return acc;
+        }, {});
+
+        // Sort zones alphabetically for display
+        const sortedZones = Object.keys(groupedData).sort();
+
+        sortedZones.forEach(zonaName => {
+            const items = groupedData[zonaName];
+
+            // Add Group Header with Count
+            const headerRow = `
+                <tr style="background-color: var(--bg-hover); font-weight: bold;">
+                    <td colspan="9" style="padding: 10px;">
+                        📂 ${zonaName} <span class="badge" style="margin-left: 10px; font-size: 0.8em;">${items.length} items</span>
+                    </td>
                 </tr>
             `;
-            tbody.innerHTML += row;
+            tbody.innerHTML += headerRow;
+
+            // Add items for this zone
+            items.forEach((item, index) => {
+                const row = `
+                    <tr>
+                        <td style="padding-left: 20px;">${index + 1}</td>
+                        <td>${item.n_expediente || ''}</td>
+                        <td>${item.caratula || ''}</td>
+                        <td>${item.origen || ''}</td>
+                        <td>${item.tipo_notificacion || ''}</td>
+                        <td>${item.destinatario_nombre || ''}</td>
+                        <td>${item.domicilio || ''}</td>
+                        <td>${item.n_troquel || '-'}</td>
+                        <td>${item.ujier_nombre || (item.usuarios ? item.usuarios.nombre : 'Sin asignar')}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
         });
     },
 
@@ -203,34 +230,48 @@ const planillas = {
         doc.text(`Fecha: ${formattedDate}`, doc.internal.pageSize.width - 14, 30, { align: 'right' });
 
         // --- TABLE ---
-        // Columns matches user request: 
-        // Nº, Nº expte., Carátula, Origen, Tipo Not., Letrado, Destinatario, Domicilio, Troquel, Costo, Medio de pago, Observaciones, Devuelta
+        const tableBody = [];
 
-        const tableBody = data.map((item, index) => {
-            // Format "Tipo Not."
-            let tipo = item.tipo_notificacion || '';
-            if (tipo === 'cedulas') tipo = 'Cédulas';
-            if (tipo === 'mandamientos') tipo = 'Mandamientos';
+        // Group data by Zona
+        const groupedData = data.reduce((acc, item) => {
+            const z = item.zona || 'Sin Zona';
+            if (!acc[z]) acc[z] = [];
+            acc[z].push(item);
+            return acc;
+        }, {});
 
-            // Format "Medio de Pago"
-            let pago = item.medio_pago || '';
-            if (pago) pago = pago.charAt(0).toUpperCase() + pago.slice(1);
+        const sortedZones = Object.keys(groupedData).sort();
 
-            return [
-                index + 1,
-                item.n_expediente || '',
-                item.caratula || '',
-                item.origen || '',
-                tipo,
-                item.letrado || '',
-                item.destinatario_nombre || '',
-                item.domicilio || '',
-                item.n_troquel || '',
-                item.costo ? `$${item.costo}` : '',
-                pago,
-                '', // Observaciones (empty for print)
-                ''  // Devuelta (checkbox)
-            ];
+        sortedZones.forEach(zonaName => {
+            // Add Separator Row for Zone
+            tableBody.push([{ content: `${zonaName} (${groupedData[zonaName].length})`, colSpan: 13, styles: { fillColor: [240, 240, 240], fontStyle: 'bold', halign: 'left' } }]);
+
+            groupedData[zonaName].forEach((item, index) => {
+                // Format "Tipo Not."
+                let tipo = item.tipo_notificacion || '';
+                if (tipo === 'cedulas') tipo = 'Cédulas';
+                if (tipo === 'mandamientos') tipo = 'Mandamientos';
+
+                // Format "Medio de Pago"
+                let pago = item.medio_pago || '';
+                if (pago) pago = pago.charAt(0).toUpperCase() + pago.slice(1);
+
+                tableBody.push([
+                    index + 1,
+                    item.n_expediente || '',
+                    item.caratula || '',
+                    item.origen || '',
+                    tipo,
+                    item.letrado || '',
+                    item.destinatario_nombre || '',
+                    item.domicilio || '',
+                    item.n_troquel || '',
+                    item.costo ? `$${item.costo}` : '',
+                    pago,
+                    '', // Observaciones
+                    ''  // Devuelta
+                ]);
+            });
         });
 
         doc.autoTable({
