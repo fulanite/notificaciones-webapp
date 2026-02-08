@@ -757,12 +757,40 @@ const ujier = {
         const cargaDiferidaToggle = document.getElementById('carga-diferida');
         cargaDiferidaToggle?.addEventListener('change', (e) => {
             const motivoContainer = document.getElementById('motivo-falla-container');
+            const gpsContainer = document.getElementById('gps-wrapper'); // New wrapper for GPS section
+
             if (e.target.checked) {
                 motivoContainer?.classList.remove('hidden');
+                gpsContainer?.classList.add('hidden');
             } else {
                 motivoContainer?.classList.add('hidden');
+                gpsContainer?.classList.remove('hidden');
             }
         });
+
+        // Troquel Toggles
+        const toggleTroquel = (val) => {
+            const container = document.getElementById('n-troquel-container');
+            const input = document.getElementById('n-troquel-diligencia');
+            const hiddenType = document.getElementById('tipo-troquel-diligencia');
+
+            if (val === 'SIN') {
+                container?.classList.add('hidden');
+                if (input) {
+                    input.required = false;
+                    input.value = '';
+                }
+                if (hiddenType) hiddenType.value = '';
+            } else {
+                container?.classList.remove('hidden');
+                if (input) input.required = true;
+                if (hiddenType) hiddenType.value = val;
+            }
+        };
+
+        document.getElementById('radio-troquel-c')?.addEventListener('change', () => toggleTroquel('C'));
+        document.getElementById('radio-troquel-m')?.addEventListener('change', () => toggleTroquel('M'));
+        document.getElementById('radio-troquel-sin')?.addEventListener('change', () => toggleTroquel('SIN'));
 
         // GPS capture
         document.getElementById('btn-capture-gps')?.addEventListener('click', () => this.captureGPS());
@@ -1173,8 +1201,11 @@ const ujier = {
             const lng = document.getElementById('ubicacion-lng').value;
 
             if (!lat || !lng) {
-                utils.showToast('La ubicación GPS es obligatoria para guardar', 'warning');
-                return;
+                // Double check if deferred is checked again just in case
+                if (!document.getElementById('carga-diferida').checked) {
+                    utils.showToast('La ubicación GPS es obligatoria para guardar', 'warning');
+                    return;
+                }
             }
         }
 
@@ -1183,15 +1214,21 @@ const ujier = {
         btnSubmit.innerHTML = '<div class="btn-spinner"></div> Guardando...';
 
         try {
+            // Include Troquel Data
+            const tipoTroquel = document.getElementById('tipo-troquel-diligencia')?.value;
+            const nTroquel = document.getElementById('n-troquel-diligencia')?.value;
+
             // Prepare result data
             const resultData = {
                 resultado,
-                ubicacion_lat: document.getElementById('ubicacion-lat').value || null,
-                ubicacion_lng: document.getElementById('ubicacion-lng').value || null,
+                ubicacion_lat: esCargaDiferida ? null : (document.getElementById('ubicacion-lat').value || null),
+                ubicacion_lng: esCargaDiferida ? null : (document.getElementById('ubicacion-lng').value || null),
                 es_carga_diferida: esCargaDiferida,
                 motivo_falla_senal: motivoFalla || null,
                 observaciones: document.getElementById('observaciones-resultado').value,
-                transcripcion_audio: document.getElementById('transcripcion-audio').value
+                transcripcion_audio: document.getElementById('transcripcion-audio').value,
+                tipo_troquel: tipoTroquel || null,
+                n_troquel: nTroquel || null
             };
 
             console.log('📦 Preparando diligencia:', resultData);
@@ -1314,7 +1351,6 @@ const ujier = {
                     <div class="historial-icon">${statusIcons[status] || '📄'}</div>
                     <div class="assignment-info">
                         <div class="historial-header">
-                            <span class="assignment-type">${visit.tipo_notificacion || 'Notificación'}</span>
                             <span class="historial-fecha">${utils.formatDateTime(visit.fecha)}</span>
                         </div>
                         <div class="assignment-recipient">👤 <strong>${visit.destinatario_nombre || '-'}</strong></div>

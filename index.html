@@ -1382,6 +1382,29 @@
                         </div>
 
                         <div class="form-section">
+                            <h4 class="section-subtitle">🎫 Troquel</h4>
+                            <div class="troquel-selection" style="display:flex; gap:15px; margin-bottom:10px;">
+                                <label class="radio-label">
+                                    <input type="radio" name="troquel_opcion" id="radio-troquel-c" value="C"> C
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="troquel_opcion" id="radio-troquel-m" value="M"> M
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="troquel_opcion" id="radio-troquel-sin" value="SIN"
+                                        checked> SIN
+                                </label>
+                                <input type="hidden" id="tipo-troquel-diligencia" name="tipo_troquel">
+                            </div>
+
+                            <div id="n-troquel-container" class="form-group hidden">
+                                <label for="n-troquel-diligencia" class="form-label">N° Troquel *</label>
+                                <input type="number" id="n-troquel-diligencia" class="form-input"
+                                    placeholder="Ej: 123456">
+                            </div>
+                        </div>
+
+                        <div id="gps-wrapper" class="form-section">
                             <h4 class="section-subtitle">📍 Ubicación GPS</h4>
                             <div class="gps-container" id="gps-container">
                                 <button type="button" class="btn btn-secondary btn-gps" id="btn-capture-gps">
@@ -1396,13 +1419,12 @@
                         </div>
 
                         <div class="form-section">
-                            <h4 class="section-subtitle">📷 Evidencia Fotográfica</h4>
+                            <h4 class="section-subtitle">📷 Fotografía</h4>
                             <div class="photo-container">
-                                <input type="file" id="evidencia-foto" accept="image/*" capture="environment"
-                                    class="hidden">
+                                <input type="file" id="evidencia-foto" accept="image/*" class="hidden">
                                 <label for="evidencia-foto" class="photo-upload-btn">
                                     <span class="upload-icon">📷</span>
-                                    <span class="upload-text">Tomar Foto</span>
+                                    <span class="upload-text">Agregar Foto</span>
                                 </label>
                                 <div id="photo-preview" class="photo-preview hidden">
                                     <img id="preview-img" src="" alt="Vista previa">
