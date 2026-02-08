@@ -92,10 +92,7 @@ const reports = {
 
     // Setup event listeners
     setupEventListeners() {
-        document.getElementById('btn-report-daily')?.addEventListener('click', () => this.generateDailyReport());
         document.getElementById('btn-report-monthly')?.addEventListener('click', () => this.generateMonthlyReport());
-        document.getElementById('btn-report-ujier')?.addEventListener('click', () => this.generateUjierReport());
-        document.getElementById('btn-report-deferred')?.addEventListener('click', () => this.generateDeferredReport());
     },
 
     // Set default dates

@@ -117,14 +117,15 @@ const db = {
         }
 
         if (options.fecha) {
+            const dateField = options.dateField || 'fecha_carga';
             const startDate = new Date(options.fecha);
             startDate.setHours(0, 0, 0, 0);
             const endDate = new Date(options.fecha);
             endDate.setHours(23, 59, 59, 999);
 
             query = query
-                .gte('fecha_carga', startDate.toISOString())
-                .lte('fecha_carga', endDate.toISOString());
+                .gte(dateField, startDate.toISOString())
+                .lte(dateField, endDate.toISOString());
         }
 
         if (options.search) {
