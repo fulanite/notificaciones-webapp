@@ -196,14 +196,13 @@ const reports = {
             return;
         }
 
-        // Filter by month on fecha_entrega_ujier
+        // Filter by month on fecha_carga (como en Glide - confirmado por código fuente)
         const monthData = (data || []).filter(n => {
-            if (!n.fecha_entrega_ujier) return false;
-            const date = new Date(n.fecha_entrega_ujier);
-            // Adjust for timezone potentially, but here we check month/year match
-            // Be careful with UTC vs Local. fecha_entrega_ujier comes as 'YYYY-MM-DD'.
-            // Simple string comparison is safer for YYYY-MM-DD
-            return n.fecha_entrega_ujier.startsWith(yyyy_mm);
+            if (!n.fecha_carga) return false;
+            // fecha_carga viene como 'YYYY-MM-DD HH:mm:ss' o 'YYYY-MM-DD'
+            // Extraer solo la parte de fecha YYYY-MM-DD
+            const fechaStr = n.fecha_carga.split(' ')[0];
+            return fechaStr.startsWith(yyyy_mm);
         });
 
         if (monthData.length === 0) {
