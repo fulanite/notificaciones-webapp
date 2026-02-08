@@ -306,6 +306,11 @@ const db = {
         }));
     },
 
+    async getDistinctValues(column) {
+        if (!apiClient) return { data: [], error: null };
+        return apiClient.get('notificaciones.php', { action: 'distinct', column });
+    },
+
     // ==================== FILE UPLOADS ====================
     async uploadPhoto(file, notificationId) {
         if (!apiClient) return { url: null, error: null };

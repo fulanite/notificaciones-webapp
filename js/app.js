@@ -523,6 +523,10 @@ const app = {
             const modalTitle = modalNuevaNotif?.querySelector('.modal-title');
             if (modalTitle) modalTitle.textContent = '📦 Nueva Notificación';
 
+            // Show persistent settings bar for new entries
+            const pBar = document.getElementById('persistent-settings-container');
+            if (pBar) pBar.classList.remove('hidden-important');
+
             this.applyPersistentSettings();
         });
 

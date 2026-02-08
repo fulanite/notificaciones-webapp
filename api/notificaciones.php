@@ -45,6 +45,20 @@ try {
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute(array_merge([$_GET['asignado_a']], $estadosArr));
                 Database::sendResponse($stmt->fetchAll());
+            } elseif (isset($_GET['action']) && $_GET['action'] === 'distinct' && isset($_GET['column'])) {
+                // Get distinct values for a column
+                $allowedColumns = ['zona', 'estado', 'tipo_notificacion', 'resultado_diligencia'];
+                $column = $_GET['column'];
+
+                if (!in_array($column, $allowedColumns)) {
+                    Database::sendError('Invalid column for distinct values', 400);
+                }
+
+                $stmt = $pdo->prepare("SELECT DISTINCT $column FROM notificaciones WHERE $column IS NOT NULL AND $column != '' ORDER BY $column ASC");
+                $stmt->execute();
+
+                $values = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                Database::sendResponse($values);
             } else {
                 // Get all notifications with filters
                 $where = ["1=1"];

@@ -399,7 +399,7 @@
                             <div class="modal-body">
                                 <form id="form-nueva-notificacion" class="compact-form">
                                     <!-- Persistent Selections (Zone and Bailiff) -->
-                                    <div class="persistent-settings-bar">
+                                    <div id="persistent-settings-container" class="persistent-settings-bar">
                                         <div class="p-setting">
                                             <label>📍 Zona Fija:</label>
                                             <select id="persist-zona" class="select-mini">
@@ -473,9 +473,9 @@
                                                 <select id="tipo-notificacion" name="tipo-notificacion" required
                                                     onchange="app.handleTipoNotificacionChange(this.value)">
                                                     <option value="cedulas">Cédulas</option>
-                                                    <option value="cedulas_urgentes_norte">Cédulas Urgentes Norte
+                                                    <option value="cedulas_urgente_norte">Cédulas Urgentes Norte
                                                     </option>
-                                                    <option value="cedulas_urgentes_sur">Cédulas Urgentes Sur</option>
+                                                    <option value="cedulas_urgente_sur">Cédulas Urgentes Sur</option>
                                                     <option value="cedulas_mandamientos_22172">Cédulas o mandamientos
                                                         Ley 22.172</option>
                                                     <option value="cedulas_correspondencia">Cédulas por correspondencia

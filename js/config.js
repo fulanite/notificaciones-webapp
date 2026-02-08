@@ -1,12 +1,11 @@
 /**
  * SGND - Configuration
- * Replace these values with your Supabase project credentials
+ * Backend hosted on Hostinger (MySQL + PHP API)
  */
 
 const CONFIG = {
-    // Supabase Configuration
-    SUPABASE_URL: 'https://mtcujjxxcbbafwjbazvt.supabase.co',
-    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10Y3Vqanh4Y2JiYWZ3amJhenZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwNjI3MTAsImV4cCI6MjA4MTYzODcxMH0.qUjrQo33indSMMmAXBCvlCC2bkmAYPUR9YEvw7GiEmU',
+    // API Configuration
+    // The base URL is handled in api-client.js based on environment
 
     // App Settings
     APP_NAME: 'SGND',

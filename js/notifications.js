@@ -17,9 +17,45 @@ const notifications = {
 
     // Initialize notifications list
     async init() {
+        await this.loadFilterOptions(); // Load options from DB first
         this.setupFilters();
         await this.loadNotifications();
         this.updateYearBadges();
+    },
+
+    // Load filter options based on real data from DB
+    async loadFilterOptions() {
+        const filterZona = document.getElementById('filter-zona');
+        const filterEstado = document.getElementById('filter-estado');
+        const filterTipo = document.getElementById('filter-tipo');
+
+        try {
+            // Load Zonas
+            const { data: zonas } = await db.getDistinctValues('zona');
+            if (filterZona && zonas) {
+                filterZona.innerHTML = '<option value="">🌎 Todas las zonas</option>' +
+                    zonas.map(z => `<option value="${z}">${z.toUpperCase()}</option>`).join('');
+            }
+
+            // Load Estados
+            const { data: estados } = await db.getDistinctValues('estado');
+            if (filterEstado && estados) {
+                filterEstado.innerHTML = '<option value="">📊 Todos los estados</option>' +
+                    estados.map(e => {
+                        const label = e.charAt(0).toUpperCase() + e.slice(1);
+                        return `<option value="${e}">${label}</option>`;
+                    }).join('');
+            }
+
+            // Load Tipos
+            const { data: tipos } = await db.getDistinctValues('tipo_notificacion');
+            if (filterTipo && tipos) {
+                filterTipo.innerHTML = '<option value="">📦 Todos los tipos</option>' +
+                    tipos.map(t => `<option value="${t}">${CONFIG.NOTIFICATION_TYPES[t] || t}</option>`).join('');
+            }
+        } catch (e) {
+            console.error('Error loading filter options:', e);
+        }
     },
 
     // Setup filter listeners
@@ -533,17 +569,29 @@ const notifications = {
             document.body.style.overflow = 'hidden';
             const modalTitle = modal.querySelector('.modal-title');
             if (modalTitle) modalTitle.textContent = '📝 Editar Notificación';
+
+            // Hide persistent settings bar during edit to avoid conflicts
+            const pBar = document.getElementById('persistent-settings-container');
+            if (pBar) pBar.classList.add('hidden-important');
         }
 
         // Wait for DOM to be ready
         setTimeout(() => {
             // Populate form fields
-            document.getElementById('tipo-notificacion').value = data.tipo_notificacion || '';
+            const selectTipo = document.getElementById('tipo-notificacion');
+            let tipoVal = data.tipo_notificacion || '';
+
+            // Handle labels from migrated notifications
+            if (tipoVal && !Array.from(selectTipo.options).some(opt => opt.value === tipoVal)) {
+                const foundLabel = Array.from(selectTipo.options).find(opt => opt.text === tipoVal);
+                if (foundLabel) tipoVal = foundLabel.value;
+            }
+            selectTipo.value = tipoVal;
 
             // Trigger tipo change to set up correct origin field
-            if (data.tipo_notificacion === 'cedulas_mandamientos_22172' ||
-                data.tipo_notificacion === 'cedulas_correspondencia') {
-                app.handleTipoNotificacionChange(data.tipo_notificacion);
+            if (tipoVal === 'cedulas_mandamientos_22172' ||
+                tipoVal === 'cedulas_correspondencia') {
+                app.handleTipoNotificacionChange(tipoVal);
                 // Wait a bit for the searchable select to be set up, then populate
                 setTimeout(() => {
                     const input = document.getElementById('origen-dinamico-input');
@@ -554,7 +602,13 @@ const notifications = {
                     }
                 }, 150);
             } else {
-                document.getElementById('origen').value = data.origen || '';
+                app.handleTipoNotificacionChange(tipoVal || 'cedulas');
+                const iFixed = document.getElementById('origen-input');
+                const hFixed = document.getElementById('origen');
+                if (iFixed && hFixed) {
+                    iFixed.value = data.origen || '';
+                    hFixed.value = data.origen || '';
+                }
             }
 
             document.getElementById('n-expediente').value = data.n_expediente || '';

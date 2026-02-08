@@ -2,7 +2,7 @@
  * SGND - Service Worker for PWA
  */
 
-const CACHE_NAME = 'sgnd-cache-v54';
+const CACHE_NAME = 'sgnd-cache-v55';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache
@@ -91,13 +91,13 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Skip Supabase API calls - always go to network
-    if (url.hostname.includes('supabase.co')) {
+    // Skip API calls - always go to network to get fresh data
+    if (url.pathname.includes('/api/')) {
         event.respondWith(
             fetch(request)
                 .catch(() => {
                     // Return empty response for failed API calls
-                    return new Response(JSON.stringify({ data: null, error: 'Offline' }), {
+                    return new Response(JSON.stringify({ data: null, error: 'Offline', success: false }), {
                         headers: { 'Content-Type': 'application/json' }
                     });
                 })
@@ -169,45 +169,7 @@ self.addEventListener('sync', (event) => {
 
 // Sync offline data
 async function syncOfflineData() {
-    // This would be handled by the offline.js module when the app is open
-    // For background sync, we'd need to implement the actual sync logic here
     console.log('[SW] Syncing offline data...');
 }
-
-// Push notifications (for future implementation)
-self.addEventListener('push', (event) => {
-    if (!event.data) return;
-
-    const data = event.data.json();
-
-    const options = {
-        body: data.body || 'Nueva notificación',
-        icon: '/assets/icons/icon-192.png',
-        badge: '/assets/icons/icon-72.png',
-        vibrate: [100, 50, 100],
-        data: {
-            url: data.url || '/'
-        },
-        actions: [
-            { action: 'open', title: 'Abrir' },
-            { action: 'close', title: 'Cerrar' }
-        ]
-    };
-
-    event.waitUntil(
-        self.registration.showNotification(data.title || 'SGND', options)
-    );
-});
-
-// Notification click handler
-self.addEventListener('notificationclick', (event) => {
-    event.notification.close();
-
-    if (event.action === 'close') return;
-
-    event.waitUntil(
-        clients.openWindow(event.notification.data.url || '/')
-    );
-});
 
 console.log('[SW] Service Worker loaded');
