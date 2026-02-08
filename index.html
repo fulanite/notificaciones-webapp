@@ -1052,37 +1052,16 @@
                             <h2>Reportes y Estadísticas</h2>
                         </div>
 
-                        <div class="reports-grid"
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px;">
-
-                            <!-- Reporte Diario -->
-                            <div class="dashboard-card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Planilla Diaria (CSV)</h3>
-                                </div>
-                                <div class="card-body">
-                                    <p class="text-secondary" style="margin-bottom: 15px;">Descargar detallado de
-                                        notificaciones por fecha.</p>
-                                    <div class="form-group">
-                                        <label for="report-date" class="form-label">Fecha</label>
-                                        <input type="date" id="report-date" class="form-input">
-                                    </div>
-                                    <button id="btn-report-daily" class="btn btn-primary"
-                                        style="width: 100%; margin-top: 15px;">
-                                        <span>📊</span> Generar CSV
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="reports-grid" style="display: flex; justify-content: center; padding: 40px 20px;">
 
                             <!-- Reporte Mensual -->
-                            <div class="dashboard-card">
+                            <div class="dashboard-card" style="max-width: 500px; width: 100%;">
                                 <div class="card-header">
                                     <h3 class="card-title">Informe Mensual (PDF)</h3>
                                 </div>
                                 <div class="card-body">
                                     <p class="text-secondary" style="margin-bottom: 15px;">Estadística mensual para la
-                                        Corte
-                                        de Justicia.</p>
+                                        Corte de Justicia.</p>
                                     <div class="form-grid"
                                         style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
                                         <div class="form-group">
@@ -1116,43 +1095,6 @@
                                     <button id="btn-report-monthly" class="btn btn-primary"
                                         style="width: 100%; margin-top: 15px;">
                                         <span>📄</span> Generar PDF
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Reporte Ujieres -->
-                            <div class="dashboard-card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Rendimiento Ujieres</h3>
-                                </div>
-                                <div class="card-body">
-                                    <p class="text-secondary" style="margin-bottom: 15px;">Estadísticas de asignaciones
-                                        y
-                                        completitud.</p>
-                                    <div class="form-group">
-                                        <label for="report-ujier" class="form-label">Ujier</label>
-                                        <select id="report-ujier" class="form-select">
-                                            <option value="all">Todos los ujieres</option>
-                                        </select>
-                                    </div>
-                                    <button id="btn-report-ujier" class="btn btn-secondary"
-                                        style="width: 100%; margin-top: 15px;">
-                                        <span>📈</span> Generar Reporte
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Reporte Diferidas -->
-                            <div class="dashboard-card">
-                                <div class="card-header">
-                                    <h3 class="card-title">Cargas Diferidas</h3>
-                                </div>
-                                <div class="card-body">
-                                    <p class="text-secondary" style="margin-bottom: 15px;">Listado de notificaciones
-                                        marcadas como diferidas.</p>
-                                    <button id="btn-report-deferred" class="btn btn-outline"
-                                        style="width: 100%; margin-top: 15px;">
-                                        <span>⚠️</span> Listar Diferidas
                                     </button>
                                 </div>
                             </div>
