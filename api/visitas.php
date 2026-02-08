@@ -90,18 +90,35 @@ try {
                     Database::sendResponse(['error' => 'User ID required'], 400);
                 }
 
-                $stmt = $pdo->prepare("
-                    SELECT v.fecha, LOWER(TRIM(v.resultado)) as resultado, v.ubicacion_lat as lat, v.ubicacion_lng as lng, v.foto_url,
-                           n.destinatario_nombre as destinatario, n.domicilio
-                    FROM visitas v
-                    LEFT JOIN notificaciones n ON v.notificacion_id = n.id
-                    WHERE (v.ujier_id = ? OR v.ujier_id = (SELECT dni FROM usuarios WHERE id = ?))
-                    AND DATE(v.fecha) = ?
-                    AND v.ubicacion_lat IS NOT NULL 
-                    AND v.ubicacion_lat != ''
-                    ORDER BY v.fecha ASC
-                ");
-                $stmt->execute([$userId, $userId, $date]);
+                if ($userId === 'all') {
+                    $stmt = $pdo->prepare("
+                        SELECT v.fecha, LOWER(TRIM(v.resultado)) as resultado, v.ubicacion_lat as lat, v.ubicacion_lng as lng, v.foto_url,
+                               n.destinatario_nombre as destinatario, n.domicilio,
+                               COALESCE(u.nombre, 'Ujier') as ujier_nombre
+                        FROM visitas v
+                        LEFT JOIN notificaciones n ON v.notificacion_id = n.id
+                        LEFT JOIN usuarios u ON (v.ujier_id = u.id OR v.ujier_id = u.dni)
+                        WHERE DATE(v.fecha) = ?
+                        AND v.ubicacion_lat IS NOT NULL 
+                        AND v.ubicacion_lat != ''
+                        ORDER BY v.fecha ASC
+                    ");
+                    $stmt->execute([$date]);
+                } else {
+                    $stmt = $pdo->prepare("
+                        SELECT v.fecha, LOWER(TRIM(v.resultado)) as resultado, v.ubicacion_lat as lat, v.ubicacion_lng as lng, v.foto_url,
+                               n.destinatario_nombre as destinatario, n.domicilio,
+                               'Yo' as ujier_nombre
+                        FROM visitas v
+                        LEFT JOIN notificaciones n ON v.notificacion_id = n.id
+                        WHERE (v.ujier_id = ? OR v.ujier_id = (SELECT dni FROM usuarios WHERE id = ?))
+                        AND DATE(v.fecha) = ?
+                        AND v.ubicacion_lat IS NOT NULL 
+                        AND v.ubicacion_lat != ''
+                        ORDER BY v.fecha ASC
+                    ");
+                    $stmt->execute([$userId, $userId, $date]);
+                }
                 Database::sendResponse($stmt->fetchAll());
             } else {
                 // Get all recent visits (standard view)

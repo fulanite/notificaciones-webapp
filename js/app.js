@@ -787,6 +787,11 @@ const app = {
                         ? Promise.resolve(reports.init())
                         : Promise.resolve();
                     break;
+                case 'mapa-seguimiento':
+                    loadPromise = typeof adminMap !== 'undefined' && adminMap.init
+                        ? adminMap.init()
+                        : Promise.resolve();
+                    break;
                 case 'mis-asignaciones':
                     loadPromise = typeof ujier !== 'undefined' && ujier.loadAssignments
                         ? ujier.loadAssignments()

@@ -312,3 +312,198 @@ const dashboard = {
         utils.showToast('Dashboard actualizado', 'success');
     }
 };
+
+/**
+ * Admin Map Module
+ */
+const adminMap = {
+    mapInstance: null,
+    mapLayer: null,
+
+    async init() {
+        console.log('🗺️ Inicializando Mapa Admin...');
+
+        await this.loadUjieres();
+
+        // Set default date
+        const dateInput = document.getElementById('admin-map-date');
+        if (dateInput && !dateInput.value) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+
+        // Init Map
+        if (!this.mapInstance) {
+            const container = document.getElementById('admin-map-container');
+            if (container) {
+                this.mapInstance = L.map('admin-map-container').setView([-27.4692131, -58.8306349], 12);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(this.mapInstance);
+            }
+        }
+
+        // Listeners
+        document.getElementById('btn-admin-refresh-map')?.addEventListener('click', () => this.loadMapData());
+        document.getElementById('admin-map-date')?.addEventListener('change', () => this.loadMapData());
+        document.getElementById('admin-map-ujier-select')?.addEventListener('change', () => this.loadMapData());
+
+        // Load Initial Data
+        this.loadMapData();
+
+        setTimeout(() => {
+            if (this.mapInstance) this.mapInstance.invalidateSize();
+        }, 300);
+    },
+
+    async loadUjieres() {
+        const select = document.getElementById('admin-map-ujier-select');
+        if (!select) return;
+
+        const { data } = await db.getUjieres();
+
+        select.innerHTML = '<option value="all">📍 Todos los Ujieres</option>';
+        if (data) {
+            data.forEach(u => {
+                select.innerHTML += `<option value="${u.id}">${u.nombre}</option>`;
+            });
+        }
+    },
+
+    async loadMapData() {
+        const date = document.getElementById('admin-map-date')?.value;
+        const userId = document.getElementById('admin-map-ujier-select')?.value || 'all';
+
+        if (!this.mapInstance) return;
+
+        // Clear layers
+        if (this.mapLayer) {
+            this.mapInstance.removeLayer(this.mapLayer);
+            this.mapLayer = null;
+        }
+
+        const { data, error } = await db.getUserLocations(userId, date);
+
+        if (error) {
+            utils.showToast('Error cargando mapa', 'error');
+            return;
+        }
+
+        const timelineContainer = document.getElementById('admin-timeline-container');
+        if (userId === 'all') {
+            timelineContainer.classList.add('hidden'); // Hide timeline on general view
+        } else {
+            timelineContainer.classList.remove('hidden');
+        }
+
+        // Stats
+        document.getElementById('admin-map-stat-visits').textContent = data ? data.length : 0;
+
+        // Count active ujieres
+        const uniqueUjieres = new Set(data.map(d => d.ujier_nombre || 'Desconocido'));
+        document.getElementById('admin-map-stat-users').textContent = data.length > 0 ? uniqueUjieres.size : 0;
+
+        if (!data || data.length === 0) {
+            return;
+        }
+
+        const markers = L.layerGroup();
+        const latlngs = [];
+
+        // Colores por Ujier para vista general
+        const ujierColors = {};
+        const palette = ['#e11d48', '#2563eb', '#16a34a', '#d97706', '#9333ea', '#0891b2'];
+
+        data.forEach((point, index) => {
+            if (point.lat && point.lng) {
+                const coord = [parseFloat(point.lat), parseFloat(point.lng)];
+
+                // Color Logic
+                let markerColor = '#666';
+                if (userId === 'all') {
+                    // Assign color based on Ujier Name
+                    if (!ujierColors[point.ujier_nombre]) {
+                        ujierColors[point.ujier_nombre] = palette[Object.keys(ujierColors).length % palette.length];
+                    }
+                    markerColor = ujierColors[point.ujier_nombre];
+                } else {
+                    // Estado colors for individual view
+                    markerColor = this.getStatusColor(point.resultado);
+                    latlngs.push(coord); // Only trace path for single user
+                }
+
+                // Popup
+                const photoHtml = point.foto_url
+                    ? `<div style="margin-top:5px; width:100%; height:100px; background-image:url('${point.foto_url}'); background-size:cover; border-radius:4px;"></div>`
+                    : '';
+
+                const popupContent = `
+                    <strong>${userId === 'all' ? point.ujier_nombre : '#' + (index + 1)}</strong><br>
+                    ${point.destinatario}<br>
+                    <span style="font-size:0.85em; color:#555;">${point.domicilio}</span><br>
+                    <span class="badge badge-${point.resultado === 'entregado' ? 'success' : 'warning'}" style="font-size:0.7em;">
+                        ${(point.resultado || '').toUpperCase()}
+                    </span>
+                    <br><small>${utils.formatTime(point.fecha)}</small>
+                    ${photoHtml}
+                `;
+
+                L.circleMarker(coord, {
+                    color: markerColor,
+                    fillColor: markerColor,
+                    fillOpacity: 0.6,
+                    radius: 6,
+                    weight: 1
+                }).bindPopup(popupContent).addTo(markers);
+            }
+        });
+
+        // Trace path only if single user
+        if (userId !== 'all' && latlngs.length > 1) {
+            L.polyline(latlngs, { color: '#3b82f6', weight: 2, dashArray: '4, 8' }).addTo(markers);
+            this.renderTimeline(data);
+        }
+
+        this.mapLayer = markers;
+        this.mapInstance.addLayer(this.mapLayer);
+
+        if (data.length > 0) {
+            const group = new L.featureGroup(Object.values(markers._layers));
+            this.mapInstance.fitBounds(group.getBounds(), { padding: [50, 50] });
+        }
+    },
+
+    getStatusColor(status) {
+        if (!status) return '#6c757d';
+        const s = status.toLowerCase().replace(/_/g, ' ').trim();
+        if (['atiende', 'entregado', 'positivo'].includes(s)) return '#10b981';
+        if (['no atiende', 'domicilio inexistente', 'negativo'].includes(s)) return '#ef4444';
+        if (['pre aviso', 'estrados'].includes(s)) return '#f59e0b';
+        return '#3b82f6';
+    },
+
+    renderTimeline(data) {
+        const container = document.getElementById('admin-timeline-container');
+        if (!container) return;
+
+        let html = '<div class="timeline-title">⏱️ Detalle del Recorrido</div><div class="timeline-steps">';
+
+        data.forEach((point, index) => {
+            const color = this.getStatusColor(point.resultado);
+            html += `
+                <div class="timeline-step">
+                    <div class="step-marker" style="background:${color};">${index + 1}</div>
+                    <div class="step-content">
+                        <div class="step-header">
+                            <span class="step-time">${utils.formatTime(point.fecha)}</span>
+                            <span class="step-status" style="color:${color}">${(point.resultado || '').toUpperCase()}</span>
+                        </div>
+                        <div class="step-address">${point.domicilio}</div>
+                        <div style="font-size:0.8rem; margin-top:4px;">👤 ${point.destinatario}</div>
+                    </div>
+                </div>
+             `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+};

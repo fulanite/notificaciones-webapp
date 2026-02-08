@@ -221,6 +221,12 @@
                                     <span class="nav-text">Explorador de Ref.</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="mapa-seguimiento">
+                                    <span class="nav-icon">🗺️</span>
+                                    <span class="nav-text">Mapa General</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
@@ -1143,6 +1149,48 @@
 
 
 
+                    <!-- Admin/Coordinator Map View -->
+                    <section id="view-mapa-admin" class="view">
+                        <div class="dashboard-header" style="flex-wrap: wrap; gap: 10px;">
+                            <h1>🗺️ Mapa de Seguimiento</h1>
+                            <div class="header-actions" style="flex-wrap: wrap;">
+                                <select id="admin-map-ujier-select" class="form-select" style="min-width: 200px;">
+                                    <option value="">Cargando ujieres...</option>
+                                </select>
+                                <input type="date" id="admin-map-date" class="form-input" style="max-width: 150px;">
+                                <button id="btn-admin-refresh-map" class="btn btn-secondary">
+                                    <span>🔄</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="admin-map-container"
+                            style="height: 65vh; width: 100%; border-radius: 12px; z-index: 1; border: 1px solid var(--border-color);">
+                        </div>
+
+                        <div class="stats-grid" style="margin-top: 20px;">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: #ecfdf5; color: #10b981;">📍</div>
+                                <div class="stat-info">
+                                    <h3 id="admin-map-stat-visits">0</h3>
+                                    <p>Visitas Totales</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: #eef2ff; color: #6366f1;">👥</div>
+                                <div class="stat-info">
+                                    <h3 id="admin-map-stat-users">-</h3>
+                                    <p>Ujieres Activos</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline Container for Admin -->
+                        <div id="admin-timeline-container" class="timeline-container hidden">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </section>
+
                     <!-- Modal: Nuevo/Editar Usuario -->
                     <div id="modal-usuario" class="modal hidden">
                         <div class="modal-overlay"></div>
@@ -1280,6 +1328,10 @@
             <button class="bottom-nav-item role-admin" data-view="dashboard-home">
                 <span class="nav-icon">📊</span>
                 <span class="nav-label">Panel</span>
+            </button>
+            <button class="bottom-nav-item role-admin" data-view="mapa-seguimiento">
+                <span class="nav-icon">🗺️</span>
+                <span class="nav-label">Mapa</span>
             </button>
 
             <!-- Shared/Common Items -->
