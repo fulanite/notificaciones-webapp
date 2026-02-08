@@ -285,7 +285,12 @@ const asignaciones = {
     showLoading() {
         const grid = document.getElementById('asignaciones-ujieres-grid');
         if (grid && !this.state.currentUjierId) {
-            grid.innerHTML = '<div class="loading-spinner">⏳ Cargando ujieres y estadísticas...</div>';
+            grid.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px;">
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">Cargando ujieres y estadísticas...</p>
+                </div>
+            `;
         }
     },
 

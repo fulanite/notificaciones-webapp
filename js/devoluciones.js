@@ -257,7 +257,14 @@ const devoluciones = {
 
     showLoading() {
         const grid = document.getElementById('devoluciones-zones-grid');
-        if (grid) grid.innerHTML = '<div class="loading-spinner">⏳ Cargando zonas...</div>';
+        if (grid) {
+            grid.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; grid-column: 1/-1;">
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 15px; color: var(--text-muted); font-size: 0.9rem;">Cargando zonas...</p>
+                </div>
+            `;
+        }
     },
 
     async confirmReturns() {
