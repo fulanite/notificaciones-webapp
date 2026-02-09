@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS notificaciones (
     -- Datos de carga inicial
     fecha_carga DATETIME DEFAULT CURRENT_TIMESTAMP,
     usuario_carga VARCHAR(255),
-    id_usuario_carga VARCHAR(50),
     estado ENUM('pendiente', 'diligenciada', 'diferida') DEFAULT 'pendiente',
     
     -- Tipo y expediente
@@ -67,7 +66,8 @@ CREATE TABLE IF NOT EXISTS notificaciones (
     resultado_diligencia ENUM('atiende', 'no_atiende', 'pre_aviso', 'estrados', 'domicilio_inexistente', 'diligenciador_ausente') DEFAULT NULL,
     fecha_diligencia DATETIME,
     diligenciado_por VARCHAR(36),
-    fecha_entrega_ujier DATETIME NULL DEFAULT NULL COMMENT 'Fecha de entrega por el ujier (migración)',
+    fecha_entrega_ujier DATETIME NULL DEFAULT NULL COMMENT 'Original delivery date from Glide',
+    migrated_from_glide TINYINT(1) DEFAULT 0 COMMENT 'Flag indicating record was migrated from Glide',
     
     -- Ubicación GPS
     ubicacion_lat DECIMAL(10, 8),
