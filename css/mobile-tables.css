@@ -22,21 +22,20 @@
         left: -9999px;
     }
 
-    /* 3. Card Container (The Row) */
+    /* 3. Card Container (The Row) - Flex Column for Reordering */
     tr {
         background: var(--bg-card);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        /* Subtle border for dark mode */
         border-radius: var(--radius-lg);
-        /* Rounded corners */
         margin-bottom: var(--space-4);
-        /* Space between cards */
         box-shadow: var(--shadow-sm);
         padding: var(--space-4);
         position: relative;
+        display: flex !important;
+        flex-direction: column;
     }
 
-    /* Zebra striping removal / preservation */
+    /* Zebra striping preservation */
     tbody tr:nth-of-type(odd) {
         background: var(--bg-card);
     }
@@ -47,193 +46,217 @@
 
     /* 4. Cell Styling (The Items) */
     td {
-        /* Behave like a row */
         border: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         position: relative;
-        padding-left: 50% !important;
-        /* Make space for label */
-        padding-top: 10px !important;
-        padding-bottom: 10px !important;
-        padding-right: 0 !important;
+        padding: 8px 0 8px 45% !important;
+        /* Right side content */
         text-align: right !important;
-        /* Align content to right */
         min-height: 24px;
-        /* Ensure height */
         display: flex !important;
         align-items: center;
         justify-content: flex-end;
-        align-content: center;
         flex-wrap: wrap;
+        width: 100%;
+        /* Fill row width */
+        box-sizing: border-box;
+        order: 10;
+        /* Default order - put everything else at bottom */
     }
 
     td:last-child {
         border-bottom: 0;
     }
 
-    /* 5. The Label (Pseudo-element) */
+    /* 5. The Label */
     td:before {
         position: absolute;
-        top: 10px;
-        /* Match padding-top */
+        top: 50%;
+        transform: translateY(-50%);
         left: 0;
-        width: 45%;
-        padding-right: 10px;
-        white-space: wrap;
+        width: 40%;
         text-align: left;
         font-weight: 600;
         text-transform: uppercase;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: var(--text-muted);
         content: attr(data-label);
+        line-height: 1.2;
     }
 
     /* =========================================
-       SPECIFIC OVERRIDES & TWEAKS
+       LOGICAL REORDERING (The Magic)
        ========================================= */
 
-    /* --- EXPEDIENTE / PRIMARY IDENTIFIER --- */
-    /* Make the expediente look like a card title */
+    /* HEADER: Expediente (Order 1) */
     td[data-label="Expediente"],
     td[data-label="Usuario"],
     .col-exp {
+        order: 1;
         background: rgba(255, 255, 255, 0.03);
-        margin: -16px -16px 10px -16px;
-        /* Negative margin to fill header */
+        margin: -16px -16px 15px -16px !important;
+        /* Extend to edges */
+        width: calc(100% + 32px) !important;
         padding: 12px 16px !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        text-align: left !important;
         justify-content: space-between;
-        padding-left: 16px !important;
-        /* Reset padding override */
         color: var(--primary-400);
         font-size: 1.1rem;
         font-weight: 700;
-        display: flex !important;
-        flex-direction: row;
     }
 
     td[data-label="Expediente"]:before,
-    td[data-label="Usuario"]:before,
     .col-exp:before {
+        content: "EXPEDIENTE";
+        /* Explicit label in header */
         position: static;
-        /* Flow naturally */
+        transform: none;
         width: auto;
         margin-right: 10px;
-        content: "EXP:";
-        color: var(--text-muted);
-        font-weight: normal;
-        font-size: 0.8rem;
-        display: none;
-        /* Hide 'Exp:' prefix for cleaner look if desired, or keep */
     }
 
-    /* --- CHECKBOXES (Batch Actions) --- */
-    td:has(input[type="checkbox"]),
-    .checkbox-cell {
+    /* SUB-HEADER: Destinatario (Order 2) */
+    td[data-label="Destinatario"],
+    .col-dest {
+        order: 2;
         padding-left: 0 !important;
         text-align: left !important;
         justify-content: flex-start;
-        border-bottom: none;
-        padding-bottom: 0 !important;
-    }
-
-    td:has(input[type="checkbox"]):before {
-        display: none;
-    }
-
-    /* Make the checkbox row float or integrate */
-    /* If we want checkbox top-left absolute */
-    td:has(input[type="checkbox"]) {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        z-index: 10;
-        width: auto;
-        padding: 0 !important;
-    }
-
-    /* Adjust Expediente to not overlap checkbox */
-    td:has(input[type="checkbox"])~td[data-label="Expediente"] {
-        padding-left: 50px !important;
-        /* Make room for checkbox */
-    }
-
-    /* --- STATUS BADGES --- */
-    td[data-label="Estado"],
-    .col-status {
-        padding-left: 16px !important;
-        text-align: right !important;
-        justify-content: flex-end;
-    }
-
-    td[data-label="Estado"]:before,
-    .col-status:before {
-        position: static;
-        width: auto;
-        margin-right: auto;
-        /* Push content to right */
-    }
-
-    /* --- DESTINATARIO / LARGE TEXT --- */
-    td[data-label="Destinatario"],
-    .col-dest {
-        display: block !important;
-        text-align: left !important;
-        padding-left: 0 !important;
-        margin-top: 5px;
+        margin-bottom: 8px;
     }
 
     td[data-label="Destinatario"]:before,
     .col-dest:before {
         position: static;
+        transform: none;
         display: block;
-        margin-bottom: 4px;
-        color: var(--text-muted);
+        margin-bottom: 2px;
+        width: 100%;
     }
 
-    td[data-label="Destinatario"] strong,
+    td[data-label="Destinatario"],
     .col-dest {
-        font-size: 1.05rem;
+        font-size: 1.1rem;
         color: var(--text-primary);
+        display: block !important;
+        /* Allow stacking */
     }
 
-    /* --- DOMICILIO --- */
+    /* DOMICILIO (Order 3) */
     td[data-label="Domicilio"],
     .col-dom {
-        text-align: left !important;
+        order: 3;
         padding-left: 0 !important;
+        text-align: left !important;
+        justify-content: flex-start;
         display: block !important;
+        margin-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 12px !important;
     }
 
     td[data-label="Domicilio"]:before,
     .col-dom:before {
         position: static;
+        transform: none;
         display: block;
+        width: 100%;
         margin-bottom: 2px;
     }
 
-    /* --- ACTIONS CELL --- */
-    td.actions-cell {
+    /* KEY INFO GRID (Order 4-9) */
+
+    /* Estado (Order 4) */
+    td[data-label="Estado"],
+    .col-status {
+        order: 4;
+        justify-content: space-between;
         padding-left: 0 !important;
-        justify-content: flex-end;
-        /* Align buttons right */
+    }
+
+    td[data-label="Estado"]:before,
+    .col-status:before {
+        position: static;
+        transform: none;
+        width: auto;
+    }
+
+    /* Fecha (Order 5) */
+    td[data-label="Fecha"],
+    .col-date {
+        order: 5;
+    }
+
+    /* Ujier (Order 6) */
+    td[data-label="Ujier"],
+    .col-ujier {
+        order: 6;
+    }
+
+    /* Zona (Order 7) */
+    td[data-label="Zona"],
+    .col-zona {
+        order: 7;
+    }
+
+    /* HIDE LESS IMPORTANT FIELDS IF EMPTY OR OPTIONAL */
+    td[data-label="Letrado"],
+    .col-letrado,
+    td[data-label="Cargador"],
+    .col-cargador,
+    td[data-label="Troquel"],
+    .col-troquel,
+    td[data-label="Carátula"],
+    .col-caratula {
+        order: 20;
+        /* Push to bottom */
+        display: none !important;
+        /* Hide to clean up UI as requested 'missing info' usually means 'clutter' or 'blank space' */
+        /* Note: If user wants them, we can remove display:none */
+    }
+
+    /* Only show Caratula if it fits logic, maybe Order 2.5? For now hide to simplify as text is long */
+    td[data-label="Carátula"],
+    .col-caratula {
+        display: flex !important;
+        order: 8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ACTIONS (Order 100) */
+    td.actions-cell {
+        order: 100;
+        padding-left: 0 !important;
+        justify-content: space-between;
         gap: 10px;
-        margin-top: 10px;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
         padding-top: 15px !important;
     }
 
-    td.actions-cell:before {
-        display: none;
+    td.actions-cell .btn {
+        flex: 1;
+        justify-content: center;
     }
 
-    td.actions-cell .btn {
-        width: auto;
-        /* Allow buttons to size naturally */
-        flex: 1;
-        /* Or make them full width if preferred */
+    /* CHECKBOX FIX for Asignaciones */
+    td:has(input[type="checkbox"]) {
+        order: 0;
+        /* Absolute top */
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: auto !important;
+        padding: 0 !important;
+        z-index: 50;
+    }
+
+    /* Adjust header pushing */
+    td:has(input[type="checkbox"])~td[data-label="Expediente"] {
+        padding-left: 50px !important;
     }
 
     /* --- SPECIFIC TABLE TWEAKS --- */
