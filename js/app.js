@@ -642,6 +642,7 @@ const app = {
 
         if (rol === 'admin' || rol === 'administrativo' || rol === 'coordinador') {
             document.getElementById('menu-admin')?.classList.remove('hidden');
+            document.getElementById('menu-auditor')?.classList.remove('hidden'); // Admins can see audit
             this.navigateTo('lista-notificaciones');
         } else if (rol === 'ujier') {
             document.getElementById('menu-ujier')?.classList.remove('hidden');
@@ -841,6 +842,11 @@ const app = {
                             ? Promise.resolve(reports.init())
                             : Promise.resolve()
                     ]);
+                    break;
+                case 'auditoria':
+                    loadPromise = typeof audit !== 'undefined' && audit.init
+                        ? audit.init()
+                        : Promise.resolve();
                     break;
                 default:
                     loadPromise = Promise.resolve();

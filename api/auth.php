@@ -5,9 +5,11 @@
  */
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/AuditLogger.php';
 
 $db = Database::getInstance();
 $pdo = $db->getConnection();
+$logger = new AuditLogger($pdo);
 $method = $_SERVER['REQUEST_METHOD'];
 
 // Get the action from query string
@@ -53,6 +55,8 @@ try {
             }
 
             if (!$passwordValid) {
+                // Log failed login attempt
+                $logger->logAuth('LOGIN', ['email' => $email], 'fallo', 'Credenciales inválidas');
                 Database::sendError('Credenciales inválidas', 401);
             }
 
@@ -71,6 +75,9 @@ try {
                 'foto' => $user['foto'],
                 'token' => $token
             ];
+
+            // Log successful login
+            $logger->logAuth('LOGIN', $userData, 'exito');
 
             Database::sendResponse($userData);
             break;
