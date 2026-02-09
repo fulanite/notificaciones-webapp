@@ -196,21 +196,22 @@ const devoluciones = {
                 <td>
                     <label class="checkbox-wrapper" onclick="event.stopPropagation()">
                         <input type="checkbox" ${this.state.selectedIds.has(n.id) ? 'checked' : ''} 
-                            onchange="devoluciones.toggleSelection('${n.id}')">
+                            onchange="devoluciones.toggleSelection('${n.id}')"
+                            class="select-checkbox">
                         <span class="checkbox-custom"></span>
                     </label>
                 </td>
-                <td><strong class="cell-primary">${n.n_expediente || 'S/N'}</strong></td>
-                <td title="${n.caratula || ''}" class="cell-truncate">${utils.truncate(n.caratula || '-', 35)}</td>
-                <td class="cell-recipient">${n.destinatario_nombre || n.destinatario_especial || '-'}</td>
-                <td style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
-                <td title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
-                <td>
+                <td data-label="Expediente"><strong class="cell-primary">${n.n_expediente || 'S/N'}</strong></td>
+                <td data-label="Carátula" title="${n.caratula || ''}" class="cell-truncate">${utils.truncate(n.caratula || '-', 35)}</td>
+                <td data-label="Destinatario" class="cell-recipient">${n.destinatario_nombre || n.destinatario_especial || '-'}</td>
+                <td data-label="N° Troquel" style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
+                <td data-label="Domicilio" title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
+                <td data-label="Ujier">
                     <div class="cell-ujier-brief">
                         <span>👤 ${n.ujier_nombre ? n.ujier_nombre.split(' ')[0] : '-'}</span>
                     </div>
                 </td>
-                <td>
+                <td data-label="Estado">
                     <span class="badge-mini status-${this.getStatusClass(n.estado)}">${n.estado.toUpperCase()}</span>
                 </td>
             </tr>

@@ -185,20 +185,21 @@ const asignaciones = {
 
         tbody.innerHTML = list.map(n => `
             <tr class="${this.state.selectedIds.has(n.id) ? 'row-selected' : ''}" 
-                onclick="asignaciones.handleRowClick(event, '${n.id}')">
-                <td onclick="event.stopPropagation()">
+                onclick="asignaciones.toggleSelection('${n.id}')">
+                <td style="width: 50px;" onclick="event.stopPropagation()">
                     <label class="checkbox-wrapper">
                         <input type="checkbox" ${this.state.selectedIds.has(n.id) ? 'checked' : ''} 
-                            onchange="asignaciones.toggleSelection('${n.id}')">
+                            onchange="asignaciones.toggleSelection('${n.id}')"
+                            class="select-checkbox">
                         <span class="checkbox-custom"></span>
                     </label>
                 </td>
-                <td><strong class="cell-primary">${n.n_expediente || 'S/N'}</strong></td>
-                <td title="${n.caratula || ''}" class="cell-truncate">${utils.truncate(n.caratula || '-', 35)}</td>
-                <td class="cell-recipient">${n.destinatario_nombre || n.destinatario_especial || '-'}</td>
-                <td style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
-                <td title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
-                <td>
+                <td data-label="Expediente"><strong class="cell-primary">${n.n_expediente || 'S/N'}</strong></td>
+                <td data-label="Carátula" title="${n.caratula || ''}" class="cell-truncate">${utils.truncate(n.caratula || '-', 35)}</td>
+                <td data-label="Destinatario" class="cell-recipient">${n.destinatario_nombre || n.destinatario_especial || '-'}</td>
+                <td data-label="N° Troquel" style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
+                <td data-label="Domicilio" title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
+                <td data-label="Estado">
                     <span class="badge-mini status-${this.getStatusClass(n.estado)}">${n.estado.toUpperCase()}</span>
                 </td>
             </tr>
