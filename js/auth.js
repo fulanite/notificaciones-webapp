@@ -86,7 +86,9 @@ const auth = {
                     email: data.data.email,
                     nombre: data.data.nombre,
                     rol: data.data.rol,
-                    foto: data.data.foto
+                    foto: data.data.foto,
+                    dni: data.data.dni,
+                    password_reset_required: data.data.password_reset_required
                 };
 
                 // Store session

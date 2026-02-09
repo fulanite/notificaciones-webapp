@@ -31,9 +31,9 @@ try {
             $email = Database::sanitize($data['email']);
             $password = $data['password']; // Don't sanitize password
 
-            // Find user by email
-            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ? AND activo = 1");
-            $stmt->execute([$email]);
+            // Find user by email or DNI
+            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE (email = ? OR dni = ?) AND activo = 1");
+            $stmt->execute([$email, $email]);
             $user = $stmt->fetch();
 
             if (!$user) {
@@ -73,6 +73,8 @@ try {
                 'nombre' => $user['nombre'],
                 'rol' => $user['rol'],
                 'foto' => $user['foto'],
+                'dni' => $user['dni'],
+                'password_reset_required' => (bool) ($user['password_reset_required'] ?? false),
                 'token' => $token
             ];
 
@@ -119,7 +121,8 @@ try {
             // Hash the new password
             $hashedPassword = password_hash($data['new_password'], PASSWORD_DEFAULT);
 
-            $stmt = $pdo->prepare("UPDATE usuarios SET password_hash = ?, updated_at = NOW() WHERE id = ?");
+            // Also clear password_reset_required flag
+            $stmt = $pdo->prepare("UPDATE usuarios SET password_hash = ?, password_reset_required = 0, updated_at = NOW() WHERE id = ?");
             $stmt->execute([$hashedPassword, $data['user_id']]);
 
             Database::sendResponse(['success' => true, 'message' => 'Password updated']);
@@ -151,18 +154,23 @@ try {
                 $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
             }
 
+            // Set password_reset_required if specified
+            $passwordResetRequired = isset($data['password_reset_required']) ? ($data['password_reset_required'] ? 1 : 0) : 0;
+
             $stmt = $pdo->prepare("
-                INSERT INTO usuarios (id, email, nombre, rol, password_hash, foto, activo, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
+                INSERT INTO usuarios (id, email, dni, nombre, rol, password_hash, foto, activo, password_reset_required, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, NOW(), NOW())
             ");
 
             $stmt->execute([
                 $id,
                 Database::sanitize($data['email']),
+                Database::sanitize($data['dni'] ?? ''),
                 Database::sanitize($data['nombre']),
                 Database::sanitize($data['rol']),
                 $hashedPassword,
-                $data['foto'] ?? null
+                $data['foto'] ?? null,
+                $passwordResetRequired
             ]);
 
             // Return created user

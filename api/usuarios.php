@@ -45,8 +45,8 @@ try {
                 $stmt->execute([$_GET['rol']]);
                 Database::sendResponse($stmt->fetchAll());
             } else {
-                // Get all users
-                $stmt = $pdo->query("SELECT * FROM usuarios WHERE activo = 1 ORDER BY nombre");
+                // Get all users (including inactive for admin management)
+                $stmt = $pdo->query("SELECT * FROM usuarios ORDER BY nombre");
                 Database::sendResponse($stmt->fetchAll());
             }
             break;

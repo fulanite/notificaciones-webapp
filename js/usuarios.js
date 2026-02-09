@@ -1,6 +1,6 @@
 /**
  * SGND - Usuarios Module
- * User management (CRUD)
+ * User management (CRUD) with password reset functionality
  */
 
 const usuarios = {
@@ -39,6 +39,11 @@ const usuarios = {
             this.saveUser();
         });
 
+        // Password reset button
+        document.getElementById('btn-reset-password')?.addEventListener('click', () => {
+            this.resetPassword();
+        });
+
         // Search
         document.getElementById('search-usuarios')?.addEventListener('input', (e) => {
             this.filterUsers(e.target.value);
@@ -50,12 +55,12 @@ const usuarios = {
         const tbody = document.getElementById('usuarios-table-body');
         if (!tbody) return;
 
-        tbody.innerHTML = '<tr><td colspan="6" class="loading">Cargando usuarios...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="loading">Cargando usuarios...</td></tr>';
 
         const { data, error } = await db.getUsers();
 
         if (error) {
-            tbody.innerHTML = '<tr><td colspan="6" class="error">Error al cargar usuarios</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="error">Error al cargar usuarios</td></tr>';
             return;
         }
 
@@ -69,7 +74,7 @@ const usuarios = {
         if (!tbody) return;
 
         if (users.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty">No hay usuarios registrados</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="empty">No hay usuarios registrados</td></tr>';
             return;
         }
 
@@ -77,10 +82,14 @@ const usuarios = {
             <tr>
                 <td><strong>${u.nombre || '-'}</strong></td>
                 <td>${u.email}</td>
+                <td>${u.dni || '-'}</td>
                 <td><span class="badge badge-${u.rol}">${this.getRolLabel(u.rol)}</span></td>
-                <td><span class="status-badge ${u.activo ? 'status-completed' : 'status-deferred'}">
-                    ${u.activo ? 'Activo' : 'Inactivo'}
-                </span></td>
+                <td>
+                    <span class="status-badge ${u.activo ? 'status-completed' : 'status-deferred'}">
+                        ${u.activo ? 'Activo' : 'Inactivo'}
+                    </span>
+                    ${u.password_reset_required ? '<span class="badge badge-warning" title="Debe cambiar contraseña">🔄</span>' : ''}
+                </td>
                 <td>${u.ultimo_acceso ? utils.formatDate(u.ultimo_acceso) : 'Nunca'}</td>
                 <td class="actions-cell">
                     <button class="btn btn-sm btn-secondary" onclick="usuarios.editUser('${u.id}')">
@@ -98,8 +107,10 @@ const usuarios = {
     getRolLabel(rol) {
         const labels = {
             'admin': 'Administrador',
+            'administrativo': 'Administrativo',
+            'coordinador': 'Coordinador',
             'ujier': 'Ujier',
-            'auditor': 'Auditor'
+            'auditor': 'Auditor' // Legacy support
         };
         return labels[rol] || rol;
     },
@@ -109,6 +120,8 @@ const usuarios = {
         const modal = document.getElementById('modal-usuario');
         const title = document.getElementById('modal-usuario-title');
         const form = document.getElementById('form-usuario');
+        const passwordResetSection = document.getElementById('password-reset-section');
+        const dniInput = document.getElementById('usuario-dni');
 
         if (!modal) return;
 
@@ -122,12 +135,21 @@ const usuarios = {
             if (user) {
                 document.getElementById('usuario-nombre').value = user.nombre || '';
                 document.getElementById('usuario-email').value = user.email || '';
+                document.getElementById('usuario-dni').value = user.dni || '';
                 document.getElementById('usuario-rol').value = user.rol || '';
                 document.getElementById('usuario-activo').checked = user.activo !== false;
+
+                // Show password reset button for existing users
+                passwordResetSection.style.display = 'block';
+                // DNI is not required for editing (only for new users)
+                dniInput.removeAttribute('required');
             }
         } else {
             // New mode
             title.textContent = 'Nuevo Usuario';
+            passwordResetSection.style.display = 'none';
+            // DNI is required for new users
+            dniInput.setAttribute('required', 'required');
         }
 
         modal.classList.remove('hidden');
@@ -142,10 +164,10 @@ const usuarios = {
 
     // Save user (create or update)
     async saveUser() {
-        const nombre = document.getElementById('usuario-nombre').value;
-        const email = document.getElementById('usuario-email').value;
+        const nombre = document.getElementById('usuario-nombre').value.trim();
+        const email = document.getElementById('usuario-email').value.trim();
+        const dni = document.getElementById('usuario-dni').value.trim();
         const rol = document.getElementById('usuario-rol').value;
-        const password = document.getElementById('usuario-password').value;
         const activo = document.getElementById('usuario-activo').checked;
 
         if (!nombre || !email || !rol) {
@@ -153,28 +175,31 @@ const usuarios = {
             return;
         }
 
-        const userData = { nombre, email, rol, activo };
+        // Validate DNI for new users
+        if (!this.editingId && !dni) {
+            utils.showToast('El DNI es obligatorio para nuevos usuarios', 'warning');
+            return;
+        }
+
+        // Validate DNI format
+        if (dni && !/^[0-9]{7,8}$/.test(dni)) {
+            utils.showToast('El DNI debe tener 7 u 8 dígitos', 'warning');
+            return;
+        }
+
+        const userData = { nombre, email, dni, rol, activo };
 
         let result;
         if (this.editingId) {
             // Update existing user
             result = await db.updateUser(this.editingId, userData);
-
-            // If password provided, update it separately
-            if (password) {
-                const pwResult = await auth.changePassword(this.editingId, password);
-                if (!pwResult.success) {
-                    utils.showToast('Usuario actualizado pero error al cambiar contraseña', 'warning');
-                }
-            }
         } else {
-            // Create new user with auth (this hashes the password)
-            if (!password) {
-                utils.showToast('La contraseña es obligatoria para nuevos usuarios', 'warning');
-                return;
-            }
-            // Use auth.createUser which hashes the password server-side
-            result = await auth.createUser({ ...userData, password });
+            // Create new user with DNI as initial password
+            result = await auth.createUser({
+                ...userData,
+                password: dni, // Use DNI as initial password
+                password_reset_required: true // Force password change on first login
+            });
         }
 
         if (result.error) {
@@ -182,9 +207,55 @@ const usuarios = {
             return;
         }
 
-        utils.showToast(this.editingId ? 'Usuario actualizado' : 'Usuario creado con contraseña', 'success');
+        utils.showToast(
+            this.editingId
+                ? 'Usuario actualizado correctamente'
+                : 'Usuario creado. Contraseña inicial: DNI',
+            'success'
+        );
         this.closeModal();
         await this.loadUsers();
+    },
+
+    // Reset password to DNI
+    async resetPassword() {
+        if (!this.editingId) return;
+
+        const user = this.users.find(u => u.id === this.editingId);
+        if (!user || !user.dni) {
+            utils.showToast('No se puede blanquear: usuario sin DNI', 'error');
+            return;
+        }
+
+        const confirmed = confirm(
+            `¿Estás seguro de blanquear la contraseña de ${user.nombre}?\n\n` +
+            `La contraseña se restablecerá a su DNI (${user.dni}) y deberá cambiarla en su próximo inicio de sesión.`
+        );
+
+        if (!confirmed) return;
+
+        try {
+            // Reset password to DNI
+            const result = await auth.changePassword(this.editingId, user.dni);
+
+            if (result.error) {
+                utils.showToast('Error al blanquear contraseña', 'error');
+                return;
+            }
+
+            // Mark as requiring password reset
+            await db.updateUser(this.editingId, { password_reset_required: true });
+
+            utils.showToast(
+                `Contraseña blanqueada correctamente. Nueva contraseña: ${user.dni}`,
+                'success'
+            );
+
+            await this.loadUsers();
+        } catch (error) {
+            console.error('Error al blanquear contraseña:', error);
+            utils.showToast('Error al blanquear contraseña', 'error');
+        }
     },
 
     // Edit user
@@ -194,6 +265,14 @@ const usuarios = {
 
     // Toggle user active status
     async toggleStatus(userId, newStatus) {
+        const user = this.users.find(u => u.id === userId);
+        if (!user) return;
+
+        const action = newStatus ? 'activar' : 'desactivar';
+        const confirmed = confirm(`¿Estás seguro de ${action} a ${user.nombre}?`);
+
+        if (!confirmed) return;
+
         const { error } = await db.updateUser(userId, { activo: newStatus });
 
         if (error) {
@@ -210,6 +289,7 @@ const usuarios = {
         const filtered = this.users.filter(u =>
             (u.nombre || '').toLowerCase().includes(query.toLowerCase()) ||
             (u.email || '').toLowerCase().includes(query.toLowerCase()) ||
+            (u.dni || '').toLowerCase().includes(query.toLowerCase()) ||
             (u.rol || '').toLowerCase().includes(query.toLowerCase())
         );
         this.renderUsers(filtered);

@@ -607,7 +607,13 @@ const app = {
     async onLoginSuccess() {
         this.showDashboard();
         this.updateUserInterface();
-        await this.initializeModules();
+
+        // Check if password reset is required
+        if (auth.currentUser?.password_reset_required) {
+            this.showPasswordResetModal();
+        } else {
+            await this.initializeModules();
+        }
     },
 
     // Show login page
@@ -972,6 +978,90 @@ const app = {
         setTimeout(() => {
             loadingScreen?.remove();
         }, 500);
+    },
+
+    // Show password reset modal (mandatory)
+    showPasswordResetModal() {
+        const modal = document.getElementById('modal-password-reset');
+        if (!modal) {
+            console.error('Modal de cambio de contraseña no encontrado');
+            return;
+        }
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        // Setup form handler
+        const form = document.getElementById('form-password-reset');
+        form?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handlePasswordReset();
+        });
+    },
+
+    // Handle password reset
+    async handlePasswordReset() {
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const errorDiv = document.getElementById('password-reset-error');
+        const submitBtn = document.querySelector('#form-password-reset button[type="submit"]');
+
+        // Clear previous errors
+        errorDiv.classList.add('hidden');
+
+        // Validate
+        if (newPassword.length < 6) {
+            errorDiv.textContent = 'La contraseña debe tener al menos 6 caracteres';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            errorDiv.textContent = 'Las contraseñas no coinciden';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        // Check if new password is the same as DNI
+        if (auth.currentUser?.dni && newPassword === auth.currentUser.dni) {
+            errorDiv.textContent = 'La nueva contraseña no puede ser tu DNI';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+
+        // Show loading
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Cambiando contraseña...';
+
+        try {
+            const result = await auth.changePassword(auth.currentUser.id, newPassword);
+
+            if (result.success) {
+                // Update current user
+                auth.currentUser.password_reset_required = false;
+                auth.storeSession(auth.currentUser);
+
+                // Close modal
+                const modal = document.getElementById('modal-password-reset');
+                modal?.classList.add('hidden');
+                document.body.style.overflow = '';
+
+                utils.showToast('Contraseña actualizada correctamente', 'success');
+
+                // Initialize modules now
+                await this.initializeModules();
+            } else {
+                errorDiv.textContent = result.error || 'Error al cambiar contraseña';
+                errorDiv.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error al cambiar contraseña:', error);
+            errorDiv.textContent = 'Error al cambiar contraseña';
+            errorDiv.classList.remove('hidden');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Cambiar Contraseña';
+        }
     }
 };
 
