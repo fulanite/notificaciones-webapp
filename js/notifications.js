@@ -292,17 +292,17 @@ const notifications = {
 
             html += `
                 <tr class="stagger-item row-hover-effect" style="cursor: pointer;" onclick="notifications.viewDetails('${notif.id}')">
-                    <td class="col-date">${notif.fecha_entrega_ujier ? utils.formatDate(notif.fecha_entrega_ujier) : '<span style="color:var(--text-muted)">-</span>'}</td>
-                    <td class="col-status">${this.getEnhancedStatusBadge(notif)}</td>
-                    <td class="col-zona"><span class="badge-zona">${notif.zona || '-'}</span></td>
-                    <td class="col-ujier">${notif.ujier_nombre ? notif.ujier_nombre.split(' ')[0] : '-'}</td>
-                    <td class="col-letrado" title="${notif.letrado || '-'}">${notif.letrado || '-'}</td>
-                    <td class="col-caratula" title="${notif.caratula || ''}">${notif.caratula || ''}</td>
-                    <td class="col-exp"><strong style="white-space: nowrap;">${notif.n_expediente}</strong></td>
-                    <td class="col-dest" title="${recipientDisplay}">${recipientDisplay}</td>
-                    <td class="col-cargador" title="${notif.cargador_nombre || '-'}">${(notif.cargador_nombre || '-').split(' ')[0]}</td>
-                    <td class="col-dom" title="${notif.domicilio}">${notif.domicilio}</td>
-                    <td class="col-troquel" style="font-family: monospace;">${notif.n_troquel || '-'}</td>
+                    <td class="col-date" data-label="Fecha">${notif.fecha_entrega_ujier ? utils.formatDate(notif.fecha_entrega_ujier) : '<span style="color:var(--text-muted)">-</span>'}</td>
+                    <td class="col-status" data-label="Estado">${this.getEnhancedStatusBadge(notif)}</td>
+                    <td class="col-zona" data-label="Zona"><span class="badge-zona">${notif.zona || '-'}</span></td>
+                    <td class="col-ujier" data-label="Ujier">${notif.ujier_nombre ? notif.ujier_nombre.split(' ')[0] : '-'}</td>
+                    <td class="col-letrado" data-label="Letrado" title="${notif.letrado || '-'}">${notif.letrado || '-'}</td>
+                    <td class="col-caratula" data-label="Carátula" title="${notif.caratula || ''}">${notif.caratula || ''}</td>
+                    <td class="col-exp" data-label="Expediente"><strong style="white-space: nowrap;">${notif.n_expediente}</strong></td>
+                    <td class="col-dest" data-label="Destinatario" title="${recipientDisplay}">${recipientDisplay}</td>
+                    <td class="col-cargador" data-label="Cargador" title="${notif.cargador_nombre || '-'}">${(notif.cargador_nombre || '-').split(' ')[0]}</td>
+                    <td class="col-dom" data-label="Domicilio" title="${notif.domicilio}">${notif.domicilio}</td>
+                    <td class="col-troquel" data-label="Troquel" style="font-family: monospace;">${notif.n_troquel || '-'}</td>
                 </tr>
             `;
         });

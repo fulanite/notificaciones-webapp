@@ -1,181 +1,273 @@
 /* ========================================
-   SGND - Mobile Tables Optimization
-   Specifically for Devoluciones and Asignaciones tables
+   SGND - Mobile Tables Optimization v2.0
+   Unified Card Design for All Tables
    ======================================== */
 
 @media (max-width: 768px) {
-    /* --- Devoluciones & Assignments Tables on Mobile --- */
 
-    /* Force Hide headers */
-    .data-table thead,
-    .notifications-table thead,
-    .usuarios-table thead,
-    #tabla-devoluciones thead,
-    #tabla-reasignaciones thead {
-        display: none !important;
-    }
-
-    /* Transform table into block layout */
-    .data-table,
-    .data-table tbody,
-    .data-table tr,
-    .data-table td,
-    .notifications-table,
-    .notifications-table tbody,
-    .notifications-table tr,
-    .notifications-table td,
-    .usuarios-table,
-    .usuarios-table tbody,
-    .usuarios-table tr,
-    .usuarios-table td,
-    #tabla-devoluciones,
-    #tabla-devoluciones tbody,
-    #tabla-devoluciones tr,
-    #tabla-devoluciones td,
-    #tabla-reasignaciones,
-    #tabla-reasignaciones tbody,
-    #tabla-reasignaciones tr,
-    #tabla-reasignaciones td {
+    /* 1. Force tables to not look like tables */
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
         display: block !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
     }
 
-    /* Transform table into block layout but use flex for the row to organize header */
-    #tabla-devoluciones tr,
-    #tabla-reasignaciones tr {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        position: relative;
-        padding: 0 !important;
-        /* Reset padding, will apply to cells */
-        padding-bottom: var(--space-3) !important;
-        margin-bottom: var(--space-4);
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: var(--radius-lg);
+    /* 2. Hide headers (but keep accesibility if possible, here we just hide) */
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    /* 3. Card Container (The Row) */
+    tr {
         background: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        /* Subtle border for dark mode */
+        border-radius: var(--radius-lg);
+        /* Rounded corners */
+        margin-bottom: var(--space-4);
+        /* Space between cards */
         box-shadow: var(--shadow-sm);
-        height: auto !important;
+        padding: var(--space-4);
+        position: relative;
     }
 
-    /* Checkbox Cell - Top Left */
-    #tabla-devoluciones tr td:first-child,
-    #tabla-reasignaciones tr td:first-child {
-        width: 48px !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        background: rgba(255, 255, 255, 0.02);
-        border-radius: var(--radius-lg) 0 0 0;
-        padding: var(--space-3) 0 !important;
+    /* Zebra striping removal / preservation */
+    tbody tr:nth-of-type(odd) {
+        background: var(--bg-card);
     }
 
-    /* Expediente Cell - Top Right (Header) */
-    #tabla-devoluciones tr td[data-label="Expediente"],
-    #tabla-reasignaciones tr td[data-label="Expediente"] {
-        flex: 1;
-        width: calc(100% - 48px) !important;
-        background: rgba(255, 255, 255, 0.02);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 0 var(--radius-lg) 0 0;
-        padding: var(--space-3) var(--space-4) !important;
-        margin: 0 !important;
-        display: flex;
-        justify-content: flex-start;
-        /* Align left */
-        align-items: center;
+    tbody tr:nth-of-type(even) {
+        background: var(--bg-card);
     }
 
-    #tabla-devoluciones tr td[data-label="Expediente"] strong,
-    #tabla-reasignaciones tr td[data-label="Expediente"] strong {
-        font-size: 1.1rem;
-        color: var(--primary-400);
-        margin: 0;
-    }
-
-    /* All other cells - Full Width Body */
-    #tabla-devoluciones tr td,
-    #tabla-reasignaciones tr td {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        padding: 6px var(--space-4) !important;
+    /* 4. Cell Styling (The Items) */
+    td {
+        /* Behave like a row */
         border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        position: relative;
+        padding-left: 50% !important;
+        /* Make space for label */
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+        padding-right: 0 !important;
+        text-align: right !important;
+        /* Align content to right */
+        min-height: 24px;
+        /* Ensure height */
+        display: flex !important;
         align-items: center;
-    }
-
-    /* Hide labels for Exp and Checkbox */
-    #tabla-devoluciones tr td:first-child::before,
-    #tabla-reasignaciones tr td:first-child::before,
-    #tabla-devoluciones tr td[data-label="Expediente"]::before,
-    #tabla-reasignaciones tr td[data-label="Expediente"]::before {
-        display: none !important;
-    }
-
-    /* Label Styling for others */
-    #tabla-devoluciones tr td:not(:first-child):not([data-label="Expediente"])::before,
-    #tabla-reasignaciones tr td:not(:first-child):not([data-label="Expediente"])::before {
-        content: attr(data-label);
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        margin-right: auto;
-        /* Push value to right */
-    }
-
-    /* Special: Destinatario Prominence */
-    #tabla-devoluciones tr td[data-label="Destinatario"],
-    #tabla-reasignaciones tr td[data-label="Destinatario"] {
-        flex-direction: column;
-        align-items: flex-start;
-        padding-top: var(--space-3) !important;
-        gap: 4px;
-    }
-
-    #tabla-devoluciones tr td[data-label="Destinatario"]::before,
-    #tabla-reasignaciones tr td[data-label="Destinatario"]::before {
-        margin-bottom: 4px;
-    }
-
-    /* Special: Ujier */
-    #tabla-devoluciones tr td[data-label="Ujier"],
-    #tabla-reasignaciones tr td[data-label="Ujier"] {
-        color: var(--text-secondary);
-    }
-
-    /* Special: Estado - Align Right */
-    #tabla-devoluciones tr td[data-label="Estado"],
-    #tabla-reasignaciones tr td[data-label="Estado"] {
         justify-content: flex-end;
-        /* Badge to the right */
+        align-content: center;
+        flex-wrap: wrap;
+    }
+
+    td:last-child {
+        border-bottom: 0;
+    }
+
+    /* 5. The Label (Pseudo-element) */
+    td:before {
+        position: absolute;
+        top: 10px;
+        /* Match padding-top */
+        left: 0;
+        width: 45%;
+        padding-right: 10px;
+        white-space: wrap;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        content: attr(data-label);
+    }
+
+    /* =========================================
+       SPECIFIC OVERRIDES & TWEAKS
+       ========================================= */
+
+    /* --- EXPEDIENTE / PRIMARY IDENTIFIER --- */
+    /* Make the expediente look like a card title */
+    td[data-label="Expediente"],
+    td[data-label="Usuario"],
+    .col-exp {
+        background: rgba(255, 255, 255, 0.03);
+        margin: -16px -16px 10px -16px;
+        /* Negative margin to fill header */
+        padding: 12px 16px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        text-align: left !important;
+        justify-content: space-between;
+        padding-left: 16px !important;
+        /* Reset padding override */
+        color: var(--primary-400);
+        font-size: 1.1rem;
+        font-weight: 700;
+        display: flex !important;
+        flex-direction: row;
+    }
+
+    td[data-label="Expediente"]:before,
+    td[data-label="Usuario"]:before,
+    .col-exp:before {
+        position: static;
+        /* Flow naturally */
+        width: auto;
+        margin-right: 10px;
+        content: "EXP:";
+        color: var(--text-muted);
+        font-weight: normal;
+        font-size: 0.8rem;
+        display: none;
+        /* Hide 'Exp:' prefix for cleaner look if desired, or keep */
+    }
+
+    /* --- CHECKBOXES (Batch Actions) --- */
+    td:has(input[type="checkbox"]),
+    .checkbox-cell {
+        padding-left: 0 !important;
+        text-align: left !important;
+        justify-content: flex-start;
+        border-bottom: none;
         padding-bottom: 0 !important;
     }
 
-    #tabla-devoluciones tr td[data-label="Estado"]::before,
-    #tabla-reasignaciones tr td[data-label="Estado"]::before {
-        margin-right: var(--space-2);
-        /* Keep label visible */
+    td:has(input[type="checkbox"]):before {
+        display: none;
     }
 
+    /* Make the checkbox row float or integrate */
+    /* If we want checkbox top-left absolute */
+    td:has(input[type="checkbox"]) {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 10;
+        width: auto;
+        padding: 0 !important;
+    }
+
+    /* Adjust Expediente to not overlap checkbox */
+    td:has(input[type="checkbox"])~td[data-label="Expediente"] {
+        padding-left: 50px !important;
+        /* Make room for checkbox */
+    }
+
+    /* --- STATUS BADGES --- */
+    td[data-label="Estado"],
+    .col-status {
+        padding-left: 16px !important;
+        text-align: right !important;
+        justify-content: flex-end;
+    }
+
+    td[data-label="Estado"]:before,
+    .col-status:before {
+        position: static;
+        width: auto;
+        margin-right: auto;
+        /* Push content to right */
+    }
+
+    /* --- DESTINATARIO / LARGE TEXT --- */
+    td[data-label="Destinatario"],
+    .col-dest {
+        display: block !important;
+        text-align: left !important;
+        padding-left: 0 !important;
+        margin-top: 5px;
+    }
+
+    td[data-label="Destinatario"]:before,
+    .col-dest:before {
+        position: static;
+        display: block;
+        margin-bottom: 4px;
+        color: var(--text-muted);
+    }
+
+    td[data-label="Destinatario"] strong,
+    .col-dest {
+        font-size: 1.05rem;
+        color: var(--text-primary);
+    }
+
+    /* --- DOMICILIO --- */
+    td[data-label="Domicilio"],
+    .col-dom {
+        text-align: left !important;
+        padding-left: 0 !important;
+        display: block !important;
+    }
+
+    td[data-label="Domicilio"]:before,
+    .col-dom:before {
+        position: static;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    /* --- ACTIONS CELL --- */
+    td.actions-cell {
+        padding-left: 0 !important;
+        justify-content: flex-end;
+        /* Align buttons right */
+        gap: 10px;
+        margin-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 15px !important;
+    }
+
+    td.actions-cell:before {
+        display: none;
+    }
+
+    td.actions-cell .btn {
+        width: auto;
+        /* Allow buttons to size naturally */
+        flex: 1;
+        /* Or make them full width if preferred */
+    }
+
+    /* --- SPECIFIC TABLE TWEAKS --- */
+
+    /* Notifications Table Specifics */
+    #tabla-notificaciones tr.date-group-row {
+        background: transparent !important;
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        margin-bottom: 0;
+    }
+
+    #tabla-notificaciones tr.date-group-row td {
+        text-align: center !important;
+        padding: 10px !important;
+        color: var(--primary);
+        font-weight: bold;
+        justify-content: center;
+    }
+
+    #tabla-notificaciones tr.date-group-row td:before {
+        display: none;
+    }
 
     /* Ujier Dashboard Fixes */
     .ujier-list {
         display: flex;
         flex-direction: column;
-        /* Force vertical stacking */
-        width: 100%;
-        overflow: visible;
-        /* Prevent cutting off */
     }
 
-    .ujier-item {
-        width: 100%;
-        box-sizing: border-box;
-        overflow: hidden;
-        /* Contain inner overflows */
+    /* Hide less critical info if needed to save space */
+    td[data-label="Cargador"],
+    td[data-label="Letrado"] {
+        /* display: none !important;  Uncomment to compact view */
     }
 }

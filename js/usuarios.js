@@ -84,11 +84,11 @@ const usuarios = {
 
         tbody.innerHTML = users.map(u => `
             <tr>
-                <td><strong>${u.nombre || '-'}</strong></td>
-                <td>${u.email}</td>
-                <td>${u.dni || '-'}</td>
-                <td><span class="badge badge-${u.rol}">${this.getRolLabel(u.rol)}</span></td>
-                <td>
+                <td data-label="Usuario"><strong>${u.nombre || '-'}</strong></td>
+                <td data-label="Email">${u.email}</td>
+                <td data-label="DNI">${u.dni || '-'}</td>
+                <td data-label="Rol"><span class="badge badge-${u.rol}">${this.getRolLabel(u.rol)}</span></td>
+                <td data-label="Estado">
                     <span class="status-badge ${u.activo ? 'status-completed' : 'status-deferred'}">
                         ${u.activo ? 'Activo' : 'Inactivo'}
                     </span>
