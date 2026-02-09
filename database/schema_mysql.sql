@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS notificaciones (
     resultado_diligencia ENUM('atiende', 'no_atiende', 'pre_aviso', 'estrados', 'domicilio_inexistente', 'diligenciador_ausente') DEFAULT NULL,
     fecha_diligencia DATETIME,
     diligenciado_por VARCHAR(36),
+    fecha_entrega_ujier DATETIME NULL DEFAULT NULL COMMENT 'Fecha de entrega por el ujier (migración)',
     
     -- Ubicación GPS
     ubicacion_lat DECIMAL(10, 8),

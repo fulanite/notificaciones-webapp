@@ -167,58 +167,73 @@ async function readCsvFile(filePath) {
             return;
         }
 
-        const rows = [];
-        let header = null;
-
-        const rl = readline.createInterface({
-            input: fs.createReadStream(filePath, { encoding: 'utf-8' }),
-            crlfDelay: Infinity
-        });
-
-        function parseCSVLine(line) {
-            const result = [];
-            let current = '';
+        try {
+            const content = fs.readFileSync(filePath, 'utf-8');
+            const rows = [];
+            let header = null;
+            let currentRow = [];
+            let currentField = '';
             let inQuotes = false;
+            let lineBuffer = '';
 
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
+            const lines = content.split(/\r?\n/);
 
-                if (char === '"') {
-                    if (inQuotes && line[i + 1] === '"') {
-                        current += '"';
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                    }
-                } else if (char === ',' && !inQuotes) {
-                    result.push(current.trim());
-                    current = '';
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i];
+
+                // Remove BOM
+                if (i === 0 && line.charCodeAt(0) === 0xFEFF) {
+                    line = line.slice(1);
+                }
+
+                if (inQuotes) {
+                    lineBuffer += '\n' + line;
                 } else {
-                    current += char;
+                    lineBuffer = line;
+                }
+
+                for (let j = (inQuotes ? lineBuffer.lastIndexOf('\n') + 1 : 0); j < lineBuffer.length; j++) {
+                    const char = lineBuffer[j];
+                    const nextChar = lineBuffer[j + 1];
+
+                    if (char === '"') {
+                        if (!inQuotes) {
+                            inQuotes = true;
+                        } else if (nextChar === '"') {
+                            currentField += '"';
+                            j++;
+                        } else {
+                            inQuotes = false;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        currentRow.push(currentField.trim());
+                        currentField = '';
+                    } else {
+                        currentField += char;
+                    }
+                }
+
+                if (!inQuotes) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                    lineBuffer = '';
+
+                    if (!header) {
+                        header = currentRow;
+                    } else if (currentRow.length > 0 && currentRow.some(c => c !== '')) {
+                        const row = {};
+                        header.forEach((col, idx) => {
+                            row[col] = currentRow[idx] || '';
+                        });
+                        rows.push(row);
+                    }
+                    currentRow = [];
                 }
             }
-            result.push(current.trim());
-
-            return result;
+            resolve(rows);
+        } catch (err) {
+            reject(err);
         }
-
-        rl.on('line', (line) => {
-            if (!header) {
-                header = parseCSVLine(line);
-            } else {
-                const values = parseCSVLine(line);
-                if (values.length === header.length) {
-                    const row = {};
-                    header.forEach((col, idx) => {
-                        row[col] = values[idx];
-                    });
-                    rows.push(row);
-                }
-            }
-        });
-
-        rl.on('close', () => resolve(rows));
-        rl.on('error', reject);
     });
 }
 
