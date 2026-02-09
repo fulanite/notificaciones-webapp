@@ -107,12 +107,12 @@ function categorizeAndCount(rows) {
         // --- NEW FALLBACK LOGIC ---
         // If still no category, use the notification type to help classify external origns
         if (tipoNot === 'cedulas_mandamientos_22172') {
-            // Use the province name from 'origen' as category
-            const cat = origen || 'Otra Provincia';
+            // Group by province name found in 'origen'
+            const cat = origen || 'Otras Provincias (Ley 22.172)';
             counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
         } else if (tipoNot === 'cedulas_correspondencia') {
-            // Use 'Juzgado de [Ciudad]' or just the city name
-            const cat = origen ? `Juzgado de ${origen}` : 'Juzgado del interior';
+            // Group ALL interior notifications under a single label
+            const cat = 'Juzgados del interior';
             counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
         } else {
             // Last resort: put in "Otros / No clasificados"
