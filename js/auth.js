@@ -145,6 +145,23 @@ const auth = {
         this.currentUser = null;
     },
 
+    // Reset password (admin only)
+    async resetPassword(userId, newPassword) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth.php?action=reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, new_password: newPassword })
+            });
+
+            const data = await response.json();
+            return { success: data.success, error: data.error };
+        } catch (error) {
+            console.error('Reset password error:', error);
+            return { success: false, error: 'Error de conexión' };
+        }
+    },
+
     // Sign out
     async signOut() {
         this.clearSession();

@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=40.0" as="style">
-    <link rel="preload" href="css/base.css?v=40.0" as="style">
-    <link rel="preload" href="js/config.js?v=40.0" as="script">
-    <link rel="preload" href="js/app.js?v=40.0" as="script">
+    <link rel="preload" href="css/variables.css?v=40.6" as="style">
+    <link rel="preload" href="css/base.css?v=40.6" as="style">
+    <link rel="preload" href="js/config.js?v=40.6" as="script">
+    <link rel="preload" href="js/app.js?v=40.6" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=40.0">
-    <link rel="stylesheet" href="css/base.css?v=40.0">
-    <link rel="stylesheet" href="css/components.css?v=40.0">
+    <link rel="stylesheet" href="css/variables.css?v=40.6">
+    <link rel="stylesheet" href="css/base.css?v=40.6">
+    <link rel="stylesheet" href="css/components.css?v=40.6">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=40.0" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=40.0" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=40.0" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=40.0" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=40.0" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=40.6" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=40.6" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=40.6" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=40.6" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=40.6" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -55,14 +55,9 @@
     </noscript>
 
     <style>
-        /* Hotfix foVerify modal structure for audio removal.l screens */
+        /* Hotfix for small screens */
         .modal-actions {
             flex-wrap: wrap !important;
-            las tablas dejalas como en la version movil pero que se pueda hacer un desplazamiento horizontal,
-            en todas,
-            notificaiciones,
-            asignaciones,
-            devoluciones,
             gap: 10px !important;
         }
 
@@ -1746,25 +1741,26 @@
 
     <!-- App Scripts - Deferred for better performance -->
     <script defer src="js/lazy-loader.js?v=40.1"></script>
-    <script defer src="js/config.js?v=40.0"></script>
-    <script defer src="js/data.js?v=40.0"></script>
-    <script defer src="js/api-client.js?v=40.0"></script>
-    <script defer src="js/auth.js?v=40.0"></script>
-    <script defer src="js/utils.js?v=40.0"></script>
-    <script defer src="js/offline.js?v=40.0"></script>
-    <script defer src="js/notifications.js?v=40.0"></script>
-    <script defer src="js/ujier.js?v=40.0"></script>
-    <script defer src="js/dashboard.js?v=40.3"></script>
-    <script defer src="js/dashboard-patch.js?v=40.0"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=40.4"></script>
-    <script defer src="js/dashboard-analytics.js?v=40.3"></script>
-    <script defer src="js/reports.js?v=40.0"></script>
-    <script defer src="js/audit.js?v=40.0"></script>
-    <script defer src="js/asignaciones.js?v=40.0"></script>
-    <script defer src="js/usuarios.js?v=40.0"></script>
-    <script defer src="js/devoluciones.js?v=40.0"></script>
-    <script defer src="js/planillas.js?v=40.0"></script>
-    <script defer src="js/app.js?v=40.0"></script>
+    <script defer src="js/lazy-loader.js?v=40.6"></script>
+    <script defer src="js/config.js?v=40.6"></script>
+    <script defer src="js/data.js?v=40.6"></script>
+    <script defer src="js/api-client.js?v=40.6"></script>
+    <script defer src="js/auth.js?v=40.6"></script>
+    <script defer src="js/utils.js?v=40.6"></script>
+    <script defer src="js/offline.js?v=40.6"></script>
+    <script defer src="js/notifications.js?v=40.6"></script>
+    <script defer src="js/ujier.js?v=40.6"></script>
+    <script defer src="js/dashboard.js?v=40.6"></script>
+    <script defer src="js/dashboard-patch.js?v=40.6"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=40.6"></script>
+    <script defer src="js/dashboard-analytics.js?v=40.6"></script>
+    <script defer src="js/reports.js?v=40.6"></script>
+    <script defer src="js/audit.js?v=40.6"></script>
+    <script defer src="js/asignaciones.js?v=40.6"></script>
+    <script defer src="js/usuarios.js?v=40.6"></script>
+    <script defer src="js/devoluciones.js?v=40.6"></script>
+    <script defer src="js/planillas.js?v=40.6"></script>
+    <script defer src="js/app.js?v=40.6"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>

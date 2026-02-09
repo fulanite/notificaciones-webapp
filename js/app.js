@@ -599,19 +599,26 @@ const app = {
     async onLoginSuccess() {
         console.log('✅ Login exitoso:', auth.currentUser?.email);
         console.log('🎭 Rol detectado:', auth.currentUser?.rol);
-        console.log('🔒 Reset requerido:', auth.currentUser?.password_reset_required);
 
-        // Check if password reset is required (robust check for bool, string "1" or number 1)
         const resetRequired = auth.currentUser?.password_reset_required;
+        console.log('🔒 Reset requerido:', resetRequired);
 
         if (resetRequired === true || resetRequired === 1 || resetRequired === "1") {
-            console.log('⚠️ Bloqueando app: Mostrando modal de reset obligatorio');
+            const modal = document.getElementById('modal-password-reset');
+            if (modal) {
+                // Ensure login page is hidden
+                document.getElementById('page-login')?.classList.remove('active');
 
-            // Hide login page so only the modal is visible on top of background
-            document.getElementById('page-login')?.classList.remove('active');
-
-            // Show only the modal, don't update UI or show dashboard yet
-            this.showPasswordResetModal();
+                // Show only the modal
+                this.showPasswordResetModal();
+                console.log('⚠️ Password reset modal displayed');
+            } else {
+                console.error('❌ Modal de cambio de contraseña no encontrado en el DOM');
+                // Fallback: Proceed to dashboard if modal is missing (to avoid blank screen)
+                this.showDashboard();
+                this.updateUserInterface();
+                await this.initializeModules();
+            }
         } else {
             // Normal flow: only if no reset is required
             this.showDashboard();
