@@ -1166,7 +1166,7 @@ const app = {
         if (closeBtn) {
             closeBtn.onclick = () => {
                 console.log('🔙 User canceled password reset, returning to login...');
-                auth.logout(); // Clear session
+                auth.signOut(); // Clear session and redirect
                 modal.classList.add('hidden');
                 modal.style.display = 'none';
                 document.body.style.overflow = '';
