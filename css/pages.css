@@ -2246,3 +2246,9 @@
     font-size: 1.1rem;
     font-weight: 500;
 }
+
+/* Ensure mandatory password reset modal is always visible when active */
+#modal-password-reset.modal:not(.hidden) {
+    display: flex !important;
+    z-index: 20000;
+}
