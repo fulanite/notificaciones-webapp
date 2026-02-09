@@ -910,8 +910,11 @@ const app = {
 
         const pageInfo = titles[viewId] || { title: 'SGND', subtitle: '' };
 
-        document.getElementById('page-title').textContent = pageInfo.title;
-        document.getElementById('page-subtitle').textContent = pageInfo.subtitle;
+        const titleEl = document.getElementById('page-title');
+        const subtitleEl = document.getElementById('page-subtitle');
+
+        if (titleEl) titleEl.textContent = pageInfo.title;
+        if (subtitleEl) subtitleEl.textContent = pageInfo.subtitle;
     },
 
     // Initialize view-specific module
@@ -1117,15 +1120,25 @@ const app = {
 
     // Hide loading screen
     hideLoading() {
+        console.log('🖼️ Hiding loading screen and showing app container...');
         const loadingScreen = document.getElementById('loading-screen');
         const appContainer = document.getElementById('app');
 
-        loadingScreen?.classList.add('fade-out');
-        appContainer?.classList.remove('hidden');
+        if (loadingScreen) {
+            loadingScreen.classList.add('fade-out');
+            setTimeout(() => {
+                loadingScreen.remove();
+                console.log('🧹 Loading screen removed from DOM');
+            }, 500);
+        }
 
-        setTimeout(() => {
-            loadingScreen?.remove();
-        }, 500);
+        if (appContainer) {
+            appContainer.classList.remove('hidden');
+            appContainer.style.display = 'block'; // Force visibility
+            console.log('✅ App container unhidden');
+        } else {
+            console.error('❌ App container (#app) not found!');
+        }
     },
 
     // Show password reset modal (mandatory)
@@ -1141,8 +1154,12 @@ const app = {
         document.getElementById('password-reset-error')?.classList.add('hidden');
 
         modal.classList.remove('hidden');
+        modal.classList.add('active'); // Some modals might use this
         modal.style.display = 'flex'; // Ensure it's shown if .hidden uses display:none
+        modal.style.zIndex = '99999'; // Super high
         document.body.style.overflow = 'hidden';
+
+        console.log('🚀 Modal reset-password visible:', modal.style.display, 'z-index:', modal.style.zIndex);
 
         // Setup form handler (only once)
         const form = document.getElementById('form-password-reset');
