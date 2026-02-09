@@ -484,12 +484,14 @@
 .modal {
     position: fixed;
     inset: 0;
-    z-index: 11000;
-    /* Por encima del bottom nav (9999) */
+    z-index: 12000;
+    /* Aumentado para estar sobre todo */
     display: flex;
     align-items: center;
     justify-content: center;
     padding: var(--space-4);
+    pointer-events: auto;
+    /* Asegurar que capture eventos */
 }
 
 .modal.hidden,

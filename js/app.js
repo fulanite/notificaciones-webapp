@@ -608,15 +608,17 @@ const app = {
         console.log('✅ Login exitoso:', auth.currentUser?.email);
         console.log('🔒 Reset requerido:', auth.currentUser?.password_reset_required);
 
-        this.showDashboard();
-        this.updateUserInterface();
-
         // Check if password reset is required (robust check for bool, string "1" or number 1)
         const resetRequired = auth.currentUser?.password_reset_required;
+
         if (resetRequired === true || resetRequired === 1 || resetRequired === "1") {
-            console.log('⚠️ Mostrando modal de reset obligatorio');
+            console.log('⚠️ Bloqueando app: Mostrando modal de reset obligatorio');
+            // Show only the modal, don't update UI or show dashboard yet
             this.showPasswordResetModal();
         } else {
+            // Normal flow: only if no reset is required
+            this.showDashboard();
+            this.updateUserInterface();
             await this.initializeModules();
         }
     },
@@ -1153,6 +1155,10 @@ const app = {
 
                 utils.showToast('Contraseña actualizada correctamente', 'success');
 
+                // Now that password is changed, show the normal app UI
+                this.showDashboard();
+                this.updateUserInterface();
+
                 // Initialize modules now
                 await this.initializeModules();
             } else {
@@ -1161,11 +1167,11 @@ const app = {
             }
         } catch (error) {
             console.error('Error al cambiar contraseña:', error);
-            errorDiv.textContent = 'Error al cambiar contraseña';
+            errorDiv.textContent = 'Error de conexión. Intentá de nuevo.';
             errorDiv.classList.remove('hidden');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Cambiar Contraseña';
+            submitBtn.textContent = '🔒 Cambiar Contraseña';
         }
     }
 };
