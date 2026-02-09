@@ -18,14 +18,14 @@ const app = {
         // Initialize theme
         this.initTheme();
 
-        // Check authentication
-        await this.checkAuth();
-
         // Setup event listeners
         this.setupEventListeners();
 
-        // Hide loading screen immediately when ready
+        // Hide loading screen early to ensure modals can be seen
         this.hideLoading();
+
+        // Check authentication
+        await this.checkAuth();
     },
 
     // Initialize theme from localStorage
@@ -606,8 +606,8 @@ const app = {
         if (resetRequired === true || resetRequired === 1 || resetRequired === "1") {
             const modal = document.getElementById('modal-password-reset');
             if (modal) {
-                // Ensure login page is hidden
-                document.getElementById('page-login')?.classList.remove('active');
+                // Keep login page active as background
+                document.getElementById('page-login')?.classList.add('active');
 
                 // Show only the modal
                 this.showPasswordResetModal();
