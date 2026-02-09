@@ -28,6 +28,8 @@ const DEMAS_JUZGADOS_MAP = new Map([
     ['Laborales', [/^Juzgado Laboral/i]],
     ['Ministerio Público', [/^Ministerio Público$/i]],
     ['Procuración', [/^Procuración$/i]],
+    ['Ley 22.172 / Otras Provincias', [/^Cédulas o Mandamientos Ley 22172$/i]],
+    ['Interior / Otras Jurisdicciones', [/^Andalgalá$/i, /^Belén$/i, /^Tinogasta$/i, /^Santa Maria$/i, /^Recreo$/i, /^Cédulas por Correspondencia/i]],
 ]);
 
 function getCategory(origen, categoryMap) {
@@ -99,6 +101,21 @@ function categorizeAndCount(rows) {
         category = getCategory(origen, DEMAS_JUZGADOS_MAP);
         if (category) {
             counts.demasJuzgados.set(category, (counts.demasJuzgados.get(category) || 0) + 1);
+            return;
+        }
+
+        // --- NEW FALLBACK LOGIC ---
+        // If still no category, use the notification type to help classify external origns
+        if (tipoNot === 'cedulas_mandamientos_22172') {
+            const cat = 'Ley 22.172 / Otras Provincias';
+            counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
+        } else if (tipoNot === 'cedulas_correspondencia') {
+            const cat = 'Interior / Otras Jurisdicciones';
+            counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
+        } else {
+            // Last resort: put in "Otros / No clasificados"
+            const cat = 'Otros / No clasificados';
+            counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
         }
     });
 
