@@ -42,11 +42,14 @@ try {
                 $placeholders = implode(',', array_fill(0, count($estadosArr), '?'));
 
                 $sql = "SELECT * FROM notificaciones 
-                        WHERE asignado_a = ? AND estado IN ($placeholders) AND devuelta_por_ujier = 0
+                        WHERE (asignado_a = ? OR asignado_a = (SELECT dni FROM usuarios WHERE id = ?)) 
+                        AND estado IN ($placeholders) AND devuelta_por_ujier = 0
                         ORDER BY COALESCE(fecha_entrega_ujier, fecha_carga) ASC";
 
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute(array_merge([$_GET['asignado_a']], $estadosArr));
+                // We need to pass both ID and placeholders, plus ID again for the subquery
+                $params = array_merge([$_GET['asignado_a'], $_GET['asignado_a']], $estadosArr);
+                $stmt->execute($params);
                 Database::sendResponse($stmt->fetchAll());
             } elseif (isset($_GET['action']) && $_GET['action'] === 'distinct' && isset($_GET['column'])) {
                 // Get distinct values for a column
@@ -113,7 +116,8 @@ try {
                 }
 
                 if (!empty($_GET['own_only']) && $_GET['own_only'] == '1' && !empty($_GET['user_email'])) {
-                    $where[] = "n.usuario_carga = ?";
+                    $where[] = "(n.usuario_carga = ? OR n.usuario_carga = (SELECT dni FROM usuarios WHERE email = ?))";
+                    $params[] = $_GET['user_email'];
                     $params[] = $_GET['user_email'];
                 }
 

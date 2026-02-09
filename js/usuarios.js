@@ -6,11 +6,15 @@
 const usuarios = {
     users: [],
     editingId: null,
+    listenersSetup: false,
 
     // Initialize the module
     async init() {
         await this.loadUsers();
-        this.setupEventListeners();
+        if (!this.listenersSetup) {
+            this.setupEventListeners();
+            this.listenersSetup = true;
+        }
     },
 
     // Setup event listeners
@@ -138,7 +142,7 @@ const usuarios = {
                 document.getElementById('usuario-nombre').value = user.nombre || '';
                 document.getElementById('usuario-email').value = user.email || '';
                 document.getElementById('usuario-dni').value = user.dni || '';
-                document.getElementById('usuario-rol').value = user.rol || '';
+                document.getElementById('usuario-rol').value = user.rol ? user.rol.toLowerCase() : '';
                 document.getElementById('usuario-activo').checked = user.activo !== false;
 
                 // Show password reset button for existing users

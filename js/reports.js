@@ -113,10 +113,13 @@ function getMonthInfo(yyyy_mm) {
 }
 
 const reports = {
+    initialized: false,
     // Initialize reports module
     init() {
+        if (this.initialized) return;
         this.setupEventListeners();
         this.setDefaultDates();
+        this.initialized = true;
     },
 
     // Setup event listeners

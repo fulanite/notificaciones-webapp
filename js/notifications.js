@@ -3,8 +3,11 @@
  */
 
 const notifications = {
+    initialized: false,
+    listenersSetup: false,
     currentPage: 1,
     totalPages: 1,
+    lastRequestId: 0,
     filters: {
         estado: '',
         tipo: '',
@@ -17,19 +20,36 @@ const notifications = {
 
     // Initialize notifications list
     async init() {
-        // Establecer filtro propio basado en rol (solo administrativo ve sus cargas por defecto)
+        if (this.initialized) {
+            // Si ya se inicializó, solo refrescamos los datos para estar al día
+            await this.loadNotifications();
+            return;
+        }
+
+        // Establecer filtro propio basado en rol
         const rol = auth.currentUser?.rol ? auth.currentUser.rol.toLowerCase() : '';
-        if (rol === 'admin' || rol === 'coordinador' || rol === 'auditor') {
+
+        // Roles que ven 'Mis Cargas' por defecto: administrativo, coordinador, ujier
+        if (rol === 'administrativo' || rol === 'coordinador' || rol === 'ujier') {
+            this.filters.own_only = true;
+            // Asegurar que el select refleje 'Mis Cargas'
+            const filterPropio = document.getElementById('filter-propio');
+            if (filterPropio) filterPropio.value = 'mine-all';
+        } else {
+            // Admin y Auditor ven TODO por defecto
             this.filters.own_only = false;
-            // Actualizar select en el DOM
             const filterPropio = document.getElementById('filter-propio');
             if (filterPropio) filterPropio.value = 'none';
         }
 
         await this.loadFilterOptions(); // Load options from DB first
-        this.setupFilters();
+        if (!this.listenersSetup) {
+            this.setupFilters();
+            this.listenersSetup = true;
+        }
         await this.loadNotifications();
         this.updateYearBadges();
+        this.initialized = true;
     },
 
     // Load filter options based on real data from DB
@@ -155,6 +175,8 @@ const notifications = {
 
     // Load notifications from database
     async loadNotifications() {
+        const requestId = ++this.lastRequestId;
+
         const tbody = document.getElementById('tabla-notificaciones');
         const refreshBtn = document.getElementById('btn-refresh-list');
         if (!tbody) return;
@@ -163,7 +185,7 @@ const notifications = {
         if (refreshBtn) refreshBtn.classList.add('rotating');
         tbody.innerHTML = `
             <tr>
-                <td colspan="8" style="text-align: center; padding: 40px;">
+                <td colspan="11" style="text-align: center; padding: 40px;">
                     <div class="spinner"></div>
                     <p style="margin-top: 16px; color: var(--text-muted);">Cargando notificaciones...</p>
                 </td>
@@ -181,10 +203,16 @@ const notifications = {
         try {
             const { data, error, count } = await db.getNotifications(options);
 
+            // Verificación de ID de petición para evitar race conditions
+            if (requestId !== this.lastRequestId) {
+                console.log('⏳ Ignorando respuesta obsoleta:', requestId);
+                return;
+            }
+
             if (error) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" style="text-align: center; padding: 40px; color: var(--error);">
+                        <td colspan="11" style="text-align: center; padding: 40px; color: var(--error);">
                             Error al cargar notificaciones: ${error.message}
                         </td>
                     </tr>

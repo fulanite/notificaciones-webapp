@@ -337,15 +337,7 @@ const app = {
 
     // Check authentication status
     async checkAuth() {
-        // Try to load from demo session first
-        const demoUser = auth.checkDemoSession();
-
-        if (demoUser) {
-            await this.onLoginSuccess();
-            return;
-        }
-
-        // Check session
+        // Always check session with server via auth.init()
         const user = await auth.init();
 
         if (user) {
@@ -1100,12 +1092,15 @@ const app = {
         modal.style.display = 'flex'; // Ensure it's shown if .hidden uses display:none
         document.body.style.overflow = 'hidden';
 
-        // Setup form handler
+        // Setup form handler (only once)
         const form = document.getElementById('form-password-reset');
-        form?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handlePasswordReset();
-        });
+        if (form && !form.dataset.listenerAttached) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handlePasswordReset();
+            });
+            form.dataset.listenerAttached = 'true';
+        }
     },
 
     // Handle password reset

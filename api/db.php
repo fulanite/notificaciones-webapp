@@ -25,55 +25,6 @@ class Database
             $this->pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
             // Set timezone for the session
             $this->pdo->exec("SET time_zone = '-03:00'");
-
-            // Quick fix for missing columns
-            try {
-                $this->pdo->exec("ALTER TABLE visitas ADD COLUMN transcripcion_audio TEXT NULL AFTER audio_url");
-            } catch (PDOException $e) {
-            }
-
-            try {
-                $this->pdo->exec("ALTER TABLE visitas ADD COLUMN ubicacion_lng VARCHAR(50) NULL AFTER ubicacion_lat");
-            } catch (PDOException $e) {
-            }
-
-            // Fix ENUM truncations
-            try {
-                $this->pdo->exec("ALTER TABLE notificaciones MODIFY COLUMN resultado_diligencia VARCHAR(100) NULL");
-                $this->pdo->exec("ALTER TABLE notificaciones MODIFY COLUMN destinatario_especial VARCHAR(255) NULL");
-            } catch (PDOException $e) {
-            }
-
-            try {
-                $this->pdo->exec("ALTER TABLE notificaciones ADD COLUMN devuelta_por_ujier TINYINT(1) DEFAULT 0");
-                $this->pdo->exec("ALTER TABLE notificaciones ADD COLUMN fecha_devolucion DATETIME NULL");
-            } catch (PDOException $e) {
-            }
-
-            // New: fecha_entrega_ujier for logistics
-            try {
-                $this->pdo->exec("ALTER TABLE notificaciones ADD COLUMN fecha_entrega_ujier DATETIME NULL AFTER fecha_carga");
-            } catch (PDOException $e) {
-            }
-
-            // Fix usuarios table: Add coordinador role and missing columns
-            try {
-                // First try to modify the ENUM for rol
-                $this->pdo->exec("ALTER TABLE usuarios MODIFY COLUMN rol ENUM('admin', 'administrativo', 'ujier', 'auditor', 'coordinador') NOT NULL");
-            } catch (PDOException $e) {
-            }
-
-            try {
-                // Add dni column if missing
-                $this->pdo->exec("ALTER TABLE usuarios ADD COLUMN dni VARCHAR(20) NULL AFTER email");
-            } catch (PDOException $e) {
-            }
-
-            try {
-                // Add password_reset_required if missing
-                $this->pdo->exec("ALTER TABLE usuarios ADD COLUMN password_reset_required TINYINT(1) DEFAULT 0 AFTER activo");
-            } catch (PDOException $e) {
-            }
         } catch (PDOException $e) {
             $this->sendError('Database connection failed: ' . $e->getMessage(), 500);
         }
