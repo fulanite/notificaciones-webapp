@@ -60,8 +60,8 @@ CREATE TABLE IF NOT EXISTS audit_log (
     INDEX idx_fecha (created_at),
     INDEX idx_severidad (severidad),
     INDEX idx_usuario_fecha (usuario_id, created_at),
-    INDEX idx_entidad_fecha (entidad, created_at)
+    INDEX idx_entidad_fecha (entidad, created_at),
+    
+    -- Índice de texto completo para búsqueda en descripción
+    FULLTEXT INDEX idx_descripcion (descripcion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Crear índice de texto completo para búsqueda
-ALTER TABLE audit_log ADD FULLTEXT INDEX idx_descripcion (descripcion);
