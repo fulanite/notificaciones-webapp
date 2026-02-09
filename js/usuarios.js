@@ -258,10 +258,13 @@ const usuarios = {
             utils.showToast('Blanqueando contraseña, por favor espere...', 'info');
 
             // Call reset-password endpoint
+            const resetPwd = String(user.dni).trim();
+            console.log(`🔐 Blanqueando clave para ID: ${this.editingId} usando DNI: ${resetPwd}`);
+
             const result = await apiClient.post('auth.php', {
                 action: 'reset-password',
                 user_id: this.editingId,
-                new_password: user.dni
+                new_password: resetPwd
             });
 
             if (result.error) {
