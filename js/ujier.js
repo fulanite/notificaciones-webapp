@@ -20,6 +20,7 @@ const ujier = {
         this.setupHistoryFilters();
         this.loadSavedOrder(); // Cargar orden antes de las asignaciones
         await this.loadAssignments();
+        this.loadHistory(); // Cargar historial en segundo plano
         this.setupDiligenciaForm();
     },
 
@@ -1287,6 +1288,7 @@ const ujier = {
     },
 
     // Load work history
+    // Load work history
     async loadHistory() {
         if (!auth.currentUser) return;
 
@@ -1300,16 +1302,23 @@ const ujier = {
             </div>
         `;
 
-        // Obtener visitas recientes del usuario
+        // Obtener historial de visitas del usuario (API ya trae JOIN con notificaciones)
         const { data, error } = await db.getUserVisits(auth.currentUser.id);
 
         if (error) {
-            listContainer.innerHTML = `<div class="error-msg">Error al cargar historial: ${error}</div>`;
+            listContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--error);">
+                     Error al cargar historial: ${error}
+                </div>
+            `;
             return;
         }
 
+        // Guardar data completa para filtrado local
         this.historyData = data || [];
-        this.filterHistory(); // Renderizar aplicando filtros actuales
+
+        // Aplicar filtros iniciales (incluyendo año seleccionado por defecto)
+        this.filterHistory();
     },
 
     // Render history list

@@ -55,7 +55,8 @@ try {
 
                 $sql = "SELECT * FROM notificaciones 
                         WHERE (asignado_a = ? OR asignado_a = (SELECT dni FROM usuarios WHERE id = ?)) 
-                        AND estado IN ($placeholders) AND devuelta_por_ujier = 0
+                        AND (estado IN ($placeholders) OR LOWER(estado) IN ('pre_aviso', 'pre aviso', 'pre-aviso')) 
+                        AND devuelta_por_ujier = 0
                         ORDER BY COALESCE(fecha_entrega_ujier, fecha_carga) ASC";
 
                 $stmt = $pdo->prepare($sql);
@@ -278,6 +279,16 @@ try {
                 )
             ");
 
+            // Normalize asignado_a to DNI if UUID provided
+            $asignadoA = $data['asignado_a'] ?? null;
+            if ($asignadoA && strlen($asignadoA) > 15) { // Assuming UUID length
+                $stmtUjier = $pdo->prepare("SELECT dni FROM usuarios WHERE id = ? LIMIT 1");
+                $stmtUjier->execute([$asignadoA]);
+                $u = $stmtUjier->fetch();
+                if ($u && !empty($u['dni']))
+                    $asignadoA = $u['dni'];
+            }
+
             $stmt->execute([
                 $id,
                 $data['fecha_entrega_ujier'] ?? date('Y-m-d'),
@@ -297,8 +308,8 @@ try {
                 $data['n_troquel'] ?? null,
                 $data['medio_pago'] ?? null,
                 $data['costo'] ?? 0,
-                $data['asignado_a'] ?? null,
-                !empty($data['asignado_a']) ? date('Y-m-d H:i:s') : null,
+                $asignadoA,
+                !empty($asignadoA) ? date('Y-m-d H:i:s') : null,
                 $data['asignado_por'] ?? null,
                 $data['observaciones_iniciales'] ?? null
             ]);
@@ -331,6 +342,16 @@ try {
             if (isset($data['action'])) {
                 switch ($data['action']) {
                     case 'assign':
+                        // Normalize asignado_a to DNI if UUID provided
+                        $asignadoA = $data['asignado_a'];
+                        if ($asignadoA && strlen($asignadoA) > 15) {
+                            $stmtUjier = $pdo->prepare("SELECT dni FROM usuarios WHERE id = ? LIMIT 1");
+                            $stmtUjier->execute([$asignadoA]);
+                            $u = $stmtUjier->fetch();
+                            if ($u && !empty($u['dni']))
+                                $asignadoA = $u['dni'];
+                        }
+
                         // Assign notification to ujier
                         $stmt = $pdo->prepare("
                             UPDATE notificaciones SET
@@ -342,7 +363,7 @@ try {
                             WHERE id = ?
                         ");
                         $stmt->execute([
-                            $data['asignado_a'],
+                            $asignadoA,
                             $data['asignado_por'],
                             $data['asignado_por'],
                             $data['id']
