@@ -107,14 +107,16 @@ function categorizeAndCount(rows) {
         // --- NEW FALLBACK LOGIC ---
         // If still no category, use the notification type to help classify external origns
         if (tipoNot === 'cedulas_mandamientos_22172') {
-            const cat = 'Ley 22.172 / Otras Provincias';
+            // Use the province name from 'origen' as category
+            const cat = origen || 'Otra Provincia';
             counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
         } else if (tipoNot === 'cedulas_correspondencia') {
-            const cat = 'Interior / Otras Jurisdicciones';
+            // Use 'Juzgado de [Ciudad]' or just the city name
+            const cat = origen ? `Juzgado de ${origen}` : 'Juzgado del interior';
             counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
         } else {
             // Last resort: put in "Otros / No clasificados"
-            const cat = 'Otros / No clasificados';
+            const cat = origen || 'Otros / No clasificados';
             counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
         }
     });
