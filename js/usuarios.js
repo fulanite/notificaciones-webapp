@@ -1,6 +1,6 @@
 /**
  * SGND - Usuarios Module
- * User management (CRUD) with password reset functionality
+ * User management (CRUD) with password reset and delete functionality
  */
 
 const usuarios = {
@@ -55,12 +55,12 @@ const usuarios = {
         const tbody = document.getElementById('usuarios-table-body');
         if (!tbody) return;
 
-        tbody.innerHTML = '<tr><td colspan="7" class="loading">Cargando usuarios...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="loading">Cargando usuarios...</td></tr>';
 
         const { data, error } = await db.getUsers();
 
         if (error) {
-            tbody.innerHTML = '<tr><td colspan="7" class="error">Error al cargar usuarios</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="error">Error al cargar usuarios</td></tr>';
             return;
         }
 
@@ -74,7 +74,7 @@ const usuarios = {
         if (!tbody) return;
 
         if (users.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty">No hay usuarios registrados</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="empty">No hay usuarios registrados</td></tr>';
             return;
         }
 
@@ -90,13 +90,15 @@ const usuarios = {
                     </span>
                     ${u.password_reset_required ? '<span class="badge badge-warning" title="Debe cambiar contraseña">🔄</span>' : ''}
                 </td>
-                <td>${u.ultimo_acceso ? utils.formatDate(u.ultimo_acceso) : 'Nunca'}</td>
                 <td class="actions-cell">
                     <button class="btn btn-sm btn-secondary" onclick="usuarios.editUser('${u.id}')">
                         ✏️ Editar
                     </button>
                     <button class="btn btn-sm btn-warning" onclick="usuarios.toggleStatus('${u.id}', ${!u.activo})">
                         ${u.activo ? '🚫 Desactivar' : '✅ Activar'}
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="usuarios.deleteUser('${u.id}')">
+                        🗑️ Eliminar
                     </button>
                 </td>
             </tr>
@@ -235,22 +237,27 @@ const usuarios = {
         if (!confirmed) return;
 
         try {
-            // Reset password to DNI
-            const result = await auth.changePassword(this.editingId, user.dni);
+            // Call reset-password endpoint
+            const result = await apiClient.post('auth.php', {
+                action: 'reset-password',
+                user_id: this.editingId,
+                new_password: user.dni
+            });
 
             if (result.error) {
-                utils.showToast('Error al blanquear contraseña', 'error');
+                utils.showToast('Error al blanquear contraseña: ' + result.error, 'error');
                 return;
             }
 
-            // Mark as requiring password reset
-            await db.updateUser(this.editingId, { password_reset_required: true });
-
             utils.showToast(
-                `Contraseña blanqueada correctamente. Nueva contraseña: ${user.dni}`,
+                `✅ Contraseña blanqueada correctamente\n\n` +
+                `Nueva contraseña: ${user.dni}\n\n` +
+                `El usuario deberá cambiarla en su próximo inicio de sesión.`,
                 'success'
             );
 
+            // Close modal and reload users to show updated status
+            this.closeModal();
             await this.loadUsers();
         } catch (error) {
             console.error('Error al blanquear contraseña:', error);
@@ -282,6 +289,43 @@ const usuarios = {
 
         utils.showToast(newStatus ? 'Usuario activado' : 'Usuario desactivado', 'success');
         await this.loadUsers();
+    },
+
+    // Delete user
+    async deleteUser(userId) {
+        const user = this.users.find(u => u.id === userId);
+        if (!user) return;
+
+        const confirmed = confirm(
+            `⚠️ ¿Estás seguro de ELIMINAR a ${user.nombre}?\n\n` +
+            `Esta acción NO se puede deshacer.\n\n` +
+            `Se eliminarán todos los datos asociados al usuario.`
+        );
+
+        if (!confirmed) return;
+
+        // Double confirmation for safety
+        const doubleConfirm = confirm(
+            `Última confirmación:\n\n` +
+            `¿Realmente querés eliminar a ${user.nombre}?`
+        );
+
+        if (!doubleConfirm) return;
+
+        try {
+            const result = await apiClient.delete('usuarios.php', { id: userId });
+
+            if (result.error) {
+                utils.showToast('Error al eliminar usuario: ' + result.error, 'error');
+                return;
+            }
+
+            utils.showToast('Usuario eliminado correctamente', 'success');
+            await this.loadUsers();
+        } catch (error) {
+            console.error('Error al eliminar usuario:', error);
+            utils.showToast('Error al eliminar usuario', 'error');
+        }
     },
 
     // Filter users by search

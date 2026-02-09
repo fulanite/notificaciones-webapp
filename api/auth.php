@@ -128,6 +128,28 @@ try {
             Database::sendResponse(['success' => true, 'message' => 'Password updated']);
             break;
 
+        case 'reset-password':
+            // Admin resets user password to DNI and sets password_reset_required flag
+            if ($method !== 'POST') {
+                Database::sendError('Method not allowed', 405);
+            }
+
+            $data = Database::getJsonBody();
+
+            if (empty($data['user_id']) || empty($data['new_password'])) {
+                Database::sendError('User ID and new password are required', 400);
+            }
+
+            // Hash the new password (DNI)
+            $hashedPassword = password_hash($data['new_password'], PASSWORD_DEFAULT);
+
+            // Set password_reset_required flag
+            $stmt = $pdo->prepare("UPDATE usuarios SET password_hash = ?, password_reset_required = 1, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$hashedPassword, $data['user_id']]);
+
+            Database::sendResponse(['success' => true, 'message' => 'Password reset to DNI']);
+            break;
+
         case 'create-user':
             if ($method !== 'POST') {
                 Database::sendError('Method not allowed', 405);
