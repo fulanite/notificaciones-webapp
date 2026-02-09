@@ -206,9 +206,7 @@
     td[data-label="Cargador"],
     .col-cargador,
     td[data-label="Troquel"],
-    .col-troquel,
-    td[data-label="Carátula"],
-    .col-caratula {
+    .col-troquel {
         order: 20;
         /* Push to bottom */
         display: none !important;
