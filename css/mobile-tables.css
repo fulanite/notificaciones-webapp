@@ -6,11 +6,13 @@
 @media (max-width: 768px) {
     /* --- Devoluciones & Assignments Tables on Mobile --- */
 
-    /* Hide headers as we'll use a card-like layout */
+    /* Force Hide headers */
     .data-table thead,
     .notifications-table thead,
-    .usuarios-table thead {
-        display: none;
+    .usuarios-table thead,
+    #tabla-devoluciones thead,
+    #tabla-reasignaciones thead {
+        display: none !important;
     }
 
     /* Transform table into block layout */
@@ -25,130 +27,109 @@
     .usuarios-table,
     .usuarios-table tbody,
     .usuarios-table tr,
-    .usuarios-table td {
-        display: block;
-        width: 100%;
-        box-sizing: border-box;
+    .usuarios-table td,
+    #tabla-devoluciones,
+    #tabla-devoluciones tbody,
+    #tabla-devoluciones tr,
+    #tabla-devoluciones td,
+    #tabla-reasignaciones,
+    #tabla-reasignaciones tbody,
+    #tabla-reasignaciones tr,
+    #tabla-reasignaciones td {
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
-    /* Add spacing between rows (which are now cards) */
+    /* Add spacing between rows (cards) */
     .data-table tr,
     .notifications-table tr,
-    .usuarios-table tr {
+    .usuarios-table tr,
+    #tabla-devoluciones tr,
+    #tabla-reasignaciones tr {
         margin-bottom: var(--space-4);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: var(--radius-lg);
         background: var(--bg-card);
         padding: var(--space-3);
         box-shadow: var(--shadow-sm);
+        height: auto !important;
     }
 
-    /* zebra striping reset for card layout */
-    .notifications-table tbody tr:nth-child(even),
-    .data-table tbody tr:nth-child(even) {
-        background: var(--bg-card);
-        /* Keep same background */
-    }
-
-    /* Style cells to look like key-value pairs or distinct blocks */
+    /* Style cells */
     .data-table td,
     .notifications-table td,
-    .usuarios-table td {
-        padding: 6px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    .usuarios-table td,
+    #tabla-devoluciones td,
+    #tabla-reasignaciones td {
+        padding: 8px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         display: flex;
         justify-content: space-between;
         align-items: center;
         text-align: right;
         font-size: 0.9rem;
-        min-height: 30px;
-        /* Ensure clickability */
+        min-height: auto;
     }
 
-    .data-table td:last-child,
-    .notifications-table td:last-child,
-    .usuarios-table td:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-        margin-top: 4px;
-        justify-content: flex-end;
-        /* Actions at the end */
-    }
-
-    /* Add labels using data-label attributes if available, 
-       otherwise rely on specific styling overrides */
-
-    /* Specific overrides for key columns to stand out */
-
-    /* Expediente / ID columns */
-    .col-exp,
-    td[data-label="Expediente"] {
-        font-weight: 700;
-        color: var(--primary-400);
-        font-size: 1rem;
+    /* Add labels using data-label attributes */
+    td[data-label]::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-right: 1rem;
         text-align: left;
-        width: 100%;
+    }
+
+    /* Special Styling for Expediente (Header like) */
+    td[data-label="Expediente"] {
+        background: rgba(255, 255, 255, 0.02);
+        margin: -12px -12px 10px -12px;
+        /* Pull to edges */
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        justify-content: space-between;
+    }
+
+    td[data-label="Expediente"]::before {
+        display: none;
+        /* Hide label 'Expediente' as it's self-evident or we want clean look */
+    }
+
+    td[data-label="Expediente"] strong {
+        font-size: 1.1rem;
+        color: var(--primary-400);
+    }
+
+    /* Destination prominence */
+    td[data-label="Destinatario"] {
         display: block;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        padding-bottom: 8px;
+        text-align: left;
+        padding-top: 5px;
+    }
+
+    td[data-label="Destinatario"]::before {
+        display: block;
         margin-bottom: 4px;
     }
 
-    /* Recipient / Name columns */
-    .col-dest,
-    td[data-label="Destinatario"] {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        text-align: left;
-        display: block;
+    /* Ujier Dashboard Fixes */
+    .ujier-list {
+        display: flex;
+        flex-direction: column;
+        /* Force vertical stacking */
         width: 100%;
-        margin-bottom: 8px;
+        overflow: visible;
+        /* Prevent cutting off */
     }
 
-    /* Status columns */
-    .col-status,
-    td[data-label="Estado"] {
-        justify-content: flex-start;
-    }
-
-    /* Make checkboxes larger for touch */
-    .select-checkbox {
-        transform: scale(1.5);
-        margin: 10px;
-    }
-
-    /* Date group rows need to be distinct */
-    .date-group-row td {
-        background: transparent !important;
-        border: none !important;
-        color: var(--text-muted) !important;
-        text-align: center !important;
-        justify-content: center !important;
-        font-size: 0.85rem !important;
-        padding: 15px 0 5px 0 !important;
-        margin-top: 10px;
-        display: block !important;
-        width: 100% !important;
-    }
-
-    /* Valid for Devoluciones Table specifically */
-    #tabla-devoluciones td::before {
-        /* content: attr(data-label); This presumes JS adds data-labels, 
-           if not we can just style the important logical parts */
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        font-weight: 600;
-        display: block;
-        /* Ensure label is on its own line if needed */
-        text-align: left;
-    }
-
-    /* Hide empty action cells or make them standard */
-    .actions-cell {
+    .ujier-item {
         width: 100%;
-        justify-content: flex-end;
-        gap: 15px;
+        box-sizing: border-box;
+        overflow: hidden;
+        /* Contain inner overflows */
     }
 }
