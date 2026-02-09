@@ -41,80 +41,126 @@
         box-sizing: border-box !important;
     }
 
-    /* Add spacing between rows (cards) */
-    .data-table tr,
-    .notifications-table tr,
-    .usuarios-table tr,
+    /* Transform table into block layout but use flex for the row to organize header */
     #tabla-devoluciones tr,
     #tabla-reasignaciones tr {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        position: relative;
+        padding: 0 !important;
+        /* Reset padding, will apply to cells */
+        padding-bottom: var(--space-3) !important;
         margin-bottom: var(--space-4);
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: var(--radius-lg);
         background: var(--bg-card);
-        padding: var(--space-3);
         box-shadow: var(--shadow-sm);
         height: auto !important;
     }
 
-    /* Style cells */
-    .data-table td,
-    .notifications-table td,
-    .usuarios-table td,
-    #tabla-devoluciones td,
-    #tabla-reasignaciones td {
-        padding: 8px 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    /* Checkbox Cell - Top Left */
+    #tabla-devoluciones tr td:first-child,
+    #tabla-reasignaciones tr td:first-child {
+        width: 48px !important;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        text-align: right;
-        font-size: 0.9rem;
-        min-height: auto;
-    }
-
-    /* Add labels using data-label attributes */
-    td[data-label]::before {
-        content: attr(data-label);
-        font-weight: 600;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-right: 1rem;
-        text-align: left;
-    }
-
-    /* Special Styling for Expediente (Header like) */
-    td[data-label="Expediente"] {
+        justify-content: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         background: rgba(255, 255, 255, 0.02);
-        margin: -12px -12px 10px -12px;
-        /* Pull to edges */
-        padding: 10px 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        justify-content: space-between;
+        border-radius: var(--radius-lg) 0 0 0;
+        padding: var(--space-3) 0 !important;
     }
 
-    td[data-label="Expediente"]::before {
-        display: none;
-        /* Hide label 'Expediente' as it's self-evident or we want clean look */
+    /* Expediente Cell - Top Right (Header) */
+    #tabla-devoluciones tr td[data-label="Expediente"],
+    #tabla-reasignaciones tr td[data-label="Expediente"] {
+        flex: 1;
+        width: calc(100% - 48px) !important;
+        background: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 0 var(--radius-lg) 0 0;
+        padding: var(--space-3) var(--space-4) !important;
+        margin: 0 !important;
+        display: flex;
+        justify-content: flex-start;
+        /* Align left */
+        align-items: center;
     }
 
-    td[data-label="Expediente"] strong {
+    #tabla-devoluciones tr td[data-label="Expediente"] strong,
+    #tabla-reasignaciones tr td[data-label="Expediente"] strong {
         font-size: 1.1rem;
         color: var(--primary-400);
+        margin: 0;
     }
 
-    /* Destination prominence */
-    td[data-label="Destinatario"] {
-        display: block;
-        text-align: left;
-        padding-top: 5px;
+    /* All other cells - Full Width Body */
+    #tabla-devoluciones tr td,
+    #tabla-reasignaciones tr td {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 6px var(--space-4) !important;
+        border: none;
+        align-items: center;
     }
 
-    td[data-label="Destinatario"]::before {
-        display: block;
+    /* Hide labels for Exp and Checkbox */
+    #tabla-devoluciones tr td:first-child::before,
+    #tabla-reasignaciones tr td:first-child::before,
+    #tabla-devoluciones tr td[data-label="Expediente"]::before,
+    #tabla-reasignaciones tr td[data-label="Expediente"]::before {
+        display: none !important;
+    }
+
+    /* Label Styling for others */
+    #tabla-devoluciones tr td:not(:first-child):not([data-label="Expediente"])::before,
+    #tabla-reasignaciones tr td:not(:first-child):not([data-label="Expediente"])::before {
+        content: attr(data-label);
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-right: auto;
+        /* Push value to right */
+    }
+
+    /* Special: Destinatario Prominence */
+    #tabla-devoluciones tr td[data-label="Destinatario"],
+    #tabla-reasignaciones tr td[data-label="Destinatario"] {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-top: var(--space-3) !important;
+        gap: 4px;
+    }
+
+    #tabla-devoluciones tr td[data-label="Destinatario"]::before,
+    #tabla-reasignaciones tr td[data-label="Destinatario"]::before {
         margin-bottom: 4px;
     }
+
+    /* Special: Ujier */
+    #tabla-devoluciones tr td[data-label="Ujier"],
+    #tabla-reasignaciones tr td[data-label="Ujier"] {
+        color: var(--text-secondary);
+    }
+
+    /* Special: Estado - Align Right */
+    #tabla-devoluciones tr td[data-label="Estado"],
+    #tabla-reasignaciones tr td[data-label="Estado"] {
+        justify-content: flex-end;
+        /* Badge to the right */
+        padding-bottom: 0 !important;
+    }
+
+    #tabla-devoluciones tr td[data-label="Estado"]::before,
+    #tabla-reasignaciones tr td[data-label="Estado"]::before {
+        margin-right: var(--space-2);
+        /* Keep label visible */
+    }
+
 
     /* Ujier Dashboard Fixes */
     .ujier-list {
