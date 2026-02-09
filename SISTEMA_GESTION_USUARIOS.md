@@ -51,13 +51,13 @@ Acceso normal al sistema
 
 ---
 
-### 4. **Activar/Desactivar Usuarios** ✅🚫
+### 4. **Activar/Desactivar/Eliminar Usuarios** ✅🚫🗑️
 
-- Botón funcional para **activar** o **desactivar** usuarios
-- Los usuarios inactivos:
-  - ❌ No pueden iniciar sesión
-  - ✅ Se muestran en la lista de gestión (con badge "Inactivo")
-  - ✅ Pueden ser reactivados en cualquier momento
+- **Activar/Desactivar**: Los usuarios inactivos no pueden iniciar sesión pero preservan su historial.
+- **Eliminar**: Funcionalidad de eliminación con protección de integridad:
+  - 🗑️ Si el usuario **tiene datos** asociados (notificaciones o visitas), el sistema lo **desactivará** automáticamente para preservar la integridad referencial.
+  - 🗑️ Si el usuario **no tiene datos**, se eliminará **permanentemente**.
+  - ⚠️ Requiere confirmación explícita.
 
 ---
 
@@ -225,22 +225,23 @@ UPDATE usuarios SET rol = 'administrativo' WHERE rol = 'auditor';
 
 ## 🎨 Interfaz de Usuario
 
-### Tabla de Usuarios
+### Tabla de Usuarios (Actualizada)
 ```
-┌─────────────┬──────────────┬──────────┬──────────────┬─────────┬───────────────┬──────────┐
-│ Nombre      │ Email        │ DNI      │ Rol          │ Estado  │ Último Acceso │ Acciones │
-├─────────────┼──────────────┼──────────┼──────────────┼─────────┼───────────────┼──────────┤
-│ Juan Pérez  │ juan@sgnd... │ 12345678 │ Ujier        │ Activo  │ 09/02/2026    │ ✏️ 🚫    │
-│ María López │ maria@sgnd...│ 87654321 │ Admin        │ Activo🔄│ 08/02/2026    │ ✏️ 🚫    │
-│ Pedro Gómez │ pedro@sgnd...│ 11223344 │ Coordinador  │ Inactivo│ Nunca         │ ✏️ ✅    │
-└─────────────┴──────────────┴──────────┴──────────────┴─────────┴───────────────┴──────────┘
+┌─────────────┬──────────────┬──────────┬──────────────┬─────────┬──────────┐
+│ Nombre      │ Email        │ DNI      │ Rol          │ Estado  │ Acciones │
+├─────────────┼──────────────┼──────────┼──────────────┼─────────┼──────────┤
+│ Juan Pérez  │ juan@sgnd... │ 12345678 │ Ujier        │ Activo  │ ✏️ 🚫 🗑️ │
+│ María López │ maria@sgnd...│ 87654321 │ Admin        │ Activo🔄│ ✏️ 🚫 🗑️ │
+│ Pedro Gómez │ pedro@sgnd...│ 11223344 │ Coordinador  │ Inactivo│ ✏️ ✅ 🗑️ │
+└─────────────┴──────────────┴──────────┴──────────────┴─────────┴──────────┘
 ```
 
 **Badges**:
-- 🔄 = Debe cambiar contraseña
-- ✏️ = Editar
-- 🚫 = Desactivar
+- 🔄 = Debe cambiar contraseña (blanqueada)
+- ✏️ = Editar usuario
+- 🚫 = Desactivar (mantiene historial)
 - ✅ = Activar
+- 🗑️ = Eliminar (inteligente: borra o desactiva según datos)
 
 ---
 

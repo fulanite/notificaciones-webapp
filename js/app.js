@@ -605,11 +605,16 @@ const app = {
 
     // On login success
     async onLoginSuccess() {
+        console.log('✅ Login exitoso:', auth.currentUser?.email);
+        console.log('🔒 Reset requerido:', auth.currentUser?.password_reset_required);
+
         this.showDashboard();
         this.updateUserInterface();
 
-        // Check if password reset is required
-        if (auth.currentUser?.password_reset_required) {
+        // Check if password reset is required (robust check for bool, string "1" or number 1)
+        const resetRequired = auth.currentUser?.password_reset_required;
+        if (resetRequired === true || resetRequired === 1 || resetRequired === "1") {
+            console.log('⚠️ Mostrando modal de reset obligatorio');
             this.showPasswordResetModal();
         } else {
             await this.initializeModules();
@@ -1083,7 +1088,12 @@ const app = {
             return;
         }
 
+        // Force reset form
+        document.getElementById('form-password-reset')?.reset();
+        document.getElementById('password-reset-error')?.classList.add('hidden');
+
         modal.classList.remove('hidden');
+        modal.style.display = 'flex'; // Ensure it's shown if .hidden uses display:none
         document.body.style.overflow = 'hidden';
 
         // Setup form handler

@@ -37,7 +37,23 @@ const auth = {
             });
 
             const data = await response.json();
-            return data.success;
+
+            if (data.success && data.data) {
+                // Update local user data with fresh data from server
+                this.currentUser = {
+                    ...this.currentUser,
+                    id: data.data.id,
+                    email: data.data.email,
+                    dni: data.data.dni,
+                    nombre: data.data.nombre,
+                    rol: data.data.rol,
+                    foto: data.data.foto,
+                    password_reset_required: data.data.password_reset_required
+                };
+                this.storeSession(this.currentUser);
+                return true;
+            }
+            return false;
         } catch (error) {
             console.error('Session verification failed:', error);
             return false;

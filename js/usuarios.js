@@ -249,12 +249,15 @@ const usuarios = {
                 return;
             }
 
-            utils.showToast(
-                `✅ Contraseña blanqueada correctamente\n\n` +
-                `Nueva contraseña: ${user.dni}\n\n` +
-                `El usuario deberá cambiarla en su próximo inicio de sesión.`,
-                'success'
+            // Show a more prominent alert as requested
+            alert(
+                `✅ CONTRASEÑA BLANQUEADA\n\n` +
+                `El usuario: ${user.nombre}\n` +
+                `Ahora tiene como clave su DNI: ${user.dni}\n\n` +
+                `IMPORTANTE: El sistema le exigirá cambiarla apenas inicie sesión.`
             );
+
+            utils.showToast('Contraseña blanqueada correctamente', 'success');
 
             // Close modal and reload users to show updated status
             this.closeModal();

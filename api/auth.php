@@ -96,11 +96,12 @@ try {
                 Database::sendError('Email is required', 400);
             }
 
-            $stmt = $pdo->prepare("SELECT id, email, nombre, rol, foto FROM usuarios WHERE email = ? AND activo = 1");
+            $stmt = $pdo->prepare("SELECT id, email, dni, nombre, rol, foto, password_reset_required FROM usuarios WHERE email = ? AND activo = 1");
             $stmt->execute([Database::sanitize($data['email'])]);
             $user = $stmt->fetch();
 
             if ($user) {
+                $user['password_reset_required'] = (bool) ($user['password_reset_required'] ?? false);
                 Database::sendResponse($user);
             } else {
                 Database::sendError('User not found', 404);
@@ -196,9 +197,13 @@ try {
             ]);
 
             // Return created user
-            $stmt = $pdo->prepare("SELECT id, email, nombre, rol, foto FROM usuarios WHERE id = ?");
+            $stmt = $pdo->prepare("SELECT id, email, dni, nombre, rol, foto, password_reset_required FROM usuarios WHERE id = ?");
             $stmt->execute([$id]);
-            Database::sendResponse($stmt->fetch(), 201);
+            $user = $stmt->fetch();
+            if ($user) {
+                $user['password_reset_required'] = (bool) ($user['password_reset_required'] ?? false);
+            }
+            Database::sendResponse($user, 201);
             break;
 
         default:
