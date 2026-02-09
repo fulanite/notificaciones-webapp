@@ -697,7 +697,18 @@ const app = {
             } else {
                 // Admin, Administrativo, Coordinador, Auditor
                 adminItems.forEach(el => el.style.display = 'flex');
+
+                // Hide Mapa for Administrativo and Auditor (same as desktop)
+                const mapBtn = mobileNav.querySelector('[data-view="mapa-seguimiento"]');
+                if (mapBtn) {
+                    if (lowerRol === 'admin' || lowerRol === 'coordinador') {
+                        mapBtn.style.display = 'flex';
+                    } else {
+                        mapBtn.style.display = 'none';
+                    }
+                }
             }
+
         }
     },
 
