@@ -7,7 +7,8 @@
 ALTER TABLE notificaciones 
 ADD COLUMN IF NOT EXISTS glide_id_cedula VARCHAR(100) DEFAULT NULL COMMENT 'Original Glide id_cedula for migrated records',
 ADD COLUMN IF NOT EXISTS migrated_from_glide TINYINT(1) DEFAULT 0 COMMENT 'Flag indicating record was migrated from Glide',
-ADD COLUMN IF NOT EXISTS fecha_entrega_ujier DATETIME NULL DEFAULT NULL COMMENT 'Original delivery date from Glide';
+ADD COLUMN IF NOT EXISTS fecha_entrega_ujier DATETIME NULL DEFAULT NULL COMMENT 'Original delivery date from Glide',
+ADD COLUMN IF NOT EXISTS id_usuario_carga VARCHAR(50) DEFAULT NULL COMMENT 'ID o DNI de quien cargó la cédula en Glide';
 
 -- Add index for Glide ID lookups
 CREATE INDEX IF NOT EXISTS idx_notificaciones_glide_id ON notificaciones(glide_id_cedula);
