@@ -568,10 +568,9 @@
         background: var(--bg-card);
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow-y: auto;
+        overflow: hidden;
+        /* Prevent full sidebar scroll */
         box-shadow: var(--shadow-xl);
-        padding-bottom: 80px;
-        /* Space for bottom nav or scrolling clearance */
     }
 
     .sidebar.open {
@@ -593,14 +592,20 @@
     .sidebar-nav {
         padding: var(--space-4);
         flex: 1;
-        overflow-y: visible;
-        /* Scroll is on sidebar */
+        overflow-y: auto;
+        /* Scroll ONLY the nav list */
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        min-height: 0;
+        /* Critical for flex scrolling */
     }
 
     .nav-list {
         display: flex;
         flex-direction: column;
         gap: var(--space-1);
+        padding-bottom: var(--space-4);
+        /* Extra padding at end of scroll */
     }
 
     .nav-section-title {
@@ -616,7 +621,10 @@
         padding: var(--space-6);
         margin-top: auto;
         flex-shrink: 0;
-        padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        /* Separator */
+        background: var(--bg-card);
+        /* Ensure no transparency overlap */
     }
 }
 
