@@ -835,16 +835,6 @@
     color: var(--text-muted);
 }
 
-.col-origin {
-    width: 110px;
-    font-size: 0.8rem;
-}
-
-.col-letrado {
-    width: 100px;
-    font-size: 0.8rem;
-}
-
 .col-status {
     width: 130px;
     text-align: center;
@@ -862,8 +852,13 @@
     font-weight: 500;
 }
 
+.col-letrado {
+    width: 110px;
+    font-size: 0.8rem;
+}
+
 .col-caratula {
-    width: 160px;
+    width: 150px;
     font-size: 0.8rem;
 }
 
@@ -874,14 +869,14 @@
 }
 
 .col-dest {
-    width: 160px;
+    width: 150px;
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-primary);
 }
 
 .col-dom {
-    width: 170px;
+    width: 160px;
     font-size: 0.8rem;
 }
 

@@ -239,6 +239,7 @@ const notifications = {
                     <td class="col-status">${this.getEnhancedStatusBadge(notif)}</td>
                     <td class="col-zona"><span class="badge-zona">${notif.zona || '-'}</span></td>
                     <td class="col-ujier">${notif.ujier_nombre ? notif.ujier_nombre.split(' ')[0] : '-'}</td>
+                    <td class="col-letrado" title="${notif.letrado || '-'}">${notif.letrado || '-'}</td>
                     <td class="col-caratula" title="${notif.caratula || ''}">${notif.caratula || ''}</td>
                     <td class="col-exp"><strong style="white-space: nowrap;">${notif.n_expediente}</strong></td>
                     <td class="col-dest" title="${recipientDisplay}">${recipientDisplay}</td>
