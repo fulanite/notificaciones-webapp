@@ -568,7 +568,7 @@ const notifications = {
                         <div class="footer-info-strip">
                              <span class="info-tag delivery-tag" style="background: rgba(var(--primary-rgb), 0.1); color: var(--primary);">📅 Entrega: ${data.fecha_entrega_ujier ? utils.formatDate(data.fecha_entrega_ujier) : 'Pendiente'}</span>
                             <span class="info-tag carga-tag">🕒 Carga: ${utils.formatDateTime(data.fecha_carga)}</span>
-                            <span class="info-tag user-tag">👤 Por: <strong>${data.usuario_carga || '-'}</strong></span>
+                            <span class="info-tag user-tag">👤 Por: <strong>${data.cargador_nombre || data.usuario_carga || '-'}</strong></span>
                             ${data.devuelta_por_ujier ? `<span class="info-tag return-tag" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">📦 Devuelta: ${utils.formatDate(data.fecha_devolucion)}</span>` : ''}
                             ${data.migrated_from_glide ? '<span class="badge-migrated-v2">📦 REGISTRO MIGRADO</span>' : ''}
                         </div>

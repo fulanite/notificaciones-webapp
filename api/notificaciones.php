@@ -21,11 +21,15 @@ try {
                 $stmt = $pdo->prepare("
                     SELECT n.*, 
                            COALESCE(u1.nombre, u2.nombre) as ujier_nombre, 
-                           COALESCE(u1.email, u2.email) as ujier_email
+                           COALESCE(u1.email, u2.email) as ujier_email,
+                           COALESCE(u3.nombre, u4.nombre, n.usuario_carga) as cargador_nombre
                     FROM notificaciones n
                     LEFT JOIN usuarios u1 ON n.asignado_a = u1.id
                     LEFT JOIN usuarios u2 ON n.asignado_a = u2.dni
+                    LEFT JOIN usuarios u3 ON n.usuario_carga = u3.dni
+                    LEFT JOIN usuarios u4 ON n.usuario_carga = u4.email
                     WHERE n.id = ?
+
                 ");
                 $stmt->execute([$_GET['id']]);
                 $notification = $stmt->fetch();
