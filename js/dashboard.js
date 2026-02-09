@@ -375,7 +375,7 @@ const adminMap = {
 
         if (!this.mapInstance) return;
 
-        // Clear layers
+        // Clear previous layers
         if (this.mapLayer) {
             this.mapInstance.removeLayer(this.mapLayer);
             this.mapLayer = null;
@@ -390,115 +390,180 @@ const adminMap = {
 
         const timelineContainer = document.getElementById('admin-timeline-container');
         if (userId === 'all') {
-            timelineContainer.classList.add('hidden'); // Hide timeline on general view
+            timelineContainer.classList.add('hidden'); // Ocultar historial en vista general
         } else {
             timelineContainer.classList.remove('hidden');
         }
 
-        // Stats
-        document.getElementById('admin-map-stat-visits').textContent = data ? data.length : 0;
+        // Stats UI Update
+        const visitsCount = data ? data.length : 0;
+        document.getElementById('admin-map-stat-visits').textContent = visitsCount;
 
-        // Count active ujieres
         const uniqueUjieres = new Set(data.map(d => d.ujier_nombre || 'Desconocido'));
-        document.getElementById('admin-map-stat-users').textContent = data.length > 0 ? uniqueUjieres.size : 0;
+        document.getElementById('admin-map-stat-users').textContent = visitsCount > 0 ? uniqueUjieres.size : 0;
 
         if (!data || data.length === 0) {
+            utils.showToast(userId === 'all' ? 'Sin actividad global registrada' : 'Sin recorrido para este ujier', 'info');
             return;
         }
 
+        // Create Layer Group
         const markers = L.layerGroup();
         const latlngs = [];
+        let totalDist = 0;
 
-        // Colores por Ujier para vista general
-        const ujierColors = {};
-        const palette = ['#e11d48', '#2563eb', '#16a34a', '#d97706', '#9333ea', '#0891b2'];
+        // --- VISTA INDIVIDUAL (RECORRIDO DETALLADO) ---
+        if (userId !== 'all') {
+            const createNumberedIcon = (number, color) => {
+                return L.divIcon({
+                    className: 'custom-map-icon',
+                    html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${number}</div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+            };
 
-        data.forEach((point, index) => {
-            if (point.lat && point.lng) {
-                const coord = [parseFloat(point.lat), parseFloat(point.lng)];
+            data.forEach((point, index) => {
+                if (point.lat && point.lng) {
+                    const coord = [parseFloat(point.lat), parseFloat(point.lng)];
+                    latlngs.push(coord);
 
-                // Color Logic
-                let markerColor = '#666';
-                if (userId === 'all') {
-                    // Assign color based on Ujier Name
-                    if (!ujierColors[point.ujier_nombre]) {
-                        ujierColors[point.ujier_nombre] = palette[Object.keys(ujierColors).length % palette.length];
-                    }
-                    markerColor = ujierColors[point.ujier_nombre];
-                } else {
-                    // Estado colors for individual view
-                    markerColor = this.getStatusColor(point.resultado);
-                    latlngs.push(coord); // Only trace path for single user
+                    const statusColor = this.getStatusColor(point.resultado);
+
+                    const popupContent = `
+                        <strong>#${index + 1} ${point.destinatario || 'Sin nombre'}</strong><br>
+                        <span style="font-size:0.9em; color:#555;">${point.domicilio}</span><br>
+                        <span class="badge" style="background:${statusColor}; color:white; font-size:0.75em; padding:2px 6px; border-radius:4px;">
+                            ${(point.resultado || 'PENDIENTE').toUpperCase()}
+                        </span>
+                        <div style="font-size:0.8em; margin-top:4px; color:#777;">🕒 ${utils.formatTime(point.fecha)}</div>
+                        ${point.foto_url ? `<div style="margin-top:6px; width:100%; height:80px; background:url('${point.foto_url}') center/cover no-repeat; border-radius:4px;"></div>` : ''}
+                    `;
+
+                    L.marker(coord, { icon: createNumberedIcon(index + 1, statusColor) })
+                        .bindPopup(popupContent)
+                        .addTo(markers);
                 }
+            });
 
-                // Popup
-                const photoHtml = point.foto_url
-                    ? `<div style="margin-top:5px; width:100%; height:100px; background-image:url('${point.foto_url}'); background-size:cover; border-radius:4px;"></div>`
-                    : '';
+            // Dibujar Líneas de Recorrido
+            if (latlngs.length > 1) {
+                L.polyline(latlngs, { color: '#3b82f6', weight: 4, opacity: 0.7, lineJoin: 'round' }).addTo(markers);
 
-                const popupContent = `
-                    <strong>${userId === 'all' ? point.ujier_nombre : '#' + (index + 1)}</strong><br>
-                    ${point.destinatario}<br>
-                    <span style="font-size:0.85em; color:#555;">${point.domicilio}</span><br>
-                    <span class="badge badge-${point.resultado === 'entregado' ? 'success' : 'warning'}" style="font-size:0.7em;">
-                        ${(point.resultado || '').toUpperCase()}
-                    </span>
-                    <br><small>${utils.formatTime(point.fecha)}</small>
-                    ${photoHtml}
-                `;
-
-                L.circleMarker(coord, {
-                    color: markerColor,
-                    fillColor: markerColor,
-                    fillOpacity: 0.6,
-                    radius: 6,
-                    weight: 1
-                }).bindPopup(popupContent).addTo(markers);
+                // Calcular distancia total
+                for (let i = 0; i < latlngs.length - 1; i++) {
+                    totalDist += this.calculateDistance(latlngs[i][0], latlngs[i][1], latlngs[i + 1][0], latlngs[i + 1][1]);
+                }
             }
-        });
 
-        // Trace path only if single user
-        if (userId !== 'all' && latlngs.length > 1) {
-            L.polyline(latlngs, { color: '#3b82f6', weight: 2, dashArray: '4, 8' }).addTo(markers);
-            this.renderTimeline(data);
+            // Renderizar Timeline + Distancia
+            this.renderTimeline(data, totalDist);
+
+        }
+        // --- VISTA GENERAL (MAPA DE CALOR / PINES SIMPLES) ---
+        else {
+            // Paleta de colores para diferenciar Ujieres
+            const ujierColors = {};
+            const palette = ['#e11d48', '#2563eb', '#16a34a', '#d97706', '#9333ea', '#0891b2', '#db2777', '#4f46e5'];
+
+            data.forEach((point) => {
+                if (point.lat && point.lng) {
+                    const coord = [parseFloat(point.lat), parseFloat(point.lng)];
+                    const ujierName = point.ujier_nombre || 'Desconocido';
+
+                    if (!ujierColors[ujierName]) {
+                        ujierColors[ujierName] = palette[Object.keys(ujierColors).length % palette.length];
+                    }
+                    const color = ujierColors[ujierName];
+
+                    const popupContent = `
+                        <strong>👤 ${ujierName}</strong><br>
+                        ${point.destinatario}<br>
+                        <span style="font-size:0.85em; color:#555;">${point.domicilio}</span><br>
+                        <small>🕒 ${utils.formatTime(point.fecha)} - ${(point.resultado || '').toUpperCase()}</small>
+                    `;
+
+                    // Círculos simples, sin números, sin líneas
+                    L.circleMarker(coord, {
+                        radius: 7,
+                        fillColor: color,
+                        color: '#fff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).bindPopup(popupContent).addTo(markers);
+                }
+            });
         }
 
+        // Add Layer to Map
         this.mapLayer = markers;
         this.mapInstance.addLayer(this.mapLayer);
 
+        // Fit Bounds
         if (data.length > 0) {
-            const group = new L.featureGroup(Object.values(markers._layers));
-            this.mapInstance.fitBounds(group.getBounds(), { padding: [50, 50] });
+            // Create a temporary feature group to get bounds
+            const group = new L.featureGroup();
+            if (userId === 'all') {
+                // For circles, we need to extract coords manually or use markers logic
+                data.forEach(p => {
+                    if (p.lat && p.lng) group.addLayer(L.marker([p.lat, p.lng]));
+                });
+            } else {
+                latlngs.forEach(ll => group.addLayer(L.marker(ll)));
+            }
+
+            if (group.getLayers().length > 0) {
+                this.mapInstance.fitBounds(group.getBounds(), { padding: [50, 50] });
+            }
         }
     },
 
     getStatusColor(status) {
-        if (!status) return '#6c757d';
+        if (!status) return '#6c757d'; // Grey default
         const s = status.toLowerCase().replace(/_/g, ' ').trim();
-        if (['atiende', 'entregado', 'positivo'].includes(s)) return '#10b981';
-        if (['no atiende', 'domicilio inexistente', 'negativo'].includes(s)) return '#ef4444';
-        if (['pre aviso', 'estrados'].includes(s)) return '#f59e0b';
-        return '#3b82f6';
+        if (['atiende', 'entregado', 'positivo'].includes(s)) return '#10b981'; // Green
+        if (['no atiende', 'domicilio inexistente', 'negativo', 'rechazado'].includes(s)) return '#ef4444'; // Red
+        if (['pre aviso', 'estrados', 'pre_aviso'].includes(s)) return '#f59e0b'; // Orange
+        if (['diligenciador ausente', 'ausente'].includes(s)) return '#6b7280'; // Grey
+        return '#3b82f6'; // Blue fallback
     },
 
-    renderTimeline(data) {
+    calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    },
+
+    renderTimeline(data, totalDist) {
         const container = document.getElementById('admin-timeline-container');
         if (!container) return;
 
-        let html = '<div class="timeline-title">⏱️ Detalle del Recorrido</div><div class="timeline-steps">';
+        let html = `
+            <div class="timeline-header-stats" style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <span class="timeline-title">⏱️ Secuencia de Visitas</span>
+                <span class="badge badge-primary" style="font-size: 0.85rem;">🏁 Distancia: ${totalDist.toFixed(2)} km</span>
+            </div>
+            <div class="timeline-steps">
+        `;
 
         data.forEach((point, index) => {
             const color = this.getStatusColor(point.resultado);
             html += `
                 <div class="timeline-step">
-                    <div class="step-marker" style="background:${color};">${index + 1}</div>
+                    <div class="step-marker" style="background:${color}; font-size: 11px;">${index + 1}</div>
                     <div class="step-content">
                         <div class="step-header">
                             <span class="step-time">${utils.formatTime(point.fecha)}</span>
-                            <span class="step-status" style="color:${color}">${(point.resultado || '').toUpperCase()}</span>
+                            <span class="step-status" style="color:${color}">${(point.resultado || '').toUpperCase().replace(/_/g, ' ')}</span>
                         </div>
                         <div class="step-address">${point.domicilio}</div>
-                        <div style="font-size:0.8rem; margin-top:4px;">👤 ${point.destinatario}</div>
+                        <div style="font-size:0.8rem; margin-top:2px; color: var(--text-muted);">👤 ${point.destinatario}</div>
                     </div>
                 </div>
              `;

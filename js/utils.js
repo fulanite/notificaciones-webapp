@@ -383,5 +383,77 @@ const utils = {
             return true;
         }
         return false;
+    },
+
+    // Show Permission Help Modal
+    showPermissionHelp(type) {
+        return new Promise((resolve, reject) => {
+            const modalId = 'permission-help-modal';
+            const existing = document.getElementById(modalId);
+            if (existing) existing.remove(); // Remove existing if any
+
+            const config = {
+                gps: {
+                    title: '📍 Acceso a Ubicación Requerido',
+                    icon: '🌍',
+                    steps: [
+                        'El navegador bloqueó el acceso al GPS.',
+                        ' Tocá el ícono de 🔒 o ⚙️ en la barra de direcciones.',
+                        ' Buscá "Permisos" o "Configuración del sitio".',
+                        ' Activá el interruptor de "Ubicación" o "GPS".',
+                        ' Volvé aquí y tocá "Reintentar".'
+                    ]
+                },
+                camera: {
+                    title: '📸 Acceso a Cámara Requerido',
+                    icon: '📷',
+                    steps: [
+                        'El navegador bloqueó el acceso a la cámara.',
+                        ' Tocá el ícono de 🔒 o ⚙️ en la barra de direcciones.',
+                        ' Buscá "Permisos" o "Configuración del sitio".',
+                        ' Activá el interruptor de "Cámara".',
+                        ' Volvé aquí y tocá "Reintentar".'
+                    ]
+                }
+            };
+
+            const content = config[type] || config.gps;
+
+            const html = `
+                <div id="${modalId}" class="modal active" style="z-index: 9999; display: flex; align-items: center; justify-content: center;">
+                    <div class="modal-overlay"></div>
+                    <div class="modal-content" style="max-width: 400px; text-align: center; margin: 20px;">
+                        <div style="font-size: 3.5rem; margin-bottom: 1rem;">${content.icon}</div>
+                        <h3 style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.25rem;">${content.title}</h3>
+                        <div style="text-align: left; background: var(--bg-main); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+                            <ol style="margin-left: 1.5rem; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">
+                                ${content.steps.map(s => `<li>${s}</li>`).join('')}
+                            </ol>
+                        </div>
+                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                            <button id="perm-cancel-btn" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
+                            <button id="perm-retry-btn" class="btn btn-primary" style="flex: 1;">🔄 Ya habilité, Reintentar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', html);
+
+            const modalEl = document.getElementById(modalId);
+            const cancelBtn = document.getElementById('perm-cancel-btn');
+            const retryBtn = document.getElementById('perm-retry-btn');
+            const overlay = modalEl.querySelector('.modal-overlay');
+
+            const close = (result) => {
+                modalEl.remove();
+                if (result) resolve(true);
+                else reject(new Error('User cancelled permission retry'));
+            };
+
+            cancelBtn.onclick = () => close(false);
+            overlay.onclick = () => close(false);
+            retryBtn.onclick = () => close(true);
+        });
     }
 };

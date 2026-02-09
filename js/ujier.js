@@ -914,7 +914,21 @@ const ujier = {
 
             utils.showToast('Ubicación capturada correctamente', 'success');
         } catch (error) {
-            utils.showToast(error.message, 'error');
+            // Handle Permission Denied with Guidance Loop
+            if (error.message && error.message.includes('Permiso')) {
+                try {
+                    // Show help modal and wait for user to click "Retry"
+                    await utils.showPermissionHelp('gps');
+                    // Recursively retry
+                    return this.captureGPS();
+                } catch (userCancelled) {
+                    utils.showToast('Ubicación requerida. Activación cancelada.', 'warning');
+                }
+            } else {
+                utils.showToast(error.message, 'error');
+            }
+
+            // Only reset button if we are NOT retrying (recursion returns early)
             btn.disabled = false;
             btn.innerHTML = '<span>📍</span> Capturar Ubicación';
         }
