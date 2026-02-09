@@ -606,6 +606,10 @@ const app = {
 
         if (resetRequired === true || resetRequired === 1 || resetRequired === "1") {
             console.log('⚠️ Bloqueando app: Mostrando modal de reset obligatorio');
+
+            // Hide login page so only the modal is visible on top of background
+            document.getElementById('page-login')?.classList.remove('active');
+
             // Show only the modal, don't update UI or show dashboard yet
             this.showPasswordResetModal();
         } else {
