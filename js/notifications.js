@@ -236,16 +236,14 @@ const notifications = {
             html += `
                 <tr class="stagger-item row-hover-effect" style="cursor: pointer;" onclick="notifications.viewDetails('${notif.id}')">
                     <td class="col-date">${notif.fecha_entrega_ujier ? utils.formatDate(notif.fecha_entrega_ujier) : '<span style="color:var(--text-muted)">-</span>'}</td>
-                    <td class="col-origin" title="${notif.origen}">${notif.origen}</td>
-                    <td class="col-letrado" title="${notif.letrado || '-'}">${notif.letrado || '-'}</td>
-                    <td class="col-exp"><strong style="white-space: nowrap;">${notif.n_expediente}</strong></td>
+                    <td class="col-status">${this.getEnhancedStatusBadge(notif)}</td>
+                    <td class="col-zona"><span class="badge-zona">${notif.zona || '-'}</span></td>
+                    <td class="col-ujier">${notif.ujier_nombre ? notif.ujier_nombre.split(' ')[0] : '-'}</td>
                     <td class="col-caratula" title="${notif.caratula || ''}">${notif.caratula || ''}</td>
+                    <td class="col-exp"><strong style="white-space: nowrap;">${notif.n_expediente}</strong></td>
                     <td class="col-dest" title="${recipientDisplay}">${recipientDisplay}</td>
                     <td class="col-dom" title="${notif.domicilio}">${notif.domicilio}</td>
-                    <td class="col-zona"><span class="badge-zona">${notif.zona || '-'}</span></td>
                     <td class="col-troquel" style="font-family: monospace;">${notif.n_troquel || '-'}</td>
-                    <td class="col-status">${this.getEnhancedStatusBadge(notif)}</td>
-                    <td class="col-ujier">${notif.ujier_nombre ? notif.ujier_nombre.split(' ')[0] : '-'}</td>
                 </tr>
             `;
         });

@@ -796,12 +796,24 @@
 }
 
 /* Zebra Striping - Professional Contrast */
-.notifications-table tbody tr:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.015);
+.notifications-table tbody tr {
+    background-color: var(--bg-card);
+    /* Base */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    /* Visible line separation */
+    transition: background-color 0.2s;
 }
 
+.notifications-table tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.03);
+    /* Moderate contrast */
+}
+
+/* Hover Effect - Highlight */
 .notifications-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.04) !important;
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    /* Stronger blue highlight */
+    border-bottom-color: rgba(59, 130, 246, 0.3);
 }
 
 .notifications-table th {
@@ -810,16 +822,17 @@
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.05);
+    /* Slightly lighter header */
     white-space: nowrap;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.08);
-    /* Stronger separator */
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Specific Column Widths */
+/* Specific Column Widths - Optimized */
 .col-date {
-    width: 85px;
+    width: 90px;
     font-size: 0.75rem;
+    color: var(--text-muted);
 }
 
 .col-origin {
@@ -832,51 +845,53 @@
     font-size: 0.8rem;
 }
 
+.col-status {
+    width: 130px;
+    text-align: center;
+}
+
+/* Wider for badge */
+.col-zona {
+    width: 70px;
+    text-align: center;
+}
+
+.col-ujier {
+    width: 90px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.col-caratula {
+    width: 160px;
+    font-size: 0.8rem;
+}
+
 .col-exp {
     width: 90px;
     font-size: 0.85rem;
     text-align: center;
 }
 
-/* Compact Exp */
-.col-caratula {
-    width: 140px;
-    font-size: 0.8rem;
-}
-
 .col-dest {
-    width: 130px;
+    width: 160px;
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-primary);
 }
 
 .col-dom {
-    width: 150px;
+    width: 170px;
     font-size: 0.8rem;
 }
 
-/* Gives most space */
-.col-zona {
-    width: 60px;
-    text-align: center;
-}
-
 .col-troquel {
-    width: 70px;
-    font-size: 0.75rem;
-    text-align: center;
-}
-
-.col-status {
-    width: 110px;
-    text-align: center;
-}
-
-.col-ujier {
     width: 80px;
     font-size: 0.75rem;
+    text-align: center;
+    font-family: monospace;
 }
+
 
 /* Responsive adjustments for smaller screens - hide lower priority columns? 
    Or just let them be consistent. User wants "compact".
