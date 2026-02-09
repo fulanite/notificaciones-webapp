@@ -217,6 +217,18 @@ try {
                 Database::sendError("Field 'domicilio' is required for regular recipients", 400);
             }
 
+            // Resolve usuario_carga: prefer DNI, lookup if email/name provided
+            $usuarioCarga = $data['usuario_carga'] ?? null;
+            if ($usuarioCarga && !is_numeric($usuarioCarga)) {
+                // Try to find user by email or name to get DNI
+                $stmtUser = $pdo->prepare("SELECT dni FROM usuarios WHERE email = ? OR nombre = ? LIMIT 1");
+                $stmtUser->execute([$usuarioCarga, $usuarioCarga]);
+                $foundUser = $stmtUser->fetch();
+                if ($foundUser && !empty($foundUser['dni'])) {
+                    $usuarioCarga = $foundUser['dni'];
+                }
+            }
+
             $id = Database::generateUUID();
             $stmt = $pdo->prepare("
                 INSERT INTO notificaciones (
@@ -239,7 +251,8 @@ try {
             $stmt->execute([
                 $id,
                 $data['fecha_entrega_ujier'] ?? date('Y-m-d'),
-                $data['usuario_carga'] ?? null,
+                $usuarioCarga, // Use resolved DNI
+
                 Database::sanitize($data['tipo_notificacion']),
                 Database::sanitize($data['n_expediente']),
                 Database::sanitize($data['caratula']),
