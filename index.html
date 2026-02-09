@@ -424,6 +424,161 @@
                         </div>
                     </section>
 
+                    <!-- Audit View -->
+                    <section id="view-auditoria" class="view hidden">
+                        <!-- Dashboard de Métricas -->
+                        <div class="stats-grid" style="margin-bottom: 24px;">
+                            <div class="stat-card stat-primary">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="stat-acciones-hoy">0</span>
+                                    <span class="stat-label">Acciones Hoy</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-success">
+                                <div class="stat-icon">📄</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="stat-reportes-semana">0</span>
+                                    <span class="stat-label">Reportes (7 días)</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-info">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="stat-usuarios-activos">0</span>
+                                    <span class="stat-label">Usuarios Activos</span>
+                                </div>
+                            </div>
+                            <div class="stat-card stat-warning">
+                                <div class="stat-icon">⚠️</div>
+                                <div class="stat-content">
+                                    <span class="stat-value" id="stat-alertas">0</span>
+                                    <span class="stat-label">Alertas (24h)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gráficos de Actividad -->
+                        <div class="dashboard-grid" style="margin-bottom: 24px;">
+                            <div class="dashboard-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">👥 Top Usuarios Activos</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="top-usuarios-list"></div>
+                                </div>
+                            </div>
+                            <div class="dashboard-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">📈 Distribución de Acciones</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="action-distribution"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filtros y Tabla de Logs -->
+                        <div class="dashboard-card">
+                            <div class="card-header"
+                                style="display: flex; justify-content: space-between; align-items: center;">
+                                <h3 class="card-title">🔍 Registro de Auditoría</h3>
+                                <button id="btn-refresh-audit" class="btn btn-primary btn-sm"
+                                    style="display: flex; align-items: center; gap: 8px;">
+                                    <span>🔄</span> Refrescar
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <!-- Filtros -->
+                                <form id="audit-filters"
+                                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; padding: 16px; background: #f9fafb; border-radius: 8px;">
+                                    <div>
+                                        <label
+                                            style="display: block; font-size: 0.85em; font-weight: 600; margin-bottom: 4px;">Acción</label>
+                                        <select name="accion" class="form-control">
+                                            <option value="">Todas</option>
+                                            <option value="CREATE">Crear</option>
+                                            <option value="UPDATE">Actualizar</option>
+                                            <option value="DELETE">Eliminar</option>
+                                            <option value="LOGIN">Login</option>
+                                            <option value="LOGOUT">Logout</option>
+                                            <option value="EXPORT">Exportar</option>
+                                            <option value="GENERATE_REPORT">Generar Reporte</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            style="display: block; font-size: 0.85em; font-weight: 600; margin-bottom: 4px;">Entidad</label>
+                                        <select name="entidad" class="form-control">
+                                            <option value="">Todas</option>
+                                            <option value="notificacion">Notificación</option>
+                                            <option value="usuario">Usuario</option>
+                                            <option value="reporte_mensual">Reporte Mensual</option>
+                                            <option value="planilla">Planilla</option>
+                                            <option value="sesion">Sesión</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            style="display: block; font-size: 0.85em; font-weight: 600; margin-bottom: 4px;">Severidad</label>
+                                        <select name="severidad" class="form-control">
+                                            <option value="">Todas</option>
+                                            <option value="info">Info</option>
+                                            <option value="warning">Warning</option>
+                                            <option value="error">Error</option>
+                                            <option value="critical">Critical</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            style="display: block; font-size: 0.85em; font-weight: 600; margin-bottom: 4px;">Desde</label>
+                                        <input type="date" name="fecha_desde" class="form-control">
+                                    </div>
+                                    <div>
+                                        <label
+                                            style="display: block; font-size: 0.85em; font-weight: 600; margin-bottom: 4px;">Hasta</label>
+                                        <input type="date" name="fecha_hasta" class="form-control">
+                                    </div>
+                                    <div style="display: flex; gap: 8px; align-items: flex-end;">
+                                        <button type="submit" class="btn btn-primary" style="flex: 1;">Filtrar</button>
+                                        <button type="button" id="btn-clear-filters"
+                                            class="btn btn-secondary">Limpiar</button>
+                                    </div>
+                                </form>
+
+                                <!-- Tabla de Logs -->
+                                <div style="overflow-x: auto;">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha/Hora</th>
+                                                <th>Severidad</th>
+                                                <th>Usuario</th>
+                                                <th>Acción</th>
+                                                <th>Entidad</th>
+                                                <th>Descripción</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="audit-logs-table">
+                                            <tr>
+                                                <td colspan="7" style="text-align: center; padding: 40px;">
+                                                    Cargando logs...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Paginación -->
+                                <div id="audit-pagination"
+                                    style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 12px; background: #f9fafb; border-radius: 8px;">
+                                    <span>Cargando...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <!-- Notification Form Modal -->
                     <div id="modal-nueva-notificacion" class="modal hidden">
                         <div class="modal-overlay"></div>
@@ -1506,9 +1661,10 @@
     <script src="js/ujier.js?v=40.0"></script>
     <script src="js/dashboard.js?v=40.3"></script>
     <script src="js/dashboard-patch.js?v=40.0"></script>
-    <script src="js/dashboard-ui-patch.js?v=40.3"></script>
+    <script src="js/dashboard-ui-patch.js?v=40.4"></script>
     <script src="js/dashboard-analytics.js?v=40.3"></script>
     <script src="js/reports.js?v=40.0"></script>
+    <script src="js/audit.js?v=40.0"></script>
     <script src="js/asignaciones.js?v=40.0"></script>
     <script src="js/usuarios.js?v=40.0"></script>
     <script src="js/devoluciones.js?v=40.0"></script>

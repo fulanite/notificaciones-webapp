@@ -433,3 +433,50 @@
         transform: translateX(5px);
     }
 }
+
+/* === Audit System Styles === */
+.spinning {
+    animation: spin 1s linear infinite !important;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.badge-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.badge-success {
+    background: #10b981;
+    color: white;
+}
+
+.badge-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.badge-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.badge-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.badge-action {
+    background: #667eea;
+    color: white;
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: 8px;
+}
