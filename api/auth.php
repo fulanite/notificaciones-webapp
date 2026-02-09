@@ -12,8 +12,16 @@ $pdo = $db->getConnection();
 $logger = new AuditLogger($pdo);
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Get the action from query string
+// Get the action from query string or JSON body
 $action = $_GET['action'] ?? '';
+$data = null;
+
+if ($method === 'POST') {
+    $data = Database::getJsonBody();
+    if (empty($action) && isset($data['action'])) {
+        $action = $data['action'];
+    }
+}
 
 try {
     switch ($action) {
@@ -21,8 +29,6 @@ try {
             if ($method !== 'POST') {
                 Database::sendError('Method not allowed', 405);
             }
-
-            $data = Database::getJsonBody();
 
             if (empty($data['email']) || empty($data['password'])) {
                 Database::sendError('Email and password are required', 400);
@@ -90,8 +96,6 @@ try {
                 Database::sendError('Method not allowed', 405);
             }
 
-            $data = Database::getJsonBody();
-
             if (empty($data['email'])) {
                 Database::sendError('Email is required', 400);
             }
@@ -113,8 +117,6 @@ try {
                 Database::sendError('Method not allowed', 405);
             }
 
-            $data = Database::getJsonBody();
-
             if (empty($data['user_id']) || empty($data['new_password'])) {
                 Database::sendError('User ID and new password are required', 400);
             }
@@ -135,8 +137,6 @@ try {
                 Database::sendError('Method not allowed', 405);
             }
 
-            $data = Database::getJsonBody();
-
             if (empty($data['user_id']) || empty($data['new_password'])) {
                 Database::sendError('User ID and new password are required', 400);
             }
@@ -155,8 +155,6 @@ try {
             if ($method !== 'POST') {
                 Database::sendError('Method not allowed', 405);
             }
-
-            $data = Database::getJsonBody();
 
             if (empty($data['email']) || empty($data['nombre']) || empty($data['rol'])) {
                 Database::sendError('Email, nombre and rol are required', 400);
