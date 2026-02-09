@@ -10,7 +10,8 @@ const dashboard = {
         await this.loadStats();
         // DISABLED: Charts now handled by dashboard-analytics.js
         // await this.initCharts();
-        await this.loadRecentActivity();
+        // REMOVED: Recent activity section eliminated per user request
+        // await this.loadRecentActivity();
         await this.loadUjierPerformance();
     },
 

@@ -104,7 +104,8 @@ const dashboardAnalytics = {
                 this.loadByZone(),
                 this.loadByUjier(),
                 this.loadByWeekday(),
-                this.loadByHour(),
+                this.loadByHourVisits(),
+                this.loadByHourLoads(),
                 this.loadTemporal()
             ]);
         } catch (error) {
@@ -226,9 +227,9 @@ const dashboardAnalytics = {
         }
     },
 
-    async loadByHour() {
+    async loadByHourVisits() {
         try {
-            const response = await fetch(`${API_BASE_URL}/stats.php?type=by_hour&year=${this.currentYear}`);
+            const response = await fetch(`${API_BASE_URL}/stats.php?type=by_hour_visits&year=${this.currentYear}`);
             const data = await response.json();
 
             if (data.success && data.data) {
@@ -242,10 +243,33 @@ const dashboardAnalytics = {
                     hourData[item.hour].count = item.count;
                 });
 
-                this.renderHourChart('chart-by-hour', hourData);
+                this.renderHourChart('chart-by-hour-visits', hourData, 'Visitas de Ujieres');
             }
         } catch (error) {
-            console.error('Error loading by hour:', error);
+            console.error('Error loading by hour visits:', error);
+        }
+    },
+
+    async loadByHourLoads() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/stats.php?type=by_hour_loads&year=${this.currentYear}`);
+            const data = await response.json();
+
+            if (data.success && data.data) {
+                // Fill missing hours with 0
+                const hourData = Array.from({ length: 24 }, (_, i) => ({
+                    hour: i,
+                    count: 0
+                }));
+
+                data.data.forEach(item => {
+                    hourData[item.hour].count = item.count;
+                });
+
+                this.renderHourChart('chart-by-hour-loads', hourData, 'Carga Administrativa');
+            }
+        } catch (error) {
+            console.error('Error loading by hour loads:', error);
         }
     },
 
@@ -433,7 +457,7 @@ const dashboardAnalytics = {
         });
     },
 
-    renderHourChart(canvasId, data) {
+    renderHourChart(canvasId, data, title = 'Actividad por Hora') {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
 
@@ -455,7 +479,7 @@ const dashboardAnalytics = {
             data: {
                 labels: data.map(item => `${item.hour}:00`),
                 datasets: [{
-                    label: 'Notificaciones por Hora',
+                    label: title,
                     data: data.map(item => item.count),
                     backgroundColor: colors,
                     borderRadius: 6
@@ -529,7 +553,8 @@ const dashboardAnalytics = {
         const container = document.getElementById('ujier-performance');
         if (!container) return;
 
-        container.innerHTML = data.slice(0, 5).map((ujier, index) => `
+        // Show ALL ujieres, not just top 5
+        container.innerHTML = data.map((ujier, index) => `
             <div style="padding: 12px; margin-bottom: 10px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border-radius: 8px; border-left: 4px solid ${index === 0 ? '#10b981' : '#667eea'};">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <strong style="color: #1f2937;">${ujier.nombre}</strong>

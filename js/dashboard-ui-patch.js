@@ -86,10 +86,19 @@
             
             <div class="dashboard-card chart-card">
                 <div class="card-header">
-                    <h3 class="card-title">⏰ Horas Pico de Actividad</h3>
+                    <h3 class="card-title">⏰ Horas de Visitas (Ujieres)</h3>
                 </div>
                 <div class="card-body">
-                    <canvas id="chart-by-hour"></canvas>
+                    <canvas id="chart-by-hour-visits"></canvas>
+                </div>
+            </div>
+            
+            <div class="dashboard-card chart-card">
+                <div class="card-header">
+                    <h3 class="card-title">📥 Horas de Carga (Administrativos)</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="chart-by-hour-loads"></canvas>
                 </div>
             </div>
             

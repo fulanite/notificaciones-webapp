@@ -186,8 +186,23 @@ try {
             Database::sendResponse($stmt->fetchAll());
             break;
 
-        case 'by_hour':
-            // Statistics by hour of day
+        case 'by_hour_visits':
+            // Statistics by hour of day for VISITS (fecha_diligencia - ujier activity)
+            $stmt = $pdo->prepare("
+                SELECT 
+                    HOUR(fecha_diligencia) as hour,
+                    COUNT(*) as count
+                FROM notificaciones
+                WHERE YEAR(fecha_carga) = :year AND fecha_diligencia IS NOT NULL
+                GROUP BY HOUR(fecha_diligencia)
+                ORDER BY hour
+            ");
+            $stmt->execute(['year' => $year]);
+            Database::sendResponse($stmt->fetchAll());
+            break;
+
+        case 'by_hour_loads':
+            // Statistics by hour of day for LOADS (fecha_carga - administrative activity)
             $stmt = $pdo->prepare("
                 SELECT 
                     HOUR(fecha_carga) as hour,
