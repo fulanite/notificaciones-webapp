@@ -297,7 +297,15 @@ async function migrate() {
                 const observaciones = cleanString(cedula['observaciones']);
                 const usuarioCarga = cleanString(cedula['cargado_por']);
 
-                const sql = `INSERT INTO notificaciones (id, glide_id_cedula, migrated_from_glide, fecha_carga, usuario_carga, estado, tipo_notificacion, n_expediente, caratula, origen, letrado, destinatario_especial, destinatario_nombre, domicilio, zona, tipo_troquel, n_troquel, medio_pago, costo, observaciones_iniciales, created_at) VALUES (${escapeSQL(newId)}, ${escapeSQL(idCedula)}, 1, ${escapeSQL(fechaCarga)}, ${escapeSQL(usuarioCarga)}, ${escapeSQL(estado)}, ${escapeSQL(tipoNotificacion)}, ${escapeSQL(nExpediente)}, ${escapeSQL(caratula)}, ${escapeSQL(origen)}, ${escapeSQL(letrado)}, ${escapeSQL(destinatarioEspecial)}, ${escapeSQL(destinatarioNombre)}, ${escapeSQL(domicilio)}, ${escapeSQL(zona)}, ${escapeSQL(tipoTroquel)}, ${nTroquel || 'NULL'}, ${escapeSQL(medioPago)}, ${costo}, ${escapeSQL(observaciones)}, ${escapeSQL(fechaCarga) || 'NOW()'});`;
+                const sql = `INSERT INTO notificaciones (id, glide_id_cedula, migrated_from_glide, fecha_carga, usuario_carga, estado, tipo_notificacion, n_expediente, caratula, origen, letrado, destinatario_especial, destinatario_nombre, domicilio, zona, tipo_troquel, n_troquel, medio_pago, costo, observaciones_iniciales, created_at) 
+VALUES (${escapeSQL(newId)}, ${escapeSQL(idCedula)}, 1, ${escapeSQL(fechaCarga)}, ${escapeSQL(usuarioCarga)}, ${escapeSQL(estado)}, ${escapeSQL(tipoNotificacion)}, ${escapeSQL(nExpediente)}, ${escapeSQL(caratula)}, ${escapeSQL(origen)}, ${escapeSQL(letrado)}, ${escapeSQL(destinatarioEspecial)}, ${escapeSQL(destinatarioNombre)}, ${escapeSQL(domicilio)}, ${escapeSQL(zona)}, ${escapeSQL(tipoTroquel)}, ${nTroquel || 'NULL'}, ${escapeSQL(medioPago)}, ${costo}, ${escapeSQL(observaciones)}, ${escapeSQL(fechaCarga) || 'NOW()'})
+ON DUPLICATE KEY UPDATE 
+fecha_carga = VALUES(fecha_carga), 
+usuario_carga = VALUES(usuario_carga), 
+estado = VALUES(estado), 
+tipo_notificacion = VALUES(tipo_notificacion), 
+caratula = VALUES(caratula), 
+observaciones_iniciales = VALUES(observaciones_iniciales);`;
 
                 notificacionesSql.push(sql);
 
