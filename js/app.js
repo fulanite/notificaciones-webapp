@@ -644,18 +644,30 @@ const app = {
         document.getElementById('menu-ujier')?.classList.add('hidden');
         document.getElementById('menu-auditor')?.classList.add('hidden');
 
-        if (rol === 'admin' || rol === 'administrativo' || rol === 'coordinador') {
+        if (rol === 'admin') {
+            // Admin: acceso completo
             document.getElementById('menu-admin')?.classList.remove('hidden');
-            document.getElementById('menu-auditor')?.classList.remove('hidden'); // Admins can see audit
+            document.getElementById('menu-auditor')?.classList.remove('hidden');
+            this.navigateTo('lista-notificaciones');
+        } else if (rol === 'administrativo') {
+            // Administrativo: acceso admin pero sin auditoría
+            document.getElementById('menu-admin')?.classList.remove('hidden');
+            this.navigateTo('lista-notificaciones');
+        } else if (rol === 'coordinador') {
+            // Coordinador: acceso admin pero sin auditoría
+            document.getElementById('menu-admin')?.classList.remove('hidden');
             this.navigateTo('lista-notificaciones');
         } else if (rol === 'ujier') {
             document.getElementById('menu-ujier')?.classList.remove('hidden');
             this.navigateTo('mis-asignaciones');
         } else if (rol === 'auditor') {
             document.getElementById('menu-auditor')?.classList.remove('hidden');
-            document.getElementById('menu-admin')?.classList.remove('hidden'); // Auditors can see admin dashboard
+            document.getElementById('menu-admin')?.classList.remove('hidden');
             this.navigateTo('lista-notificaciones');
         }
+
+        // Hide specific menu items based on role
+        this.updateMenuItemsVisibility(rol);
 
         // Show/hide Global Action button (Nueva Notificación)
         // Show/hide Global Action button (Nueva Notificación)
@@ -688,10 +700,47 @@ const app = {
         }
     },
 
+    // Update menu items visibility based on role
+    updateMenuItemsVisibility(rol) {
+        // Devoluciones: Solo admin y coordinador
+        const devolucionesLink = document.querySelector('[data-view="devoluciones"]');
+        if (devolucionesLink) {
+            const devolucionesItem = devolucionesLink.closest('.nav-item');
+            if (rol === 'admin' || rol === 'coordinador') {
+                devolucionesItem?.classList.remove('hidden');
+            } else {
+                devolucionesItem?.classList.add('hidden');
+            }
+        }
+
+        // Mapa General: Solo admin y coordinador
+        const mapaLink = document.querySelector('[data-view="mapa-seguimiento"]');
+        if (mapaLink) {
+            const mapaItem = mapaLink.closest('.nav-item');
+            if (rol === 'admin' || rol === 'coordinador') {
+                mapaItem?.classList.remove('hidden');
+            } else {
+                mapaItem?.classList.add('hidden');
+            }
+        }
+
+        // Auditoría: Solo admin
+        const auditoriaLink = document.querySelector('[data-view="auditoria"]');
+        if (auditoriaLink) {
+            const auditoriaItem = auditoriaLink.closest('.nav-item');
+            if (rol === 'admin') {
+                auditoriaItem?.classList.remove('hidden');
+            } else {
+                auditoriaItem?.classList.add('hidden');
+            }
+        }
+    },
+
     // Initialize modules based on role
     async initializeModules() {
         const rol = auth.currentUser?.rol;
 
+        // Módulos comunes para admin, administrativo, coordinador, auditor
         if (rol === 'admin' || rol === 'administrativo' || rol === 'auditor' || rol === 'coordinador') {
             await dashboard.init();
             await notifications.init();
@@ -700,10 +749,17 @@ const app = {
             reports.init();
         }
 
-        if (rol === 'coordinador') {
+        // Devoluciones: Solo admin y coordinador
+        if (rol === 'admin' || rol === 'coordinador') {
             await devoluciones.init();
         }
 
+        // Usuarios: Solo admin, administrativo, coordinador
+        if (rol === 'admin' || rol === 'administrativo' || rol === 'coordinador') {
+            await usuarios.init();
+        }
+
+        // Ujier
         if (rol === 'ujier') {
             await ujier.init();
         }
@@ -711,6 +767,45 @@ const app = {
 
     // Navigate to view
     navigateTo(viewId) {
+        // Validar permisos de acceso
+        const rol = auth.currentUser?.rol;
+
+        // Devoluciones: Solo admin y coordinador
+        if (viewId === 'devoluciones' && rol !== 'admin' && rol !== 'coordinador') {
+            utils.showToast('No tenés permisos para acceder a esta sección', 'error');
+            return;
+        }
+
+        // Mapa de Seguimiento: Solo admin y coordinador
+        if (viewId === 'mapa-seguimiento' && rol !== 'admin' && rol !== 'coordinador') {
+            utils.showToast('No tenés permisos para acceder a esta sección', 'error');
+            return;
+        }
+
+        // Auditoría: Solo admin
+        if (viewId === 'auditoria' && rol !== 'admin') {
+            utils.showToast('No tenés permisos para acceder a esta sección', 'error');
+            return;
+        }
+
+        // Usuarios: Solo admin, administrativo, coordinador
+        if (viewId === 'usuarios' && rol !== 'admin' && rol !== 'administrativo' && rol !== 'coordinador') {
+            utils.showToast('No tenés permisos para acceder a esta sección', 'error');
+            return;
+        }
+
+        // Mi Recorrido (ubicaciones-ujier): Solo ujier
+        if (viewId === 'ubicaciones-ujier' && rol !== 'ujier') {
+            utils.showToast('No tenés permisos para acceder a esta sección', 'error');
+            return;
+        }
+
+        // Mis Asignaciones: Solo ujier
+        if (viewId === 'mis-asignaciones' && rol !== 'ujier') {
+            utils.showToast('No tenés permisos para acceder a esta sección', 'error');
+            return;
+        }
+
         // Hide all views
         document.querySelectorAll('.view').forEach(view => {
             view.classList.remove('active');
