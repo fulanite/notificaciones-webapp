@@ -44,9 +44,13 @@ const usuarios = {
         });
 
         // Password reset button
-        document.getElementById('btn-reset-password')?.addEventListener('click', () => {
-            this.resetPassword();
-        });
+        const btnReset = document.getElementById('btn-reset-password');
+        if (btnReset && !btnReset.dataset.listenerAttached) {
+            btnReset.addEventListener('click', () => {
+                this.resetPassword();
+            });
+            btnReset.dataset.listenerAttached = 'true';
+        }
 
         // Search
         document.getElementById('search-usuarios')?.addEventListener('input', (e) => {
@@ -226,21 +230,24 @@ const usuarios = {
     // Reset password to DNI
     async resetPassword() {
         if (!this.editingId) return;
+        if (this.isResetting) return; // Prevent concurrent calls
 
-        const user = this.users.find(u => u.id === this.editingId);
-        if (!user || !user.dni) {
-            utils.showToast('No se puede blanquear: usuario sin DNI', 'error');
-            return;
-        }
-
-        const confirmed = confirm(
-            `¿Estás seguro de blanquear la contraseña de ${user.nombre}?\n\n` +
-            `La contraseña se restablecerá a su DNI (${user.dni}) y deberá cambiarla en su próximo inicio de sesión.`
-        );
-
-        if (!confirmed) return;
+        this.isResetting = true;
 
         try {
+            const user = this.users.find(u => u.id === this.editingId);
+            if (!user || !user.dni) {
+                utils.showToast('No se puede blanquear: usuario sin DNI', 'error');
+                return;
+            }
+
+            const confirmed = confirm(
+                `¿Estás seguro de blanquear la contraseña de ${user.nombre}?\n\n` +
+                `La contraseña se restablecerá a su DNI (${user.dni}) y deberá cambiarla en su próximo inicio de sesión.`
+            );
+
+            if (!confirmed) return;
+
             // Call reset-password endpoint
             const result = await apiClient.post('auth.php', {
                 action: 'reset-password',
@@ -269,6 +276,8 @@ const usuarios = {
         } catch (error) {
             console.error('Error al blanquear contraseña:', error);
             utils.showToast('Error al blanquear contraseña', 'error');
+        } finally {
+            this.isResetting = false;
         }
     },
 
