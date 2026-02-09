@@ -35,14 +35,14 @@ try {
                         THEN 1 ELSE 0 
                     END) as diligenciadas,
                     SUM(CASE WHEN es_carga_diferida = 1 THEN 1 ELSE 0 END) as diferidas,
-                    ROUND(
+                    CAST(ROUND(
                         SUM(CASE 
                             WHEN estado != 'pendiente' 
                             AND (resultado_diligencia IS NULL OR resultado_diligencia NOT IN ('Pre Aviso', 'PRE_AVISO', 'pre_aviso'))
                             THEN 1 ELSE 0 
                         END) * 100.0 / NULLIF(COUNT(*), 0),
                         2
-                    ) as tasa_diligenciamiento
+                    ) AS DECIMAL(10,2)) as tasa_diligenciamiento
                 FROM notificaciones
                 WHERE $yearFilter
             ");
@@ -56,13 +56,13 @@ try {
                 SELECT 
                     tipo_notificacion as type,
                     COUNT(*) as count,
-                    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM notificaciones WHERE $yearFilter), 2) as percentage
+                    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM notificaciones WHERE YEAR(fecha_carga) = :year2), 2) as percentage
                 FROM notificaciones
-                WHERE $yearFilter
+                WHERE YEAR(fecha_carga) = :year
                 GROUP BY tipo_notificacion
                 ORDER BY count DESC
             ");
-            $stmt->execute(['year' => $year]);
+            $stmt->execute(['year' => $year, 'year2' => $year]);
             Database::sendResponse($stmt->fetchAll());
             break;
 
@@ -74,15 +74,15 @@ try {
                     COUNT(*) as count,
                     ROUND(
                         COUNT(*) * 100.0 / 
-                        (SELECT COUNT(*) FROM notificaciones WHERE $yearFilter AND resultado_diligencia IS NOT NULL),
+                        (SELECT COUNT(*) FROM notificaciones WHERE YEAR(fecha_carga) = :year2 AND resultado_diligencia IS NOT NULL),
                         2
                     ) as percentage
                 FROM notificaciones
-                WHERE $yearFilter AND resultado_diligencia IS NOT NULL
+                WHERE YEAR(fecha_carga) = :year AND resultado_diligencia IS NOT NULL
                 GROUP BY resultado_diligencia
                 ORDER BY count DESC
             ");
-            $stmt->execute(['year' => $year]);
+            $stmt->execute(['year' => $year, 'year2' => $year]);
             Database::sendResponse($stmt->fetchAll());
             break;
 
@@ -92,14 +92,14 @@ try {
                 SELECT 
                     origen as origin,
                     COUNT(*) as count,
-                    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM notificaciones WHERE $yearFilter), 2) as percentage
+                    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM notificaciones WHERE YEAR(fecha_carga) = :year2), 2) as percentage
                 FROM notificaciones
-                WHERE $yearFilter
+                WHERE YEAR(fecha_carga) = :year
                 GROUP BY origen
                 ORDER BY count DESC
                 LIMIT 15
             ");
-            $stmt->execute(['year' => $year]);
+            $stmt->execute(['year' => $year, 'year2' => $year]);
             Database::sendResponse($stmt->fetchAll());
             break;
 
@@ -154,7 +154,7 @@ try {
                         2
                     ) as efectividad
                 FROM notificaciones
-                WHERE $yearFilter
+                WHERE YEAR(fecha_carga) = :year
                 GROUP BY zona
                 ORDER BY total DESC
             ");
@@ -178,7 +178,7 @@ try {
                     DAYOFWEEK(fecha_carga) as day_num,
                     COUNT(*) as count
                 FROM notificaciones
-                WHERE $yearFilter
+                WHERE YEAR(fecha_carga) = :year
                 GROUP BY DAYOFWEEK(fecha_carga)
                 ORDER BY day_num
             ");
@@ -193,7 +193,7 @@ try {
                     HOUR(fecha_carga) as hour,
                     COUNT(*) as count
                 FROM notificaciones
-                WHERE $yearFilter
+                WHERE YEAR(fecha_carga) = :year
                 GROUP BY HOUR(fecha_carga)
                 ORDER BY hour
             ");
@@ -214,7 +214,7 @@ try {
                         THEN 1 ELSE 0 
                     END) as completed
                 FROM notificaciones
-                WHERE $yearFilter AND fecha_carga >= DATE_SUB(NOW(), INTERVAL :days DAY)
+                WHERE YEAR(fecha_carga) = :year AND fecha_carga >= DATE_SUB(NOW(), INTERVAL :days DAY)
                 GROUP BY DATE(fecha_carga)
                 ORDER BY date ASC
             ");
