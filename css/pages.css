@@ -776,6 +776,13 @@
 }
 
 /* Responsiveness - Smart Table Layout */
+.notifications-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    /* Crucial for strict column control */
+}
+
 .notifications-table th,
 .notifications-table td {
     padding: 6px 8px;
@@ -783,6 +790,18 @@
     text-align: left;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Zebra Striping - Professional Contrast */
+.notifications-table tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.015);
+}
+
+.notifications-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.04) !important;
 }
 
 .notifications-table th {
@@ -791,9 +810,79 @@
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.03);
     white-space: nowrap;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+    /* Stronger separator */
 }
+
+/* Specific Column Widths */
+.col-date {
+    width: 85px;
+    font-size: 0.75rem;
+}
+
+.col-origin {
+    width: 110px;
+    font-size: 0.8rem;
+}
+
+.col-letrado {
+    width: 100px;
+    font-size: 0.8rem;
+}
+
+.col-exp {
+    width: 90px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* Compact Exp */
+.col-caratula {
+    width: 140px;
+    font-size: 0.8rem;
+}
+
+.col-dest {
+    width: 130px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.col-dom {
+    width: 150px;
+    font-size: 0.8rem;
+}
+
+/* Gives most space */
+.col-zona {
+    width: 60px;
+    text-align: center;
+}
+
+.col-troquel {
+    width: 70px;
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+.col-status {
+    width: 110px;
+    text-align: center;
+}
+
+.col-ujier {
+    width: 80px;
+    font-size: 0.75rem;
+}
+
+/* Responsive adjustments for smaller screens - hide lower priority columns? 
+   Or just let them be consistent. User wants "compact".
+   The total above is ~1125px.
+   If screen is smaller, horizontal scroll is inevitable but controlled.
+*/
 
 .notifications-table td {
     font-size: 0.8rem;
