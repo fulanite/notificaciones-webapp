@@ -606,6 +606,7 @@ const app = {
     // On login success
     async onLoginSuccess() {
         console.log('✅ Login exitoso:', auth.currentUser?.email);
+        console.log('🎭 Rol detectado:', auth.currentUser?.rol);
         console.log('🔒 Reset requerido:', auth.currentUser?.password_reset_required);
 
         // Check if password reset is required (robust check for bool, string "1" or number 1)
@@ -651,23 +652,25 @@ const app = {
         document.getElementById('menu-ujier')?.classList.add('hidden');
         document.getElementById('menu-auditor')?.classList.add('hidden');
 
-        if (rol === 'admin') {
+        const lowerRol = rol ? rol.toLowerCase() : '';
+
+        if (lowerRol === 'admin') {
             // Admin: acceso completo
             document.getElementById('menu-admin')?.classList.remove('hidden');
             document.getElementById('menu-auditor')?.classList.remove('hidden');
             this.navigateTo('lista-notificaciones');
-        } else if (rol === 'administrativo') {
+        } else if (lowerRol === 'administrativo') {
             // Administrativo: acceso admin pero sin auditoría
             document.getElementById('menu-admin')?.classList.remove('hidden');
             this.navigateTo('lista-notificaciones');
-        } else if (rol === 'coordinador') {
+        } else if (lowerRol === 'coordinador') {
             // Coordinador: acceso admin pero sin auditoría
             document.getElementById('menu-admin')?.classList.remove('hidden');
             this.navigateTo('lista-notificaciones');
-        } else if (rol === 'ujier') {
+        } else if (lowerRol === 'ujier') {
             document.getElementById('menu-ujier')?.classList.remove('hidden');
             this.navigateTo('mis-asignaciones');
-        } else if (rol === 'auditor') {
+        } else if (lowerRol === 'auditor') {
             document.getElementById('menu-auditor')?.classList.remove('hidden');
             document.getElementById('menu-admin')?.classList.remove('hidden');
             this.navigateTo('lista-notificaciones');
@@ -713,7 +716,7 @@ const app = {
         const devolucionesLink = document.querySelector('[data-view="devoluciones"]');
         if (devolucionesLink) {
             const devolucionesItem = devolucionesLink.closest('.nav-item');
-            if (rol === 'admin' || rol === 'coordinador') {
+            if (rol.toLowerCase() === 'admin' || rol.toLowerCase() === 'coordinador') {
                 devolucionesItem?.classList.remove('hidden');
             } else {
                 devolucionesItem?.classList.add('hidden');
@@ -724,7 +727,7 @@ const app = {
         const mapaLink = document.querySelector('[data-view="mapa-seguimiento"]');
         if (mapaLink) {
             const mapaItem = mapaLink.closest('.nav-item');
-            if (rol === 'admin' || rol === 'coordinador') {
+            if (rol.toLowerCase() === 'admin' || rol.toLowerCase() === 'coordinador') {
                 mapaItem?.classList.remove('hidden');
             } else {
                 mapaItem?.classList.add('hidden');
@@ -735,7 +738,7 @@ const app = {
         const auditoriaLink = document.querySelector('[data-view="auditoria"]');
         if (auditoriaLink) {
             const auditoriaItem = auditoriaLink.closest('.nav-item');
-            if (rol === 'admin') {
+            if (rol.toLowerCase() === 'admin') {
                 auditoriaItem?.classList.remove('hidden');
             } else {
                 auditoriaItem?.classList.add('hidden');
@@ -802,13 +805,13 @@ const app = {
         }
 
         // Mi Recorrido (ubicaciones-ujier): Solo ujier
-        if (viewId === 'ubicaciones-ujier' && rol !== 'ujier') {
+        if (viewId === 'ubicaciones-ujier' && rol.toLowerCase() !== 'ujier') {
             utils.showToast('No tenés permisos para acceder a esta sección', 'error');
             return;
         }
 
         // Mis Asignaciones: Solo ujier
-        if (viewId === 'mis-asignaciones' && rol !== 'ujier') {
+        if (viewId === 'mis-asignaciones' && rol.toLowerCase() !== 'ujier') {
             utils.showToast('No tenés permisos para acceder a esta sección', 'error');
             return;
         }

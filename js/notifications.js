@@ -17,6 +17,15 @@ const notifications = {
 
     // Initialize notifications list
     async init() {
+        // Establecer filtro propio basado en rol (solo administrativo ve sus cargas por defecto)
+        const rol = auth.currentUser?.rol ? auth.currentUser.rol.toLowerCase() : '';
+        if (rol === 'admin' || rol === 'coordinador' || rol === 'auditor') {
+            this.filters.own_only = false;
+            // Actualizar select en el DOM
+            const filterPropio = document.getElementById('filter-propio');
+            if (filterPropio) filterPropio.value = 'none';
+        }
+
         await this.loadFilterOptions(); // Load options from DB first
         this.setupFilters();
         await this.loadNotifications();
