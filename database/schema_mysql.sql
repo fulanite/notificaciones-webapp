@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS notificaciones (
     -- Datos de carga inicial
     fecha_carga DATETIME DEFAULT CURRENT_TIMESTAMP,
     usuario_carga VARCHAR(255),
+    id_usuario_carga VARCHAR(50),
     estado ENUM('pendiente', 'diligenciada', 'diferida') DEFAULT 'pendiente',
     
     -- Tipo y expediente
