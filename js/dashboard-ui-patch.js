@@ -128,6 +128,17 @@
                     <canvas id="chart-temporal"></canvas>
                 </div>
             </div>
+            
+            <div class="dashboard-card ujier-card" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                    <h3 class="card-title">👥 Rendimiento por Ujier</h3>
+                </div>
+                <div class="card-body">
+                    <div class="ujier-list" id="ujier-performance" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px;">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </div>
         `;
 
         dashboardGrid.insertAdjacentHTML('beforeend', newChartsHTML);
