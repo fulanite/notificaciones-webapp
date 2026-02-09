@@ -1162,14 +1162,17 @@ const app = {
         console.log('🚀 Modal reset-password visible:', modal.style.display, 'z-index:', modal.style.zIndex);
 
         // Close button (return to login)
-        document.getElementById('btn-close-modal-reset')?.onclick = () => {
-            console.log('🔙 User canceled password reset, returning to login...');
-            auth.logout(); // Clear session
-            modal.classList.add('hidden');
-            modal.style.display = 'none';
-            document.body.style.overflow = '';
-            this.showLoginPage();
-        };
+        const closeBtn = document.getElementById('btn-close-modal-reset');
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                console.log('🔙 User canceled password reset, returning to login...');
+                auth.logout(); // Clear session
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+                this.showLoginPage();
+            };
+        }
 
         // Setup form handler (only once)
         const form = document.getElementById('form-password-reset');
