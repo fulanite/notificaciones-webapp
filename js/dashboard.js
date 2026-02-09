@@ -310,6 +310,46 @@ const dashboard = {
         await this.loadRecentActivity();
         await this.loadUjierPerformance();
         utils.showToast('Dashboard actualizado', 'success');
+    },
+
+    // Open Image Viewer
+    openImageViewer(url, caption = '') {
+        let modal = document.getElementById('image-viewer-modal');
+        if (!modal) {
+            const html = `
+                <div id="image-viewer-modal" class="image-viewer-modal" onclick="dashboard.closeImageViewer()">
+                    <div class="image-viewer-content" onclick="event.stopPropagation()">
+                         <button class="image-viewer-close" onclick="dashboard.closeImageViewer()">×</button>
+                        <img id="image-viewer-img" class="image-viewer-img" src="" alt="Vista ampliada">
+                        <div id="image-viewer-caption" class="image-viewer-caption"></div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', html);
+            modal = document.getElementById('image-viewer-modal');
+        }
+
+        const img = document.getElementById('image-viewer-img');
+        const cap = document.getElementById('image-viewer-caption');
+
+        img.src = url;
+        cap.textContent = caption;
+
+        // Timeout to ensure display block before opacity transition
+        requestAnimationFrame(() => {
+            modal.classList.add('active');
+        });
+    },
+
+    closeImageViewer() {
+        const modal = document.getElementById('image-viewer-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            setTimeout(() => {
+                const img = document.getElementById('image-viewer-img');
+                if (img) img.src = '';
+            }, 300);
+        }
     }
 };
 
@@ -343,9 +383,13 @@ const adminMap = {
         }
 
         // Listeners
+        // Listeners
         document.getElementById('btn-admin-refresh-map')?.addEventListener('click', () => this.loadMapData());
         document.getElementById('admin-map-date')?.addEventListener('change', () => this.loadMapData());
         document.getElementById('admin-map-ujier-select')?.addEventListener('change', () => this.loadMapData());
+
+        // Fullscreen Listener
+        document.getElementById('btn-admin-map-fullscreen')?.addEventListener('click', () => this.toggleFullscreen());
 
         // Load Initial Data
         this.loadMapData();
@@ -353,6 +397,18 @@ const adminMap = {
         setTimeout(() => {
             if (this.mapInstance) this.mapInstance.invalidateSize();
         }, 300);
+    },
+
+    toggleFullscreen() {
+        const container = document.getElementById('admin-map-container');
+        if (!container) return;
+
+        container.classList.toggle('fullscreen');
+
+        // Force map resize recalculation
+        setTimeout(() => {
+            if (this.mapInstance) this.mapInstance.invalidateSize();
+        }, 100);
     },
 
     async loadUjieres() {
