@@ -5,9 +5,12 @@
  */
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/AuditLogger.php';
 
+session_start();
 $db = Database::getInstance();
 $pdo = $db->getConnection();
+$logger = new AuditLogger($pdo);
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
@@ -236,7 +239,18 @@ try {
             // Return created notification
             $stmt = $pdo->prepare("SELECT * FROM notificaciones WHERE id = ?");
             $stmt->execute([$id]);
-            Database::sendResponse($stmt->fetch(), 201);
+            $createdNotif = $stmt->fetch();
+
+            // Log creation
+            if (isset($_SESSION['user_id'])) {
+                $logger->logCreate('notificacion', $id, $createdNotif, [
+                    'id' => $_SESSION['user_id'],
+                    'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+                    'rol' => $_SESSION['user_rol'] ?? 'unknown'
+                ], "Creó notificación #{$id} - {$data['tipo_notificacion']}");
+            }
+
+            Database::sendResponse($createdNotif, 201);
             break;
 
         case 'PUT':
@@ -444,7 +458,27 @@ try {
             // Return updated notification
             $stmt = $pdo->prepare("SELECT * FROM notificaciones WHERE id = ?");
             $stmt->execute([$data['id']]);
-            Database::sendResponse($stmt->fetch());
+            $updatedNotif = $stmt->fetch();
+
+            // Log update
+            if (isset($_SESSION['user_id'])) {
+                $action = $data['action'] ?? 'update';
+                $description = "Actualizó notificación #{$data['id']}";
+                if ($action === 'assign')
+                    $description = "Asignó notificación #{$data['id']} a ujier";
+                if ($action === 'result')
+                    $description = "Registró resultado en notificación #{$data['id']}";
+                if ($action === 'return')
+                    $description = "Marcó notificación #{$data['id']} como devuelta";
+
+                $logger->logUpdate('notificacion', $data['id'], null, $updatedNotif, [
+                    'id' => $_SESSION['user_id'],
+                    'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+                    'rol' => $_SESSION['user_rol'] ?? 'unknown'
+                ], $description);
+            }
+
+            Database::sendResponse($updatedNotif);
             break;
 
         case 'DELETE':
@@ -454,9 +488,23 @@ try {
                 Database::sendError('Notification ID is required', 400);
             }
 
+            // Get notification data before deleting
+            $stmt = $pdo->prepare("SELECT * FROM notificaciones WHERE id = ?");
+            $stmt->execute([$data['id']]);
+            $deletedNotif = $stmt->fetch();
+
             // Hard delete (or you could implement soft delete)
             $stmt = $pdo->prepare("DELETE FROM notificaciones WHERE id = ?");
             $stmt->execute([$data['id']]);
+
+            // Log deletion
+            if ($deletedNotif && isset($_SESSION['user_id'])) {
+                $logger->logDelete('notificacion', $data['id'], $deletedNotif, [
+                    'id' => $_SESSION['user_id'],
+                    'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+                    'rol' => $_SESSION['user_rol'] ?? 'unknown'
+                ], "Eliminó notificación #{$data['id']} - {$deletedNotif['tipo_notificacion']}");
+            }
 
             Database::sendResponse(['deleted' => true]);
             break;

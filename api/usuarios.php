@@ -5,9 +5,12 @@
  */
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/AuditLogger.php';
 
+session_start();
 $db = Database::getInstance();
 $pdo = $db->getConnection();
+$logger = new AuditLogger($pdo);
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
@@ -73,7 +76,18 @@ try {
             // Return created user
             $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = ?");
             $stmt->execute([$id]);
-            Database::sendResponse($stmt->fetch(), 201);
+            $createdUser = $stmt->fetch();
+
+            // Log creation
+            if (isset($_SESSION['user_id'])) {
+                $logger->logCreate('usuario', $id, $createdUser, [
+                    'id' => $_SESSION['user_id'],
+                    'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+                    'rol' => $_SESSION['user_rol'] ?? 'unknown'
+                ], "Creó usuario {$data['nombre']} ({$data['rol']})");
+            }
+
+            Database::sendResponse($createdUser, 201);
             break;
 
         case 'PUT':
@@ -118,19 +132,38 @@ try {
             // Return updated user
             $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = ?");
             $stmt->execute([$data['id']]);
-            Database::sendResponse($stmt->fetch());
+            $updatedUser = $stmt->fetch();
+
+            // Log update
+            if (isset($_SESSION['user_id'])) {
+                $logger->logUpdate('usuario', $data['id'], null, $updatedUser, [
+                    'id' => $_SESSION['user_id'],
+                    'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+                    'rol' => $_SESSION['user_rol'] ?? 'unknown'
+                ], "Actualizó usuario {$updatedUser['nombre']}");
+            }
+
+            Database::sendResponse($updatedUser);
             break;
 
         case 'DELETE':
+            // Get user data before soft deleting
+            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = ?");
+            $stmt->execute([$data['id']]);
+            $deletedUser = $stmt->fetch();
+
             // Soft delete user (set activo = 0)
-            $data = Database::getJsonBody();
-
-            if (empty($data['id'])) {
-                Database::sendError('User ID is required', 400);
-            }
-
             $stmt = $pdo->prepare("UPDATE usuarios SET activo = 0, updated_at = NOW() WHERE id = ?");
             $stmt->execute([$data['id']]);
+
+            // Log deletion
+            if ($deletedUser && isset($_SESSION['user_id'])) {
+                $logger->logDelete('usuario', $data['id'], $deletedUser, [
+                    'id' => $_SESSION['user_id'],
+                    'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+                    'rol' => $_SESSION['user_rol'] ?? 'unknown'
+                ], "Desactivó usuario {$deletedUser['nombre']}");
+            }
 
             Database::sendResponse(['deleted' => true]);
             break;
