@@ -61,13 +61,14 @@ try {
 
             $id = Database::generateUUID();
             $stmt = $pdo->prepare("
-                INSERT INTO usuarios (id, email, nombre, rol, foto, activo, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW())
+                INSERT INTO usuarios (id, email, dni, nombre, rol, foto, activo, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
             ");
 
             $stmt->execute([
                 $id,
                 Database::sanitize($data['email']),
+                Database::sanitize($data['dni'] ?? ''),
                 Database::sanitize($data['nombre']),
                 Database::sanitize($data['rol']),
                 $data['foto'] ?? null
@@ -108,6 +109,10 @@ try {
             if (isset($data['rol'])) {
                 $updates[] = "rol = ?";
                 $params[] = Database::sanitize($data['rol']);
+            }
+            if (isset($data['dni'])) {
+                $updates[] = "dni = ?";
+                $params[] = Database::sanitize($data['dni']);
             }
             if (isset($data['foto'])) {
                 $updates[] = "foto = ?";

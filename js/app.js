@@ -680,10 +680,9 @@ const app = {
         this.updateMenuItemsVisibility(rol);
 
         // Show/hide Global Action button (Nueva Notificación)
-        // Show/hide Global Action button (Nueva Notificación)
         const btnNuevaNotif = document.getElementById('btn-open-nueva-notif');
         if (btnNuevaNotif) {
-            if (rol === 'admin' || rol === 'administrativo' || rol === 'coordinador') {
+            if (lowerRol === 'admin' || lowerRol === 'administrativo' || lowerRol === 'coordinador') {
                 btnNuevaNotif.classList.remove('hidden');
             } else {
                 btnNuevaNotif.classList.add('hidden');
@@ -701,7 +700,7 @@ const app = {
             adminItems.forEach(el => el.style.display = 'none');
             ujierItems.forEach(el => el.style.display = 'none');
 
-            if (rol === 'ujier') {
+            if (lowerRol === 'ujier') {
                 ujierItems.forEach(el => el.style.display = 'flex');
             } else {
                 // Admin, Administrativo, Coordinador, Auditor
@@ -748,7 +747,7 @@ const app = {
 
     // Initialize modules based on role
     async initializeModules() {
-        const rol = auth.currentUser?.rol;
+        const rol = auth.currentUser?.rol ? auth.currentUser.rol.toLowerCase() : '';
 
         // Módulos comunes para admin, administrativo, coordinador, auditor
         if (rol === 'admin' || rol === 'administrativo' || rol === 'auditor' || rol === 'coordinador') {

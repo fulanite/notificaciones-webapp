@@ -55,6 +55,25 @@ class Database
                 $this->pdo->exec("ALTER TABLE notificaciones ADD COLUMN fecha_entrega_ujier DATETIME NULL AFTER fecha_carga");
             } catch (PDOException $e) {
             }
+
+            // Fix usuarios table: Add coordinador role and missing columns
+            try {
+                // First try to modify the ENUM for rol
+                $this->pdo->exec("ALTER TABLE usuarios MODIFY COLUMN rol ENUM('admin', 'administrativo', 'ujier', 'auditor', 'coordinador') NOT NULL");
+            } catch (PDOException $e) {
+            }
+
+            try {
+                // Add dni column if missing
+                $this->pdo->exec("ALTER TABLE usuarios ADD COLUMN dni VARCHAR(20) NULL AFTER email");
+            } catch (PDOException $e) {
+            }
+
+            try {
+                // Add password_reset_required if missing
+                $this->pdo->exec("ALTER TABLE usuarios ADD COLUMN password_reset_required TINYINT(1) DEFAULT 0 AFTER activo");
+            } catch (PDOException $e) {
+            }
         } catch (PDOException $e) {
             $this->sendError('Database connection failed: ' . $e->getMessage(), 500);
         }
