@@ -310,14 +310,18 @@ const notifications = {
         tbody.innerHTML = html;
     },
 
-    // Enhanced status badge that handles special recipients logic
+    // Enhanced status badge that handles special recipients logic and latest visit result
     getEnhancedStatusBadge(notif) {
-        let status = notif.resultado_diligencia || notif.estado;
+        // Priorizamos el estado procesado por la API (que incluye la última visita)
+        let status = notif.estado_display || notif.resultado_diligencia || notif.estado;
 
         // If it's a special recipient and status is 'atiende', show as 'entregado'
-        if ((notif.destinatario_especial) && status === 'atiende') {
-            status = 'entregado';
+        if ((notif.destinatario_especial) && (status === 'atiende' || status === 'pendiente')) {
+            // Para ARCAT/Estrados, si aún está pendiente pero es receptor especial, 
+            // mantenemos la lógica visual de negocio si corresponde.
+            if (status === 'atiende') status = 'entregado';
         }
+
 
         let badge = utils.getStatusBadge(status);
 

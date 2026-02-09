@@ -22,19 +22,27 @@ try {
                     SELECT n.*, 
                            COALESCE(u1.nombre, u2.nombre) as ujier_nombre, 
                            COALESCE(u1.email, u2.email) as ujier_email,
-                           COALESCE(u3.nombre, u4.nombre, n.usuario_carga) as cargador_nombre
+                           COALESCE(u3.nombre, u4.nombre, n.usuario_carga) as cargador_nombre,
+                           (SELECT resultado FROM visitas v_sub 
+                            WHERE v_sub.notificacion_id = n.id 
+                            ORDER BY v_sub.fecha DESC, v_sub.created_at DESC LIMIT 1) as resultado_ultima_visita,
+                           (SELECT fecha FROM visitas v_sub 
+                            WHERE v_sub.notificacion_id = n.id 
+                            ORDER BY v_sub.fecha DESC, v_sub.created_at DESC LIMIT 1) as fecha_ultima_visita
                     FROM notificaciones n
                     LEFT JOIN usuarios u1 ON n.asignado_a = u1.id
                     LEFT JOIN usuarios u2 ON n.asignado_a = u2.dni
                     LEFT JOIN usuarios u3 ON n.usuario_carga = u3.dni
                     LEFT JOIN usuarios u4 ON n.usuario_carga = u4.email
                     WHERE n.id = ?
-
                 ");
                 $stmt->execute([$_GET['id']]);
                 $notification = $stmt->fetch();
 
                 if ($notification) {
+                    $notification['estado_display'] = !empty($notification['resultado_ultima_visita'])
+                        ? $notification['resultado_ultima_visita']
+                        : $notification['estado'];
                     Database::sendResponse($notification);
                 } else {
                     Database::sendError('Notification not found', 404);
@@ -180,14 +188,21 @@ try {
 
                 $sql = "
                     SELECT n.*, 
-                           COALESCE(u1.nombre, u2.nombre) as ujier_nombre, 
-                           COALESCE(u3.nombre, u4.nombre, n.usuario_carga) as cargador_nombre
+                           MAX(COALESCE(u1.nombre, u2.nombre)) as ujier_nombre, 
+                           MAX(COALESCE(u3.nombre, u4.nombre, n.usuario_carga)) as cargador_nombre,
+                           (SELECT resultado FROM visitas v_sub 
+                            WHERE v_sub.notificacion_id = n.id 
+                            ORDER BY v_sub.fecha DESC, v_sub.created_at DESC LIMIT 1) as resultado_ultima_visita,
+                           (SELECT fecha FROM visitas v_sub 
+                            WHERE v_sub.notificacion_id = n.id 
+                            ORDER BY v_sub.fecha DESC, v_sub.created_at DESC LIMIT 1) as fecha_ultima_visita
                     FROM notificaciones n
                     LEFT JOIN usuarios u1 ON n.asignado_a = u1.id
                     LEFT JOIN usuarios u2 ON n.asignado_a = u2.dni
                     LEFT JOIN usuarios u3 ON n.usuario_carga = u3.email
                     LEFT JOIN usuarios u4 ON n.usuario_carga = u4.dni
                     WHERE " . implode(" AND ", $where) . "
+                    GROUP BY n.id
                     ORDER BY COALESCE(n.fecha_entrega_ujier, n.fecha_carga) DESC, n.created_at DESC
                     LIMIT $limit OFFSET $offset
                 ";
@@ -195,8 +210,19 @@ try {
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute($params);
 
+                $results = $stmt->fetchAll();
+
+                // Sobrescribimos el estado visual con el de la última visita si existe
+                foreach ($results as &$row) {
+                    if (!empty($row['resultado_ultima_visita'])) {
+                        $row['estado_display'] = $row['resultado_ultima_visita'];
+                    } else {
+                        $row['estado_display'] = $row['estado'];
+                    }
+                }
+
                 Database::sendResponse([
-                    'data' => $stmt->fetchAll(),
+                    'data' => $results,
                     'total' => (int) $total,
                     'page' => $page,
                     'limit' => $limit,
