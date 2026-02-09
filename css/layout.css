@@ -564,7 +564,8 @@
         height: 100dvh;
         display: flex;
         flex-direction: column;
-        z-index: 1100;
+        z-index: 10001;
+        /* Above mobile bottom nav */
         background: var(--bg-card);
         transform: translateX(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -581,6 +582,7 @@
         padding: var(--space-6);
         justify-content: space-between;
         flex-shrink: 0;
+        flex-wrap: wrap;
     }
 
     .sidebar-user {
@@ -625,6 +627,21 @@
         /* Separator */
         background: var(--bg-card);
         /* Ensure no transparency overlap */
+    }
+
+    /* Wrap buttons on mobile footers to prevent overflow */
+    .card-footer,
+    .list-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .card-footer button,
+    .list-header button {
+        flex: 1 1 auto;
+        /* Allow buttons to grow and shrink */
+        min-width: 120px;
+        /* Minimum width for touch targets */
     }
 }
 

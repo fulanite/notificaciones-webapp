@@ -73,7 +73,11 @@ const asignaciones = {
             if (notifResult.error) throw notifResult.error;
             if (ujieresResult.error) throw ujieresResult.error;
 
-            this.state.notificaciones = notifResult.data || [];
+            // Deduplicate notifications to prevent double rows
+            const uniqueNotifs = new Map();
+            (notifResult.data || []).forEach(n => uniqueNotifs.set(n.id, n));
+            this.state.notificaciones = Array.from(uniqueNotifs.values());
+
             this.state.ujieres = ujieresResult.data || [];
 
             this.renderAll();
