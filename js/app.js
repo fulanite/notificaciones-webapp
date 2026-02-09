@@ -645,10 +645,17 @@ const app = {
 
         const { nombre, rol } = auth.currentUser;
 
-        // Update user info in sidebar
-        document.getElementById('user-name').textContent = nombre;
-        document.getElementById('user-role').textContent = CONFIG.ROLES[rol] || rol;
-        document.getElementById('user-avatar').querySelector('.avatar-initials').textContent = auth.getInitials();
+        // Update user info in sidebar with safety checks
+        const nameEl = document.getElementById('user-name');
+        const roleEl = document.getElementById('user-role');
+        const avatarEl = document.getElementById('user-avatar');
+
+        if (nameEl) nameEl.textContent = nombre;
+        if (roleEl) roleEl.textContent = CONFIG.ROLES[rol] || rol;
+        if (avatarEl) {
+            const initialsEl = avatarEl.querySelector('.avatar-initials');
+            if (initialsEl) initialsEl.textContent = auth.getInitials();
+        }
 
         // Show appropriate menu based on role
         document.getElementById('menu-admin')?.classList.add('hidden');
