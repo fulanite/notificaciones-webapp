@@ -328,7 +328,14 @@ const db = {
         }));
     },
 
+    async getYearCounts(options = {}) {
+        if (!apiClient) return { 2025: 0, 2026: 0 };
+        const result = await apiClient.get('stats.php', { type: 'year_counts', ...options });
+        return result.data || { 2025: 0, 2026: 0 };
+    },
+
     async getDistinctValues(column) {
+
         if (!apiClient) return { data: [], error: null };
         return apiClient.get('notificaciones.php', { action: 'distinct', column });
     },

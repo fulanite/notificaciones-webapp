@@ -271,7 +271,7 @@ try {
             $data = [
                 ':id' => $newId,
                 ':fecha_carga' => parseDate($cedula['fecha_carga'] ?? null),
-                ':usuario_carga' => cleanString($cedula['cargado_por'] ?? null),
+                ':usuario_carga' => cleanString($cedula['id_usuario_carga'] ?? $cedula['cargado_por'] ?? null),
                 ':estado' => mapEstado($cedula['estado_notificacion'] ?? null),
                 ':tipo_notificacion' => cleanString($cedula['tipo_not'] ?? null) ?: 'cedulas',
                 ':n_expediente' => cleanString($cedula['n_exp'] ?? null) ?: 'SIN EXPEDIENTE',

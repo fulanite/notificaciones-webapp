@@ -101,8 +101,17 @@ try {
 
                 if (!empty($_GET['year'])) {
                     $year = (int) $_GET['year'];
-                    $where[] = "YEAR(COALESCE(n.fecha_entrega_ujier, n.fecha_carga)) = ?";
+                    // Mas robusto para fechas migradas que pueden ser strings o NULL
+                    $where[] = "(
+                        YEAR(n.fecha_entrega_ujier) = ? OR 
+                        YEAR(n.fecha_carga) = ? OR 
+                        n.fecha_carga LIKE ? OR
+                        n.created_at LIKE ?
+                    )";
                     $params[] = $year;
+                    $params[] = $year;
+                    $params[] = "%$year%";
+                    $params[] = "$year%";
                 }
 
                 if (isset($_GET['devuelta_por_ujier'])) {
@@ -116,9 +125,18 @@ try {
                 }
 
                 if (!empty($_GET['own_only']) && $_GET['own_only'] == '1' && !empty($_GET['user_email'])) {
-                    $where[] = "(n.usuario_carga = ? OR n.usuario_carga = (SELECT dni FROM usuarios WHERE email = ?))";
+                    // Buscar por email actual, o por DNI/Nombre que pudieran estar en la base migrada
+                    $where[] = "(
+                        n.usuario_carga = ? OR 
+                        TRIM(n.usuario_carga) = (SELECT dni FROM usuarios WHERE email = ? LIMIT 1) OR
+                        TRIM(n.usuario_carga) = (SELECT nombre FROM usuarios WHERE email = ? LIMIT 1) OR
+                        (SELECT nombre FROM usuarios WHERE email = ? LIMIT 1) LIKE CONCAT('%', TRIM(n.usuario_carga), '%')
+                    )";
                     $params[] = $_GET['user_email'];
                     $params[] = $_GET['user_email'];
+                    $params[] = $_GET['user_email'];
+                    $params[] = $_GET['user_email'];
+
                 }
 
                 if (!empty($_GET['search'])) {
@@ -159,10 +177,12 @@ try {
                 $sql = "
                     SELECT n.*, 
                            COALESCE(u1.nombre, u2.nombre) as ujier_nombre, 
-                           COALESCE(u1.email, u2.email) as ujier_email
+                           COALESCE(u3.nombre, u4.nombre, n.usuario_carga) as cargador_nombre
                     FROM notificaciones n
                     LEFT JOIN usuarios u1 ON n.asignado_a = u1.id
                     LEFT JOIN usuarios u2 ON n.asignado_a = u2.dni
+                    LEFT JOIN usuarios u3 ON n.usuario_carga = u3.email
+                    LEFT JOIN usuarios u4 ON n.usuario_carga = u4.dni
                     WHERE " . implode(" AND ", $where) . "
                     ORDER BY COALESCE(n.fecha_entrega_ujier, n.fecha_carga) DESC, n.created_at DESC
                     LIMIT $limit OFFSET $offset

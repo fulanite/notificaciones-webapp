@@ -99,7 +99,9 @@ const notifications = {
         const updateAndLoad = () => {
             this.currentPage = 1;
             this.loadNotifications();
+            this.updateYearBadges();
         };
+
 
         searchInput?.addEventListener('input', utils.debounce(() => {
             this.filters.search = searchInput.value;
@@ -168,10 +170,24 @@ const notifications = {
 
     // Update counts on year tabs
     async updateYearBadges() {
-        const userId = this.filters.own_only ? auth.currentUser?.email : null;
-        // This is a simplified call, ideally we'd have a specific endpoint for counts
-        // but for now we'll just show the total if needed or keep it static
+        const params = {
+            own_only: this.filters.own_only ? 1 : 0,
+            user_email: auth.currentUser?.email
+        };
+
+        try {
+            const counts = await db.getYearCounts(params);
+
+            const badge2026 = document.getElementById('badge-2026');
+            const badge2025 = document.getElementById('badge-2025');
+
+            if (badge2026) badge2026.textContent = counts['2026'] || 0;
+            if (badge2025) badge2025.textContent = counts['2025'] || 0;
+        } catch (error) {
+            console.error('Error updating year badges:', error);
+        }
     },
+
 
     // Load notifications from database
     async loadNotifications() {
@@ -239,10 +255,14 @@ const notifications = {
         if (!tbody) return;
 
         if (data.length === 0) {
+            const hasFilters = this.filters.estado || this.filters.search || this.filters.zona || this.filters.own_only;
+            const yearText = this.filters.year;
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="11" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                        No se encontraron notificaciones
+                    <td colspan="11" style="text-align: center; padding: 60px; color: var(--text-muted);">
+                        <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
+                        <h3>No hay notificaciones en ${yearText}</h3>
+                        <p>${hasFilters ? 'Probá quitando algunos filtros o buscando en otro año.' : 'No hay registros cargados para este año aún.'}</p>
                     </td>
                 </tr>
             `;
@@ -280,6 +300,7 @@ const notifications = {
                     <td class="col-caratula" title="${notif.caratula || ''}">${notif.caratula || ''}</td>
                     <td class="col-exp"><strong style="white-space: nowrap;">${notif.n_expediente}</strong></td>
                     <td class="col-dest" title="${recipientDisplay}">${recipientDisplay}</td>
+                    <td class="col-cargador" title="${notif.cargador_nombre || '-'}">${(notif.cargador_nombre || '-').split(' ')[0]}</td>
                     <td class="col-dom" title="${notif.domicilio}">${notif.domicilio}</td>
                     <td class="col-troquel" style="font-family: monospace;">${notif.n_troquel || '-'}</td>
                 </tr>

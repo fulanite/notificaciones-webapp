@@ -237,7 +237,41 @@ try {
             Database::sendResponse($stmt->fetchAll());
             break;
 
+        case 'year_counts':
+            // Simple counts for each year tab
+            $userId = $_GET['user_email'] ?? null;
+            $ownOnly = ($_GET['own_only'] ?? '0') === '1';
+
+            $whereClause = "1=1";
+            $params = [];
+
+            if ($ownOnly && !empty($userId)) {
+                $whereClause = " (
+                    n.usuario_carga = ? OR 
+                    TRIM(n.usuario_carga) = (SELECT dni FROM usuarios WHERE email = ? LIMIT 1) OR
+                    TRIM(n.usuario_carga) = (SELECT nombre FROM usuarios WHERE email = ? LIMIT 1) OR
+                    (SELECT nombre FROM usuarios WHERE email = ? LIMIT 1) LIKE CONCAT('%', TRIM(n.usuario_carga), '%')
+                )";
+                $params = [$userId, $userId, $userId, $userId];
+            }
+
+
+            $stmt2026 = $pdo->prepare("SELECT COUNT(*) FROM notificaciones n WHERE (YEAR(n.fecha_carga) = 2026 OR YEAR(n.created_at) = 2026) AND $whereClause");
+            $stmt2026->execute($params);
+            $count2026 = $stmt2026->fetchColumn();
+
+            $stmt2025 = $pdo->prepare("SELECT COUNT(*) FROM notificaciones n WHERE (YEAR(n.fecha_carga) = 2025 OR YEAR(n.created_at) = 2025) AND $whereClause");
+            $stmt2025->execute($params);
+            $count2025 = $stmt2025->fetchColumn();
+
+            Database::sendResponse([
+                '2026' => (int) $count2026,
+                '2025' => (int) $count2025
+            ]);
+            break;
+
         default:
+
             Database::sendError('Invalid stats type', 400);
     }
 } catch (PDOException $e) {
