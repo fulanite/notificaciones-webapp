@@ -462,35 +462,32 @@ const adminMap = {
         }
         // --- VISTA GENERAL (MAPA DE CALOR / PINES SIMPLES) ---
         else {
-            // Paleta de colores para diferenciar Ujieres
-            const ujierColors = {};
-            const palette = ['#e11d48', '#2563eb', '#16a34a', '#d97706', '#9333ea', '#0891b2', '#db2777', '#4f46e5'];
-
             data.forEach((point) => {
                 if (point.lat && point.lng) {
                     const coord = [parseFloat(point.lat), parseFloat(point.lng)];
                     const ujierName = point.ujier_nombre || 'Desconocido';
 
-                    if (!ujierColors[ujierName]) {
-                        ujierColors[ujierName] = palette[Object.keys(ujierColors).length % palette.length];
-                    }
-                    const color = ujierColors[ujierName];
+                    // Color por Resultado (Estado)
+                    const color = this.getStatusColor(point.resultado);
 
                     const popupContent = `
                         <strong>👤 ${ujierName}</strong><br>
                         ${point.destinatario}<br>
                         <span style="font-size:0.85em; color:#555;">${point.domicilio}</span><br>
-                        <small>🕒 ${utils.formatTime(point.fecha)} - ${(point.resultado || '').toUpperCase()}</small>
+                        <span class="badge" style="background:${color}; color:white; font-size:0.7em; padding:2px 5px; border-radius:3px;">
+                            ${(point.resultado || 'PENDIENTE').toUpperCase()}
+                        </span>
+                        <br><small>🕒 ${utils.formatTime(point.fecha)}</small>
                     `;
 
                     // Círculos simples, sin números, sin líneas
                     L.circleMarker(coord, {
-                        radius: 7,
+                        radius: 6,
                         fillColor: color,
                         color: '#fff',
-                        weight: 2,
-                        opacity: 1,
-                        fillOpacity: 0.8
+                        weight: 1,
+                        opacity: 0.9,
+                        fillOpacity: 0.7
                     }).bindPopup(popupContent).addTo(markers);
                 }
             });
