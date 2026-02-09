@@ -297,30 +297,38 @@ const usuarios = {
         if (!user) return;
 
         const confirmed = confirm(
-            `⚠️ ¿Estás seguro de ELIMINAR a ${user.nombre}?\n\n` +
-            `Esta acción NO se puede deshacer.\n\n` +
-            `Se eliminarán todos los datos asociados al usuario.`
+            `⚠️ ¿Estás seguro de intentar eliminar a ${user.nombre}?\n\n` +
+            `Si el usuario tiene notificaciones o visitas asignadas, solo se DESACTIVARÁ.\n\n` +
+            `Si no tiene datos asociados, se ELIMINARÁ permanentemente.`
         );
 
         if (!confirmed) return;
-
-        // Double confirmation for safety
-        const doubleConfirm = confirm(
-            `Última confirmación:\n\n` +
-            `¿Realmente querés eliminar a ${user.nombre}?`
-        );
-
-        if (!doubleConfirm) return;
 
         try {
             const result = await apiClient.delete('usuarios.php', { id: userId });
 
             if (result.error) {
-                utils.showToast('Error al eliminar usuario: ' + result.error, 'error');
+                utils.showToast('Error: ' + result.error, 'error');
                 return;
             }
 
-            utils.showToast('Usuario eliminado correctamente', 'success');
+            // Check if it was deleted or deactivated
+            if (result.data.deleted) {
+                // Hard delete (no associated data)
+                utils.showToast('✅ Usuario eliminado correctamente', 'success');
+            } else if (result.data.deactivated) {
+                // Soft delete (has associated data)
+                const notifCount = result.data.notif_count || 0;
+                const visitCount = result.data.visit_count || 0;
+
+                utils.showToast(
+                    `⚠️ Usuario desactivado (no eliminado)\n\n` +
+                    `Tiene ${notifCount} notificaciones y ${visitCount} visitas asignadas.\n\n` +
+                    `Los datos históricos se preservan.`,
+                    'warning'
+                );
+            }
+
             await this.loadUsers();
         } catch (error) {
             console.error('Error al eliminar usuario:', error);

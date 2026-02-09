@@ -146,26 +146,75 @@ try {
             Database::sendResponse($updatedUser);
             break;
 
+
         case 'DELETE':
-            // Get user data before soft deleting
-            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = ?");
-            $stmt->execute([$data['id']]);
-            $deletedUser = $stmt->fetch();
+            // Get user data before deleting
+            $data = Database::getJsonBody();
 
-            // Soft delete user (set activo = 0)
-            $stmt = $pdo->prepare("UPDATE usuarios SET activo = 0, updated_at = NOW() WHERE id = ?");
-            $stmt->execute([$data['id']]);
-
-            // Log deletion
-            if ($deletedUser && isset($_SESSION['user_id'])) {
-                $logger->logDelete('usuario', $data['id'], $deletedUser, [
-                    'id' => $_SESSION['user_id'],
-                    'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
-                    'rol' => $_SESSION['user_rol'] ?? 'unknown'
-                ], "Desactivó usuario {$deletedUser['nombre']}");
+            if (empty($data['id'])) {
+                Database::sendError('User ID is required', 400);
             }
 
-            Database::sendResponse(['deleted' => true]);
+            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = ?");
+            $stmt->execute([$data['id']]);
+            $user = $stmt->fetch();
+
+            if (!$user) {
+                Database::sendError('User not found', 404);
+            }
+
+            // Check if user has assigned notifications
+            $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM notificaciones WHERE asignado_a = ?");
+            $stmt->execute([$data['id']]);
+            $notifCount = $stmt->fetch()['count'];
+
+            // Check if user has visits
+            $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM visitas WHERE ujier_id = ?");
+            $stmt->execute([$data['id']]);
+            $visitCount = $stmt->fetch()['count'];
+
+            // If user has associated data, only allow soft delete
+            if ($notifCount > 0 || $visitCount > 0) {
+                // Soft delete (deactivate)
+                $stmt = $pdo->prepare("UPDATE usuarios SET activo = 0, updated_at = NOW() WHERE id = ?");
+                $stmt->execute([$data['id']]);
+
+                // Log soft deletion
+                if (isset($_SESSION['user_id'])) {
+                    $logger->logDelete('usuario', $data['id'], $user, [
+                        'id' => $_SESSION['user_id'],
+                        'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+                        'rol' => $_SESSION['user_rol'] ?? 'unknown'
+                    ], "Desactivó usuario {$user['nombre']} (tiene {$notifCount} notificaciones y {$visitCount} visitas)");
+                }
+
+                Database::sendResponse([
+                    'deleted' => false,
+                    'deactivated' => true,
+                    'message' => "Usuario desactivado (tiene {$notifCount} notificaciones y {$visitCount} visitas asignadas)",
+                    'notif_count' => $notifCount,
+                    'visit_count' => $visitCount
+                ]);
+            } else {
+                // Hard delete (no associated data)
+                $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = ?");
+                $stmt->execute([$data['id']]);
+
+                // Log hard deletion
+                if (isset($_SESSION['user_id'])) {
+                    $logger->logDelete('usuario', $data['id'], $user, [
+                        'id' => $_SESSION['user_id'],
+                        'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+                        'rol' => $_SESSION['user_rol'] ?? 'unknown'
+                    ], "Eliminó usuario {$user['nombre']} (sin datos asociados)");
+                }
+
+                Database::sendResponse([
+                    'deleted' => true,
+                    'deactivated' => false,
+                    'message' => 'Usuario eliminado correctamente'
+                ]);
+            }
             break;
 
         default:
