@@ -233,6 +233,8 @@ const usuarios = {
         if (this.isResetting) return; // Prevent concurrent calls
 
         this.isResetting = true;
+        const btn = document.getElementById('btn-reset-password');
+        const originalText = btn ? btn.innerHTML : '';
 
         try {
             const user = this.users.find(u => u.id === this.editingId);
@@ -247,6 +249,13 @@ const usuarios = {
             );
 
             if (!confirmed) return;
+
+            // Show loading state
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '⏳ Procesando...';
+            }
+            utils.showToast('Blanqueando contraseña, por favor espere...', 'info');
 
             // Call reset-password endpoint
             const result = await apiClient.post('auth.php', {
@@ -278,6 +287,11 @@ const usuarios = {
             utils.showToast('Error al blanquear contraseña', 'error');
         } finally {
             this.isResetting = false;
+            // Restore button state if modal is still open (though we close it on success)
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
     },
 
