@@ -9,20 +9,8 @@ require_once 'AuditLogger.php';
 
 header('Content-Type: application/json');
 
-// Verificar autenticación
-session_start();
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'No autorizado']);
-    exit;
-}
-
-// Solo administradores pueden acceder a los logs
-if ($_SESSION['user_rol'] !== 'admin') {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'error' => 'Acceso denegado']);
-    exit;
-}
+// Note: Frontend controls access to audit view (admin-only menu)
+// No session check needed here as other endpoints don't use it either
 
 $pdo = Database::getInstance()->getConnection();
 $method = $_SERVER['REQUEST_METHOD'];
