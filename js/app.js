@@ -718,7 +718,18 @@ const app = {
                         usersBtn.style.display = 'flex';
                     }
                 }
+
+                // Hide Devoluciones for Administrativo and Auditor
+                const devolucionesBtn = mobileNav.querySelector('[data-view="devoluciones"]');
+                if (devolucionesBtn) {
+                    if (lowerRol === 'admin' || lowerRol === 'coordinador') {
+                        devolucionesBtn.style.display = 'flex';
+                    } else {
+                        devolucionesBtn.style.display = 'none';
+                    }
+                }
             }
+
 
 
         }
