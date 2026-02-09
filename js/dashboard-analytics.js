@@ -130,7 +130,7 @@ const dashboardAnalytics = {
                 document.getElementById('stat-pending-percent').textContent =
                     `${((stats.pendientes / total) * 100).toFixed(1)}%`;
                 document.getElementById('stat-completed-percent').textContent =
-                    `${(stats.tasa_diligenciamiento || 0).toFixed(1)}%`;
+                    `${parseFloat(stats.tasa_diligenciamiento || 0).toFixed(1)}%`;
                 document.getElementById('stat-deferred-percent').textContent =
                     `${((stats.diferidas / total) * 100).toFixed(1)}%`;
 

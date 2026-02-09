@@ -8,7 +8,8 @@ const dashboard = {
     // Initialize dashboard
     async init() {
         await this.loadStats();
-        await this.initCharts();
+        // DISABLED: Charts now handled by dashboard-analytics.js
+        // await this.initCharts();
         await this.loadRecentActivity();
         await this.loadUjierPerformance();
     },
