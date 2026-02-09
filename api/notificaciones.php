@@ -25,10 +25,10 @@ try {
                            COALESCE(u3.nombre, u4.nombre, n.usuario_carga) as cargador_nombre,
                            (SELECT resultado FROM visitas v_sub 
                             WHERE v_sub.notificacion_id = n.id 
-                            ORDER BY v_sub.fecha DESC, v_sub.created_at DESC LIMIT 1) as resultado_ultima_visita,
+                            ORDER BY v_sub.fecha DESC, v_sub.id DESC LIMIT 1) as resultado_ultima_visita,
                            (SELECT fecha FROM visitas v_sub 
                             WHERE v_sub.notificacion_id = n.id 
-                            ORDER BY v_sub.fecha DESC, v_sub.created_at DESC LIMIT 1) as fecha_ultima_visita
+                            ORDER BY v_sub.fecha DESC, v_sub.id DESC LIMIT 1) as fecha_ultima_visita
                     FROM notificaciones n
                     LEFT JOIN usuarios u1 ON n.asignado_a = u1.id
                     LEFT JOIN usuarios u2 ON n.asignado_a = u2.dni
@@ -192,10 +192,10 @@ try {
                            MAX(COALESCE(u3.nombre, u4.nombre, n.usuario_carga)) as cargador_nombre,
                            (SELECT resultado FROM visitas v_sub 
                             WHERE v_sub.notificacion_id = n.id 
-                            ORDER BY v_sub.fecha DESC, v_sub.created_at DESC LIMIT 1) as resultado_ultima_visita,
+                            ORDER BY v_sub.fecha DESC, v_sub.id DESC LIMIT 1) as resultado_ultima_visita,
                            (SELECT fecha FROM visitas v_sub 
                             WHERE v_sub.notificacion_id = n.id 
-                            ORDER BY v_sub.fecha DESC, v_sub.created_at DESC LIMIT 1) as fecha_ultima_visita
+                            ORDER BY v_sub.fecha DESC, v_sub.id DESC LIMIT 1) as fecha_ultima_visita
                     FROM notificaciones n
                     LEFT JOIN usuarios u1 ON n.asignado_a = u1.id
                     LEFT JOIN usuarios u2 ON n.asignado_a = u2.dni
