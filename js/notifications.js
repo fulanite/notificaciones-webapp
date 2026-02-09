@@ -352,9 +352,11 @@ const notifications = {
 
     // View notification details
     async viewDetails(id) {
+        utils.showLoading('Abriendo detalle...');
         const { data, error } = await db.getNotificationById(id);
 
         if (error || !data) {
+            utils.hideLoading();
             utils.showToast('Error al cargar detalles', 'error');
             return;
         }
@@ -585,6 +587,7 @@ const notifications = {
 
         // Insert modal into DOM and prevent body scroll
         document.body.insertAdjacentHTML('beforeend', modalHtml);
+        utils.hideLoading();
         document.body.style.overflow = 'hidden';
 
         // Add escape key listener

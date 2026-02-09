@@ -196,7 +196,7 @@ const reports = {
 
         const yyyy_mm = `${year}-${String(month).padStart(2, '0')}`;
 
-        utils.showToast('Generando informe mensual...', 'info');
+        utils.showLoading('Generando estadística mensual...');
 
         // Get all notifications for the month
         // We filter by 'fecha_entrega_ujier' as per user requirement "tomas las notificaciones que tienen fecha de entrega de ese mes"
@@ -326,6 +326,7 @@ const reports = {
         const filename = `informe_mensual_${yyyy_mm}.pdf`;
         doc.save(filename);
 
+        utils.hideLoading();
         utils.showToast('Informe mensual generado con éxito', 'success');
     },
 

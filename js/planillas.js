@@ -241,8 +241,10 @@ const planillas = {
     },
 
     async generatePDF() {
+        utils.showLoading('Preparando planillas PDF...');
         const data = await this.fetchData();
         if (!data || data.length === 0) {
+            utils.hideLoading();
             utils.showToast('No hay datos para generar la planilla', 'warning');
             return;
         }
@@ -478,6 +480,7 @@ const planillas = {
             doc.save(fileName);
         });
 
+        utils.hideLoading();
         utils.showToast('Planillas generadas con éxito', 'success');
     }
 };
