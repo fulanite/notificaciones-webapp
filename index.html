@@ -17,24 +17,39 @@
     <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
-    <!-- Google Fonts -->
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="css/variables.css?v=40.0" as="style">
+    <link rel="preload" href="css/base.css?v=40.0" as="style">
+    <link rel="preload" href="js/config.js?v=40.0" as="script">
+    <link rel="preload" href="js/app.js?v=40.0" as="script">
+
+    <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+        rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet">
+    </noscript>
 
-    <!-- Leaflet Maps -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- Styles -->
+    <!-- Critical Styles - Inline or Load First -->
     <link rel="stylesheet" href="css/variables.css?v=40.0">
     <link rel="stylesheet" href="css/base.css?v=40.0">
     <link rel="stylesheet" href="css/components.css?v=40.0">
-    <link rel="stylesheet" href="css/references.css?v=40.0">
-    <link rel="stylesheet" href="css/layout.css?v=40.0">
-    <link rel="stylesheet" href="css/pages.css?v=40.0">
-    <link rel="stylesheet" href="css/animations.css?v=40.0">
+
+    <!-- Non-Critical Styles - Deferred -->
+    <link rel="stylesheet" href="css/references.css?v=40.0" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=40.0" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=40.0" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=40.0" media="print" onload="this.media='all'">
+
+    <!-- Leaflet Maps - Lazy Load (only when needed) -->
+    <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    </noscript>
 
     <style>
         /* Hotfix foVerify modal structure for audio removal.l screens */
@@ -1650,26 +1665,45 @@
         </div>
     </div>
 
-    <!-- App Scripts -->
-    <script src="js/config.js?v=40.0"></script>
-    <script src="js/data.js?v=40.0"></script>
-    <script src="js/api-client.js?v=40.0"></script>
-    <script src="js/auth.js?v=40.0"></script>
-    <script src="js/utils.js?v=40.0"></script>
-    <script src="js/offline.js?v=40.0"></script>
-    <script src="js/notifications.js?v=40.0"></script>
-    <script src="js/ujier.js?v=40.0"></script>
-    <script src="js/dashboard.js?v=40.3"></script>
-    <script src="js/dashboard-patch.js?v=40.0"></script>
-    <script src="js/dashboard-ui-patch.js?v=40.4"></script>
-    <script src="js/dashboard-analytics.js?v=40.3"></script>
-    <script src="js/reports.js?v=40.0"></script>
-    <script src="js/audit.js?v=40.0"></script>
-    <script src="js/asignaciones.js?v=40.0"></script>
-    <script src="js/usuarios.js?v=40.0"></script>
-    <script src="js/devoluciones.js?v=40.0"></script>
-    <script src="js/planillas.js?v=40.0"></script>
-    <script src="js/app.js?v=40.0"></script>
+    <!-- App Scripts - Deferred for better performance -->
+    <script defer src="js/lazy-loader.js?v=40.1"></script>
+    <script defer src="js/config.js?v=40.0"></script>
+    <script defer src="js/data.js?v=40.0"></script>
+    <script defer src="js/api-client.js?v=40.0"></script>
+    <script defer src="js/auth.js?v=40.0"></script>
+    <script defer src="js/utils.js?v=40.0"></script>
+    <script defer src="js/offline.js?v=40.0"></script>
+    <script defer src="js/notifications.js?v=40.0"></script>
+    <script defer src="js/ujier.js?v=40.0"></script>
+    <script defer src="js/dashboard.js?v=40.3"></script>
+    <script defer src="js/dashboard-patch.js?v=40.0"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=40.4"></script>
+    <script defer src="js/dashboard-analytics.js?v=40.3"></script>
+    <script defer src="js/reports.js?v=40.0"></script>
+    <script defer src="js/audit.js?v=40.0"></script>
+    <script defer src="js/asignaciones.js?v=40.0"></script>
+    <script defer src="js/usuarios.js?v=40.0"></script>
+    <script defer src="js/devoluciones.js?v=40.0"></script>
+    <script defer src="js/planillas.js?v=40.0"></script>
+    <script defer src="js/app.js?v=40.0"></script>
+
+    <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
+    <script>
+        // Lazy load Leaflet only when needed
+        window.loadLeaflet = function () {
+            return new Promise((resolve, reject) => {
+                if (window.L) {
+                    resolve();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        };
+    </script>
 
     <!-- Service Worker Registration -->
     <script>

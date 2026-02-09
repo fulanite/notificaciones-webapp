@@ -24,10 +24,8 @@ const app = {
         // Setup event listeners
         this.setupEventListeners();
 
-        // Hide loading screen
-        setTimeout(() => {
-            this.hideLoading();
-        }, 1000);
+        // Hide loading screen immediately when ready
+        this.hideLoading();
     },
 
     // Initialize theme from localStorage
