@@ -707,7 +707,19 @@ const app = {
                         mapBtn.style.display = 'none';
                     }
                 }
+
+                // Hide Usuarios for Auditor
+                const usersBtn = mobileNav.querySelector('[data-view="usuarios"]');
+                if (usersBtn) {
+                    if (lowerRol === 'auditor') {
+                        usersBtn.style.display = 'none';
+                    } else {
+                        // Admin, Administrativo, Coordinador
+                        usersBtn.style.display = 'flex';
+                    }
+                }
             }
+
 
         }
     },
