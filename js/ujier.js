@@ -13,6 +13,16 @@ const ujier = {
     historyData: [], // Almacenar historial completo para filtrado local
     selectedHistoryYear: 2026,
 
+    getVisitStatusColor(status) {
+        if (!status) return '#6c757d'; // Gris por defecto
+        const s = status.toLowerCase().replace(/_/g, ' ').trim();
+        if (['atiende', 'entregado', 'positivo'].includes(s)) return '#10b981'; // Verde
+        if (['no atiende', 'domicilio inexistente', 'negativo', 'rechazado'].includes(s)) return '#ef4444'; // Rojo
+        if (['pre aviso', 'estrados', 'pre_aviso', 'preaviso'].includes(s)) return '#f59e0b'; // Naranja
+        if (['diligenciador ausente', 'ausente'].includes(s)) return '#6b7280'; // Gris metálico
+        return '#3b82f6'; // Azul fallback
+    },
+
     // Initialize ujier view
     async init() {
         this.updateDateDisplay();
@@ -744,28 +754,56 @@ const ujier = {
         }
 
         container?.classList.remove('hidden');
-        list.innerHTML = data.map(v => `
-            <div class="visita-item-mini">
-                <div class="visita-meta">
-                    <span class="visita-fecha-mini">${utils.formatDateTime(v.fecha)}</span>
-                    <span class="visita-resultado-mini resultado-${v.resultado}">${(v.resultado || '').replace(/_/g, ' ').toUpperCase()}</span>
+        list.innerHTML = `
+            <div class="timeline-steps" style="padding-left: 0; margin-top: 10px;">
+        ` + data.map((v, index) => {
+            const visitNum = data.length - index;
+            const statusColor = this.getVisitStatusColor(v.resultado);
+            const hasTranscription = (v.transcripcion_audio || v.audio_transcripcion);
+
+            return `
+            <div class="timeline-step" style="margin-bottom: 20px; gap: 12px;">
+                <div class="step-marker" style="background:${statusColor}; width: 24px; height: 24px; font-size: 10px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white; font-weight: 800;">
+                    ${visitNum}
                 </div>
-                ${v.observaciones ? `<p class="visita-obs-mini">📝 ${v.observaciones}</p>` : ''}
-                ${v.transcripcion_audio ? `<p class="visita-trans-mini">🎤 <em>"${v.transcripcion_audio}"</em></p>` : ''}
-                <div class="visita-adjuntos-mini">
-                    ${v.foto_url ? `
-                    <div class="visita-foto-mini" onclick="ujier.viewFullImage('${v.foto_url}')">
-                        <img src="${v.foto_url}" alt="Foto visita" loading="lazy">
+                <div class="step-content" style="background: rgba(var(--primary-rgb), 0.03); border: 1px solid rgba(var(--primary-rgb), 0.1); border-radius: 12px; padding: 12px; flex-grow: 1;">
+                    <div class="step-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span class="step-time" style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">
+                            📅 ${utils.formatDateTime(v.fecha)}
+                        </span>
+                        <span class="step-status" style="background:${statusColor}22; color:${statusColor}; padding: 2px 8px; border-radius: 12px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;">
+                            ${v.resultado || 'PENDIENTE'}
+                        </span>
                     </div>
+                    
+                    ${(v.observaciones || hasTranscription) ? `
+                        <div class="visit-obs-box" style="font-size: 0.85rem; color: var(--text-secondary); background: white; padding: 10px; border-radius: 8px; border-left: 3px solid ${statusColor}; margin-bottom: 8px; line-height: 1.4;">
+                            ${v.observaciones ? `<div>${v.observaciones}</div>` : ''}
+                            ${hasTranscription ? `
+                                <div style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(0,0,0,0.1); color: #db2777; font-style: italic; display: flex; gap: 6px;">
+                                    <span>🎤</span>
+                                    <span>${v.transcripcion_audio || v.audio_transcripcion}</span>
+                                </div>
+                            ` : ''}
+                        </div>
                     ` : ''}
-                    ${(v.ubicacion_lat && v.ubicacion_lng) ? `
-                    <a href="https://www.google.com/maps?q=${v.ubicacion_lat},${v.ubicacion_lng}" target="_blank" class="visita-gps-link">
-                        📍 Posición GPS
-                    </a>
-                    ` : ''}
+                    
+                    <div class="step-actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        ${v.ubicacion_lat && v.ubicacion_lng ? `
+                            <a href="https://www.google.com/maps?q=${v.ubicacion_lat},${v.ubicacion_lng}" 
+                               target="_blank" class="btn-visit-action" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #3b82f615; color: #3b82f6; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-decoration: none; border: 1px solid #3b82f630;">
+                                📍 Mapa
+                            </a>
+                        ` : ''}
+                        ${v.foto_url ? `
+                            <button type="button" onclick="ujier.viewFullImage('${v.foto_url}')" class="btn-visit-action" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #8b5cf615; color: #8b5cf6; border-radius: 6px; font-size: 0.7rem; font-weight: 600; border: 1px solid #8b5cf630; cursor: pointer;">
+                                📸 Foto
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('') + `</div>`;
     },
 
     // Ver imagen a pantalla completa

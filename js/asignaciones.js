@@ -134,15 +134,21 @@ const asignaciones = {
             ujierStats[u.id] = {
                 name: u.nombre || u.email,
                 pending: 0,
-                preAviso: 0
+                preAviso: 0,
+                returned: 0
             };
         });
 
         this.state.notificaciones.forEach(n => {
             if (n.asignado_a && ujierStats[n.asignado_a]) {
                 const isPre = utils.isPreAviso(n.estado) || utils.isPreAviso(n.resultado_diligencia);
-                if (isPre) ujierStats[n.asignado_a].preAviso++;
-                else ujierStats[n.asignado_a].pending++;
+                if (n.devuelta_por_ujier == 1) {
+                    ujierStats[n.asignado_a].returned++;
+                } else if (isPre) {
+                    ujierStats[n.asignado_a].preAviso++;
+                } else {
+                    ujierStats[n.asignado_a].pending++;
+                }
             }
         });
 
@@ -164,7 +170,10 @@ const asignaciones = {
                     <div class="zone-icon">👤</div>
                     <div class="zone-card-body">
                         <h3 class="zone-name">${stats.name}</h3>
-                        <p class="zone-desc">${stats.pending} pendientes / ${stats.preAviso} pre-avisos</p>
+                        <p class="zone-desc">
+                            ${stats.pending} pendientes / ${stats.preAviso} pre / 
+                            <span style="color: ${stats.returned > 0 ? 'var(--error)' : 'inherit'}; font-weight: ${stats.returned > 0 ? 'bold' : 'normal'}">${stats.returned} devueltas</span>
+                        </p>
                     </div>
                     <div class="zone-card-footer">
                         <span>Ver notificaciones →</span>
@@ -180,8 +189,12 @@ const asignaciones = {
         this.state.searchTerm = '';
 
         const ujier = this.state.ujieres.find(u => u.id === id);
+        const returnedCount = this.state.notificaciones.filter(n => n.asignado_a === id && n.devuelta_por_ujier == 1).length;
+
         const titleEl = document.getElementById('current-ujier-title');
-        if (titleEl) titleEl.textContent = `Ujier: ${ujier?.nombre || 'Desconocido'}`;
+        if (titleEl) {
+            titleEl.innerHTML = `Ujier: ${ujier?.nombre || 'Desconocido'} ${returnedCount > 0 ? `<span class="badge-mini status-error" style="margin-left: 10px;">${returnedCount} Devueltas</span>` : ''}`;
+        }
 
         const searchInput = document.getElementById('search-notif-reasign');
         if (searchInput) searchInput.value = '';
@@ -211,7 +224,7 @@ const asignaciones = {
         const list = this.getFilteredNotifications();
 
         if (list.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay notificaciones activas para este ujier</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay notificaciones activas para este ujier</td></tr>';
             return;
         }
 
@@ -235,6 +248,9 @@ const asignaciones = {
                     <td data-label="N° Troquel" style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
                     <td data-label="Domicilio" title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
                     <td data-label="Entrega">${utils.formatDate(n.fecha_entrega_ujier) || '-'}</td>
+                    <td data-label="Devuelta" class="text-center">
+                        ${n.devuelta_por_ujier == 1 ? '<span title="Devuelta por Ujier" style="font-size: 1.1rem;">📦</span>' : '-'}
+                    </td>
                     <td data-label="Estado">
                         <span class="badge-mini status-${this.getStatusClass(actualStatus)}">${displayEstado}</span>
                     </td>
