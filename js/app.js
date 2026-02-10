@@ -472,8 +472,18 @@ const app = {
             const labelDomicilio = document.querySelector('label[for="domicilio"]');
 
             if (val && val !== '') {
-                // Autopopulate name
+                // Autopopulate name and origin
                 if (nombreInput) nombreInput.value = val;
+
+                const origenInput = document.getElementById('origen-input');
+                const origenHidden = document.getElementById('origen');
+                const origenDinamicoInput = document.getElementById('origen-dinamico-input');
+                const origenDinamicoHidden = document.getElementById('origen-dinamico');
+
+                if (origenInput) origenInput.value = val;
+                if (origenHidden) origenHidden.value = val;
+                if (origenDinamicoInput) origenDinamicoInput.value = val;
+                if (origenDinamicoHidden) origenDinamicoHidden.value = val;
 
                 // Domicilio non-mandatory
                 if (domicilioInput) {
@@ -1034,14 +1044,16 @@ const app = {
         const destinatarioEspecial = getVal('destinatario-especial');
         const destinatarioNombre = getVal('destinatario-nombre');
 
+        const isSpecialVal = utils.isSpecialDestination(destinatarioEspecial);
+
         const notificationData = {
             tipo_notificacion: getVal('tipo-notificacion'),
             n_expediente: getVal('n-expediente'),
             caratula: getVal('caratula'),
             origen: origenDinamico || origenJuzgado,
             letrado: getVal('letrado'),
-            destinatario_especial: utils.isSpecialDestination(destinatarioEspecial) ? destinatarioEspecial : null,
-            destinatario_nombre: destinatarioNombre || (utils.isSpecialDestination(destinatarioEspecial) ? destinatarioEspecial : null),
+            destinatario_especial: isSpecialVal ? '1' : '0',
+            destinatario_nombre: destinatarioNombre || (isSpecialVal ? destinatarioEspecial : null),
             domicilio: getVal('domicilio'),
             zona: getVal('zona'),
             fecha_entrega_ujier: getVal('fecha-entrega') || getVal('persist-fecha-entrega'),

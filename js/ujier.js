@@ -518,7 +518,7 @@ const ujier = {
                         </div>
                         <div class="summary-row">
                             <span class="summary-label">👤 Destinatario:</span>
-                            <span class="summary-value"><strong>${assignment.destinatario_nombre || '-'}</strong></span>
+                            <span class="summary-value"><strong>${assignment.destinatario_nombre || utils.getSpecialDestinationText(assignment) || '-'}</strong></span>
                         </div>
                         <div class="summary-row">
                             <span class="summary-label">🏠 Domicilio:</span>

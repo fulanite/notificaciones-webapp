@@ -688,7 +688,16 @@ const notifications = {
             document.getElementById('n-expediente').value = data.n_expediente || '';
             document.getElementById('caratula').value = data.caratula || '';
             document.getElementById('letrado').value = data.letrado || '';
-            document.getElementById('destinatario-especial').value = data.destinatario_especial || '';
+            if (utils.isSpecialDestination(data.destinatario_especial)) {
+                // If it's a special flag (usually '1'), we use the name from origen/destinatario_nombre
+                // to match the dropdown options.
+                document.getElementById('destinatario-especial').value =
+                    (String(data.destinatario_especial) === '1') ?
+                        (data.origen || data.destinatario_nombre || '1') :
+                        data.destinatario_especial;
+            } else {
+                document.getElementById('destinatario-especial').value = '';
+            }
             document.getElementById('destinatario-nombre').value = data.destinatario_nombre || '';
             document.getElementById('domicilio').value = data.domicilio || '';
 
