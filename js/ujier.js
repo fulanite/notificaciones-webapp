@@ -177,7 +177,7 @@ const ujier = {
             </div>
         `;
 
-        const { data, error } = await db.getMyAssignments(auth.currentUser.id);
+        const { data, error } = await db.getMyAssignments(auth.currentUser.id, { year: 2026 });
 
         if (error) {
             listContainer.innerHTML = `
@@ -238,15 +238,15 @@ const ujier = {
                         ${assignment.devuelta_por_ujier ? '<span class="badge-returned" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; font-size:0.7rem; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:auto;">📦 DEVUELTA</span>' : ''}
                     </div>
                     
-                    <div class="assignment-recipient" style="font-size: 1.25rem; line-height: 1.3;">
-                        👤 <strong>${assignment.destinatario_nombre || utils.getSpecialDestinationText(assignment) || '-'}</strong>
-                    </div>
-                    
-                    <div class="assignment-address" style="font-size: 1.15rem; line-height: 1.3; color: var(--text-main); margin-top: 4px;">
+                    <div class="assignment-address" style="font-size: 1.3rem; line-height: 1.3; font-weight: 700; color: var(--primary);">
                         🏠 ${assignment.domicilio || '-'}
                     </div>
                     
-                    ${assignment.caratula ? `<div class="assignment-caratula" style="font-size: 0.9rem; margin-top: 6px;">📄 ${assignment.caratula}</div>` : ''}
+                    <div class="assignment-recipient" style="font-size: 1.05rem; line-height: 1.2; color: var(--text-muted); margin-top: 2px;">
+                        👤 <strong>${assignment.destinatario_nombre || utils.getSpecialDestinationText(assignment) || '-'}</strong>
+                    </div>
+                    
+                    ${assignment.caratula ? `<div class="assignment-caratula" style="font-size: 0.85rem; margin-top: 4px; color: var(--text-muted);">📄 ${assignment.caratula}</div>` : ''}
                 </div>
                 
                 ${this.reorderMode ? `
