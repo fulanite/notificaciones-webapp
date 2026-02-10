@@ -1757,35 +1757,66 @@ const ujier = {
         document.getElementById('map-stat-distance').textContent = totalDist.toFixed(2) + ' km';
     },
 
-    // View full image
-    viewFullImage(url) {
+    // View full image (Dynamic Modal like Dashboard)
+    viewFullImage(url, caption = '') {
         console.log('👁️ Opening image viewer for:', url);
         if (!url) return;
-        const modal = document.getElementById('modal-image-viewer');
-        const img = document.getElementById('full-image-display');
-        if (modal && img) {
-            img.src = url;
-            modal.classList.remove('hidden');
-            modal.style.zIndex = '999999'; // Force top z-index
-            // Force reflow
-            void modal.offsetWidth;
-            modal.classList.add('show');
+
+        // Use the same ID as dashboard to share styles/logic or a new one?
+        // Let's use 'ujier-image-viewer-modal' to avoid conflict if dashboard is also open
+        // But if styles are bound to 'image-viewer-modal' class, we use that class.
+        let modal = document.getElementById('image-viewer-modal');
+
+        // If modal doesn't exist, create it
+        if (!modal) {
+            const html = `
+                <div id="image-viewer-modal" class="image-viewer-modal" onclick="ujier.closeImageViewer()">
+                    <div class="image-viewer-content" onclick="event.stopPropagation()">
+                         <button class="image-viewer-close" onclick="ujier.closeImageViewer()">×</button>
+                        <img id="image-viewer-img" class="image-viewer-img" src="" alt="Vista ampliada">
+                        <div id="image-viewer-caption" class="image-viewer-caption"></div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', html);
+            modal = document.getElementById('image-viewer-modal');
         } else {
-            console.error('❌ Modal or image element not found');
+            // Update onclick handlers to point to ujier if they were pointing to dashboard
+            // actually, simpler to just overwrite them or assume closure is global?
+            // Let's force update them just in case
+            modal.setAttribute('onclick', 'ujier.closeImageViewer()');
+            const closeBtn = modal.querySelector('.image-viewer-close');
+            if (closeBtn) closeBtn.setAttribute('onclick', 'ujier.closeImageViewer()');
         }
+
+        const img = document.getElementById('image-viewer-img');
+        const cap = document.getElementById('image-viewer-caption');
+
+        if (img) img.src = url;
+        if (cap) cap.textContent = caption;
+
+        // Force reflow and show
+        requestAnimationFrame(() => {
+            modal.classList.add('active');
+        });
     },
 
     // Close image viewer
     closeImageViewer() {
-        const modal = document.getElementById('modal-image-viewer');
+        const modal = document.getElementById('image-viewer-modal');
         if (modal) {
-            modal.classList.remove('show');
+            modal.classList.remove('active');
             setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.style.zIndex = ''; // Reset z-index
-                const img = document.getElementById('full-image-display');
+                const img = document.getElementById('image-viewer-img');
                 if (img) img.src = '';
             }, 300);
+        }
+
+        // Legacy modal cleanup (if exists)
+        const oldModal = document.getElementById('modal-image-viewer');
+        if (oldModal) {
+            oldModal.classList.remove('show');
+            setTimeout(() => oldModal.classList.add('hidden'), 300);
         }
     },
 
