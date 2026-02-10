@@ -1611,31 +1611,70 @@
                             </div>
                         </div>
 
-                        <div class="filters-container glass-card" style="margin-bottom: 20px;">
-                            <div class="filters-grid">
+                        <div class="filters-container glass-card" style="margin-bottom: 20px; padding: 20px;">
+                            <style>
+                                .bulk-filters-grid {
+                                    display: grid;
+                                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                                    gap: 20px;
+                                }
+
+                                @media (min-width: 1200px) {
+                                    .bulk-filters-grid {
+                                        grid-template-columns: repeat(3, 1fr);
+                                    }
+                                }
+                            </style>
+                            <div class="bulk-filters-grid">
                                 <div class="filter-group">
-                                    <label class="filter-label">Buscar Expediente/Nombre</label>
-                                    <div class="search-bar">
+                                    <label class="filter-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600;">Buscar
+                                        Expediente/Nombre</label>
+                                    <div class="search-bar" style="width: 100%;">
                                         <span class="search-icon">🔍</span>
                                         <input type="text" id="bulk-search" class="search-input"
-                                            placeholder="Ej: 123/2025...">
+                                            placeholder="Ej: 123/2025..." style="width: 100%;">
                                     </div>
                                 </div>
                                 <div class="filter-group">
-                                    <label class="filter-label">Filtrar por Ujier</label>
-                                    <select id="bulk-filter-ujier" class="form-select">
+                                    <label class="filter-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600;">Ujier</label>
+                                    <select id="bulk-filter-ujier" class="form-select" style="width: 100%;">
                                         <option value="">👤 Todos los ujieres</option>
                                     </select>
                                 </div>
                                 <div class="filter-group">
-                                    <label class="filter-label">Filtrar por Zona</label>
-                                    <select id="bulk-filter-zona" class="form-select">
+                                    <label class="filter-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600;">Zona</label>
+                                    <select id="bulk-filter-zona" class="form-select" style="width: 100%;">
                                         <option value="">🌎 Todas las zonas</option>
                                     </select>
                                 </div>
                                 <div class="filter-group">
-                                    <label class="filter-label">Año</label>
-                                    <select id="bulk-filter-year" class="form-select">
+                                    <label class="filter-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600;">Estado
+                                        Actual</label>
+                                    <select id="bulk-filter-estado" class="form-select" style="width: 100%;">
+                                        <option value="">Estado...</option>
+                                        <option value="pendiente">Pendiente</option>
+                                        <option value="pre_aviso">Pre Aviso</option>
+                                        <option value="entregado">Entregado/Finalizado</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600;">Devolución
+                                        Ujier</label>
+                                    <select id="bulk-filter-devuelta" class="form-select" style="width: 100%;">
+                                        <option value="">Todas</option>
+                                        <option value="1">📦 Sólo Devueltas</option>
+                                        <option value="0">Sin Devolver</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label"
+                                        style="display: block; margin-bottom: 8px; font-weight: 600;">Año</label>
+                                    <select id="bulk-filter-year" class="form-select" style="width: 100%;">
                                         <option value="2026">2026</option>
                                         <option value="2025">2025</option>
                                     </select>

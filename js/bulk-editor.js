@@ -12,6 +12,8 @@ const bulkEditor = {
             search: '',
             ujier: '',
             zona: '',
+            estado: '',
+            devuelta: '',
             year: '2026'
         },
         currentPage: 1,
@@ -36,6 +38,9 @@ const bulkEditor = {
         const filterZona = document.getElementById('bulk-filter-zona');
         const filterYear = document.getElementById('bulk-filter-year');
 
+        const filterEstado = document.getElementById('bulk-filter-estado');
+        const filterDevuelta = document.getElementById('bulk-filter-devuelta');
+
         const updateAndLoad = () => {
             this.state.currentPage = 1;
             this.loadData();
@@ -53,6 +58,16 @@ const bulkEditor = {
 
         filterZona?.addEventListener('change', () => {
             this.state.filters.zona = filterZona.value;
+            updateAndLoad();
+        });
+
+        filterEstado?.addEventListener('change', () => {
+            this.state.filters.estado = filterEstado.value;
+            updateAndLoad();
+        });
+
+        filterDevuelta?.addEventListener('change', () => {
+            this.state.filters.devuelta = filterDevuelta.value;
             updateAndLoad();
         });
 
@@ -118,6 +133,8 @@ const bulkEditor = {
             search: this.state.filters.search,
             zona: this.state.filters.zona,
             year: this.state.filters.year,
+            estado: this.state.filters.estado,
+            devuelta_por_ujier: this.state.filters.devuelta,
             ujier_id: this.state.filters.ujier
         };
 

@@ -143,6 +143,7 @@ const db = {
         if (options.estado) params.estado = options.estado;
         if (options.tipo) params.tipo = options.tipo;
         if (options.asignado_a) params.asignado_a = options.asignado_a;
+        if (options.ujier_id) params.asignado_a = options.ujier_id; // Support alias
         if (options.fecha) {
             params.fecha = options.fecha;
             if (options.dateField) params.date_field = options.dateField; // Support custom date field
