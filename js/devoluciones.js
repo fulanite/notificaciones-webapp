@@ -13,6 +13,7 @@ const devoluciones = {
         selectedIds: new Set(),
         loading: false,
         filterYear: '2026',
+        gridSearchTerm: '',
         initialized: false
     },
 
@@ -29,7 +30,7 @@ const devoluciones = {
 
     resetState() {
         this.state.selectedIds.clear();
-        this.state.currentZone = null;
+        this.state.currentZone = null; // We use currentUjierId now but keeping this for safety
 
         // Reset visibility
         document.getElementById('devoluciones-zones-grid')?.classList.remove('hidden');
@@ -55,8 +56,7 @@ const devoluciones = {
             this.state.notificacionesPendientes = Array.isArray(data) ? data : [];
             console.log(`[Devoluciones] Data received:`, this.state.notificacionesPendientes.length, 'records');
 
-            this.groupByZone();
-            this.renderZones();
+            this.renderUjieresGrid();
         } catch (err) {
             console.error('[Devoluciones] Error loading data:', err);
             const grid = document.getElementById('devoluciones-zones-grid');
@@ -126,6 +126,12 @@ const devoluciones = {
         // Confirm Return button
         document.getElementById('btn-confirm-return')?.addEventListener('click', () => this.confirmReturns());
 
+        // Grid Search
+        document.getElementById('search-ujier-grid-devol')?.addEventListener('input', (e) => {
+            this.state.gridSearchTerm = e.target.value.toLowerCase();
+            this.renderUjieresGrid();
+        });
+
         // Year Filter
         document.getElementById('filter-devoluciones-year')?.addEventListener('change', (e) => {
             this.state.filterYear = e.target.value;
@@ -136,54 +142,63 @@ const devoluciones = {
         document.getElementById('btn-refresh-devoluciones-top')?.addEventListener('click', () => this.refreshData());
     },
 
-    renderZones() {
-        console.log('[Devoluciones] renderZones called. Zones count:', Object.keys(this.state.zones).length);
+    renderUjieresGrid() {
         const grid = document.getElementById('devoluciones-zones-grid');
-        const list = document.getElementById('devoluciones-list-container');
-        if (!grid) {
-            console.error('[Devoluciones] Grid element not found');
-            return;
-        }
+        const listContainer = document.getElementById('devoluciones-list-container');
+        if (!grid) return;
 
-        // Ensure grid is visible and list is hidden
         grid.classList.remove('hidden');
-        if (list) list.classList.add('hidden');
+        if (listContainer) listContainer.classList.add('hidden');
 
-        if (Object.keys(this.state.zones).length === 0) {
-            console.log('[Devoluciones] No zones to display');
-            grid.innerHTML = `
-                <div class="empty-state" style="grid-column: 1/-1; padding: 4rem 2rem; text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
-                    <p style="font-size: 1.1rem; color: var(--text-secondary);">Todas las notificaciones físicas han sido devueltas.</p>
-                </div>`;
+        // Aggregate by Ujier
+        const ujierStats = {};
+        this.state.notificacionesPendientes.forEach(n => {
+            const uid = n.asignado_a || 'unassigned';
+            const uname = n.ujier_nombre || 'Sin Ujier';
+            if (!ujierStats[uid]) {
+                ujierStats[uid] = { name: uname, count: 0, notifications: [] };
+            }
+            ujierStats[uid].count++;
+            ujierStats[uid].notifications.push(n);
+        });
+
+        // Sort Alphabetically
+        const filtered = Object.entries(ujierStats)
+            .filter(([id, stats]) => !this.state.gridSearchTerm || stats.name.toLowerCase().includes(this.state.gridSearchTerm))
+            .sort((a, b) => a[1].name.localeCompare(b[1].name));
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;">No se encontraron resultados</div>';
             return;
         }
 
-        grid.innerHTML = Object.values(this.state.zones).map(z => `
-            <div class="zone-premium-card clickable-card" onclick="devoluciones.openZone('${z.name}')">
+        grid.innerHTML = filtered.map(([id, stats]) => `
+            <div class="zone-premium-card clickable-card" onclick="devoluciones.openUjier('${id}', '${stats.name}')">
                 <div class="zone-card-header">
-                    <div class="zone-icon">📍</div>
-                    <div class="zone-badge">${z.count}</div>
+                    <div class="zone-icon">👤</div>
+                    <div class="zone-badge">${stats.count}</div>
                 </div>
                 <div class="zone-card-body">
-                    <h3 class="zone-name">${z.name}</h3>
-                    <p class="zone-desc">Notificaciones pendientes</p>
+                    <h3 class="zone-name">${stats.name}</h3>
+                    <p class="zone-desc">Pendientes de devolución</p>
                 </div>
                 <div class="zone-card-footer">
-                    <span>Ver lista de retorno →</span>
+                    <span>Ver lista para retorno →</span>
                 </div>
             </div>
         `).join('');
-
-        console.log('[Devoluciones] Zones rendered successfully');
     },
 
-    openZone(zonaName) {
-        this.state.currentZone = zonaName;
+    openUjier(id, name) {
+        this.state.currentUjierId = id;
         this.state.selectedIds.clear();
-        this.state.filteredNotificaciones = this.state.zones[zonaName].notificaciones;
 
-        document.getElementById('current-zone-title').textContent = `Zona: ${zonaName}`;
+        // Find notifications for this specific ujier
+        this.state.filteredNotificaciones = this.state.notificacionesPendientes.filter(n =>
+            (n.asignado_a || 'unassigned') === id
+        );
+
+        document.getElementById('current-zone-title').textContent = `Ujier: ${name}`;
         document.getElementById('devoluciones-zones-grid').classList.add('hidden');
         document.getElementById('devoluciones-list-container').classList.remove('hidden');
 
@@ -202,44 +217,48 @@ const devoluciones = {
             return;
         }
 
-        tbody.innerHTML = list.map(n => `
-            <tr class="${this.state.selectedIds.has(n.id) ? 'row-selected' : ''}" onclick="devoluciones.toggleSelection('${n.id}')">
-                <td>
-                    <label class="checkbox-wrapper" onclick="event.stopPropagation()">
-                        <input type="checkbox" ${this.state.selectedIds.has(n.id) ? 'checked' : ''} 
-                            onchange="devoluciones.toggleSelection('${n.id}')"
-                            class="select-checkbox">
-                        <span class="checkbox-custom"></span>
-                    </label>
-                </td>
-                <td data-label="Expediente"><strong class="cell-primary">${n.n_expediente || 'S/N'}</strong></td>
-                <td data-label="Carátula" title="${n.caratula || ''}" class="cell-truncate">${utils.truncate(n.caratula || '-', 35)}</td>
-                <td data-label="Destinatario" class="cell-recipient">${n.destinatario_nombre || utils.getSpecialDestinationText(n) || '-'}</td>
-                <td data-label="N° Troquel" style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
-                <td data-label="Domicilio" title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
-                <td data-label="Ujier">
-                    <div class="cell-ujier-brief">
-                        <span>👤 ${n.ujier_nombre ? n.ujier_nombre.split(' ')[0] : '-'}</span>
-                    </div>
-                </td>
-                <td data-label="Estado">
-                    <span class="badge-mini status-${this.getStatusClass(n.estado)}">${n.estado.toUpperCase()}</span>
-                </td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = list.map(n => {
+            const actualStatus = n.resultado_ultima_visita || n.resultado_diligencia || n.estado || 'pendiente';
+            const displayEstado = actualStatus.replace(/_/g, ' ').toUpperCase();
+            return `
+                <tr class="${this.state.selectedIds.has(n.id) ? 'row-selected' : ''}" onclick="devoluciones.toggleSelection('${n.id}')">
+                    <td>
+                        <label class="checkbox-wrapper" onclick="event.stopPropagation()">
+                            <input type="checkbox" ${this.state.selectedIds.has(n.id) ? 'checked' : ''} 
+                                onchange="devoluciones.toggleSelection('${n.id}')"
+                                class="select-checkbox">
+                            <span class="checkbox-custom"></span>
+                        </label>
+                    </td>
+                    <td data-label="Expediente"><strong class="cell-primary">${n.n_expediente || 'S/N'}</strong></td>
+                    <td data-label="Carátula" title="${n.caratula || ''}" class="cell-truncate">${utils.truncate(n.caratula || '-', 35)}</td>
+                    <td data-label="Destinatario" class="cell-recipient">${n.destinatario_nombre || utils.getSpecialDestinationText(n) || '-'}</td>
+                    <td data-label="N° Troquel" style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
+                    <td data-label="Domicilio" title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
+                    <td data-label="Ujier">
+                        <div class="cell-ujier-brief">
+                            <span>👤 ${n.ujier_nombre ? n.ujier_nombre.split(' ')[0] : '-'}</span>
+                        </div>
+                    </td>
+                    <td data-label="Entrega">${utils.formatDate(n.fecha_entrega_ujier) || '-'}</td>
+                    <td data-label="Estado">
+                        <span class="badge-mini status-${this.getStatusClass(actualStatus)}">${displayEstado}</span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     },
 
     getStatusClass(estado) {
-        switch (estado) {
-            case 'pendiente': return 'warning';
-            case 'diligenciada': return 'success';
-            case 'Entregado': return 'success';
-            case 'entregado': return 'success';
-            case 'en_proceso': return 'info';
-            case 'pre_aviso': return 'info';
-            case 'diferida': return 'error';
-            default: return 'secondary';
-        }
+        if (!estado) return 'warning';
+        const norm = estado.toLowerCase().replace(/_/g, ' ');
+
+        if (norm.includes('entregado') || norm.includes('atiende')) return 'success';
+        if (norm.includes('no atiende') || norm.includes('ausente') || norm.includes('inexistente')) return 'error';
+        if (norm.includes('pre aviso') || norm.includes('visto')) return 'info';
+        if (norm.includes('pendiente') || norm.includes('proceso')) return 'warning';
+
+        return 'secondary';
     },
 
     toggleSelection(id) {

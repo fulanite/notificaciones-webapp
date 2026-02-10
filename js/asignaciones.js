@@ -57,6 +57,12 @@ const asignaciones = {
         // Confirm Reassignment
         document.getElementById('btn-confirm-reasign')?.addEventListener('click', () => this.executeReassignment());
 
+        // Grid Search
+        document.getElementById('search-ujier-grid-asign')?.addEventListener('input', (e) => {
+            this.state.gridSearchTerm = e.target.value.toLowerCase();
+            this.renderUjieresGrid();
+        });
+
         // Year Filter
         document.getElementById('filter-asignaciones-year')?.addEventListener('change', (e) => {
             this.state.filterYear = e.target.value;
@@ -140,7 +146,17 @@ const asignaciones = {
             }
         });
 
-        grid.innerHTML = Object.entries(ujierStats).map(([id, stats]) => {
+        // Filter and Sort Alphabetically
+        const filteredUjieres = Object.entries(ujierStats)
+            .filter(([id, stats]) => !this.state.gridSearchTerm || stats.name.toLowerCase().includes(this.state.gridSearchTerm))
+            .sort((a, b) => a[1].name.localeCompare(b[1].name));
+
+        if (filteredUjieres.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 20px;">No se encontraron ujieres</div>';
+            return;
+        }
+
+        grid.innerHTML = filteredUjieres.map(([id, stats]) => {
             const total = stats.pending + stats.preAviso;
             return `
                 <div class="zone-premium-card" onclick="asignaciones.openUjier('${id}')">
@@ -199,27 +215,32 @@ const asignaciones = {
             return;
         }
 
-        tbody.innerHTML = list.map(n => `
-            <tr class="${this.state.selectedIds.has(n.id) ? 'row-selected' : ''}" 
-                onclick="asignaciones.toggleSelection('${n.id}')">
-                <td style="width: 50px;" onclick="event.stopPropagation()">
-                    <label class="checkbox-wrapper">
-                        <input type="checkbox" ${this.state.selectedIds.has(n.id) ? 'checked' : ''} 
-                            onchange="asignaciones.toggleSelection('${n.id}')"
-                            class="select-checkbox">
-                        <span class="checkbox-custom"></span>
-                    </label>
-                </td>
-                <td data-label="Expediente"><strong class="cell-primary">${n.n_expediente || 'S/N'}</strong></td>
-                <td data-label="Carátula" title="${n.caratula || ''}" class="cell-truncate">${utils.truncate(n.caratula || '-', 35)}</td>
-                <td data-label="Destinatario" class="cell-recipient">${n.destinatario_nombre || utils.getSpecialDestinationText(n) || '-'}</td>
-                <td data-label="N° Troquel" style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
-                <td data-label="Domicilio" title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
-                <td data-label="Estado">
-                    <span class="badge-mini status-${this.getStatusClass(n.estado)}">${n.estado.toUpperCase()}</span>
-                </td>
-            </tr>
-        `).join('');
+        tbody.innerHTML = list.map(n => {
+            const actualStatus = n.resultado_ultima_visita || n.resultado_diligencia || n.estado || 'pendiente';
+            const displayEstado = actualStatus.replace(/_/g, ' ').toUpperCase();
+            return `
+                <tr class="${this.state.selectedIds.has(n.id) ? 'row-selected' : ''}" 
+                    onclick="asignaciones.toggleSelection('${n.id}')">
+                    <td style="width: 50px;" onclick="event.stopPropagation()">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" ${this.state.selectedIds.has(n.id) ? 'checked' : ''} 
+                                onchange="asignaciones.toggleSelection('${n.id}')"
+                                class="select-checkbox">
+                            <span class="checkbox-custom"></span>
+                        </label>
+                    </td>
+                    <td data-label="Expediente"><strong class="cell-primary">${n.n_expediente || 'S/N'}</strong></td>
+                    <td data-label="Carátula" title="${n.caratula || ''}" class="cell-truncate">${utils.truncate(n.caratula || '-', 35)}</td>
+                    <td data-label="Destinatario" class="cell-recipient">${n.destinatario_nombre || utils.getSpecialDestinationText(n) || '-'}</td>
+                    <td data-label="N° Troquel" style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
+                    <td data-label="Domicilio" title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
+                    <td data-label="Entrega">${utils.formatDate(n.fecha_entrega_ujier) || '-'}</td>
+                    <td data-label="Estado">
+                        <span class="badge-mini status-${this.getStatusClass(actualStatus)}">${displayEstado}</span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     },
 
     handleRowClick(event, id) {
@@ -239,12 +260,15 @@ const asignaciones = {
     },
 
     getStatusClass(estado) {
-        switch (estado) {
-            case 'pendiente': return 'warning';
-            case 'en_proceso': return 'info';
-            case 'pre_aviso': return 'info';
-            default: return 'secondary';
-        }
+        if (!estado) return 'warning';
+        const norm = estado.toLowerCase().replace(/_/g, ' ');
+
+        if (norm.includes('entregado') || norm.includes('atiende')) return 'success';
+        if (norm.includes('no atiende') || norm.includes('ausente') || norm.includes('inexistente')) return 'error';
+        if (norm.includes('pre aviso') || norm.includes('visto')) return 'info';
+        if (norm.includes('pendiente') || norm.includes('proceso')) return 'warning';
+
+        return 'secondary';
     },
 
     populateTargetUjieres() {

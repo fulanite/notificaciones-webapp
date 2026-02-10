@@ -1245,16 +1245,25 @@
 
                     <!-- Asignaciones View (Reassignment focus) -->
                     <section id="view-asignaciones" class="view">
-                        <div class="dashboard-header">
-                            <h1>🔄 Asignaciones</h1>
-                            <div class="header-actions">
-                                <select id="filter-asignaciones-year" class="form-select" style="max-width: 120px;">
-                                    <option value="2026" selected>2026</option>
-                                    <option value="2025">2025</option>
-                                </select>
-                                <button id="btn-refresh-asignaciones-top" class="btn btn-secondary" title="Actualizar">
-                                    <span>🔄</span>
-                                </button>
+                        <div class="dashboard-header" style="flex-direction: column; align-items: stretch; gap: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h1>🔄 Asignaciones</h1>
+                                <div class="header-actions">
+                                    <select id="filter-asignaciones-year" class="form-select" style="max-width: 120px;">
+                                        <option value="2026" selected>2026</option>
+                                        <option value="2025">2025</option>
+                                    </select>
+                                    <button id="btn-refresh-asignaciones-top" class="btn btn-secondary"
+                                        title="Actualizar">
+                                        <span>🔄</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Added Grid Search -->
+                            <div class="search-bar" style="max-width: 100%; width: 100%;">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="search-ujier-grid-asign" class="search-input"
+                                    placeholder="Buscar ujier por nombre...">
                             </div>
                         </div>
                         <!-- Ujieres Premium Grid -->
@@ -1283,12 +1292,13 @@
                                     <table class="data-table">
                                         <thead>
                                             <tr>
-                                                <th style="width: 40px;"></th>
+                                                <th></th>
                                                 <th>Expediente</th>
                                                 <th>Carátula</th>
                                                 <th>Destinatario</th>
                                                 <th>Troquel</th>
                                                 <th>Domicilio</th>
+                                                <th>Entrega</th>
                                                 <th>Estado</th>
                                             </tr>
                                         </thead>
@@ -1506,16 +1516,25 @@
 
                     <!-- Devolución View -->
                     <section id="view-devoluciones" class="view">
-                        <div class="dashboard-header">
-                            <h1>📦 Devoluciones</h1>
-                            <div class="header-actions">
-                                <select id="filter-devoluciones-year" class="form-select" style="max-width: 120px;">
-                                    <option value="2026" selected>2026</option>
-                                    <option value="2025">2025</option>
-                                </select>
-                                <button id="btn-refresh-devoluciones-top" class="btn btn-secondary" title="Actualizar">
-                                    <span>🔄</span>
-                                </button>
+                        <div class="dashboard-header" style="flex-direction: column; align-items: stretch; gap: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h1>📦 Devoluciones</h1>
+                                <div class="header-actions">
+                                    <select id="filter-devoluciones-year" class="form-select" style="max-width: 120px;">
+                                        <option value="2026" selected>2026</option>
+                                        <option value="2025">2025</option>
+                                    </select>
+                                    <button id="btn-refresh-devoluciones-top" class="btn btn-secondary"
+                                        title="Actualizar">
+                                        <span>🔄</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Added Grid Search -->
+                            <div class="search-bar" style="max-width: 100%; width: 100%;">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="search-ujier-grid-devol" class="search-input"
+                                    placeholder="Buscar ujier por nombre...">
                             </div>
                         </div>
                         <div id="devoluciones-zones-grid" class="zones-grid">
@@ -1545,6 +1564,7 @@
                                                 <th>Troquel</th>
                                                 <th>Domicilio</th>
                                                 <th>Ujier</th>
+                                                <th>Entrega</th>
                                                 <th>Estado</th>
                                             </tr>
                                         </thead>
