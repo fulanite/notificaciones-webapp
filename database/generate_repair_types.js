@@ -8,7 +8,8 @@ function mapTipoNotificacion(valor) {
     if (!valor) return 'cedulas';
     const v = valor.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    if (v.includes('22172')) return 'cedulas_mandamientos_22172';
+    const clean = v.replace(/[^a-z0-9]/g, '');
+    if (clean.includes('22172')) return 'cedulas_mandamientos_22172';
     if (v.includes('correspondencia')) return 'cedulas_correspondencia';
 
     if (v.includes('urgente')) {
