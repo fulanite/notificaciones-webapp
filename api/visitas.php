@@ -65,18 +65,19 @@ try {
                     FROM visitas v
                     LEFT JOIN notificaciones n ON v.notificacion_id = n.id
                     LEFT JOIN usuarios u ON (v.ujier_id = u.id OR v.ujier_id = u.dni)
-                    WHERE (n.destinatario_especial IS NULL OR n.destinatario_especial = '')
+                    WHERE (n.destinatario_especial IS NULL OR n.destinatario_especial = '' OR n.destinatario_especial = '0' OR n.destinatario_especial = 'false')
                 ";
 
                 if ($searchTerm) {
-                    $sql .= " AND (n.domicilio LIKE ? OR n.destinatario_nombre LIKE ? OR n.n_expediente LIKE ?)";
+                    $sql .= " AND (n.domicilio LIKE ? OR n.destinatario_nombre LIKE ? OR n.n_expediente LIKE ? OR n.caratula LIKE ?)";
                 }
 
                 $sql .= " ORDER BY v.fecha DESC LIMIT 2000";
 
                 $stmt = $pdo->prepare($sql);
                 if ($searchTerm) {
-                    $stmt->execute([$searchTerm, $searchTerm, $searchTerm]);
+                    // 4 parameters now: domicilio, destinatario_nombre, n_expediente, caratula
+                    $stmt->execute([$searchTerm, $searchTerm, $searchTerm, $searchTerm]);
                 } else {
                     $stmt->execute();
                 }

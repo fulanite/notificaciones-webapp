@@ -1375,22 +1375,25 @@ const ujier = {
         const inputSearch = document.getElementById('search-references');
         const listContainer = document.getElementById('references-list');
 
-        if (btnSearch) {
-            btnSearch.onclick = () => this.loadReferences();
+        if (btnSearch && !btnSearch.hasListener) {
+            btnSearch.addEventListener('click', () => this.loadReferences());
+            btnSearch.hasListener = true;
         }
 
-        if (inputSearch) {
-            inputSearch.onkeyup = (e) => {
+        if (inputSearch && !inputSearch.hasListener) {
+            inputSearch.addEventListener('keyup', (e) => {
                 if (e.key === 'Enter') this.loadReferences();
-            };
+            });
+            inputSearch.hasListener = true;
+
             // Optional: focus input
             setTimeout(() => inputSearch.focus(), 100);
         }
 
-        // Mostrar mensaje inicial en lugar de cargar todo
-        if (listContainer) {
+        // Mostrar mensaje inicial solo si el contenedor está vacío o tiene el empty-state inicial
+        if (listContainer && (listContainer.innerHTML.trim() === '' || listContainer.querySelector('.empty-state-initial'))) {
             listContainer.innerHTML = `
-                <div class="empty-state" style="grid-column: 1 / -1; padding: 40px;">
+                <div class="empty-state empty-state-initial" style="grid-column: 1 / -1; padding: 40px;">
                     <div class="empty-icon" style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
                     <h3 style="margin-bottom: 8px;">Explorador de Referencias</h3>
                     <p style="color: var(--text-muted);">Ingresa un nombre, dirección o expediente para buscar en el historial.</p>
@@ -1453,7 +1456,7 @@ const ujier = {
                 <div class="reference-card">
                     <div class="reference-photo-container">
                         ${hasPhoto ?
-                    `<img src="${visit.foto_url}" class="reference-photo" alt="Fachada" loading="lazy" onclick="window.open(this.src, '_blank')">` :
+                    `<img src="${visit.foto_url}" class="reference-photo" alt="Fachada" loading="lazy" onclick="ujier.viewFullImage(this.src)">` :
                     `<div class="reference-no-photo"><span>📷</span> Sin foto disponible</div>`
                 }
                         <span class="reference-badge-zona">${visit.zona || 'SIN ZONA'}</span>
@@ -1495,7 +1498,6 @@ const ujier = {
                             ` : ''}
                         </div>
                     </div>
-                </div>
                 </div>
             `;
         }).join('');
