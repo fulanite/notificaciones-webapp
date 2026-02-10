@@ -104,6 +104,14 @@ const utils = {
         return s !== '' && s !== '0' && s.toLowerCase() !== 'null';
     },
 
+    // Resolves the text to display for a special destination (handles '1' migration case)
+    getSpecialDestinationText(notif) {
+        if (!this.isSpecialDestination(notif.destinatario_especial)) return null;
+        const val = String(notif.destinatario_especial).trim();
+        if (val === '1') return notif.origen || 'Destino Especial';
+        return notif.destinatario_especial;
+    },
+
     // Throttle function
     throttle(func, limit = 300) {
         let inThrottle;

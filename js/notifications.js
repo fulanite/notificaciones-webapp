@@ -288,7 +288,7 @@ const notifications = {
                 lastDate = displayDate;
             }
 
-            const recipientDisplay = (notif.destinatario_nombre?.trim() || notif.destinatario_especial?.trim() || 'Sin destinatario');
+            const recipientDisplay = (notif.destinatario_nombre?.trim() || utils.getSpecialDestinationText(notif) || 'Sin destinatario');
 
             html += `
                 <tr class="stagger-item row-hover-effect" style="cursor: pointer;" onclick="notifications.viewDetails('${notif.id}')">
@@ -466,7 +466,7 @@ const notifications = {
                                 <div class="card-icon">👤</div>
                                 <div class="card-content">
                                     <span class="card-label">Destinatario</span>
-                                    <span class="card-value"><strong>${data.destinatario_nombre || data.destinatario_especial || 'Sin nombre'}</strong></span>
+                                    <span class="card-value"><strong>${data.destinatario_nombre || utils.getSpecialDestinationText(data) || 'Sin nombre'}</strong></span>
                                 </div>
                             </div>
                             <div class="premium-card dom-card grow">
@@ -533,7 +533,7 @@ const notifications = {
                                         ${utils.isSpecialDestination(data.destinatario_especial) ? `
                                             <tr>
                                                 <th>Destino Esp.</th>
-                                                <td><span class="badge-dest-esp">${data.destinatario_especial}</span></td>
+                                                <td><span class="badge-dest-esp">${utils.getSpecialDestinationText(data)}</span></td>
                                             </tr>
                                         ` : ''}
                                     </table>

@@ -241,7 +241,7 @@ const ujier = {
                     </div>
                     
                     <div class="assignment-recipient" style="font-size: 1.25rem; line-height: 1.3;">
-                        👤 <strong>${assignment.destinatario_nombre || (utils.isSpecialDestination(assignment.destinatario_especial) ? assignment.destinatario_especial : '') || '-'}</strong>
+                        👤 <strong>${assignment.destinatario_nombre || utils.getSpecialDestinationText(assignment) || '-'}</strong>
                     </div>
                     
                     <div class="assignment-address" style="font-size: 1.15rem; line-height: 1.3; color: var(--text-main); margin-top: 4px;">
@@ -275,7 +275,7 @@ const ujier = {
         const assignment = this.assignments.find(a => a.id === id);
         if (!assignment) return;
 
-        const recipientName = assignment.destinatario_nombre || (utils.isSpecialDestination(assignment.destinatario_especial) ? assignment.destinatario_especial : '') || 'el destinatario';
+        const recipientName = assignment.destinatario_nombre || utils.getSpecialDestinationText(assignment) || 'el destinatario';
         const confirmMsg = `¿Confirmar entrega rápida a ${recipientName}?`;
         if (!confirm(confirmMsg)) return;
 
@@ -1358,7 +1358,7 @@ const ujier = {
                         <div class="historial-header">
                             <span class="historial-fecha">${utils.formatDateTime(visit.fecha)}</span>
                         </div>
-                        <div class="assignment-recipient">👤 <strong>${visit.destinatario_nombre || '-'}</strong></div>
+                        <div class="assignment-recipient">👤 <strong>${visit.destinatario_nombre || utils.getSpecialDestinationText(visit) || '-'}</strong></div>
                         <div class="assignment-address">🏠 ${visit.domicilio || '-'}</div>
                         <div class="historial-footer">
                             <span class="resultado-badge resultado-${status}">${(visit.resultado || 'PENDIENTE').replace(/_/g, ' ').toUpperCase()}</span>
@@ -1468,7 +1468,7 @@ const ujier = {
                         </div>
                         <div class="reference-info-row">
                             <span>👤 Destinatario:</span>
-                            <strong>${visit.destinatario_nombre || '-'}</strong>
+                            <strong>${visit.destinatario_nombre || utils.getSpecialDestinationText(visit) || '-'}</strong>
                         </div>
                         <div class="reference-info-row">
                             <span>⚖️ Exp:</span>

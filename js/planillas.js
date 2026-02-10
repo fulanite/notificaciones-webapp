@@ -350,7 +350,7 @@ const planillas = {
                         item.origen || '',
                         tipo,
                         item.letrado || '',
-                        item.destinatario_nombre || '',
+                        item.destinatario_nombre || utils.getSpecialDestinationText(item) || '',
                         item.domicilio || '',
                         item.n_troquel || '',
                         item.costo ? `$${item.costo}` : '',
