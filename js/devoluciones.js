@@ -243,6 +243,11 @@ const devoluciones = {
                     <td data-label="Estado">
                         <span class="badge-mini status-${this.getStatusClass(actualStatus)}">${displayEstado}</span>
                     </td>
+                    <td class="text-center" onclick="event.stopPropagation()">
+                        <button class="btn-icon-mini" onclick="app.viewNotificationDetail('${n.id}')" title="Ver Detalle">
+                            👁️
+                        </button>
+                    </td>
                 </tr>
             `;
         }).join('');

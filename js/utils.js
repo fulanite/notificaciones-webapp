@@ -108,7 +108,7 @@ const utils = {
     isPreAviso(status) {
         if (!status) return false;
         const s = String(status).toLowerCase().replace(/_/g, ' ').trim();
-        return s === 'pre aviso';
+        return s.includes('pre aviso');
     },
 
     // Resolves the text to display for a special destination (handles '1' migration case)
@@ -349,7 +349,13 @@ const utils = {
             diligenciador_ausente: '<span class="status-badge status-warning">👤 Diligenciador Ausente</span>'
         };
 
-        return badges[norm] || `<span class="status-badge">${status}</span>`;
+        if (badges[norm]) return badges[norm];
+
+        if (norm.includes('pre_aviso')) {
+            return `<span class="status-badge status-warning">📋 ${status}</span>`;
+        }
+
+        return `<span class="status-badge">${status}</span>`;
     },
 
     // Check if online

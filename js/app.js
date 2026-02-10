@@ -59,6 +59,15 @@ const app = {
         utils.showToast(`Tema ${newTheme === 'dark' ? 'oscuro' : 'claro'} activado`, 'info');
     },
 
+    // View notification details (Delegate to notifications module)
+    viewNotificationDetail(id) {
+        if (typeof notifications !== 'undefined') {
+            notifications.viewDetails(id);
+        } else {
+            console.error('Notifications module not loaded');
+        }
+    },
+
     // Handle persistent settings for Zona/Ujier
     applyPersistentSettings() {
         // Skip persistent settings if we are in edit mode

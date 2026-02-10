@@ -18,7 +18,7 @@ const ujier = {
         const s = status.toLowerCase().replace(/_/g, ' ').trim();
         if (['atiende', 'entregado', 'positivo'].includes(s)) return '#10b981'; // Verde
         if (['no atiende', 'domicilio inexistente', 'negativo', 'rechazado'].includes(s)) return '#ef4444'; // Rojo
-        if (['pre aviso', 'estrados', 'pre_aviso', 'preaviso'].includes(s)) return '#f59e0b'; // Naranja
+        if (s.includes('pre aviso') || s.includes('preaviso') || s === 'estrados') return '#f59e0b'; // Naranja
         if (['diligenciador ausente', 'ausente'].includes(s)) return '#6b7280'; // Gris metálico
         return '#3b82f6'; // Azul fallback
     },
@@ -256,8 +256,9 @@ const ujier = {
                         👤 <strong>${assignment.destinatario_nombre || utils.getSpecialDestinationText(assignment) || '-'}</strong>
                     </div>
                     
-                    ${assignment.caratula ? `<div class="assignment-caratula" style="font-size: 0.85rem; margin-top: 4px; color: var(--text-muted);">📄 ${assignment.caratula}</div>` : ''}
-                </div>
+                ${assignment.caratula ? `<div class="assignment-caratula" style="font-size: 0.85rem; margin-top: 4px; color: var(--text-muted);">📄 ${assignment.caratula}</div>` : ''}
+                ${assignment.fecha_entrega_ujier ? `<div class="assignment-date" style="font-size: 0.75rem; margin-top: 2px; color: var(--text-muted); opacity: 0.8;">📅 Entrega: ${utils.formatDate(assignment.fecha_entrega_ujier)}</div>` : ''}
+            </div>
                 
                 ${this.reorderMode ? `
                     <div class="reorder-position-badge">ORDEN: ${index + 1}</div>

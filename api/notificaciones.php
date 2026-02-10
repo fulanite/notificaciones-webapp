@@ -94,8 +94,25 @@ try {
 
                 if (!empty($_GET['estado'])) {
                     $estadosArr = explode(',', $_GET['estado']);
+
+                    // Check if pre_aviso is requested to add loose matching
+                    $includePreAviso = false;
+                    foreach ($estadosArr as $est) {
+                        $norm = str_replace('_', ' ', strtolower(trim($est)));
+                        if ($norm === 'pre aviso') {
+                            $includePreAviso = true;
+                            break;
+                        }
+                    }
+
                     $placeholders = implode(',', array_fill(0, count($estadosArr), '?'));
-                    $where[] = "COALESCE(n.resultado_diligencia, n.estado) IN ($placeholders)";
+
+                    if ($includePreAviso) {
+                        $where[] = "(COALESCE(n.resultado_diligencia, n.estado) IN ($placeholders) OR COALESCE(n.resultado_diligencia, n.estado) LIKE '%pre aviso%' OR COALESCE(n.resultado_diligencia, n.estado) LIKE '%pre_aviso%')";
+                    } else {
+                        $where[] = "COALESCE(n.resultado_diligencia, n.estado) IN ($placeholders)";
+                    }
+
                     foreach ($estadosArr as $est) {
                         $params[] = trim($est);
                     }
