@@ -156,8 +156,8 @@ try {
                 Database::sendError('Method not allowed', 405);
             }
 
-            if (empty($data['email']) || empty($data['nombre']) || empty($data['rol'])) {
-                Database::sendError('Email, nombre and rol are required', 400);
+            if (empty($data['email']) || empty($data['nombre']) || empty($data['rol']) || empty($data['dni'])) {
+                Database::sendError('Email, nombre, rol and DNI are required', 400);
             }
 
             // Check if email already exists
@@ -167,7 +167,14 @@ try {
                 Database::sendError('Email already exists', 400);
             }
 
-            $id = Database::generateUUID();
+            // Check if DNI (ID) already exists
+            $checkDni = $pdo->prepare("SELECT id FROM usuarios WHERE id = ?");
+            $checkDni->execute([$data['dni']]);
+            if ($checkDni->fetch()) {
+                Database::sendError('User with this DNI already exists', 409);
+            }
+
+            $id = $data['dni'];
             $hashedPassword = null;
 
             // If password provided, hash it
