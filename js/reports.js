@@ -221,11 +221,10 @@ const reports = {
 
         // Filter by month on fecha_entrega_ujier (Criterio real de trabajo entregado)
         const monthData = (data || []).filter(n => {
-            // Usar fecha_entrega_ujier (fecha del documento) o fallback a fecha_carga
-            const dateToCheck = n.fecha_entrega_ujier || n.fecha_carga;
-            if (!dateToCheck) return false;
-
-            return dateToCheck.startsWith(yyyy_mm);
+            // Revert: Strict filter on fecha_entrega_ujier as per user request
+            if (!n.fecha_entrega_ujier) return false;
+            // fecha_entrega_ujier comes as 'YYYY-MM-DD'
+            return n.fecha_entrega_ujier.startsWith(yyyy_mm);
         });
 
         if (monthData.length === 0) {

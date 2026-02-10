@@ -53,11 +53,20 @@ try {
                 $estadosArr = explode(',', $estadosStr);
                 $placeholders = implode(',', array_fill(0, count($estadosArr), '?'));
 
-                $sql = "SELECT * FROM notificaciones 
-                        WHERE (asignado_a = ? OR asignado_a = (SELECT dni FROM usuarios WHERE id = ?)) 
-                        AND (estado IN ($placeholders) OR LOWER(estado) IN ('pre_aviso', 'pre aviso', 'pre-aviso')) 
-                        AND devuelta_por_ujier = 0
-                        ORDER BY COALESCE(fecha_entrega_ujier, fecha_carga) ASC";
+                $sql = "SELECT DISTINCT n.* FROM notificaciones n
+                        WHERE (n.asignado_a = ? OR n.asignado_a = (SELECT dni FROM usuarios WHERE id = ?)) 
+                        AND (n.estado IN ($placeholders) OR LOWER(n.estado) IN ('pre_aviso', 'pre aviso', 'pre-aviso')) 
+                        AND n.devuelta_por_ujier = 0
+                        AND (
+                            -- Solo si NO tiene una visita con un resultado final (distinto a pre aviso)
+                            NOT EXISTS (
+                                SELECT 1 FROM visitas v
+                                WHERE v.notificacion_id = n.id
+                                AND LOWER(v.resultado) NOT IN ('pre_aviso', 'pre aviso', 'pre-aviso')
+                            )
+                            OR n.estado = 'pre_aviso'
+                        )
+                        ORDER BY COALESCE(n.fecha_entrega_ujier, n.fecha_carga) ASC";
 
                 $stmt = $pdo->prepare($sql);
                 // We need to pass both ID and placeholders, plus ID again for the subquery
@@ -372,12 +381,8 @@ try {
 
                     case 'result':
                         // Register result (diligencia)
-                        $newEstado = 'diligenciada';
-                        if ($data['es_carga_diferida'] ?? false) {
-                            $newEstado = 'diferida';
-                        } elseif (($data['resultado'] ?? '') === 'pre_aviso') {
-                            $newEstado = 'pre_aviso';
-                        }
+                        // Segun el usuario: 'el estado de la notificacion, es la ultima visita que hizo el ujier, el resultado'
+                        $newEstado = $data['resultado'];
 
                         $stmt = $pdo->prepare("
                             UPDATE notificaciones SET

@@ -28,8 +28,8 @@ const CONFIG = {
     // Notification Types
     NOTIFICATION_TYPES: {
         cedulas: 'Cédulas',
-        cedulas_urgente_norte: 'Cédulas Urgente Norte',
-        cedulas_urgente_sur: 'Cédulas Urgente Sur',
+        cedulas_urgentes_norte: 'Cédulas Urgentes Norte',
+        cedulas_urgentes_sur: 'Cédulas Urgentes Sur',
         cedulas_mandamientos_22172: 'Cédulas o Mandamientos Ley 22172',
         cedulas_correspondencia: 'Cédulas por Correspondencia (Interior)',
         mandamientos: 'Mandamientos',

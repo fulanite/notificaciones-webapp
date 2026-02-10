@@ -727,9 +727,9 @@
                                                 <select id="tipo-notificacion" name="tipo-notificacion" required
                                                     onchange="app.handleTipoNotificacionChange(this.value)">
                                                     <option value="cedulas">Cédulas</option>
-                                                    <option value="cedulas_urgente_norte">Cédulas Urgentes Norte
+                                                    <option value="cedulas_urgentes_norte">Cédulas Urgentes Norte
                                                     </option>
-                                                    <option value="cedulas_urgente_sur">Cédulas Urgentes Sur</option>
+                                                    <option value="cedulas_urgentes_sur">Cédulas Urgentes Sur</option>
                                                     <option value="cedulas_mandamientos_22172">Cédulas o mandamientos
                                                         Ley 22.172</option>
                                                     <option value="cedulas_correspondencia">Cédulas por correspondencia
@@ -982,7 +982,13 @@
                                 <select id="filter-tipo" class="filter-select">
                                     <option value="">Todos los tipos</option>
                                     <option value="cedulas">Cédulas</option>
+                                    <option value="cedulas_urgentes_norte">Cédulas Urgentes Norte</option>
+                                    <option value="cedulas_urgentes_sur">Cédulas Urgentes Sur</option>
+                                    <option value="cedulas_mandamientos_22172">Ley 22.172</option>
+                                    <option value="cedulas_correspondencia">Correspondencia (Interior)</option>
                                     <option value="mandamientos">Mandamientos</option>
+                                    <option value="mandamientos_habilitacion_norte">Mandamientos Hab. Norte</option>
+                                    <option value="mandamientos_habilitacion_sur">Mandamientos Hab. Sur</option>
                                 </select>
                                 <input type="date" id="filter-fecha" class="filter-input">
                             </div>
