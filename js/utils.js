@@ -115,7 +115,7 @@ const utils = {
     getSpecialDestinationText(notif) {
         if (!this.isSpecialDestination(notif.destinatario_especial)) return null;
         const val = String(notif.destinatario_especial).trim();
-        if (val === '1') return notif.origen || 'Destino Especial';
+        if (val === '1') return notif.destinatario_nombre || 'Destino Especial';
         return notif.destinatario_especial;
     },
 

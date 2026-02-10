@@ -703,7 +703,7 @@ const notifications = {
                 // to match the dropdown options.
                 document.getElementById('destinatario-especial').value =
                     (String(data.destinatario_especial) === '1') ?
-                        (data.origen || data.destinatario_nombre || '1') :
+                        (data.destinatario_nombre || data.origen || '1') :
                         data.destinatario_especial;
             } else {
                 document.getElementById('destinatario-especial').value = '';

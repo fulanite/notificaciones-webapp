@@ -112,6 +112,29 @@ function mapMedioPago(valor) {
     return 'gratuito';
 }
 
+function mapTipoNotificacion(valor) {
+    if (!valor) return 'cedulas';
+    const v = valor.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    if (v.includes('22172')) return 'cedulas_mandamientos_22172';
+    if (v.includes('correspondencia')) return 'cedulas_correspondencia';
+
+    if (v.includes('urgente')) {
+        if (v.includes('norte')) return 'cedulas_urgentes_norte';
+        if (v.includes('sur')) return 'cedulas_urgentes_sur';
+    }
+
+    if (v.includes('mandamiento')) {
+        if (v.includes('habilitacion') || v.includes('sur') || v.includes('norte')) {
+            if (v.includes('sur')) return 'mandamientos_habilitacion_sur';
+            if (v.includes('norte')) return 'mandamientos_habilitacion_norte';
+        }
+        return 'mandamientos';
+    }
+
+    return 'cedulas';
+}
+
 function escapeSQL(value) {
     if (value === null || value === undefined || value === 'NULL') return 'NULL';
     if (typeof value === 'number') return value.toString();
@@ -279,7 +302,7 @@ async function migrate() {
                 tipo_troquel, n_troquel, medio_pago, costo, observaciones_iniciales, asignado_a, created_at
             ) VALUES (
                 ${escapeSQL(uuid)}, ${escapeSQL(idCedula)}, 1, ${escapeSQL(fecha)}, ${escapeSQL(fechaEntrega)}, ${devuelta}, ${escapeSQL(usuarioCargaVal)},
-                ${escapeSQL(mapEstado(c['estado_notificacion']))}, 'cedula', ${escapeSQL(c['n_exp'])}, ${escapeSQL(c['caratula'])},
+                ${escapeSQL(mapEstado(c['estado_notificacion']))}, ${escapeSQL(mapTipoNotificacion(c['tipo_not']))}, ${escapeSQL(c['n_exp'])}, ${escapeSQL(c['caratula'])},
                 ${escapeSQL(c['origen'])}, ${escapeSQL(c['letrado'])}, ${escapeSQL(destEspecial)},
                 ${escapeSQL(c['destinatario'])}, ${escapeSQL(c['domicilio'])}, ${escapeSQL(c['zona_cedula'])},
                 ${escapeSQL(c['troquel_categoria'])}, ${nTroquel || 'NULL'}, ${escapeSQL(mapMedioPago(c['Medio de pago']))},
