@@ -767,7 +767,7 @@ const ujier = {
                 <div class="step-marker" style="background:${statusColor}; width: 24px; height: 24px; font-size: 10px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white; font-weight: 800;">
                     ${visitNum}
                 </div>
-                <div class="step-content" style="background: rgba(var(--primary-rgb), 0.03); border: 1px solid rgba(var(--primary-rgb), 0.1); border-radius: 12px; padding: 12px; flex-grow: 1;">
+                <div class="step-content" style="background: #ffffff; border: 1px solid rgba(var(--primary-rgb), 0.2); border-radius: 12px; padding: 12px; flex-grow: 1;">
                     <div class="step-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                         <span class="step-time" style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">
                             📅 ${utils.formatDateTime(v.fecha)}
