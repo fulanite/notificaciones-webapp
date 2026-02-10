@@ -484,7 +484,8 @@
 .modal {
     position: fixed;
     inset: 0;
-    z-index: 12000;
+    z-index: 2000000;
+    /* Higher than map fullscreen (999999) */
     /* Aumentado para estar sobre todo */
     display: flex;
     align-items: center;
@@ -971,7 +972,8 @@
     position: fixed;
     bottom: 24px;
     right: 24px;
-    z-index: 800;
+    z-index: 3000000;
+    /* Always on top */
     display: flex;
     flex-direction: column;
     gap: var(--space-3);

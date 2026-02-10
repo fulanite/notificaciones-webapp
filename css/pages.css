@@ -2229,7 +2229,8 @@ body.map-fullscreen {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.95);
-    z-index: 10000;
+    z-index: 2000000;
+    /* Higher than map fullscreen (999999) */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2284,5 +2285,5 @@ body.map-fullscreen {
 /* Ensure mandatory password reset modal is always visible when active */
 #modal-password-reset.modal:not(.hidden) {
     display: flex !important;
-    z-index: 20000;
+    z-index: 2500000;
 }

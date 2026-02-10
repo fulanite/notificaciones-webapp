@@ -520,7 +520,12 @@ const adminMap = {
                             ${(point.resultado || 'PENDIENTE').toUpperCase()}
                         </span>
                         <div style="font-size:0.8em; margin-top:4px; color:#777;">🕒 ${utils.formatTime(point.fecha)}</div>
-                        ${point.foto_url ? `<div style="margin-top:6px; width:100%; height:80px; background:url('${point.foto_url}') center/cover no-repeat; border-radius:4px;"></div>` : ''}
+                        ${point.foto_url ? `
+                            <div style="margin-top:6px; width:100%; height:80px; background:url('${point.foto_url}') center/cover no-repeat; border-radius:4px; cursor: pointer;" 
+                                 onclick="dashboard.openImageViewer('${point.foto_url}', 'Visita #${index + 1} - ${point.destinatario}')"
+                                 title="Ver foto ampliada">
+                            </div>
+                        ` : ''}
                     `;
 
                     L.marker(coord, { icon: createNumberedIcon(index + 1, statusColor) })
@@ -561,6 +566,11 @@ const adminMap = {
                             ${(point.resultado || 'PENDIENTE').toUpperCase()}
                         </span>
                         <br><small>🕒 ${utils.formatTime(point.fecha)}</small>
+                        ${point.foto_url ? `
+                            <div style="margin-top:6px; width:100%; height:60px; background:url('${point.foto_url}') center/cover no-repeat; border-radius:4px; cursor: pointer;" 
+                                 onclick="dashboard.openImageViewer('${point.foto_url}', 'Foto de ${ujierName}')">
+                            </div>
+                        ` : ''}
                     `;
 
                     // Círculos simples, sin números, sin líneas
