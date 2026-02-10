@@ -405,11 +405,36 @@ const adminMap = {
         const container = document.getElementById('admin-map-container');
         if (!container) return;
 
-        container.classList.toggle('fullscreen');
+        const isFullscreen = container.classList.toggle('fullscreen');
+        document.body.classList.toggle('map-fullscreen', isFullscreen);
+
+        // Manage close button for fullscreen
+        let closeBtn = document.getElementById('admin-map-close-fs');
+
+        if (isFullscreen) {
+            if (!closeBtn) {
+                closeBtn = document.createElement('button');
+                closeBtn.id = 'admin-map-close-fs';
+                closeBtn.innerHTML = '✕ Cerrar Vista Completa';
+                closeBtn.className = 'btn-close-map-fs';
+                closeBtn.onclick = () => this.toggleFullscreen();
+                document.body.appendChild(closeBtn);
+            }
+            closeBtn.style.display = 'flex';
+        } else {
+            if (closeBtn) closeBtn.style.display = 'none';
+        }
 
         // Force map resize recalculation
         setTimeout(() => {
-            if (this.mapInstance) this.mapInstance.invalidateSize();
+            if (this.mapInstance) {
+                this.mapInstance.invalidateSize();
+                // If exiting fullscreen, we might want to re-fit bounds or just invalidate
+                if (!isFullscreen) {
+                    // Slight delay to ensure DOM has settled
+                    this.mapInstance.invalidateSize();
+                }
+            }
         }, 100);
     },
 

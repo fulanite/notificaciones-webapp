@@ -2176,15 +2176,49 @@
 }
 
 /* Map Fullscreen */
+body.map-fullscreen {
+    overflow: hidden !important;
+}
+
 #admin-map-container.fullscreen {
-    position: fixed;
+    position: fixed !important;
     top: 0;
     left: 0;
     width: 100vw !important;
     height: 100vh !important;
-    z-index: 9999;
+    z-index: 999999 !important;
+    /* Above everything */
     border-radius: 0 !important;
     border: none !important;
+    margin: 0 !important;
+}
+
+.btn-close-map-fs {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000000;
+    /* Above the map */
+    background: rgba(15, 23, 42, 0.9);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    transition: all 0.2s;
+}
+
+.btn-close-map-fs:hover {
+    background: #ef4444;
+    transform: scale(1.05);
+    border-color: #ef4444;
 }
 
 /* Image Viewer Modal */
