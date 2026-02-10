@@ -1394,8 +1394,8 @@ const ujier = {
                         <div class="historial-header">
                             <span class="historial-fecha">${utils.formatDateTime(visit.fecha)}</span>
                         </div>
-                        <div class="assignment-recipient">👤 <strong>${visit.destinatario_nombre || utils.getSpecialDestinationText(visit) || '-'}</strong></div>
-                        <div class="assignment-address">🏠 ${visit.domicilio || '-'}</div>
+                        <div class="assignment-address" style="font-size: 1.15rem; line-height: 1.3; font-weight: 700; color: var(--primary);">🏠 ${visit.domicilio || '-'}</div>
+                        <div class="assignment-recipient" style="font-size: 0.95rem; line-height: 1.2; color: var(--text-muted); margin-top: 2px;">👤 <strong>${visit.destinatario_nombre || utils.getSpecialDestinationText(visit) || '-'}</strong></div>
                         <div class="historial-footer">
                             <span class="resultado-badge resultado-${status}">${(visit.resultado || 'PENDIENTE').replace(/_/g, ' ').toUpperCase()}</span>
                             ${visit.zona ? `<span class="historial-zona">${visit.zona}</span>` : ''}
@@ -1465,6 +1465,48 @@ const ujier = {
         if (error) {
             listContainer.innerHTML = `<div class="error-msg" style="grid-column: 1 / -1;">Error: ${error}</div>`;
             return;
+        }
+
+        if (data && data.length > 0) {
+            data.sort((a, b) => {
+                const getScore = (item) => {
+                    let score = 0;
+                    const hasPhoto = !!item.foto_url;
+                    const hasLoc = item.ubicacion_lat && item.ubicacion_lng;
+                    const hasObs = !!item.observaciones;
+
+                    if (hasPhoto && hasLoc) score = 30; // Priority 1
+                    else if (hasPhoto) score = 20;      // Priority 2
+                    // User specified "no tengan foto, ubicacion pero si tengan observaciones" for next tier. 
+                    // Location alone isn't explicitly prioritized above observations by user text, 
+                    // but typically location > text. Let's give location a small edge or treat equal?
+                    // User said: "al ultimo los que no tengan foto, ubicacion pero si tengan observaciones"
+                    // This implies: if (not photo AND not loc AND has obs).
+                    // So if it HAS loc, it shouldn't fall into that bucket.
+                    // Let's infer: Location alone is probably better than Obs alone.
+                    else if (hasLoc) score = 10;
+                    else if (hasObs) score = 5;         // Priority 3 ("no tengan foto, ni ubi, pero si obs")
+                    else score = 0;                     // Priority 4 ("ni foto, ni ubi, ni obs")
+
+                    return score;
+                };
+
+                const scoreA = getScore(a);
+                const scoreB = getScore(b);
+
+                // Sort by score descending
+                if (scoreA !== scoreB) {
+                    return scoreB - scoreA;
+                }
+
+                // Tie-breaker: Date descending (assuming data is already close to date ordered or id ordered)
+                // If 'fecha' exists and is sortable
+                if (a.fecha && b.fecha) {
+                    return new Date(b.fecha) - new Date(a.fecha);
+                }
+
+                return 0;
+            });
         }
 
         this.renderReferences(data || []);
@@ -1713,6 +1755,33 @@ const ujier = {
         // Update Stats
         document.getElementById('map-stat-visits').textContent = data.length;
         document.getElementById('map-stat-distance').textContent = totalDist.toFixed(2) + ' km';
+    },
+
+    // View full image
+    viewFullImage(url) {
+        if (!url) return;
+        const modal = document.getElementById('modal-image-viewer');
+        const img = document.getElementById('full-image-display');
+        if (modal && img) {
+            img.src = url;
+            modal.classList.remove('hidden');
+            // Force reflow
+            void modal.offsetWidth;
+            modal.classList.add('show');
+        }
+    },
+
+    // Close image viewer
+    closeImageViewer() {
+        const modal = document.getElementById('modal-image-viewer');
+        if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                const img = document.getElementById('full-image-display');
+                if (img) img.src = '';
+            }, 300);
+        }
     },
 
     // Haversine formula
