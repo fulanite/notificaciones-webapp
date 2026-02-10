@@ -57,19 +57,19 @@ function categorizeAndCount(rows) {
         // Map all notification types to their display names
         let displayTipo = tipoNot;
 
-        // Mapeo completo de tipos según CONFIG.NOTIFICATION_TYPES
+        // Mapeo completo de tipos según base de datos (corregido plurales)
         switch (tipoNot) {
             case 'cedulas':
                 displayTipo = 'Cédulas';
                 break;
-            case 'cedulas_urgente_norte':
-                displayTipo = 'Cédulas Urgente Norte';
+            case 'cedulas_urgentes_norte': // Fixed typo: urgente -> urgentes
+                displayTipo = 'Cédulas Urgentes Norte';
                 break;
-            case 'cedulas_urgente_sur':
-                displayTipo = 'Cédulas Urgente Sur';
+            case 'cedulas_urgentes_sur': // Fixed typo: urgente -> urgentes
+                displayTipo = 'Cédulas Urgentes Sur';
                 break;
             case 'cedulas_mandamientos_22172':
-                displayTipo = 'Cédulas o Mandamientos Ley 22172';
+                displayTipo = 'Cédulas o Mandamientos Ley 22.172';
                 break;
             case 'cedulas_correspondencia':
                 displayTipo = 'Cédulas por Correspondencia (Interior)';
@@ -92,33 +92,34 @@ function categorizeAndCount(rows) {
 
         // Categorization by 'origen'
         const origen = (row.origen || '').trim();
+
+        // 1. Check if it belongs to Juzgados Penales (Prioridad Base)
         let category = getCategory(origen, JUZGADOS_PENALES_MAP);
         if (category) {
             counts.juzgadosPenales.set(category, (counts.juzgadosPenales.get(category) || 0) + 1);
             return;
         }
 
-        category = getCategory(origen, DEMAS_JUZGADOS_MAP);
-        if (category) {
-            counts.demasJuzgados.set(category, (counts.demasJuzgados.get(category) || 0) + 1);
-            return;
+        // 2. Special Logic for Specific Notification Types (Overrides Generic Maps)
+        if (tipoNot === 'cedulas_mandamientos_22172') {
+            // Agrupar por el texto exacto del Origen (Provincia)
+            category = origen || 'Otras Provincias (Ley 22.172 - Sin especificar)';
+        } else if (tipoNot === 'cedulas_correspondencia') {
+            // Agrupar todo bajo 'Juzgados del interior'
+            category = 'Juzgados del interior';
         }
 
-        // --- NEW FALLBACK LOGIC ---
-        // If still no category, use the notification type to help classify external origns
-        if (tipoNot === 'cedulas_mandamientos_22172') {
-            // Group by province name found in 'origen'
-            const cat = origen || 'Otras Provincias (Ley 22.172)';
-            counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
-        } else if (tipoNot === 'cedulas_correspondencia') {
-            // Group ALL interior notifications under a single label
-            const cat = 'Juzgados del interior';
-            counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
-        } else {
-            // Last resort: put in "Otros / No clasificados"
-            const cat = origen || 'Otros / No clasificados';
-            counts.demasJuzgados.set(cat, (counts.demasJuzgados.get(cat) || 0) + 1);
+        // 3. If not handled by special logic, use Generic Map for Demas Juzgados
+        if (!category) {
+            category = getCategory(origen, DEMAS_JUZGADOS_MAP);
         }
+
+        // 4. Fallback
+        if (!category) {
+            category = origen || 'Otros / No clasificados';
+        }
+
+        counts.demasJuzgados.set(category, (counts.demasJuzgados.get(category) || 0) + 1);
     });
 
     return counts;
@@ -220,9 +221,11 @@ const reports = {
 
         // Filter by month on fecha_entrega_ujier (Criterio real de trabajo entregado)
         const monthData = (data || []).filter(n => {
-            if (!n.fecha_entrega_ujier) return false;
-            // fecha_entrega_ujier viene como 'YYYY-MM-DD'
-            return n.fecha_entrega_ujier.startsWith(yyyy_mm);
+            // Usar fecha_entrega_ujier (fecha del documento) o fallback a fecha_carga
+            const dateToCheck = n.fecha_entrega_ujier || n.fecha_carga;
+            if (!dateToCheck) return false;
+
+            return dateToCheck.startsWith(yyyy_mm);
         });
 
         if (monthData.length === 0) {
