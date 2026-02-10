@@ -59,7 +59,21 @@ try {
                 Database::sendError('Email, nombre and rol are required', 400);
             }
 
-            $id = Database::generateUUID();
+            // Use DNI as ID for consistency
+            $id = $data['dni'];
+
+            // Validate that ID/DNI is not empty
+            if (empty($id)) {
+                Database::sendError('DNI is required and will be used as ID', 400);
+            }
+
+            // Check if ID already exists
+            $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE id = ?");
+            $stmt->execute([$id]);
+            if ($stmt->fetch()) {
+                Database::sendError('User with this DNI already exists', 409);
+            }
+
             $stmt = $pdo->prepare("
                 INSERT INTO usuarios (id, email, dni, nombre, rol, foto, activo, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
