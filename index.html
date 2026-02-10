@@ -299,6 +299,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="#" class="nav-link" data-view="bulk-editor">
+                                    <span class="nav-icon">⚡</span>
+                                    <span class="nav-text">Gestión Masiva</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="#" class="nav-link" data-view="planillas">
                                     <span class="nav-icon">📝</span>
                                     <span class="nav-text">Planillas e Informes</span>
@@ -1595,6 +1601,114 @@
                         </div>
                     </section>
 
+                    <!-- View: Gestión Masiva (Admin/Coord Only) -->
+                    <section id="view-bulk-editor" class="view">
+                        <div class="dashboard-header">
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <h1>⚡ Gestión Masiva de Resultados</h1>
+                                <p style="color: var(--text-muted); font-size: 0.9rem;">Corrección de estados para
+                                    registros migrados o sin visita.</p>
+                            </div>
+                        </div>
+
+                        <div class="filters-container glass-card" style="margin-bottom: 20px;">
+                            <div class="filters-grid">
+                                <div class="filter-group">
+                                    <label class="filter-label">Buscar Expediente/Nombre</label>
+                                    <div class="search-bar">
+                                        <span class="search-icon">🔍</span>
+                                        <input type="text" id="bulk-search" class="search-input"
+                                            placeholder="Ej: 123/2025...">
+                                    </div>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Filtrar por Ujier</label>
+                                    <select id="bulk-filter-ujier" class="form-select">
+                                        <option value="">👤 Todos los ujieres</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Filtrar por Zona</label>
+                                    <select id="bulk-filter-zona" class="form-select">
+                                        <option value="">🌎 Todas las zonas</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Año</label>
+                                    <select id="bulk-filter-year" class="form-select">
+                                        <option value="2026">2026</option>
+                                        <option value="2025">2025</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card" style="width: 100%;">
+                            <div class="card-header"
+                                style="flex-wrap: wrap; gap: 15px; border-bottom: 1px solid rgba(var(--primary-rgb), 0.1);">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <h3 class="card-title">Listado de Notificaciones</h3>
+                                    <div id="bulk-selected-badge" class="badge-mini status-info hidden">0 seleccionadas
+                                    </div>
+                                </div>
+
+                                <div class="card-actions" style="display: flex; gap: 10px; align-items: center;">
+                                    <button id="btn-bulk-select-all" class="btn btn-outline btn-sm">Seleccionar
+                                        Todo</button>
+
+                                    <div
+                                        style="width: 1px; height: 24px; background: var(--border-light); margin: 0 5px;">
+                                    </div>
+
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <select id="bulk-new-status" class="form-select form-select-sm"
+                                            style="width: 160px; height: 36px;">
+                                            <option value="">⚙️ Nuevo Estado...</option>
+                                            <option value="diligenciada">Diligenciada</option>
+                                            <option value="atiende">Atiende</option>
+                                            <option value="entregado">Entregado</option>
+                                            <option value="pre_aviso">Pre aviso</option>
+                                            <option value="estrados">Estrados</option>
+                                            <option value="domicilio_inexistente">Docimilio Inexistente</option>
+                                        </select>
+                                        <button id="btn-apply-bulk-status" class="btn btn-primary btn-sm" disabled>
+                                            ⚡ Aplicar Cambio
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 40px;"></th>
+                                                <th>Expediente</th>
+                                                <th>Destinatario</th>
+                                                <th>Domicilio</th>
+                                                <th>Ujier</th>
+                                                <th>Estado Actual</th>
+                                                <th style="text-align: center;">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="bulk-table-body">
+                                            <!-- Dynamic content -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer"
+                                style="display: flex; justify-content: space-between; align-items: center;">
+                                <div id="bulk-pagination-info" class="text-muted" style="font-size: 0.95rem;">Página 1
+                                    de 1</div>
+                                <div class="pagination-controls">
+                                    <button id="btn-bulk-prev" class="btn btn-icon" disabled>⬅️</button>
+                                    <button id="btn-bulk-next" class="btn btn-icon" disabled>➡️</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <!-- Additional views will be added dynamically -->
                 </div>
             </main>
@@ -1638,6 +1752,10 @@
             <button class="bottom-nav-item role-admin" data-view="devoluciones">
                 <span class="nav-icon">🎁</span>
                 <span class="nav-label">Devoluciones</span>
+            </button>
+            <button class="bottom-nav-item role-admin" data-view="bulk-editor">
+                <span class="nav-icon">⚡</span>
+                <span class="nav-label">Masivo</span>
             </button>
             <button class="bottom-nav-item role-admin" data-view="mapa-seguimiento">
                 <span class="nav-icon">🗺️</span>
@@ -1820,6 +1938,7 @@
     <script defer src="js/reports.js?v=40.8"></script>
     <script defer src="js/audit.js?v=40.8"></script>
     <script defer src="js/asignaciones.js?v=40.8"></script>
+    <script defer src="js/bulk-editor.js?v=40.8"></script>
     <script defer src="js/usuarios.js?v=40.8"></script>
     <script defer src="js/devoluciones.js?v=40.8"></script>
     <script defer src="js/planillas.js?v=40.8"></script>

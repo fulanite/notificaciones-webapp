@@ -542,7 +542,9 @@ try {
                     'n_troquel',
                     'sin_troquel',
                     'medio_pago',
-                    'costo'
+                    'costo',
+                    'resultado_diligencia',
+                    'fecha_diligencia'
                 ];
                 $updates = [];
                 $params = [];

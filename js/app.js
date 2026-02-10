@@ -760,11 +760,13 @@ const app = {
 
     // Update menu items visibility based on role
     updateMenuItemsVisibility(rol) {
+        const lowerRol = (rol || '').toLowerCase();
+
         // Devoluciones: Solo admin y coordinador
         const devolucionesLink = document.querySelector('[data-view="devoluciones"]');
         if (devolucionesLink) {
             const devolucionesItem = devolucionesLink.closest('.nav-item');
-            if (rol.toLowerCase() === 'admin' || rol.toLowerCase() === 'coordinador') {
+            if (lowerRol === 'admin' || lowerRol === 'coordinador') {
                 devolucionesItem?.classList.remove('hidden');
             } else {
                 devolucionesItem?.classList.add('hidden');
@@ -775,10 +777,21 @@ const app = {
         const mapaLink = document.querySelector('[data-view="mapa-seguimiento"]');
         if (mapaLink) {
             const mapaItem = mapaLink.closest('.nav-item');
-            if (rol.toLowerCase() === 'admin' || rol.toLowerCase() === 'coordinador') {
+            if (lowerRol === 'admin' || lowerRol === 'coordinador') {
                 mapaItem?.classList.remove('hidden');
             } else {
                 mapaItem?.classList.add('hidden');
+            }
+        }
+
+        // Gestión Masiva: Solo admin y coordinador
+        const bulkLink = document.querySelector('[data-view="bulk-editor"]');
+        if (bulkLink) {
+            const bulkItem = bulkLink.closest('.nav-item');
+            if (lowerRol === 'admin' || lowerRol === 'coordinador') {
+                bulkItem?.classList.remove('hidden');
+            } else {
+                bulkItem?.classList.add('hidden');
             }
         }
 
@@ -786,7 +799,7 @@ const app = {
         const auditoriaLink = document.querySelector('[data-view="auditoria"]');
         if (auditoriaLink) {
             const auditoriaItem = auditoriaLink.closest('.nav-item');
-            if (rol.toLowerCase() === 'admin') {
+            if (lowerRol === 'admin') {
                 auditoriaItem?.classList.remove('hidden');
             } else {
                 auditoriaItem?.classList.add('hidden');
@@ -852,6 +865,12 @@ const app = {
             return;
         }
 
+        // Gestión Masiva: Solo admin y coordinador
+        if (viewId === 'bulk-editor' && rol !== 'admin' && rol !== 'coordinador') {
+            utils.showToast('No tenés permisos para acceder a esta sección', 'error');
+            return;
+        }
+
         // Mi Recorrido (ubicaciones-ujier): Solo ujier
         if (viewId === 'ubicaciones-ujier' && rol.toLowerCase() !== 'ujier') {
             utils.showToast('No tenés permisos para acceder a esta sección', 'error');
@@ -910,7 +929,8 @@ const app = {
             'auditoria': { title: 'Panel de Auditoría', subtitle: 'Control y seguimiento de operaciones' },
             'cargas-diferidas': { title: 'Cargas Diferidas', subtitle: 'Notificaciones con carga diferida' },
             'estadisticas': { title: 'Estadísticas', subtitle: 'Análisis de rendimiento' },
-            'devoluciones': { title: 'Retorno de Notificaciones', subtitle: 'Control de documentos devueltos por ujieres' }
+            'devoluciones': { title: 'Retorno de Notificaciones', subtitle: 'Control de documentos devueltos por ujieres' },
+            'bulk-editor': { title: 'Gestión Masiva', subtitle: 'Corrección masiva de resultados de diligencia' }
         };
 
         const pageInfo = titles[viewId] || { title: 'SGND', subtitle: '' };
@@ -991,6 +1011,11 @@ const app = {
                 case 'devoluciones':
                     loadPromise = typeof devoluciones !== 'undefined' && devoluciones.init
                         ? devoluciones.init()
+                        : Promise.resolve();
+                    break;
+                case 'bulk-editor':
+                    loadPromise = typeof bulkEditor !== 'undefined' && bulkEditor.init
+                        ? bulkEditor.init()
                         : Promise.resolve();
                     break;
                 case 'planillas':

@@ -45,7 +45,8 @@ const CONFIG = {
         pre_aviso: 'Pre aviso',
         estrados: 'Estrados',
         domicilio_inexistente: 'Domicilio inexistente',
-        diligenciador_ausente: 'Diligenciador ausente'
+        diligenciador_ausente: 'Diligenciador ausente',
+        diligenciada: 'Diligenciada'
     },
 
     // Payment Methods
