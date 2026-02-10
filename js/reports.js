@@ -53,13 +53,25 @@ function categorizeAndCount(rows) {
     rows.forEach(row => {
         // Dynamic categorization based on 'tipo_notificacion'
         const tipoNot = (row.tipo_notificacion || '').trim();
+        const normInput = utils.normalizeLabel(tipoNot);
 
-        // Use the official label from SGND_DATA if possible
-        const officialType = SGND_DATA.TIPOS_NOTIFICACION.find(t => t.value === tipoNot);
+        // Find match in official types by value or label normalized
+        const officialType = SGND_DATA.TIPOS_NOTIFICACION.find(t =>
+            utils.normalizeLabel(t.value) === normInput ||
+            utils.normalizeLabel(t.label) === normInput
+        );
+
         let displayTipo = officialType ? officialType.label : (tipoNot || 'No especificado');
 
-        // Fallback for empty strings if somehow they bypassed the above
-        if (displayTipo === '') displayTipo = 'No especificado';
+        // Normalización final de visualización para agrupar variantes que escaparon al match
+        // Ej: si en la base dice "cedula" y no matcheó con "Cédulas"
+        if (normInput === 'cedulas') displayTipo = 'Cédulas';
+        if (normInput === 'mandamientos') displayTipo = 'Mandamientos';
+
+        // Capitalize first letter if it's still raw text
+        if (!officialType && displayTipo !== 'No especificado') {
+            displayTipo = displayTipo.charAt(0).toUpperCase() + displayTipo.slice(1);
+        }
 
         counts.tipos.set(displayTipo, (counts.tipos.get(displayTipo) || 0) + 1);
 
@@ -185,7 +197,12 @@ const reports = {
         // OR better: use the dateField logic we implemented recently if available, but passing a range is tricky without range support.
         // Let's rely on fetching reasonable amount of data. The user mentions "tomas las notificaciones que tienen fecha de entrega de ese mes".
 
-        const { data, error } = await db.getNotifications({ limit: 5000 }); // Increase limit to ensure we get month's data
+        // Fetch only the relevant month/year from API
+        const { data, error } = await db.getNotifications({
+            year: year,
+            month: month,
+            limit: 5000
+        });
 
         if (error) {
             utils.showToast('Error al obtener datos', 'error');

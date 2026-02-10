@@ -136,6 +136,11 @@ try {
                     $params[] = "$year%";
                 }
 
+                if (!empty($_GET['month'])) {
+                    $where[] = "MONTH(n.fecha_entrega_ujier) = ?";
+                    $params[] = (int) $_GET['month'];
+                }
+
                 if (isset($_GET['devuelta_por_ujier'])) {
                     $val = (int) $_GET['devuelta_por_ujier'];
                     if ($val === 0) {

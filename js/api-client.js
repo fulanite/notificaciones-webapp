@@ -156,6 +156,7 @@ const db = {
         }
         if (options.page) params.page = options.page;
         if (options.limit) params.limit = options.limit;
+        if (options.month) params.month = options.month;
         if (options.devuelta_por_ujier !== undefined) params.devuelta_por_ujier = options.devuelta_por_ujier;
 
         const result = await apiClient.get('notificaciones.php', params);

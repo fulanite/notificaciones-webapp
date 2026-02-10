@@ -379,6 +379,7 @@ const utils = {
             .replace(/cedula$/g, 'cedulas')
             .replace(/especial$/g, 'especiales')
             .replace(/ ley 22\.?172/g, ' ley 22.172') // standardize law name
+            .replace(/_/g, ' ') // treat underscores as spaces
             .replace(/\s+/g, ' '); // remove double spaces
     },
 
