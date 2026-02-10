@@ -163,22 +163,24 @@ const app = {
 
         if (!grupoDinamico || !input || !dropdown || !label) return;
 
-        // Auto-set troquel type for Mandamientos
+        // Auto-set troquel type for Mandamientos (Only when NOT editing)
         const isMandamiento = tipo.includes('mandamientos') && tipo !== 'cedulas_mandamientos_22172';
         const isHabilitacion = tipo.includes('habilitacion');
 
-        if (tipo === 'mandamientos' || isHabilitacion) {
-            if (troquelSelect) {
-                troquelSelect.value = 'M';
-                this.handleTroquelChange('M');
-            }
-        } else if (tipo === 'cedulas' ||
-            tipo === 'cedulas_mandamientos_22172' ||
-            tipo === 'cedulas_correspondencia' ||
-            tipo.includes('urgentes')) {
-            if (troquelSelect) {
-                troquelSelect.value = 'C';
-                this.handleTroquelChange('C');
+        if (!notifications?.editingId) {
+            if (tipo === 'mandamientos' || isHabilitacion) {
+                if (troquelSelect) {
+                    troquelSelect.value = 'M';
+                    this.handleTroquelChange('M');
+                }
+            } else if (tipo === 'cedulas' ||
+                tipo === 'cedulas_mandamientos_22172' ||
+                tipo === 'cedulas_correspondencia' ||
+                tipo.includes('urgentes')) {
+                if (troquelSelect) {
+                    troquelSelect.value = 'C';
+                    this.handleTroquelChange('C');
+                }
             }
         }
 

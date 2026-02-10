@@ -110,6 +110,8 @@ class Database
     // Helper: Sanitize input
     public static function sanitize($input)
     {
+        if ($input === null)
+            return null;
         if (is_array($input)) {
             return array_map([self::class, 'sanitize'], $input);
         }

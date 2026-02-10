@@ -30,7 +30,7 @@ const devoluciones = {
 
     resetState() {
         this.state.selectedIds.clear();
-        this.state.currentZone = null; // We use currentUjierId now but keeping this for safety
+        this.state.currentZone = null;
 
         // Reset visibility
         document.getElementById('devoluciones-zones-grid')?.classList.remove('hidden');
@@ -56,7 +56,7 @@ const devoluciones = {
             this.state.notificacionesPendientes = Array.isArray(data) ? data : [];
             console.log(`[Devoluciones] Data received:`, this.state.notificacionesPendientes.length, 'records');
 
-            this.renderUjieresGrid();
+            this.renderZonesGrid();
         } catch (err) {
             console.error('[Devoluciones] Error loading data:', err);
             const grid = document.getElementById('devoluciones-zones-grid');
@@ -127,9 +127,9 @@ const devoluciones = {
         document.getElementById('btn-confirm-return')?.addEventListener('click', () => this.confirmReturns());
 
         // Grid Search
-        document.getElementById('search-ujier-grid-devol')?.addEventListener('input', (e) => {
+        document.getElementById('search-zone-grid-devol')?.addEventListener('input', (e) => {
             this.state.gridSearchTerm = e.target.value.toLowerCase();
-            this.renderUjieresGrid();
+            this.renderZonesGrid();
         });
 
         // Year Filter
@@ -142,7 +142,7 @@ const devoluciones = {
         document.getElementById('btn-refresh-devoluciones-top')?.addEventListener('click', () => this.refreshData());
     },
 
-    renderUjieresGrid() {
+    renderZonesGrid() {
         const grid = document.getElementById('devoluciones-zones-grid');
         const listContainer = document.getElementById('devoluciones-list-container');
         if (!grid) return;
@@ -150,20 +150,19 @@ const devoluciones = {
         grid.classList.remove('hidden');
         if (listContainer) listContainer.classList.add('hidden');
 
-        // Aggregate by Ujier
-        const ujierStats = {};
+        // Aggregate by Zone
+        const zonesStats = {};
         this.state.notificacionesPendientes.forEach(n => {
-            const uid = n.asignado_a || 'unassigned';
-            const uname = n.ujier_nombre || 'Sin Ujier';
-            if (!ujierStats[uid]) {
-                ujierStats[uid] = { name: uname, count: 0, notifications: [] };
+            const zona = n.zona || 'SIN_ZONA';
+            if (!zonesStats[zona]) {
+                zonesStats[zona] = { name: zona, count: 0, notifications: [] };
             }
-            ujierStats[uid].count++;
-            ujierStats[uid].notifications.push(n);
+            zonesStats[zona].count++;
+            zonesStats[zona].notifications.push(n);
         });
 
         // Sort Alphabetically
-        const filtered = Object.entries(ujierStats)
+        const filtered = Object.entries(zonesStats)
             .filter(([id, stats]) => !this.state.gridSearchTerm || stats.name.toLowerCase().includes(this.state.gridSearchTerm))
             .sort((a, b) => a[1].name.localeCompare(b[1].name));
 
@@ -173,9 +172,9 @@ const devoluciones = {
         }
 
         grid.innerHTML = filtered.map(([id, stats]) => `
-            <div class="zone-premium-card clickable-card" onclick="devoluciones.openUjier('${id}', '${stats.name}')">
+            <div class="zone-premium-card clickable-card" onclick="devoluciones.openZone('${id}', '${stats.name}')">
                 <div class="zone-card-header">
-                    <div class="zone-icon">👤</div>
+                    <div class="zone-icon">📍</div>
                     <div class="zone-badge">${stats.count}</div>
                 </div>
                 <div class="zone-card-body">
@@ -189,16 +188,16 @@ const devoluciones = {
         `).join('');
     },
 
-    openUjier(id, name) {
-        this.state.currentUjierId = id;
+    openZone(id, name) {
+        this.state.currentZone = id;
         this.state.selectedIds.clear();
 
-        // Find notifications for this specific ujier
+        // Find notifications for this specific zone
         this.state.filteredNotificaciones = this.state.notificacionesPendientes.filter(n =>
-            (n.asignado_a || 'unassigned') === id
+            (n.zona || 'SIN_ZONA') === id
         );
 
-        document.getElementById('current-zone-title').textContent = `Ujier: ${name}`;
+        document.getElementById('current-zone-title').textContent = `Zona: ${name}`;
         document.getElementById('devoluciones-zones-grid').classList.add('hidden');
         document.getElementById('devoluciones-list-container').classList.remove('hidden');
 

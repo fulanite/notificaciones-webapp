@@ -95,7 +95,7 @@ try {
                 if (!empty($_GET['estado'])) {
                     $estadosArr = explode(',', $_GET['estado']);
                     $placeholders = implode(',', array_fill(0, count($estadosArr), '?'));
-                    $where[] = "n.estado IN ($placeholders)";
+                    $where[] = "COALESCE(n.resultado_diligencia, n.estado) IN ($placeholders)";
                     foreach ($estadosArr as $est) {
                         $params[] = trim($est);
                     }
@@ -321,7 +321,7 @@ try {
 
             $stmt->execute([
                 $id,
-                $data['fecha_entrega_ujier'] ?? date('Y-m-d'),
+                !empty($data['fecha_entrega_ujier']) ? $data['fecha_entrega_ujier'] : null,
                 $usuarioCarga, // Use resolved DNI
 
                 Database::sanitize($data['tipo_notificacion']),
@@ -536,13 +536,19 @@ try {
                     'domicilio',
                     'zona',
                     'asignado_a',
-                    'fecha_entrega_ujier'
+                    'fecha_entrega_ujier',
+                    'destinatario_especial',
+                    'tipo_troquel',
+                    'n_troquel',
+                    'sin_troquel',
+                    'medio_pago',
+                    'costo'
                 ];
                 $updates = [];
                 $params = [];
 
                 foreach ($allowedFields as $field) {
-                    if (isset($data[$field])) {
+                    if (array_key_exists($field, $data)) {
                         $updates[] = "$field = ?";
                         $params[] = Database::sanitize($data[$field]);
 

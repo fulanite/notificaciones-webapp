@@ -67,21 +67,23 @@ const notifications = {
                     zonas.map(z => `<option value="${z}">${z.toUpperCase()}</option>`).join('');
             }
 
-            // Load Estados
-            const { data: estados } = await db.getDistinctValues('estado');
+            // Load Estados (now based on resultado_diligencia)
+            const { data: estados } = await db.getDistinctValues('resultado_diligencia');
             if (filterEstado && estados) {
+                // Combine with default "pendiente" to ensure it's always selectable
+                const allEstados = Array.from(new Set(['pendiente', ...estados.map(e => e.toLowerCase())]));
                 filterEstado.innerHTML = '<option value="">📊 Todos los estados</option>' +
-                    estados.map(e => {
-                        const label = e.charAt(0).toUpperCase() + e.slice(1);
+                    allEstados.map(e => {
+                        const label = CONFIG.RESULT_OPTIONS[e] || e.charAt(0).toUpperCase() + e.slice(1);
                         return `<option value="${e}">${label}</option>`;
                     }).join('');
             }
 
-            // Load Tipos
+            // Load Tipos (already using tipo_notificacion, but ensuring it uses labels)
             const { data: tipos } = await db.getDistinctValues('tipo_notificacion');
             if (filterTipo && tipos) {
                 filterTipo.innerHTML = '<option value="">📦 Todos los tipos</option>' +
-                    tipos.map(t => `<option value="${t}">${CONFIG.NOTIFICATION_TYPES[t] || t}</option>`).join('');
+                    tipos.map(t => `<option value="${t}">${CONFIG.NOTIFICATION_TYPES[t] || t.toUpperCase()}</option>`).join('');
             }
         } catch (e) {
             console.error('Error loading filter options:', e);
@@ -716,6 +718,18 @@ const notifications = {
             utils.setSelectByText('asignado-a', data.asignado_a);
             document.getElementById('tipo-troquel').value = data.tipo_troquel || '';
             document.getElementById('n-troquel').value = data.n_troquel || '';
+
+            // Sync selector-troquel
+            const troquelSelector = document.getElementById('selector-troquel');
+            if (troquelSelector) {
+                if (data.sin_troquel == 1 || data.sin_troquel === true) {
+                    troquelSelector.value = 'SIN';
+                } else {
+                    troquelSelector.value = data.tipo_troquel || 'C';
+                }
+                app.handleTroquelChange(troquelSelector.value);
+            }
+
             document.getElementById('medio-pago').value = data.medio_pago || '';
             document.getElementById('costo').value = data.costo || '';
             document.getElementById('asignado-a').value = data.asignado_a || '';
@@ -728,16 +742,12 @@ const notifications = {
                 const dateOnly = data.fecha_entrega_ujier.split(' ')[0];
                 if (fechaInput) fechaInput.value = dateOnly;
                 if (fechaForm) fechaForm.value = dateOnly;
+            } else {
+                if (fechaInput) fechaInput.value = '';
+                if (fechaForm) fechaForm.value = '';
             }
 
-            // Handle checkboxes
-            const sinTroquel = document.getElementById('sin-troquel');
-            if (sinTroquel) {
-                sinTroquel.checked = data.sin_troquel || false;
-                if (data.sin_troquel) {
-                    document.getElementById('grupo-n-troquel')?.classList.add('hidden');
-                }
-            }
+
 
 
             utils.showToast('Editando notificación - Modificá los campos y guardá', 'info');

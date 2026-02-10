@@ -158,6 +158,7 @@ const db = {
         if (options.limit) params.limit = options.limit;
         if (options.month) params.month = options.month;
         if (options.devuelta_por_ujier !== undefined) params.devuelta_por_ujier = options.devuelta_por_ujier;
+        if (options.unassigned_only) params.unassigned_only = '1';
 
         const result = await apiClient.get('notificaciones.php', params);
 
