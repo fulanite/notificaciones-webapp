@@ -11,6 +11,7 @@ const asignaciones = {
         selectedIds: new Set(),
         loading: false,
         searchTerm: '',
+        filterYear: '2026',
         initialized: false
     },
 
@@ -55,6 +56,15 @@ const asignaciones = {
 
         // Confirm Reassignment
         document.getElementById('btn-confirm-reasign')?.addEventListener('click', () => this.executeReassignment());
+
+        // Year Filter
+        document.getElementById('filter-asignaciones-year')?.addEventListener('change', (e) => {
+            this.state.filterYear = e.target.value;
+            this.refreshData();
+        });
+
+        // Refresh Button
+        document.getElementById('btn-refresh-asignaciones-top')?.addEventListener('click', () => this.refreshData());
     },
 
     async refreshData() {
@@ -64,7 +74,8 @@ const asignaciones = {
         try {
             const [notifResult, ujieresResult] = await Promise.all([
                 db.getNotifications({
-                    limit: 1000,
+                    limit: 2000,
+                    year: this.state.filterYear,
                     estado: 'pendiente,en_proceso,pre_aviso'
                 }),
                 db.getUjieres()

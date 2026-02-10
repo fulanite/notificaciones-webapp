@@ -12,6 +12,7 @@ const devoluciones = {
         currentZone: null,
         selectedIds: new Set(),
         loading: false,
+        filterYear: '2026',
         initialized: false
     },
 
@@ -44,6 +45,7 @@ const devoluciones = {
             console.log('[Devoluciones] Fetching notifications with devuelta_por_ujier: 0...');
             const result = await db.getNotifications({
                 limit: 2000,
+                year: this.state.filterYear,
                 devuelta_por_ujier: 0
             });
 
@@ -123,6 +125,15 @@ const devoluciones = {
 
         // Confirm Return button
         document.getElementById('btn-confirm-return')?.addEventListener('click', () => this.confirmReturns());
+
+        // Year Filter
+        document.getElementById('filter-devoluciones-year')?.addEventListener('change', (e) => {
+            this.state.filterYear = e.target.value;
+            this.refreshData();
+        });
+
+        // Refresh Button
+        document.getElementById('btn-refresh-devoluciones-top')?.addEventListener('click', () => this.refreshData());
     },
 
     renderZones() {
