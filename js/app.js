@@ -472,18 +472,8 @@ const app = {
             const labelDomicilio = document.querySelector('label[for="domicilio"]');
 
             if (val && val !== '') {
-                // Autopopulate name and origin
+                // Autopopulate name
                 if (nombreInput) nombreInput.value = val;
-
-                const origenInput = document.getElementById('origen-input');
-                const origenHidden = document.getElementById('origen');
-                const origenDinamicoInput = document.getElementById('origen-dinamico-input');
-                const origenDinamicoHidden = document.getElementById('origen-dinamico');
-
-                if (origenInput) origenInput.value = val;
-                if (origenHidden) origenHidden.value = val;
-                if (origenDinamicoInput) origenDinamicoInput.value = val;
-                if (origenDinamicoHidden) origenDinamicoHidden.value = val;
 
                 // Domicilio non-mandatory
                 if (domicilioInput) {
@@ -492,6 +482,9 @@ const app = {
                 }
                 if (labelDomicilio) labelDomicilio.innerHTML = 'Domicilio';
             } else {
+                // Clear autopopulated name if NO APLICA
+                if (nombreInput) nombreInput.value = '';
+
                 // Reset mandatory
                 if (domicilioInput) {
                     domicilioInput.required = true;
@@ -1053,7 +1046,7 @@ const app = {
             origen: origenDinamico || origenJuzgado,
             letrado: getVal('letrado'),
             destinatario_especial: isSpecialVal ? '1' : '0',
-            destinatario_nombre: destinatarioNombre || (isSpecialVal ? destinatarioEspecial : null),
+            destinatario_nombre: isSpecialVal ? destinatarioEspecial : destinatarioNombre,
             domicilio: getVal('domicilio'),
             zona: getVal('zona'),
             fecha_entrega_ujier: getVal('fecha-entrega') || getVal('persist-fecha-entrega'),
