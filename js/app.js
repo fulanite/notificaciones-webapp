@@ -1031,14 +1031,17 @@ const app = {
         const origenDinamico = getVal('origen-dinamico');
         const origenJuzgado = getVal('origen');
 
+        const destinatarioEspecial = getVal('destinatario-especial');
+        const destinatarioNombre = getVal('destinatario-nombre');
+
         const notificationData = {
             tipo_notificacion: getVal('tipo-notificacion'),
             n_expediente: getVal('n-expediente'),
             caratula: getVal('caratula'),
             origen: origenDinamico || origenJuzgado,
             letrado: getVal('letrado'),
-            destinatario_especial: getVal('destinatario-especial') || null,
-            destinatario_nombre: getVal('destinatario-nombre') || getVal('destinatario-especial'),
+            destinatario_especial: utils.isSpecialDestination(destinatarioEspecial) ? destinatarioEspecial : null,
+            destinatario_nombre: destinatarioNombre || (utils.isSpecialDestination(destinatarioEspecial) ? destinatarioEspecial : null),
             domicilio: getVal('domicilio'),
             zona: getVal('zona'),
             fecha_entrega_ujier: getVal('fecha-entrega') || getVal('persist-fecha-entrega'),
