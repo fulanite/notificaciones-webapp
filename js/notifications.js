@@ -438,7 +438,7 @@ const notifications = {
                                 ` : ''}
                                 ${v.foto_url ? `
                                     <a href="${v.foto_url}" target="_blank" class="btn-visit-action" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #8b5cf615; color: #8b5cf6; border-radius: 8px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid #8b5cf630; transition: all 0.2s;">
-                                        📸 Ver Evidencia
+                                        📸 Ver Foto
                                     </a>
                                 ` : ''}
                             </div>
@@ -578,10 +578,10 @@ const notifications = {
                             <div class="dashboard-sidebar">
                                 ${data.evidencia_foto ? `
                                     <div class="sidebar-photo-box">
-                                        <h4 class="sidebar-title">📸 Evidencia</h4>
+                                        <h4 class="sidebar-title">📸 Foto</h4>
                                         <div class="photo-container" onclick="window.open('${data.evidencia_foto}', '_blank')">
                                             <img src="${data.evidencia_foto}">
-                                            <div class="photo-hint">Ampliar Evidencia</div>
+                                            <div class="photo-hint">Ampliar Foto</div>
                                         </div>
                                     </div>
                                 ` : ''}
