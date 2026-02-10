@@ -437,6 +437,7 @@ const planillas = {
                     // Total: 247 unidades (cabe cómodamente en ~265 disponibles)
                 },
                 theme: 'grid', // Grid theme for borders
+                rowPageBreak: 'avoid', // Prevent rows from being cut across pages
                 didDrawCell: (data) => {
                     // Draw square checkbox for 'Devuelta' column
                     if (data.section === 'body' && data.column.index === 12) {

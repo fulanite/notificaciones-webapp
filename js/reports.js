@@ -247,6 +247,7 @@ const reports = {
             headStyles: { fillColor: [238, 238, 238], textColor: 20, fontStyle: "bold" },
             margin: { left: 50, right: 50 },
             columnStyles: { 0: { fontStyle: 'bold' } },
+            rowPageBreak: 'avoid',
         };
 
         // --- TABLE 1: Dynamic Notification Types ---
