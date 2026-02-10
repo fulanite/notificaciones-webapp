@@ -316,7 +316,7 @@ const notifications = {
         let status = notif.estado_display || notif.resultado_diligencia || notif.estado;
 
         // If it's a special recipient and status is 'atiende', show as 'entregado'
-        if ((notif.destinatario_especial) && (status === 'atiende' || status === 'pendiente')) {
+        if (utils.isSpecialDestination(notif.destinatario_especial) && (status === 'atiende' || status === 'pendiente')) {
             // Para ARCAT/Estrados, si aún está pendiente pero es receptor especial, 
             // mantenemos la lógica visual de negocio si corresponde.
             if (status === 'atiende') status = 'entregado';
@@ -530,7 +530,7 @@ const notifications = {
                 '<span class="badge-mini status-warning">⏳ EN PODER DEL UJIER</span>'}
                                             </td>
                                         </tr>
-                                        ${data.destinatario_especial ? `
+                                        ${utils.isSpecialDestination(data.destinatario_especial) ? `
                                             <tr>
                                                 <th>Destino Esp.</th>
                                                 <td><span class="badge-dest-esp">${data.destinatario_especial}</span></td>

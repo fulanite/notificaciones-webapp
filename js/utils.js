@@ -97,6 +97,13 @@ const utils = {
         };
     },
 
+    // Check if a value is a valid special destination (ignores '0' from migration)
+    isSpecialDestination(val) {
+        if (!val) return false;
+        const s = String(val).trim();
+        return s !== '' && s !== '0' && s.toLowerCase() !== 'null';
+    },
+
     // Throttle function
     throttle(func, limit = 300) {
         let inThrottle;

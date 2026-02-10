@@ -219,7 +219,7 @@ const ujier = {
             const isSelected = this.selectedCardId === assignment.id;
             const estadoNormalizado = (assignment.estado || '').toLowerCase().replace(/_/g, ' ').trim();
             const isPreAviso = estadoNormalizado === 'pre aviso';
-            const isSpecial = !!assignment.destinatario_especial;
+            const isSpecial = utils.isSpecialDestination(assignment.destinatario_especial);
 
             return `
             <div class="assignment-card stagger-item ${isSelected ? 'selected' : ''}" 
@@ -241,7 +241,7 @@ const ujier = {
                     </div>
                     
                     <div class="assignment-recipient" style="font-size: 1.25rem; line-height: 1.3;">
-                        👤 <strong>${assignment.destinatario_nombre || assignment.destinatario_especial || '-'}</strong>
+                        👤 <strong>${assignment.destinatario_nombre || (utils.isSpecialDestination(assignment.destinatario_especial) ? assignment.destinatario_especial : '') || '-'}</strong>
                     </div>
                     
                     <div class="assignment-address" style="font-size: 1.15rem; line-height: 1.3; color: var(--text-main); margin-top: 4px;">
@@ -275,7 +275,7 @@ const ujier = {
         const assignment = this.assignments.find(a => a.id === id);
         if (!assignment) return;
 
-        const recipientName = assignment.destinatario_nombre || assignment.destinatario_especial || 'el destinatario';
+        const recipientName = assignment.destinatario_nombre || (utils.isSpecialDestination(assignment.destinatario_especial) ? assignment.destinatario_especial : '') || 'el destinatario';
         const confirmMsg = `¿Confirmar entrega rápida a ${recipientName}?`;
         if (!confirm(confirmMsg)) return;
 
@@ -567,7 +567,7 @@ const ujier = {
         // Limit results for special recipients vs particulars
         const resultSelect = document.getElementById('resultado-diligencia');
         if (resultSelect) {
-            const isSpecial = !!assignment.destinatario_especial;
+            const isSpecial = utils.isSpecialDestination(assignment.destinatario_especial);
 
             Array.from(resultSelect.options).forEach(opt => {
                 if (opt.value === '') return; // "Seleccionar..."

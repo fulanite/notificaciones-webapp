@@ -182,7 +182,7 @@ const planillas = {
             const specialItems = [];
 
             items.forEach(item => {
-                const isSpecial = item.destinatario_especial ||
+                const isSpecial = utils.isSpecialDestination(item.destinatario_especial) ||
                     (item.destinatario_nombre && specialDestinations.includes(item.destinatario_nombre.toLowerCase()));
                 if (isSpecial) {
                     specialItems.push(item);
@@ -313,7 +313,7 @@ const planillas = {
             const specialItems = [];
 
             items.forEach(item => {
-                const isSpecial = item.destinatario_especial ||
+                const isSpecial = utils.isSpecialDestination(item.destinatario_especial) ||
                     (item.destinatario_nombre && specialDestinations.includes(item.destinatario_nombre.toLowerCase()));
 
                 if (isSpecial) {
