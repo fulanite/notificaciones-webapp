@@ -1537,7 +1537,7 @@ const ujier = {
                 <div class="reference-card">
                     <div class="reference-photo-container">
                         ${hasPhoto ?
-                    `<img src="${visit.foto_url}" class="reference-photo" alt="Fachada" loading="lazy" onclick="ujier.viewFullImage(this.src)">` :
+                    `<img src="${visit.foto_url}" class="reference-photo" alt="Fachada" loading="lazy" onclick="event.stopPropagation(); ujier.viewFullImage(this.src)">` :
                     `<div class="reference-no-photo"><span>📷</span> Sin foto disponible</div>`
                 }
                         <span class="reference-badge-zona">${visit.zona || 'SIN ZONA'}</span>
@@ -1759,15 +1759,19 @@ const ujier = {
 
     // View full image
     viewFullImage(url) {
+        console.log('👁️ Opening image viewer for:', url);
         if (!url) return;
         const modal = document.getElementById('modal-image-viewer');
         const img = document.getElementById('full-image-display');
         if (modal && img) {
             img.src = url;
             modal.classList.remove('hidden');
+            modal.style.zIndex = '999999'; // Force top z-index
             // Force reflow
             void modal.offsetWidth;
             modal.classList.add('show');
+        } else {
+            console.error('❌ Modal or image element not found');
         }
     },
 
@@ -1778,6 +1782,7 @@ const ujier = {
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.classList.add('hidden');
+                modal.style.zIndex = ''; // Reset z-index
                 const img = document.getElementById('full-image-display');
                 if (img) img.src = '';
             }, 300);
@@ -1801,5 +1806,7 @@ const ujier = {
     deg2rad(deg) {
         return deg * (Math.PI / 180);
     }
-
 };
+
+// Expose globally if needed (though const ujier is usually global in browser scope)
+window.ujier = ujier;
