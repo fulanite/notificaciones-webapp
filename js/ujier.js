@@ -99,8 +99,7 @@ const ujier = {
         // Handle values with underscores or spaces
         if (status === 'no_atiende' || status.includes('no atiende')) return 'no_atiende';
         if (status === 'atiende' || status.includes('entregado') || (status.includes('atiende') && !status.includes('no'))) return 'atiende';
-        if (status === 'pre_aviso' || status === 'pre aviso' || status.includes('pre aviso')) return 'pre_aviso';
-        if (status === 'pendiente') return 'pre_aviso';
+        if (utils.isPreAviso(status) || status === 'pendiente') return 'pre_aviso';
         if (status === 'estrados' || status.includes('estrados')) return 'estrados';
         if (status.includes('inexistente')) return 'domicilio_inexistente';
         if (status.includes('ausente')) return 'diligenciador_ausente';
@@ -217,8 +216,7 @@ const ujier = {
 
         listContainer.innerHTML = this.assignments.map((assignment, index) => {
             const isSelected = this.selectedCardId === assignment.id;
-            const estadoNormalizado = (assignment.estado || '').toLowerCase().replace(/_/g, ' ').trim();
-            const isPreAviso = estadoNormalizado === 'pre aviso';
+            const isPreAviso = utils.isPreAviso(assignment.estado) || utils.isPreAviso(assignment.resultado_diligencia);
             const isSpecial = utils.isSpecialDestination(assignment.destinatario_especial);
 
             return `
@@ -600,9 +598,8 @@ const ujier = {
         // BLOCKING LOGIC: If already returned, disable form
         const isReturned = assignment.devuelta_por_ujier == 1;
         // Pre-aviso NO cuenta como completado final, permite registrar nueva visita
-        const resultadoNormalizado = (assignment.resultado_diligencia || '').toLowerCase().replace(/_/g, ' ').trim();
-        const isCompleted = !!assignment.resultado_diligencia && resultadoNormalizado !== 'pre aviso';
-        const isPreAviso = resultadoNormalizado === 'pre aviso';
+        const isPreAviso = utils.isPreAviso(assignment.resultado_diligencia);
+        const isCompleted = !!assignment.resultado_diligencia && !isPreAviso;
 
         const form = document.getElementById('form-diligenciar');
         const submitBtn = form?.querySelector('button[type="submit"]');

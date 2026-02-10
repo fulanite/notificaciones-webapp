@@ -51,42 +51,15 @@ function categorizeAndCount(rows) {
     };
 
     rows.forEach(row => {
-        // Dynamic categorization based on 'tipoNotificacion'
-        const tipoNot = (row.tipo_notificacion || '').trim() || 'No especificado';
+        // Dynamic categorization based on 'tipo_notificacion'
+        const tipoNot = (row.tipo_notificacion || '').trim();
 
-        // Map all notification types to their display names
-        let displayTipo = tipoNot;
+        // Use the official label from SGND_DATA if possible
+        const officialType = SGND_DATA.TIPOS_NOTIFICACION.find(t => t.value === tipoNot);
+        let displayTipo = officialType ? officialType.label : (tipoNot || 'No especificado');
 
-        // Mapeo completo de tipos según base de datos (corregido plurales)
-        switch (tipoNot) {
-            case 'cedulas':
-                displayTipo = 'Cédulas';
-                break;
-            case 'cedulas_urgentes_norte': // Fixed typo: urgente -> urgentes
-                displayTipo = 'Cédulas Urgentes Norte';
-                break;
-            case 'cedulas_urgentes_sur': // Fixed typo: urgente -> urgentes
-                displayTipo = 'Cédulas Urgentes Sur';
-                break;
-            case 'cedulas_mandamientos_22172':
-                displayTipo = 'Cédulas o Mandamientos Ley 22.172';
-                break;
-            case 'cedulas_correspondencia':
-                displayTipo = 'Cédulas por Correspondencia (Interior)';
-                break;
-            case 'mandamientos':
-                displayTipo = 'Mandamientos';
-                break;
-            case 'mandamientos_habilitacion_norte':
-                displayTipo = 'Mandamientos con habilitación Norte';
-                break;
-            case 'mandamientos_habilitacion_sur':
-                displayTipo = 'Mandamientos con habilitación Sur';
-                break;
-            default:
-                // Si no coincide con ninguno, usar el valor tal cual con primera letra mayúscula
-                displayTipo = tipoNot.charAt(0).toUpperCase() + tipoNot.slice(1);
-        }
+        // Fallback for empty strings if somehow they bypassed the above
+        if (displayTipo === '') displayTipo = 'No especificado';
 
         counts.tipos.set(displayTipo, (counts.tipos.get(displayTipo) || 0) + 1);
 

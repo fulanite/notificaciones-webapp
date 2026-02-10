@@ -104,6 +104,13 @@ const utils = {
         return s !== '' && s !== '0' && s.toLowerCase() !== 'null';
     },
 
+    // Check if a result is a "Pre Aviso"
+    isPreAviso(status) {
+        if (!status) return false;
+        const s = String(status).toLowerCase().replace(/_/g, ' ').trim();
+        return s === 'pre aviso';
+    },
+
     // Resolves the text to display for a special destination (handles '1' migration case)
     getSpecialDestinationText(notif) {
         if (!this.isSpecialDestination(notif.destinatario_especial)) return null;
@@ -323,15 +330,17 @@ const utils = {
 
     // Get status badge HTML
     getStatusBadge(status) {
+        if (!status) return '<span class="status-badge">Sin estado</span>';
+
+        const norm = String(status).toLowerCase().replace(/ /g, '_');
+
         const badges = {
             // Estados del proceso
             pendiente: '<span class="status-badge status-pending">⏳ Pendiente</span>',
             diligenciada: '<span class="status-badge status-completed">✅ Diligenciada</span>',
-            Entregado: '<span class="status-badge status-completed">✅ Entregado</span>',
             entregado: '<span class="status-badge status-completed">✅ Entregado</span>',
             diferida: '<span class="status-badge status-deferred">⚠️ Diferida</span>',
             // Resultados del ujier
-            entregado: '<span class="status-badge status-completed">✅ Entregado</span>',
             atiende: '<span class="status-badge status-completed">🏘️ Atiende</span>',
             no_atiende: '<span class="status-badge status-deferred">🚪 No Atiende</span>',
             pre_aviso: '<span class="status-badge status-warning">📋 Pre Aviso</span>',
@@ -340,7 +349,7 @@ const utils = {
             diligenciador_ausente: '<span class="status-badge status-warning">👤 Diligenciador Ausente</span>'
         };
 
-        return badges[status] || `<span class="status-badge">${status || 'Sin estado'}</span>`;
+        return badges[norm] || `<span class="status-badge">${status}</span>`;
     },
 
     // Check if online

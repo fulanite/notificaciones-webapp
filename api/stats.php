@@ -31,14 +31,14 @@ try {
                     SUM(CASE WHEN estado = 'pendiente' THEN 1 ELSE 0 END) as pendientes,
                     SUM(CASE 
                         WHEN estado != 'pendiente' 
-                        AND (resultado_diligencia IS NULL OR resultado_diligencia NOT IN ('Pre Aviso', 'PRE_AVISO', 'pre_aviso', 'pre aviso'))
+                        AND (resultado_diligencia IS NULL OR LOWER(REPLACE(resultado_diligencia, '_', ' ')) NOT IN ('pre aviso'))
                         THEN 1 ELSE 0 
                     END) as diligenciadas,
                     SUM(CASE WHEN es_carga_diferida = 1 THEN 1 ELSE 0 END) as diferidas,
                     CAST(ROUND(
                         SUM(CASE 
                             WHEN estado != 'pendiente' 
-                            AND (resultado_diligencia IS NULL OR resultado_diligencia NOT IN ('Pre Aviso', 'PRE_AVISO', 'pre_aviso', 'pre aviso'))
+                            AND (resultado_diligencia IS NULL OR LOWER(REPLACE(resultado_diligencia, '_', ' ')) NOT IN ('pre aviso'))
                             THEN 1 ELSE 0 
                         END) * 100.0 / NULLIF(COUNT(*), 0),
                         2
@@ -112,13 +112,13 @@ try {
                     COUNT(n.id) as total,
                     SUM(CASE 
                         WHEN n.estado != 'pendiente' 
-                        AND (n.resultado_diligencia IS NULL OR n.resultado_diligencia NOT IN ('Pre Aviso', 'PRE_AVISO', 'pre_aviso', 'pre aviso'))
+                        AND (n.resultado_diligencia IS NULL OR LOWER(REPLACE(n.resultado_diligencia, '_', ' ')) NOT IN ('pre aviso'))
                         THEN 1 ELSE 0 
                     END) as completed,
                     ROUND(
                         SUM(CASE 
                             WHEN n.estado != 'pendiente' 
-                            AND (n.resultado_diligencia IS NULL OR n.resultado_diligencia NOT IN ('Pre Aviso', 'PRE_AVISO', 'pre_aviso', 'pre aviso'))
+                            AND (n.resultado_diligencia IS NULL OR LOWER(REPLACE(n.resultado_diligencia, '_', ' ')) NOT IN ('pre aviso'))
                             THEN 1 ELSE 0 
                         END) * 100.0 / NULLIF(COUNT(n.id), 0),
                         2
@@ -142,13 +142,13 @@ try {
                     SUM(CASE WHEN estado = 'pendiente' THEN 1 ELSE 0 END) as pendientes,
                     SUM(CASE 
                         WHEN estado != 'pendiente' 
-                        AND (resultado_diligencia IS NULL OR resultado_diligencia NOT IN ('Pre Aviso', 'PRE_AVISO', 'pre_aviso', 'pre aviso'))
+                        AND (resultado_diligencia IS NULL OR LOWER(REPLACE(resultado_diligencia, '_', ' ')) NOT IN ('pre aviso'))
                         THEN 1 ELSE 0 
                     END) as diligenciadas,
                     ROUND(
                         SUM(CASE 
                             WHEN estado != 'pendiente' 
-                            AND (resultado_diligencia IS NULL OR resultado_diligencia NOT IN ('Pre Aviso', 'PRE_AVISO', 'pre_aviso', 'pre aviso'))
+                            AND (resultado_diligencia IS NULL OR LOWER(REPLACE(resultado_diligencia, '_', ' ')) NOT IN ('pre aviso'))
                             THEN 1 ELSE 0 
                         END) * 100.0 / NULLIF(COUNT(*), 0),
                         2
@@ -225,7 +225,7 @@ try {
                     COUNT(*) as created,
                     SUM(CASE 
                         WHEN estado != 'pendiente' 
-                        AND (resultado_diligencia IS NULL OR resultado_diligencia NOT IN ('Pre Aviso', 'PRE_AVISO', 'pre_aviso', 'pre aviso'))
+                        AND (resultado_diligencia IS NULL OR LOWER(REPLACE(resultado_diligencia, '_', ' ')) NOT IN ('pre aviso'))
                         THEN 1 ELSE 0 
                     END) as completed
                 FROM notificaciones

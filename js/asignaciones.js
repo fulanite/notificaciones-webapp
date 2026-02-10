@@ -123,7 +123,8 @@ const asignaciones = {
 
         this.state.notificaciones.forEach(n => {
             if (n.asignado_a && ujierStats[n.asignado_a]) {
-                if (n.estado === 'pre_aviso') ujierStats[n.asignado_a].preAviso++;
+                const isPre = utils.isPreAviso(n.estado) || utils.isPreAviso(n.resultado_diligencia);
+                if (isPre) ujierStats[n.asignado_a].preAviso++;
                 else ujierStats[n.asignado_a].pending++;
             }
         });
