@@ -281,7 +281,7 @@ const bulkEditor = {
                     resultado_diligencia: newStatus,
                     fecha_diligencia: fechaActual,
                     // If we are forcing a result, we might also want to update the state if it was 'pendiente'
-                    estado: newStatus === 'pre_aviso' ? 'pre_aviso' : (newStatus === 'diligenciada' || newStatus === 'atiende' || newStatus === 'entregado' ? 'entregado' : 'pendiente')
+                    estado: newStatus === 'pre_aviso' ? 'pre_aviso' : (newStatus === 'diligenciada' ? 'diligenciada' : (newStatus === 'atiende' || newStatus === 'entregado' ? 'entregado' : 'pendiente'))
                 })));
             }
 
