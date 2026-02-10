@@ -759,6 +759,16 @@ const notifications = {
         const { data: result, error } = await db.createNotification(data);
 
         if (error) {
+            if (error.message && error.message.includes('1452')) {
+                utils.showToast('Error: El ujier seleccionado no es válido en la base de datos actual. Se ha limpiado la selección.', 'error');
+                // Clear invalid selection
+                const select = document.getElementById('asignado-a');
+                if (select) select.value = '';
+                // Clear persistence
+                localStorage.removeItem('sgnd-persist-ujier');
+                return { success: false, error };
+            }
+
             utils.showToast('Error al crear notificación: ' + error.message, 'error');
             return { success: false, error };
         }
