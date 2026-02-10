@@ -19,6 +19,16 @@ const notifications = {
         unassigned_only: false
     },
 
+    getVisitStatusColor(status) {
+        if (!status) return '#6c757d'; // Gris por defecto
+        const s = status.toLowerCase().replace(/_/g, ' ').trim();
+        if (['atiende', 'entregado', 'positivo'].includes(s)) return '#10b981'; // Verde
+        if (['no atiende', 'domicilio inexistente', 'negativo', 'rechazado'].includes(s)) return '#ef4444'; // Rojo
+        if (['pre aviso', 'estrados', 'pre_aviso', 'preaviso'].includes(s)) return '#f59e0b'; // Naranja
+        if (['diligenciador ausente', 'ausente'].includes(s)) return '#6b7280'; // Gris metálico
+        return '#3b82f6'; // Azul fallback
+    },
+
     // Initialize notifications list
     async init() {
         if (this.initialized) {
@@ -380,54 +390,61 @@ const notifications = {
         try {
             const visitasResp = await db.getVisitas(id);
             if (visitasResp.data && visitasResp.data.length > 0) {
-                // Tactical Logistics Timeline (Shipping style) - Light Theme Optimized
-                visitasHtml = visitasResp.data.map((v, index) => `
-                    <div class="timeline-item-tactical">
-                        <div class="timeline-dot-box">
-                            <div class="timeline-dot-tactical completed"></div>
+                // Premium Sequence Timeline (Map Style)
+                visitasHtml = `
+                    <div class="timeline-steps" style="padding-left: 0; margin-top: 10px;">
+                ` + visitasResp.data.map((v, index) => {
+                    const visitNum = visitasResp.data.length - index;
+                    const statusColor = this.getVisitStatusColor(v.resultado);
+                    const hasTranscription = (v.transcripcion_audio || v.audio_transcripcion || v.transcripcion_observacion);
+
+                    return `
+                    <div class="timeline-step" style="margin-bottom: 24px; gap: 12px;">
+                        <div class="step-marker" style="background:${statusColor}; width: 28px; height: 28px; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white; font-weight: 800;">
+                            ${visitNum}
                         </div>
-                        <div class="timeline-detail">
-                            <div class="timeline-header">
-                                <div class="timeline-header-top">
-                                    <span class="timeline-step">Visita #${visitasResp.data.length - index}</span>
-                                    <span class="timeline-time">${utils.formatDateTime(v.fecha)}</span>
-                                </div>
-                                <div class="timeline-ujier-info">
-                                    <span class="ujier-badge-mini">🚶 ${v.ujier_nombre || 'Sin registro'}</span>
-                                </div>
-                            </div>
-                            <div class="timeline-status">
-                                ${v.resultado ? `<strong>${v.resultado}</strong>` : '<em>Registrada</em>'}
+                        <div class="step-content" style="background: rgba(var(--primary-rgb), 0.03); border: 1px solid rgba(var(--primary-rgb), 0.1); border-radius: 12px; padding: 12px 16px; flex-grow: 1;">
+                            <div class="step-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <span class="step-time" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
+                                    📅 ${utils.formatDateTime(v.fecha)}
+                                </span>
+                                <span class="step-status" style="background:${statusColor}22; color:${statusColor}; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">
+                                    ${v.resultado || 'PENDIENTE'}
+                                </span>
                             </div>
                             
-                            ${v.observaciones ? `<div class="visit-notes-box">📝 ${v.observaciones}</div>` : ''}
-                            
-                            ${(v.transcripcion_audio || v.audio_transcripcion || v.transcripcion_observacion) ? `
-                                <div class="audio-transcription-box">
-                                    <span class="audio-icon">🎤</span>
-                                    <div class="audio-body">
-                                        <span class="audio-label">Transcripción de voz:</span>
-                                        <p class="transcription-text">${v.transcripcion_audio || v.audio_transcripcion || v.transcripcion_observacion}</p>
-                                    </div>
+                            <div class="ujier-info" style="font-size: 0.85rem; color: var(--text-main); font-weight: 500; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                                <span style="opacity: 0.7;">👤 Ujier:</span> <strong>${v.ujier_nombre || 'Sin registro'}</strong>
+                            </div>
+
+                            ${(v.observaciones || hasTranscription) ? `
+                                <div class="visit-obs-box" style="font-size: 0.9rem; color: var(--text-secondary); background: white; padding: 10px; border-radius: 8px; border-left: 3px solid ${statusColor}; margin-bottom: 10px; line-height: 1.4;">
+                                    ${v.observaciones ? `<div>${v.observaciones}</div>` : ''}
+                                    ${hasTranscription ? `
+                                        <div style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(0,0,0,0.1); color: #db2777; font-style: italic; display: flex; gap: 6px;">
+                                            <span>🎤</span>
+                                            <span>${v.transcripcion_audio || v.audio_transcripcion || v.transcripcion_observacion}</span>
+                                        </div>
+                                    ` : ''}
                                 </div>
                             ` : ''}
                             
-                            <div class="timeline-footer mt-2">
+                            <div class="step-actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
                                 ${v.ubicacion_lat && v.ubicacion_lng ? `
                                     <a href="https://www.google.com/maps?q=${v.ubicacion_lat},${v.ubicacion_lng}" 
-                                       target="_blank" class="timeline-link">
-                                        📍 Ubicación GPS
+                                       target="_blank" class="btn-visit-action" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #3b82f615; color: #3b82f6; border-radius: 8px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid #3b82f630; transition: all 0.2s;">
+                                        📍 Ver en Mapa
                                     </a>
                                 ` : ''}
                                 ${v.foto_url ? `
-                                    <a href="${v.foto_url}" target="_blank" class="timeline-link photo-link">
-                                        📸 Ver Foto
+                                    <a href="${v.foto_url}" target="_blank" class="btn-visit-action" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #8b5cf615; color: #8b5cf6; border-radius: 8px; font-size: 0.75rem; font-weight: 600; text-decoration: none; border: 1px solid #8b5cf630; transition: all 0.2s;">
+                                        📸 Ver Evidencia
                                     </a>
                                 ` : ''}
                             </div>
                         </div>
-                    </div>
-                `).join('');
+                    </div>`;
+                }).join('') + `</div>`;
             }
         } catch (e) {
             console.log('No se pudieron cargar visitas:', e);
@@ -570,7 +587,7 @@ const notifications = {
                                 ` : ''}
 
                                 <div class="sidebar-timeline-box">
-                                    <h4 class="sidebar-title">📜 Historial de Visitas</h4>
+                                    <h4 class="sidebar-title">⏱️ Secuencia de Visitas</h4>
                                     <div class="logistics-timeline">
                                         ${visitasHtml || '<div class="timeline-empty">Sin visitas registradas</div>'}
                                     </div>

@@ -810,6 +810,38 @@
     background: rgba(59, 130, 246, 0.25);
 }
 
+/* Premium Visit History Actions */
+.btn-visit-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-visit-action:active {
+    transform: translateY(0);
+}
+
+.sidebar-timeline-box .timeline-steps {
+    position: relative;
+    padding-left: 0;
+}
+
+.sidebar-timeline-box .timeline-steps::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    /* Center of 28px marker */
+    top: 10px;
+    bottom: 40px;
+    width: 2px;
+    background: rgba(var(--primary-rgb), 0.1);
+    z-index: 0;
+}
+
+.sidebar-timeline-box .timeline-step {
+    position: relative;
+    z-index: 1;
+}
+
 /* Responsive - Mobile improvements */
 @media (max-width: 768px) {
     .details-grid {
