@@ -15,7 +15,8 @@ const notifications = {
         search: '',
         zona: '',
         year: '2026',
-        own_only: true
+        own_only: true,
+        unassigned_only: false
     },
 
     // Initialize notifications list
@@ -95,6 +96,7 @@ const notifications = {
         const filterFecha = document.getElementById('filter-fecha');
         const filterZona = document.getElementById('filter-zona');
         const filterPropio = document.getElementById('filter-propio');
+        const filterSinFecha = document.getElementById('filter-sin-fecha');
 
         const updateAndLoad = () => {
             this.currentPage = 1;
@@ -137,6 +139,11 @@ const notifications = {
                 this.filters.own_only = false;
                 utils.showToast('Mostrando todas las notificaciones', 'info');
             }
+            updateAndLoad();
+        });
+
+        filterSinFecha?.addEventListener('change', () => {
+            this.filters.unassigned_only = filterSinFecha.checked;
             updateAndLoad();
         });
 
@@ -213,7 +220,8 @@ const notifications = {
             limit: CONFIG.ITEMS_PER_PAGE,
             ...this.filters,
             user_id: auth.currentUser?.id,
-            user_email: auth.currentUser?.email
+            user_email: auth.currentUser?.email,
+            unassigned_only: this.filters.unassigned_only ? 1 : 0
         };
 
         try {

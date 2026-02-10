@@ -121,15 +121,31 @@ try {
                     $params[] = $_GET['zona'];
                 }
 
+                if (!empty($_GET['unassigned_only']) && $_GET['unassigned_only'] == '1') {
+                    $where[] = "(n.fecha_entrega_ujier IS NULL OR n.fecha_entrega_ujier = '')";
+                }
+
                 if (!empty($_GET['year'])) {
                     $year = (int) $_GET['year'];
                     // Mas robusto para fechas migradas que pueden ser strings o NULL
-                    $where[] = "(
+                    // Si se pide un año, incluimos las que coincidan por YEAR() PERO TAMBIEN permitimos ver las que NO TIENEN FECHA DE ENTREGA
+                    // si unassigned_only NO está activado (para que aparezcan en "Todas")
+
+                    $condition = "(
                         YEAR(n.fecha_entrega_ujier) = ? OR 
                         YEAR(n.fecha_carga) = ? OR 
                         n.fecha_carga LIKE ? OR
-                        n.created_at LIKE ?
-                    )";
+                        n.created_at LIKE ?";
+
+                    // Si NO estamos filtrando SOLO por una zona u otro parametro hiper especifico, 
+                    // y el usuario quiere ver "Todas", permitimos que las sin fecha se vean en el año actual
+                    if (empty($_GET['unassigned_only']) && $year == (int) date('Y')) {
+                        $condition .= " OR n.fecha_entrega_ujier IS NULL OR n.fecha_entrega_ujier = ''";
+                    }
+
+                    $condition .= ")";
+
+                    $where[] = $condition;
                     $params[] = $year;
                     $params[] = $year;
                     $params[] = "%$year%";
