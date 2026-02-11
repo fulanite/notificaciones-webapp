@@ -1054,7 +1054,9 @@
                             </div>
                         </div>
 
-                        <div class="view-toggle" style="justify-content: flex-end;">
+                        <div class="view-toggle" style="justify-content: flex-end; gap: 10px;">
+                            <button id="btn-group-by-date" class="btn-reorder-toggle"
+                                onclick="ujier.toggleGroupByDate()">📋 Agrupar por Fecha</button>
                             <button id="btn-reorder-toggle" class="btn-reorder-toggle">🔃 Reordenar</button>
                         </div>
 
@@ -1083,6 +1085,11 @@
                                     placeholder="Buscar por nombre, domicilio, expediente...">
                             </div>
                             <div class="filter-group">
+                                <button id="btn-group-by-date-history" class="btn btn-secondary"
+                                    onclick="ujier.toggleGroupByDateHistory()" title="Agrupar por fecha"
+                                    style="padding: 8px 12px;">
+                                    <span>📋 Agrupar por Fecha</span>
+                                </button>
                                 <select id="filter-historial-estado" class="filter-input-select"
                                     title="Filtrar por estado">
                                     <option value="">📊 Todos los estados</option>

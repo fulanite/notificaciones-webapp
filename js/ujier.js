@@ -12,6 +12,7 @@ const ujier = {
     reorderMode: false,
     historyData: [], // Almacenar historial completo para filtrado local
     selectedHistoryYear: 2026,
+    groupByDateEnabled: false, // Nuevo: agrupar por fecha de entrega
 
     getVisitStatusColor(status) {
         if (!status) return '#6c757d'; // Gris por defecto
@@ -89,6 +90,26 @@ const ujier = {
             btn.classList.toggle('active', this.reorderMode);
         }
         this.renderAssignments();
+    },
+
+    toggleGroupByDate() {
+        this.groupByDateEnabled = !this.groupByDateEnabled;
+        const btn = document.getElementById('btn-group-by-date');
+        if (btn) {
+            btn.innerHTML = this.groupByDateEnabled ? '📅 Agrupado por Fecha' : '📋 Agrupar por Fecha';
+            btn.classList.toggle('active', this.groupByDateEnabled);
+        }
+        this.renderAssignments();
+    },
+
+    toggleGroupByDateHistory() {
+        this.groupByDateEnabled = !this.groupByDateEnabled;
+        const btn = document.getElementById('btn-group-by-date-history');
+        if (btn) {
+            btn.innerHTML = this.groupByDateEnabled ? '📅 Agrupado por Fecha' : '📋 Agrupar por Fecha';
+            btn.classList.toggle('active', this.groupByDateEnabled);
+        }
+        this.filterHistory(); // Re-render history with grouping
     },
 
     // Setup history filters
@@ -224,12 +245,40 @@ const ujier = {
             return;
         }
 
-        listContainer.innerHTML = this.assignments.map((assignment, index) => {
+        // Si está agrupado por fecha, ordenar por fecha de entrega (más antiguas primero)
+        // IMPORTANTE: No agrupar en modo reordenamiento para evitar problemas de índices
+        let assignmentsToRender = [...this.assignments];
+        if (this.groupByDateEnabled && !this.reorderMode) {
+            assignmentsToRender.sort((a, b) => {
+                const dateA = a.fecha_entrega_ujier || '9999-12-31'; // Sin fecha al final
+                const dateB = b.fecha_entrega_ujier || '9999-12-31';
+                return dateA.localeCompare(dateB); // Orden ascendente (más antiguas primero)
+            });
+        }
+
+        let html = '';
+        let currentDate = null;
+        let globalIndex = 0;
+
+        assignmentsToRender.forEach((assignment, index) => {
             const isSelected = this.selectedCardId === assignment.id;
             const isPreAviso = utils.isPreAviso(assignment.estado) || utils.isPreAviso(assignment.resultado_diligencia);
             const isSpecial = utils.isSpecialDestination(assignment.destinatario_especial);
+            const deliveryDate = assignment.fecha_entrega_ujier;
 
-            return `
+            // Si está habilitado el agrupamiento por fecha, mostrar encabezado de fecha
+            if (this.groupByDateEnabled && !this.reorderMode && deliveryDate !== currentDate) {
+                currentDate = deliveryDate;
+                const dateLabel = deliveryDate ? utils.formatDate(deliveryDate) : 'Sin fecha de entrega';
+                html += `
+                    <div class="date-group-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 12px 16px; border-radius: 12px; margin: 20px 0 12px 0; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);">
+                        <span style="font-size: 1.2rem;">📅</span>
+                        <span>${dateLabel}</span>
+                    </div>
+                `;
+            }
+
+            html += `
             <div class="assignment-card stagger-item ${isSelected ? 'selected' : ''}" 
                  data-id="${assignment.id}" 
                  onclick="ujier.reorderMode ? '' : ujier.openDiligencia('${assignment.id}')">
@@ -257,7 +306,7 @@ const ujier = {
                     </div>
                     
                 ${assignment.caratula ? `<div class="assignment-caratula" style="font-size: 0.85rem; margin-top: 4px; color: var(--text-muted);">📄 ${assignment.caratula}</div>` : ''}
-                ${assignment.fecha_entrega_ujier ? `<div class="assignment-date" style="font-size: 0.75rem; margin-top: 2px; color: var(--text-muted); opacity: 0.8;">📅 Entrega: ${utils.formatDate(assignment.fecha_entrega_ujier)}</div>` : ''}
+                ${assignment.fecha_entrega_ujier && !this.groupByDateEnabled ? `<div class="assignment-date" style="font-size: 0.75rem; margin-top: 2px; color: var(--text-muted); opacity: 0.8;">📅 Entrega: ${utils.formatDate(assignment.fecha_entrega_ujier)}</div>` : ''}
             </div>
                 
                 ${this.reorderMode ? `
@@ -273,7 +322,9 @@ const ujier = {
                 `}
             </div>
             `;
-        }).join('');
+        });
+
+        listContainer.innerHTML = html;
 
         // Limpiar selección después de renderizar (opcional)
         // this.selectedCardId = null;
@@ -1384,15 +1435,41 @@ const ujier = {
             diligenciador_ausente: '🚶'
         };
 
-        listContainer.innerHTML = visits.map(visit => {
-            const status = this.getNormalizedStatus(visit.resultado);
+        // Si está agrupado por fecha, ordenar por fecha (más antiguas primero)
+        let visitsToRender = [...visits];
+        if (this.groupByDateEnabled) {
+            visitsToRender.sort((a, b) => {
+                const dateA = a.fecha || '9999-12-31';
+                const dateB = b.fecha || '9999-12-31';
+                return dateA.localeCompare(dateB); // Orden ascendente (más antiguas primero)
+            });
+        }
 
-            return `
+        let html = '';
+        let currentDate = null;
+
+        visitsToRender.forEach(visit => {
+            const status = this.getNormalizedStatus(visit.resultado);
+            const visitDateStr = visit.fecha ? visit.fecha.split(' ')[0] : null; // YYYY-MM-DD
+
+            // Si está habilitado el agrupamiento por fecha, mostrar encabezado de fecha
+            if (this.groupByDateEnabled && visitDateStr !== currentDate) {
+                currentDate = visitDateStr;
+                const dateLabel = visitDateStr ? utils.formatDate(visitDateStr) : 'Sin fecha';
+                html += `
+                    <div class="date-group-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 12px 16px; border-radius: 12px; margin: 20px 0 12px 0; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);">
+                        <span style="font-size: 1.2rem;">📅</span>
+                        <span>${dateLabel}</span>
+                    </div>
+                `;
+            }
+
+            html += `
                 <div class="assignment-card historial-card" onclick="ujier.openDiligencia('${visit.notificacion_id}')">
                     <div class="historial-icon">${statusIcons[status] || '📄'}</div>
                     <div class="assignment-info">
                         <div class="historial-header">
-                            <span class="historial-fecha">${utils.formatDateTime(visit.fecha)}</span>
+                            <span class="historial-fecha">${this.groupByDateEnabled ? utils.formatTime(visit.fecha) : utils.formatDateTime(visit.fecha)}</span>
                         </div>
                         <div class="assignment-address" style="font-size: 1.15rem; line-height: 1.3; font-weight: 700; color: var(--primary);">🏠 ${visit.domicilio || '-'}</div>
                         <div class="assignment-recipient" style="font-size: 0.95rem; line-height: 1.2; color: var(--text-muted); margin-top: 2px;">👤 <strong>${visit.destinatario_nombre || utils.getSpecialDestinationText(visit) || '-'}</strong></div>
@@ -1405,7 +1482,9 @@ const ujier = {
                     <div class="assignment-arrow">›</div>
                 </div>
             `;
-        }).join('');
+        });
+
+        listContainer.innerHTML = html;
     },
 
     // Initialize References View (Shared by all roles)
