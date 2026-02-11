@@ -486,20 +486,24 @@ const app = {
                 // Autopopulate name
                 if (nombreInput) nombreInput.value = val;
 
-                // Domicilio non-mandatory
+                // Domicilio non-mandatory and default to SIN DOMICILIO
                 if (domicilioInput) {
                     domicilioInput.required = false;
                     domicilioInput.placeholder = "Dirección (Opcional para destinatario especial)";
+                    domicilioInput.value = 'SIN DOMICILIO';
                 }
                 if (labelDomicilio) labelDomicilio.innerHTML = 'Domicilio';
             } else {
                 // Clear autopopulated name if NO APLICA
                 if (nombreInput) nombreInput.value = '';
 
-                // Reset mandatory
+                // Reset mandatory and clear default if present
                 if (domicilioInput) {
                     domicilioInput.required = true;
                     domicilioInput.placeholder = "Dirección completa";
+                    if (domicilioInput.value === 'SIN DOMICILIO') {
+                        domicilioInput.value = '';
+                    }
                 }
                 if (labelDomicilio) labelDomicilio.innerHTML = 'Domicilio *';
             }
