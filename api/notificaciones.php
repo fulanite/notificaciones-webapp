@@ -350,9 +350,9 @@ try {
                 Database::sanitize($data['destinatario_nombre']),
                 Database::sanitize($data['domicilio']),
                 Database::sanitize($data['zona']),
-                $data['tipo_troquel'] ?? null,
-                $data['sin_troquel'] ?? 0,
-                $data['n_troquel'] ?? null,
+                !empty($data['tipo_troquel']) ? $data['tipo_troquel'] : null,
+                isset($data['sin_troquel']) ? (int) $data['sin_troquel'] : 0,
+                !empty($data['n_troquel']) ? (int) $data['n_troquel'] : null,
                 $data['medio_pago'] ?? null,
                 $data['costo'] ?? 0,
                 $asignadoA,
@@ -569,7 +569,19 @@ try {
                 foreach ($allowedFields as $field) {
                     if (array_key_exists($field, $data)) {
                         $updates[] = "$field = ?";
-                        $params[] = Database::sanitize($data[$field]);
+                        $val = $data[$field];
+
+                        if ($field === 'sin_troquel') {
+                            $params[] = ($val === true || $val === '1' || $val === 'true' || $val === 1) ? 1 : 0;
+                        } elseif ($field === 'n_troquel') {
+                            $params[] = !empty($val) ? (int) $val : null;
+                        } elseif ($field === 'costo') {
+                            $params[] = (float) $val;
+                        } elseif ($field === 'tipo_troquel') {
+                            $params[] = !empty($val) ? $val : null;
+                        } else {
+                            $params[] = Database::sanitize($val);
+                        }
 
                         // Si se cambia el ujier, actualizar también la fecha de asignación
                         if ($field === 'asignado_a' && !empty($data['asignado_a'])) {

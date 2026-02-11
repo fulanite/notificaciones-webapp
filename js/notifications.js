@@ -322,7 +322,7 @@ const notifications = {
                     <td class="col-dest" data-label="Destinatario" title="${recipientDisplay}">${recipientDisplay}</td>
                     <td class="col-cargador" data-label="Cargador" title="${notif.cargador_nombre || '-'}">${(notif.cargador_nombre || '-').split(' ')[0]}</td>
                     <td class="col-dom" data-label="Domicilio" title="${notif.domicilio}">${notif.domicilio}</td>
-                    <td class="col-troquel" data-label="Troquel" style="font-family: monospace;">${notif.n_troquel || '-'}</td>
+                    <td class="col-troquel" data-label="Troquel" style="font-family: monospace;">${(notif.sin_troquel == 1 || notif.sin_troquel === true) ? 'SIN' : (notif.n_troquel || '-')}</td>
                 </tr>
             `;
         });
@@ -539,7 +539,7 @@ const notifications = {
                                     <table class="dashboard-table">
                                         <tr>
                                             <th>N° Troquel</th>
-                                            <td class="val-highlight">${data.sin_troquel ? 'N/A' : (data.n_troquel || '-')}</td>
+                                            <td class="val-highlight">${(data.sin_troquel == 1 || data.sin_troquel === true) ? 'N/A' : (data.n_troquel || '-')}</td>
                                         </tr>
                                         <tr>
                                             <th>Medio de Pago</th>
