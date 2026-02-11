@@ -232,15 +232,27 @@ const ujier = {
         let assignmentsToRender = [...this.assignments];
         if (this.groupByDateEnabled && !this.reorderMode) {
             assignmentsToRender.sort((a, b) => {
-                const dateA = a.fecha_entrega_ujier || '9999-12-31'; // Sin fecha al final
+                const dateA = a.fecha_entrega_ujier || '9999-12-31';
                 const dateB = b.fecha_entrega_ujier || '9999-12-31';
-                return dateA.localeCompare(dateB); // Orden ascendente (más antiguas primero)
+
+                if (dateA !== dateB) {
+                    return dateA.localeCompare(dateB);
+                }
+
+                // Dentro de la misma fecha, agrupar especiales primero
+                const specA = utils.isSpecialDestination(a.destinatario_especial) ? 0 : 1;
+                const specB = utils.isSpecialDestination(b.destinatario_especial) ? 0 : 1;
+
+                if (specA !== specB) return specA - specB;
+
+                // Tercer criterio: Domicilio
+                return (a.domicilio || '').localeCompare(b.domicilio || '');
             });
         }
 
         let html = '';
         let currentDate = null;
-        let globalIndex = 0;
+        let currentGroupIsSpecial = null;
 
         assignmentsToRender.forEach((assignment, index) => {
             const isSelected = this.selectedCardId === assignment.id;
@@ -251,11 +263,25 @@ const ujier = {
             // Si está habilitado el agrupamiento por fecha, mostrar encabezado de fecha
             if (this.groupByDateEnabled && !this.reorderMode && deliveryDate !== currentDate) {
                 currentDate = deliveryDate;
+                currentGroupIsSpecial = null; // Reset para nueva fecha
                 const dateLabel = deliveryDate ? utils.formatDate(deliveryDate) : 'Sin fecha de entrega';
                 html += `
                     <div class="date-group-header" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0c4a6e; padding: 12px 16px; border-radius: 12px; margin: 20px 0 12px 0; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2); border: 1px solid #7dd3fc;">
                         <span style="font-size: 1.2rem;">📅</span>
                         <span>${dateLabel}</span>
+                    </div>
+                `;
+            }
+
+            // Agrupamiento por Destino Especial dentro de la fecha
+            if (this.groupByDateEnabled && !this.reorderMode && isSpecial !== currentGroupIsSpecial) {
+                currentGroupIsSpecial = isSpecial;
+                const groupLabel = isSpecial ? '⭐ Destinos Especiales' : '📍 Destinos Normales';
+                const groupColor = isSpecial ? '#f59e0b' : '#64748b';
+                html += `
+                    <div class="special-subgroup-header" style="padding: 4px 16px; margin: 8px 0 4px 0; font-size: 0.75rem; font-weight: 700; color: ${groupColor}; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; opacity: 0.8;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: ${groupColor};"></span>
+                        <span>${groupLabel}</span>
                     </div>
                 `;
             }
@@ -1419,7 +1445,7 @@ const ujier = {
                     <div class="historial-icon">${statusIcons[status] || '📄'}</div>
                     <div class="assignment-info">
                         <div class="historial-header">
-                            <span class="historial-fecha">${this.groupByDateEnabled ? utils.formatTime(visit.fecha) : utils.formatDateTime(visit.fecha)}</span>
+                            <span class="historial-fecha">${this.groupByDateEnabledHistory ? utils.formatTime(visit.fecha) : utils.formatDateTime(visit.fecha)}</span>
                         </div>
                         <div class="assignment-address" style="font-size: 1.15rem; line-height: 1.3; font-weight: 700; color: var(--primary);">🏠 ${visit.domicilio || '-'}</div>
                         <div class="assignment-recipient" style="font-size: 0.95rem; line-height: 1.2; color: var(--text-muted); margin-top: 2px;">👤 <strong>${visit.destinatario_nombre || utils.getSpecialDestinationText(visit) || '-'}</strong></div>
