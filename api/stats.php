@@ -193,7 +193,7 @@ try {
                     HOUR(fecha_diligencia) as hour,
                     COUNT(*) as count
                 FROM notificaciones
-                WHERE YEAR(fecha_carga) = :year AND fecha_diligencia IS NOT NULL
+                WHERE YEAR(fecha_diligencia) = :year AND fecha_diligencia IS NOT NULL
                 GROUP BY HOUR(fecha_diligencia)
                 ORDER BY hour
             ");
