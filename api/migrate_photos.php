@@ -4,8 +4,9 @@
  * Downloads photos from external Glide/Google URLs and saves them locally.
  */
 
-define('SGND_API', true);
-require_once __DIR__ . '/config.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 require_once __DIR__ . '/db.php';
 
 // Increase limits for processing
