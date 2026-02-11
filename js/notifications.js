@@ -716,17 +716,31 @@ const notifications = {
             document.getElementById('caratula').value = data.caratula || '';
             document.getElementById('letrado').value = data.letrado || '';
             if (utils.isSpecialDestination(data.destinatario_especial)) {
-                // If it's a special flag (usually '1'), we use the name from origen/destinatario_nombre
-                // to match the dropdown options.
-                document.getElementById('destinatario-especial').value =
-                    (String(data.destinatario_especial) === '1') ?
-                        (data.destinatario_nombre || data.origen || '1') :
-                        data.destinatario_especial;
+                const specialVal = (String(data.destinatario_especial) === '1') ? (data.destinatario_nombre || data.origen || '1') : data.destinatario_especial;
+                const specialSelect = document.getElementById('destinatario-especial');
+                if (specialSelect) {
+                    specialSelect.value = specialVal;
+                    // Trigger change manually to update Domicilio state (required, placeholder)
+                    // But we'll restore the actual address immediately after 
+                    const currentAddress = data.domicilio || '';
+                    specialSelect.dispatchEvent(new Event('change'));
+                    if (currentAddress) {
+                        document.getElementById('domicilio').value = currentAddress;
+                    }
+                }
             } else {
-                document.getElementById('destinatario-especial').value = '';
+                const specialSelect = document.getElementById('destinatario-especial');
+                if (specialSelect) {
+                    specialSelect.value = '';
+                    specialSelect.dispatchEvent(new Event('change'));
+                }
             }
-            document.getElementById('destinatario-nombre').value = data.destinatario_nombre || '';
-            document.getElementById('domicilio').value = data.domicilio || '';
+            if (data.domicilio) {
+                document.getElementById('domicilio').value = data.domicilio;
+            }
+            if (data.destinatario_nombre) {
+                document.getElementById('destinatario-nombre').value = data.destinatario_nombre;
+            }
 
             // Smart normalization for Zone
             utils.setSelectByText('zona', data.zona);
