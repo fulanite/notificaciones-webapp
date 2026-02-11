@@ -14,7 +14,6 @@ const ujier = {
     selectedHistoryYear: 2026,
     groupByDateEnabled: true, // SIEMPRE agrupado por fecha en RUTA (por defecto)
     groupByDateEnabledHistory: false, // NO agrupar en historial
-    showTomorrowAssignments: false, // Modo preview: ver notificaciones de mañana
 
     getVisitStatusColor(status) {
         if (!status) return '#6c757d'; // Gris por defecto
@@ -93,27 +92,6 @@ const ujier = {
         }
         this.renderAssignments();
     },
-
-    toggleTomorrowPreview() {
-        this.showTomorrowAssignments = !this.showTomorrowAssignments;
-        const btn = document.getElementById('btn-tomorrow-preview');
-        if (btn) {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-            if (this.showTomorrowAssignments) {
-                btn.innerHTML = `📅 Viendo: Mañana ${tomorrowStr}`;
-                btn.classList.add('active');
-            } else {
-                btn.innerHTML = `👁️ Ver notificaciones de mañana ${tomorrowStr}`;
-                btn.classList.remove('active');
-            }
-        }
-        this.loadAssignments(); // Recargar con el filtro aplicado
-    },
-
-    // Función eliminada: ya no se agrupa por fecha en historial
 
     // Setup history filters
     setupHistoryFilters() {
@@ -222,26 +200,8 @@ const ujier = {
             return;
         }
 
-        // Filtrar por fecha según el modo activo
-        let filteredData = data || [];
-        const today = new Date();
-        const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const tomorrowStr = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD
-
-        if (this.showTomorrowAssignments) {
-            // Modo "ver mañana": mostrar SOLO las de mañana
-            filteredData = filteredData.filter(a => a.fecha_entrega_ujier === tomorrowStr);
-        } else {
-            // Modo normal: mostrar todo EXCEPTO las de mañana (solo hoy y anteriores)
-            filteredData = filteredData.filter(a => {
-                const entregaDate = a.fecha_entrega_ujier;
-                return !entregaDate || entregaDate <= todayStr;
-            });
-        }
-
-        this.assignments = filteredData;
+        // Mostrar TODAS las notificaciones pendientes/pre-aviso
+        this.assignments = data || [];
 
         // Aplicar orden guardado
         this.applySavedOrder();
@@ -655,23 +615,14 @@ const ujier = {
                 if (opt.value === '') return; // "Seleccionar..."
 
                 if (isSpecial) {
-                    // For special recipients: only show "Entregado"
-                    if (opt.value === 'entregado') {
-                        opt.disabled = false;
-                        opt.style.display = 'block';
-                    } else {
-                        opt.disabled = true;
-                        opt.style.display = 'none';
-                    }
+                    // Para destinos especiales: solo mostrar "Entregado"
+                    const isEntregado = opt.value === 'entregado';
+                    opt.disabled = !isEntregado;
+                    opt.style.display = isEntregado ? 'block' : 'none';
                 } else {
-                    // For regular recipients: hide "Entregado", show "Atiende" and the rest
-                    if (opt.value === 'entregado') {
-                        opt.disabled = true;
-                        opt.style.display = 'none';
-                    } else {
-                        opt.disabled = false;
-                        opt.style.display = 'block';
-                    }
+                    // Para destinatarios particulares: mostrar TODAS las opciones (incluyendo Entregado para carga diferida)
+                    opt.disabled = false;
+                    opt.style.display = 'block';
                 }
             });
 
