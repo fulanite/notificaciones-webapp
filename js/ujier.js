@@ -12,7 +12,8 @@ const ujier = {
     reorderMode: false,
     historyData: [], // Almacenar historial completo para filtrado local
     selectedHistoryYear: 2026,
-    groupByDateEnabled: true, // SIEMPRE agrupado por fecha (por defecto)
+    groupByDateEnabled: true, // SIEMPRE agrupado por fecha en RUTA (por defecto)
+    groupByDateEnabledHistory: false, // NO agrupar en historial
     showTomorrowAssignments: false, // Modo preview: ver notificaciones de mañana
 
     getVisitStatusColor(status) {
@@ -112,15 +113,7 @@ const ujier = {
         this.loadAssignments(); // Recargar con el filtro aplicado
     },
 
-    toggleGroupByDateHistory() {
-        this.groupByDateEnabled = !this.groupByDateEnabled;
-        const btn = document.getElementById('btn-group-by-date-history');
-        if (btn) {
-            btn.innerHTML = this.groupByDateEnabled ? '📅 Agrupado por Fecha' : '📋 Agrupar por Fecha';
-            btn.classList.toggle('active', this.groupByDateEnabled);
-        }
-        this.filterHistory(); // Re-render history with grouping
-    },
+    // Función eliminada: ya no se agrupa por fecha en historial
 
     // Setup history filters
     setupHistoryFilters() {
@@ -229,14 +222,23 @@ const ujier = {
             return;
         }
 
-        // Filtrar por fecha si está en modo "ver mañana"
+        // Filtrar por fecha según el modo activo
         let filteredData = data || [];
-        if (this.showTomorrowAssignments) {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0]; // YYYY-MM-DD
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD
 
+        if (this.showTomorrowAssignments) {
+            // Modo "ver mañana": mostrar SOLO las de mañana
             filteredData = filteredData.filter(a => a.fecha_entrega_ujier === tomorrowStr);
+        } else {
+            // Modo normal: mostrar todo EXCEPTO las de mañana (solo hoy y anteriores)
+            filteredData = filteredData.filter(a => {
+                const entregaDate = a.fecha_entrega_ujier;
+                return !entregaDate || entregaDate <= todayStr;
+            });
         }
 
         this.assignments = filteredData;
@@ -1455,34 +1457,11 @@ const ujier = {
             diligenciador_ausente: '🚶'
         };
 
-        // Si está agrupado por fecha, ordenar por fecha (más antiguas primero)
-        let visitsToRender = [...visits];
-        if (this.groupByDateEnabled) {
-            visitsToRender.sort((a, b) => {
-                const dateA = a.fecha || '9999-12-31';
-                const dateB = b.fecha || '9999-12-31';
-                return dateA.localeCompare(dateB); // Orden ascendente (más antiguas primero)
-            });
-        }
-
+        // No agrupar en historial - mostrar en orden cronológico inverso (más recientes primero)
         let html = '';
-        let currentDate = null;
 
-        visitsToRender.forEach(visit => {
+        visits.forEach(visit => {
             const status = this.getNormalizedStatus(visit.resultado);
-            const visitDateStr = visit.fecha ? visit.fecha.split(' ')[0] : null; // YYYY-MM-DD
-
-            // Si está habilitado el agrupamiento por fecha, mostrar encabezado de fecha
-            if (this.groupByDateEnabled && visitDateStr !== currentDate) {
-                currentDate = visitDateStr;
-                const dateLabel = visitDateStr ? utils.formatDate(visitDateStr) : 'Sin fecha';
-                html += `
-                    <div class="date-group-header" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0c4a6e; padding: 12px 16px; border-radius: 12px; margin: 20px 0 12px 0; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2); border: 1px solid #7dd3fc;">
-                        <span style="font-size: 1.2rem;">📅</span>
-                        <span>${dateLabel}</span>
-                    </div>
-                `;
-            }
 
             html += `
                 <div class="assignment-card historial-card" onclick="ujier.openDiligencia('${visit.notificacion_id}')">
