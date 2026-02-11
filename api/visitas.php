@@ -28,9 +28,13 @@ try {
                 $stmt->execute([$_GET['notificacion_id']]);
                 Database::sendResponse($stmt->fetchAll());
             } elseif (isset($_GET['ujier_id'])) {
-                // Get visits by ujier with full notification info
-                // Use LEFT JOIN with usuarios to support both UUID and DNI in 'ujier_id' column
-                $stmt = $pdo->prepare("
+                $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 2000;
+                $offset = isset($_GET['offset']) ? (int) $_GET['offset'] : 0;
+
+                $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+                $searchTerm = $search !== '' ? '%' . $search . '%' : null;
+
+                $sql = "
                     SELECT v.*, 
                            n.n_expediente, 
                            n.destinatario_nombre, 
@@ -42,11 +46,21 @@ try {
                     FROM visitas v
                     LEFT JOIN notificaciones n ON v.notificacion_id = n.id
                     LEFT JOIN usuarios u ON (v.ujier_id = u.id OR v.ujier_id = u.dni)
-                    WHERE u.id = ? OR (v.ujier_id IS NULL AND n.asignado_a = ?)
-                    ORDER BY v.fecha DESC
-                    LIMIT 2000
-                ");
-                $stmt->execute([$_GET['ujier_id'], $_GET['ujier_id']]);
+                    WHERE (u.id = ? OR (v.ujier_id IS NULL AND n.asignado_a = ?))
+                ";
+
+                if ($searchTerm) {
+                    $sql .= " AND (n.domicilio LIKE ? OR n.destinatario_nombre LIKE ? OR n.n_expediente LIKE ? OR n.caratula LIKE ? OR v.observaciones LIKE ?)";
+                }
+
+                $sql .= " ORDER BY v.fecha DESC LIMIT $limit OFFSET $offset";
+
+                $stmt = $pdo->prepare($sql);
+                $params = [$_GET['ujier_id'], $_GET['ujier_id']];
+                if ($searchTerm) {
+                    $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
+                }
+                $stmt->execute($params);
                 Database::sendResponse($stmt->fetchAll());
             } elseif (isset($_GET['view']) && $_GET['view'] === 'references') {
                 // Get all "public" visits (excluding special recipients) for logistic references

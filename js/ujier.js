@@ -11,9 +11,13 @@ const ujier = {
     audioChunks: [],
     reorderMode: false,
     historyData: [], // Almacenar historial completo para filtrado local
-    selectedHistoryYear: 2026,
+    selectedHistoryYear: new Date().getFullYear(),
     groupByDateEnabled: true, // SIEMPRE agrupado por fecha en RUTA (por defecto)
     groupByDateEnabledHistory: false, // NO agrupar en historial
+    historyLimit: 50,
+    historyOffset: 0,
+    historyHasMore: true,
+    isLoadingHistory: false,
 
     getVisitStatusColor(status) {
         if (!status) return '#6c757d'; // Gris por defecto
@@ -34,6 +38,7 @@ const ujier = {
         await this.loadAssignments();
         this.loadHistory(); // Cargar historial en segundo plano
         this.setupDiligenciaForm();
+        this.setupInfiniteScroll();
     },
 
     // Update current date display
@@ -99,9 +104,26 @@ const ujier = {
         const dateInput = document.getElementById('filter-historial-fecha');
         const statusSelect = document.getElementById('filter-historial-estado');
 
-        searchInput?.addEventListener('input', () => this.filterHistory());
-        dateInput?.addEventListener('change', () => this.filterHistory());
-        statusSelect?.addEventListener('change', () => this.filterHistory());
+        // Recargar desde el servidor al cambiar filtros o buscar
+        if (searchInput) {
+            const debouncedLoad = utils.debounce(() => this.loadHistory(), 400);
+            searchInput.addEventListener('input', debouncedLoad);
+        }
+
+        dateInput?.addEventListener('change', () => this.loadHistory());
+        statusSelect?.addEventListener('change', () => this.loadHistory());
+    },
+
+    // Observador para scroll infinito en historial
+    setupInfiniteScroll() {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && this.historyHasMore && !this.isLoadingHistory) {
+                this.loadMoreHistory();
+            }
+        }, { threshold: 0.1 });
+
+        // Función para conectar el observador al botón de carga
+        this.historyObserver = observer;
     },
 
     // Get normalized status for filtering and rendering
@@ -1377,36 +1399,69 @@ const ujier = {
 
     // Load work history
     // Load work history
-    async loadHistory() {
-        if (!auth.currentUser) return;
+    async loadHistory(append = false) {
+        if (!auth.currentUser || this.isLoadingHistory) return;
 
         const listContainer = document.getElementById('historial-list');
         if (!listContainer) return;
 
-        listContainer.innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <div class="spinner"></div>
-                <p style="margin-top: 16px; color: var(--text-muted);">Cargando historial...</p>
-            </div>
-        `;
+        const searchQuery = document.getElementById('search-historial')?.value || '';
 
-        // Obtener historial de visitas del usuario (API ya trae JOIN con notificaciones)
-        const { data, error } = await db.getUserVisits(auth.currentUser.id);
-
-        if (error) {
+        if (!append) {
+            this.historyOffset = 0;
+            this.historyData = [];
             listContainer.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: var(--error);">
-                     Error al cargar historial: ${error}
+                <div style="text-align: center; padding: 40px;">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 16px; color: var(--text-muted);">Cargando historial...</p>
                 </div>
             `;
-            return;
         }
 
-        // Guardar data completa para filtrado local
-        this.historyData = data || [];
+        this.isLoadingHistory = true;
 
-        // Aplicar filtros iniciales (incluyendo año seleccionado por defecto)
-        this.filterHistory();
+        try {
+            const { data, error } = await db.getUserVisits(
+                auth.currentUser.id,
+                this.historyLimit,
+                this.historyOffset,
+                searchQuery
+            );
+
+            if (error) throw new Error(error);
+
+            const newVisits = data || [];
+
+            if (append) {
+                this.historyData = [...this.historyData, ...newVisits];
+            } else {
+                this.historyData = newVisits;
+            }
+
+            this.historyHasMore = newVisits.length === this.historyLimit;
+            this.historyOffset += newVisits.length;
+
+            this.filterHistory();
+
+        } catch (err) {
+            console.error('History load error:', err);
+            if (!append) {
+                listContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--error);">
+                        Error al cargar historial: ${err.message}
+                    </div>
+                `;
+            } else {
+                utils.showToast('Error al cargar más historial', 'error');
+            }
+        } finally {
+            this.isLoadingHistory = false;
+        }
+    },
+
+    async loadMoreHistory() {
+        if (!this.historyHasMore || this.isLoadingHistory) return;
+        await this.loadHistory(true);
     },
 
     // Render history list
@@ -1441,7 +1496,7 @@ const ujier = {
             const status = this.getNormalizedStatus(visit.resultado);
 
             html += `
-                <div class="assignment-card historial-card" onclick="ujier.openDiligencia('${visit.notificacion_id}')">
+                <div class="assignment-card historial-card stagger-item" onclick="ujier.openDiligencia('${visit.notificacion_id}')">
                     <div class="historial-icon">${statusIcons[status] || '📄'}</div>
                     <div class="assignment-info">
                         <div class="historial-header">
@@ -1459,6 +1514,26 @@ const ujier = {
                 </div>
             `;
         });
+
+        if (this.historyHasMore) {
+            html += `
+                <div id="infinite-scroll-trigger" style="text-align: center; padding: 20px; margin-top: 10px;">
+                    <div class="spinner-mini" style="display: ${this.isLoadingHistory ? 'inline-block' : 'none'}"></div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">
+                        ${this.isLoadingHistory ? 'Cargando más...' : 'Desliza para cargar más'}
+                    </span>
+                </div>
+            `;
+
+            // Conectar el observador después de renderizar (usando un pequeño delay)
+            setTimeout(() => {
+                const trigger = document.getElementById('infinite-scroll-trigger');
+                if (trigger && this.historyObserver) {
+                    this.historyObserver.disconnect();
+                    this.historyObserver.observe(trigger);
+                }
+            }, 100);
+        }
 
         listContainer.innerHTML = html;
     },

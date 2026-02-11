@@ -251,9 +251,11 @@ const db = {
         return this.getNotificationVisits(notificationId);
     },
 
-    async getUserVisits(userId) {
+    async getUserVisits(userId, limit = 2000, offset = 0, search = '') {
         if (!apiClient) return { data: [], error: null };
-        return apiClient.get('visitas.php', { ujier_id: userId });
+        const params = { ujier_id: userId, limit, offset };
+        if (search) params.search = search;
+        return apiClient.get('visitas.php', params);
     },
 
     async getReferences(search = '') {
