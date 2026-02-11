@@ -1055,8 +1055,15 @@
                         </div>
 
                         <div class="view-toggle" style="justify-content: flex-end; gap: 10px;">
-                            <button id="btn-group-by-date" class="btn-reorder-toggle"
-                                onclick="ujier.toggleGroupByDate()">📋 Agrupar por Fecha</button>
+                            <button id="btn-tomorrow-preview" class="btn-reorder-toggle"
+                                onclick="ujier.toggleTomorrowPreview()">
+                                <script>
+                                    const tomorrow = new Date();
+                                    tomorrow.setDate(tomorrow.getDate() + 1);
+                                    const tomorrowStr = tomorrow.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                    document.write(`👁️ Ver notificaciones de mañana ${tomorrowStr}`);
+                                </script>
+                            </button>
                             <button id="btn-reorder-toggle" class="btn-reorder-toggle">🔃 Reordenar</button>
                         </div>
 

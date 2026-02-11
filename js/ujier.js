@@ -12,7 +12,8 @@ const ujier = {
     reorderMode: false,
     historyData: [], // Almacenar historial completo para filtrado local
     selectedHistoryYear: 2026,
-    groupByDateEnabled: false, // Nuevo: agrupar por fecha de entrega
+    groupByDateEnabled: true, // SIEMPRE agrupado por fecha (por defecto)
+    showTomorrowAssignments: false, // Modo preview: ver notificaciones de mañana
 
     getVisitStatusColor(status) {
         if (!status) return '#6c757d'; // Gris por defecto
@@ -92,14 +93,23 @@ const ujier = {
         this.renderAssignments();
     },
 
-    toggleGroupByDate() {
-        this.groupByDateEnabled = !this.groupByDateEnabled;
-        const btn = document.getElementById('btn-group-by-date');
+    toggleTomorrowPreview() {
+        this.showTomorrowAssignments = !this.showTomorrowAssignments;
+        const btn = document.getElementById('btn-tomorrow-preview');
         if (btn) {
-            btn.innerHTML = this.groupByDateEnabled ? '📅 Agrupado por Fecha' : '📋 Agrupar por Fecha';
-            btn.classList.toggle('active', this.groupByDateEnabled);
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+            if (this.showTomorrowAssignments) {
+                btn.innerHTML = `📅 Viendo: Mañana ${tomorrowStr}`;
+                btn.classList.add('active');
+            } else {
+                btn.innerHTML = `👁️ Ver notificaciones de mañana ${tomorrowStr}`;
+                btn.classList.remove('active');
+            }
         }
-        this.renderAssignments();
+        this.loadAssignments(); // Recargar con el filtro aplicado
     },
 
     toggleGroupByDateHistory() {
@@ -219,7 +229,17 @@ const ujier = {
             return;
         }
 
-        this.assignments = data || [];
+        // Filtrar por fecha si está en modo "ver mañana"
+        let filteredData = data || [];
+        if (this.showTomorrowAssignments) {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0]; // YYYY-MM-DD
+
+            filteredData = filteredData.filter(a => a.fecha_entrega_ujier === tomorrowStr);
+        }
+
+        this.assignments = filteredData;
 
         // Aplicar orden guardado
         this.applySavedOrder();
@@ -271,7 +291,7 @@ const ujier = {
                 currentDate = deliveryDate;
                 const dateLabel = deliveryDate ? utils.formatDate(deliveryDate) : 'Sin fecha de entrega';
                 html += `
-                    <div class="date-group-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 12px 16px; border-radius: 12px; margin: 20px 0 12px 0; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);">
+                    <div class="date-group-header" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0c4a6e; padding: 12px 16px; border-radius: 12px; margin: 20px 0 12px 0; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2); border: 1px solid #7dd3fc;">
                         <span style="font-size: 1.2rem;">📅</span>
                         <span>${dateLabel}</span>
                     </div>
@@ -1457,7 +1477,7 @@ const ujier = {
                 currentDate = visitDateStr;
                 const dateLabel = visitDateStr ? utils.formatDate(visitDateStr) : 'Sin fecha';
                 html += `
-                    <div class="date-group-header" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 12px 16px; border-radius: 12px; margin: 20px 0 12px 0; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);">
+                    <div class="date-group-header" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0c4a6e; padding: 12px 16px; border-radius: 12px; margin: 20px 0 12px 0; font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2); border: 1px solid #7dd3fc;">
                         <span style="font-size: 1.2rem;">📅</span>
                         <span>${dateLabel}</span>
                     </div>
