@@ -334,7 +334,8 @@ const dashboard = {
         const img = document.getElementById('image-viewer-img');
         const cap = document.getElementById('image-viewer-caption');
 
-        img.src = url;
+        const singleUrl = String(url).split(',')[0].trim();
+        img.src = singleUrl;
         if (caption) {
             cap.textContent = caption;
             cap.style.display = 'block';
@@ -532,7 +533,7 @@ const adminMap = {
                         <div style="font-size:0.8em; margin-top:4px; color:#777;">🕒 ${utils.formatTime(point.fecha)}</div>
                         ${point.foto_url ? `
                             <div style="margin-top:6px; display:flex; gap:5px; flex-wrap:wrap;">
-                                ${point.foto_url.split(',').map((url, i) =>
+                                ${point.foto_url.split(',').map(url => url.trim()).map((url, i) =>
                         `<button onclick="dashboard.openImageViewer('${url}', 'Visita #${index + 1} - Foto ${i + 1}')" style="background:#f3f4f6; border:1px solid #d1d5db; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">
                                         📸 Foto ${i + 1}
                                     </button>`
@@ -581,11 +582,11 @@ const adminMap = {
                         <br><small>🕒 ${utils.formatTime(point.fecha)}</small>
                         ${point.foto_url ? `
                             <div style="margin-top:6px; display:flex; gap:5px; flex-wrap:wrap;">
-                                ${point.foto_url.split(',').map((url, i) =>
-                        `<button onclick="dashboard.openImageViewer('${url}', 'Foto ${i + 1} de ${ujierName}')" style="background:#f3f4f6; border:1px solid #d1d5db; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">
+                                ${point.foto_url ? point.foto_url.split(',').map(url => url.trim()).map((url, i) => `
+                                    <button type="button" onclick="ujier.viewFullImage('${url}')" class="btn-visit-action" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #8b5cf615; color: #8b5cf6; border-radius: 6px; font-size: 0.7rem; font-weight: 600; border: 1px solid #8b5cf630; cursor: pointer;">
                                         📸 Foto ${i + 1}
-                                    </button>`
-                    ).join('')}
+                                    </button>
+                                `).join('') : ''}
                             </div>
                         ` : ''}
                     `;

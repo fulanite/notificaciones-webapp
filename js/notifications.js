@@ -459,7 +459,7 @@ const notifications = {
                                         📍 Ver en Mapa
                                     </a>
                                 ` : ''}
-                                ${v.foto_url ? v.foto_url.split(',').map((url, i) => `
+                                ${v.foto_url ? v.foto_url.split(',').map(url => url.trim()).map((url, i) => `
                                     <button type="button" onclick="ujier.viewFullImage('${url}')" class="btn-visit-action" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #8b5cf615; color: #8b5cf6; border-radius: 8px; font-size: 0.75rem; font-weight: 600; border: 1px solid #8b5cf630; transition: all 0.2s; cursor: pointer;">
                                         📸 Foto ${i + 1}
                                     </button>

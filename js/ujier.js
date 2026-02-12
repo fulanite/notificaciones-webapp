@@ -44,7 +44,7 @@ const ujier = {
 
     // Global listeners
     setupGlobalListeners() {
-        document.getElementById('btn-bulk-deliver-open')?.addEventListener('click', () => this.openBulkDeliverModal());
+        // document.getElementById('btn-bulk-deliver-open')?.addEventListener('click', () => this.openBulkDeliverModal());
     },
 
     // Update current date display
@@ -1100,25 +1100,28 @@ const ujier = {
                                 📍 Mapa
                             </a>
                         ` : ''}
-                        ${v.foto_url ? `
-                            <button type="button" onclick="ujier.viewFullImage('${v.foto_url}')" class="btn-visit-action" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #8b5cf615; color: #8b5cf6; border-radius: 6px; font-size: 0.7rem; font-weight: 600; border: 1px solid #8b5cf630; cursor: pointer;">
-                                📸 Foto
+                        ${v.foto_url ? v.foto_url.split(',').map(url => url.trim()).map((url, i) => `
+                            <button type="button" onclick="ujier.viewFullImage('${url}')" class="btn-visit-action" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #8b5cf615; color: #8b5cf6; border-radius: 6px; font-size: 0.7rem; font-weight: 600; border: 1px solid #8b5cf630; cursor: pointer;">
+                                📸 Foto ${i + 1}
                             </button>
-                        ` : ''}
+                        `).join('') : ''}
                     </div>
                 </div>
             </div>`;
         }).join('') + `</div>`;
     },
 
-    // Ver imagen a pantalla completa (Consolidado y Unificado con Dashboard)
     viewFullImage(url, caption = '') {
-        console.log('👁️ Opening image viewer for:', url);
         if (!url) return;
+
+        // Handle comma-separated URLs (take first one for the viewer)
+        const singleUrl = String(url).split(',')[0].trim();
+
+        console.log('👁️ Opening image viewer for:', singleUrl);
 
         // Prioritize the unified dashboard viewer
         if (typeof dashboard !== 'undefined' && dashboard.openImageViewer) {
-            dashboard.openImageViewer(url, caption);
+            dashboard.openImageViewer(singleUrl, caption);
             return;
         }
 
@@ -2027,9 +2030,9 @@ const ujier = {
             return `
                 <div class="reference-card">
                     <div class="reference-photo-container">
-                        ${hasPhoto ?
+                         ${hasPhoto ?
                     `<div class="reference-carousel">
-                                ${visit.foto_url.split(',').map(url =>
+                                ${visit.foto_url.split(',').map(url => url.trim()).map(url =>
                         `<img src="${url}" class="reference-slide-img" alt="Fachada" loading="lazy" onclick="event.stopPropagation(); ujier.viewFullImage('${url}')">`
                     ).join('')}
                             </div>
@@ -2193,7 +2196,7 @@ const ujier = {
                 // Popup Content
                 const photoHtml = point.foto_url
                     ? `<div style="margin-top:5px; display:flex; gap:5px; flex-wrap:wrap;">
-                        ${point.foto_url.split(',').map((url, i) =>
+                        ${point.foto_url.split(',').map(url => url.trim()).map((url, i) =>
                         `<button onclick="ujier.viewFullImage('${url}')" style="background:#f3f4f6; border:1px solid #d1d5db; padding:4px 8px; border-radius:4px; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
                                 📸 Foto ${i + 1}
                             </button>`
