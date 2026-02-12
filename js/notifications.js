@@ -890,6 +890,13 @@ const notifications = {
 
                 select.innerHTML = defaultOption + options;
                 if (persistSelect) persistSelect.innerHTML = defaultPersist + options;
+
+                // Auto-restore persistent ujier if exists in localStorage
+                const savedUjier = localStorage.getItem('sgnd-persist-ujier');
+                if (savedUjier) {
+                    if (select) select.value = savedUjier;
+                    if (persistSelect) persistSelect.value = savedUjier;
+                }
             } else {
                 select.innerHTML = defaultOption;
                 if (persistSelect) persistSelect.innerHTML = defaultPersist;

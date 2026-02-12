@@ -535,7 +535,7 @@ const app = {
         // Modal Nueva Notificación
         const modalNuevaNotif = document.getElementById('modal-nueva-notificacion');
 
-        document.getElementById('btn-open-nueva-notif')?.addEventListener('click', () => {
+        document.getElementById('btn-open-nueva-notif')?.addEventListener('click', async () => {
             modalNuevaNotif?.classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Prevent scroll
 
@@ -550,7 +550,7 @@ const app = {
             if (pBar) pBar.classList.remove('hidden-important');
 
             // Refresh ujieres list to ensure it's up to date
-            notifications.loadUjieres();
+            await notifications.loadUjieres();
 
             this.applyPersistentSettings();
         });
@@ -563,11 +563,6 @@ const app = {
         document.getElementById('btn-close-modal-nueva-notif')?.addEventListener('click', closeModal);
         document.getElementById('btn-cancelar-nueva-notif')?.addEventListener('click', closeModal);
         modalNuevaNotif?.querySelector('.modal-overlay')?.addEventListener('click', closeModal);
-
-        // Persistent settings change
-        document.getElementById('persist-zona')?.addEventListener('change', () => this.savePersistentSettings());
-        document.getElementById('persist-ujier')?.addEventListener('change', () => this.savePersistentSettings());
-        document.getElementById('persist-fecha-entrega')?.addEventListener('change', () => this.savePersistentSettings());
 
         // Close sidebar on mobile when clicking outside
         document.querySelector('.main-content')?.addEventListener('click', () => {
@@ -855,6 +850,9 @@ const app = {
         if (rol === 'admin' || rol === 'administrativo' || rol === 'coordinador') {
             await usuarios.init();
         }
+
+        // Apply persistent settings to sync UI
+        this.applyPersistentSettings();
 
         // Ujier
         if (rol === 'ujier') {
