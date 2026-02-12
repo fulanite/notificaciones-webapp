@@ -228,4 +228,122 @@ class AuditLogger
 
         return $desc;
     }
+    /**
+     * Obtener logs con filtros y paginación
+     */
+    public function getLogs($filters = [], $page = 1, $limit = 50)
+    {
+        try {
+            $where = [];
+            $params = [];
+
+            if (!empty($filters['accion'])) {
+                $where[] = "accion = :accion";
+                $params['accion'] = $filters['accion'];
+            }
+            if (!empty($filters['entidad'])) {
+                $where[] = "entidad = :entidad";
+                $params['entidad'] = $filters['entidad'];
+            }
+            if (!empty($filters['severidad'])) {
+                $where[] = "severidad = :severidad";
+                $params['severidad'] = $filters['severidad'];
+            }
+            if (!empty($filters['usuario_id'])) {
+                $where[] = "usuario_id = :usuario_id";
+                $params['usuario_id'] = $filters['usuario_id'];
+            }
+            if (!empty($filters['fecha_desde'])) {
+                $where[] = "created_at >= :fecha_desde";
+                $params['fecha_desde'] = $filters['fecha_desde'] . ' 00:00:00';
+            }
+            if (!empty($filters['fecha_hasta'])) {
+                $where[] = "created_at <= :fecha_hasta";
+                $params['fecha_hasta'] = $filters['fecha_hasta'] . ' 23:59:59';
+            }
+
+            $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+
+            // Count total
+            $countStmt = $this->pdo->prepare("SELECT COUNT(*) FROM audit_log $whereSql");
+            $countStmt->execute($params);
+            $total = $countStmt->fetchColumn();
+
+            // Get logs
+            $offset = ($page - 1) * $limit;
+            $stmt = $this->pdo->prepare("
+                SELECT * FROM audit_log 
+                $whereSql 
+                ORDER BY created_at DESC 
+                LIMIT :limit OFFSET :offset
+            ");
+
+            // Bind values explicitly for LIMIT/OFFSET
+            foreach ($params as $key => $val) {
+                $stmt->bindValue($key, $val);
+            }
+            $stmt->bindValue('limit', (int) $limit, PDO::PARAM_INT);
+            $stmt->bindValue('offset', (int) $offset, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return [
+                'logs' => $stmt->fetchAll(PDO::FETCH_ASSOC),
+                'total' => (int) $total,
+                'page' => (int) $page,
+                'pages' => ceil($total / $limit)
+            ];
+        } catch (Exception $e) {
+            error_log("Error en getLogs: " . $e->getMessage());
+            return ['logs' => [], 'total' => 0, 'page' => 1, 'pages' => 0];
+        }
+    }
+
+    /**
+     * Obtener estadísticas de auditoría
+     */
+    public function getStats()
+    {
+        try {
+            $stats = [];
+
+            // Acciones hoy
+            $stats['acciones_hoy'] = $this->pdo->query("SELECT COUNT(*) FROM audit_log WHERE DATE(created_at) = CURDATE()")->fetchColumn();
+
+            // Reportes última semana
+            $stats['reportes_semana'] = $this->pdo->query("SELECT COUNT(*) FROM audit_log WHERE accion = 'GENERATE_REPORT' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
+
+            // Usuarios activos hoy (únicos)
+            $stats['usuarios_activos'] = $this->pdo->query("SELECT COUNT(DISTINCT usuario_id) FROM audit_log WHERE DATE(created_at) = CURDATE() AND usuario_id IS NOT NULL")->fetchColumn();
+
+            // Alertas (severidad warning/error/critical) hoy
+            $stats['alertas'] = $this->pdo->query("SELECT COUNT(*) FROM audit_log WHERE severidad IN ('warning', 'error', 'critical') AND created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)")->fetchColumn();
+
+            // Top usuarios (últimos 30 días)
+            $stmt = $this->pdo->query("
+                SELECT usuario_nombre, COUNT(*) as acciones 
+                FROM audit_log 
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) 
+                AND usuario_id IS NOT NULL
+                GROUP BY usuario_id, usuario_nombre 
+                ORDER BY acciones DESC 
+                LIMIT 5
+            ");
+            $stats['top_usuarios'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Distribución de acciones (últimos 30 días)
+            $stmt = $this->pdo->query("
+                SELECT accion, COUNT(*) as count 
+                FROM audit_log 
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) 
+                GROUP BY accion 
+                ORDER BY count DESC
+            ");
+            $stats['distribucion_acciones'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $stats;
+        } catch (Exception $e) {
+            error_log("Error en getStats: " . $e->getMessage());
+            return [];
+        }
+    }
 }

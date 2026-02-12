@@ -1942,6 +1942,24 @@
         </div>
     </div>
 
+    <!-- Auditoría: Modal de Detalles -->
+    <div id="modal-audit-details" class="modal hidden">
+        <div class="modal-overlay" onclick="audit.closeDetails()"></div>
+        <div class="modal-container modal-lg">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 Detalle de Operación</h2>
+                <button class="btn-close-modal" onclick="audit.closeDetails()">×</button>
+            </div>
+            <div class="modal-body" id="audit-details-content">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <div class="modal-footer"
+                style="display: flex; justify-content: flex-end; padding: 15px; border-top: 1px solid #e5e7eb;">
+                <button class="btn btn-secondary" onclick="audit.closeDetails()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <script defer src="js/lazy-loader.js?v=40.10"></script>
     <script defer src="js/config.js?v=40.10"></script>
     <script defer src="js/data.js?v=40.10"></script>

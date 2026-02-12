@@ -1031,6 +1031,11 @@ const app = {
                         ? bulkEditor.init()
                         : Promise.resolve();
                     break;
+                case 'auditoria':
+                    loadPromise = typeof audit !== 'undefined' && audit.init
+                        ? audit.init()
+                        : Promise.resolve();
+                    break;
                 case 'planillas':
                     loadPromise = Promise.all([
                         typeof planillas !== 'undefined' && planillas.init

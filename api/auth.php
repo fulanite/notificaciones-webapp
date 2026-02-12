@@ -7,10 +7,17 @@
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/AuditLogger.php';
 
+session_start();
 $db = Database::getInstance();
 $pdo = $db->getConnection();
 $logger = new AuditLogger($pdo);
 $method = $_SERVER['REQUEST_METHOD'];
+
+// Add CORS with credentials support if not already handled
+header('Access-Control-Allow-Credentials: true');
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+}
 
 // Get the action from query string or JSON body
 $action = $_GET['action'] ?? '';
@@ -86,6 +93,12 @@ try {
 
             // Log successful login
             $logger->logAuth('LOGIN', $userData, 'exito');
+
+            // Store in session for AuditLogger and other requests
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_nombre'] = $user['nombre'];
+            $_SESSION['user_rol'] = $user['rol'];
+            $_SESSION['user_dni'] = $user['dni'];
 
             Database::sendResponse($userData);
             break;

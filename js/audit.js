@@ -264,25 +264,116 @@ const audit = {
 
     // Mostrar detalles de log
     async showDetails(logId) {
-        // TODO: Implementar modal con detalles completos
-        console.log('Show details for log:', logId);
+        utils.showLoading('Cargando detalles...');
+
+        try {
+            // No hay endpoint individual, buscamos en los logs cargados o pedimos de nuevo
+            // Para simplicidad, volveremos a pedir los logs pero filtrados por ID (si el API lo soporta)
+            // O mejor, buscamos en el array local si lo guardamos
+            const log = this.currentLogs.find(l => l.id == logId);
+
+            if (log) {
+                this.renderLogDetails(log);
+                document.getElementById('modal-audit-details').classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error showing log details:', error);
+            utils.showToast('Error al cargar detalles', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    },
+
+    // Renderizar detalles en el modal
+    renderLogDetails(log) {
+        const container = document.getElementById('audit-details-content');
+        if (!container) return;
+
+        const formatJson = (json) => {
+            if (!json) return '<i style="color: #9ca3af;">N/A</i>';
+            try {
+                return `<pre style="background: #f3f4f6; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 0.85em; max-height: 200px;">${JSON.stringify(json, null, 2)}</pre>`;
+            } catch (e) {
+                return json;
+            }
+        };
+
+        container.innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">Información General</h4>
+                    <table class="detail-table" style="width: 100%; font-size: 0.9em;">
+                        <tr><td style="font-weight: 600; padding: 4px 0;">ID Log:</td><td>#${log.id}</td></tr>
+                        <tr><td style="font-weight: 600; padding: 4px 0;">Fecha:</td><td>${this.formatDate(log.created_at)}</td></tr>
+                        <tr><td style="font-weight: 600; padding: 4px 0;">Usuario:</td><td>${log.usuario_nombre || 'Sistema'} (ID: ${log.usuario_id || '-'})</td></tr>
+                        <tr><td style="font-weight: 600; padding: 4px 0;">Rol:</td><td>${log.usuario_rol || '-'}</td></tr>
+                        <tr><td style="font-weight: 600; padding: 4px 0;">Acción:</td><td><span class="badge badge-action">${this.getActionLabel(log.accion)}</span></td></tr>
+                        <tr><td style="font-weight: 600; padding: 4px 0;">Entidad:</td><td>${log.entidad} (ID: ${log.entidad_id || '-'})</td></tr>
+                    </table>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">Detalles Técnicos</h4>
+                    <table class="detail-table" style="width: 100%; font-size: 0.9em;">
+                        <tr><td style="font-weight: 600; padding: 4px 0;">IP:</td><td>${log.ip_address || '-'}</td></tr>
+                        <tr><td style="font-weight: 600; padding: 4px 0;">Método:</td><td>${log.metodo || '-'}</td></tr>
+                        <tr><td style="font-weight: 600; padding: 4px 0;">Ruta:</td><td style="word-break: break-all;">${log.ruta || '-'}</td></tr>
+                        <tr><td style="font-weight: 600; padding: 4px 0;">Resultado:</td><td><span class="badge badge-${log.resultado === 'exito' ? 'success' : 'danger'}">${log.resultado}</span></td></tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">Descripción</h4>
+                <p style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 4px solid #667eea;">${log.descripcion}</p>
+            </div>
+
+            <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">🔄 Datos Anteriores</h4>
+                    ${formatJson(log.datos_anteriores)}
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">🆕 Datos Nuevos</h4>
+                    ${formatJson(log.datos_nuevos)}
+                </div>
+            </div>
+
+            ${log.metadatos ? `
+                <div style="margin-top: 20px;">
+                    <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">📦 Metadatos</h4>
+                    ${formatJson(log.metadatos)}
+                </div>
+            ` : ''}
+
+            ${log.mensaje_error ? `
+                <div style="margin-top: 20px; padding: 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #b91c1c;">
+                    <h4 style="margin-bottom: 4px; font-size: 0.9em; text-transform: uppercase;">Error Registrado</h4>
+                    <p style="font-family: monospace;">${log.mensaje_error}</p>
+                </div>
+            ` : ''}
+        `;
+    },
+
+    closeDetails() {
+        document.getElementById('modal-audit-details').classList.add('hidden');
     },
 
     // Exportar logs
     async exportLogs() {
-        // TODO: Implementar exportación a Excel
-        console.log('Export logs');
+        utils.showToast('Funcionalidad de exportación en desarrollo', 'info');
     },
 
     // Helpers
     formatDate(dateString) {
+        if (!dateString) return '-';
         const date = new Date(dateString);
         return date.toLocaleString('es-AR', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            second: '2-digit'
         });
     },
 
@@ -311,4 +402,14 @@ const audit = {
         };
         return labels[action] || action;
     }
+};
+
+// Guardar array de logs localmente para los detalles
+audit.currentLogs = [];
+
+// Envolver el renderLogs original para guardar el estado
+const originalRenderLogs = audit.renderLogs;
+audit.renderLogs = function (logs) {
+    this.currentLogs = logs || [];
+    originalRenderLogs.call(this, logs);
 };
