@@ -1387,7 +1387,11 @@ const ujier = {
         utils.showLoading('Procesando imágenes...');
 
         try {
-            for (const file of filesToProcess) {
+            for (let i = 0; i < filesToProcess.length; i++) {
+                const file = filesToProcess[i];
+                if (filesToProcess.length > 1) {
+                    utils.showLoading(`Procesando imagen ${i + 1} de ${filesToProcess.length}...`);
+                }
                 // Compress image
                 const compressedBlob = await utils.compressImage(file);
                 this.capturedPhotos.push(compressedBlob);
@@ -1438,8 +1442,16 @@ const ujier = {
 
         if (!this.currentAssignment) return;
 
+        // EARLY CONNECTIVITY GUARD
+        if (!utils.isOnline()) {
+            utils.showToast('Celular sin conexión a internet, todos los cambios que hagas en este estado no se guardarán, aguarde a tener conexión nuevamente', 'error', 6000);
+            return;
+        }
+
         const btnSubmit = event.target.querySelector('button[type="submit"]');
         const originalBtnHtml = btnSubmit.innerHTML;
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span> Guardando...';
 
         const resultado = document.getElementById('resultado-diligencia').value;
         const esCargaDiferida = document.getElementById('carga-diferida').checked;
@@ -1500,12 +1512,18 @@ const ujier = {
                 if (this.capturedPhotos && this.capturedPhotos.length > 0) {
                     console.log(`📸 Subiendo ${this.capturedPhotos.length} fotos...`);
                     const photoUrls = [];
-                    for (const photo of this.capturedPhotos) {
+                    for (let i = 0; i < this.capturedPhotos.length; i++) {
+                        const photo = this.capturedPhotos[i];
+                        const progressMsg = `Subiendo foto ${i + 1} de ${this.capturedPhotos.length}...`;
+                        utils.showLoading(progressMsg);
+
                         const { url, error: photoErr } = await db.uploadPhoto(photo, this.currentAssignment.id);
                         if (!photoErr && url) {
                             photoUrls.push(url);
                         } else {
                             console.error('Error al subir foto:', photoErr);
+                            // If one fails, we might want to warn or abort. 
+                            // For now let's just log and continue if some worked.
                         }
                     }
                     if (photoUrls.length > 0) {
@@ -1516,30 +1534,18 @@ const ujier = {
 
             // Save result
             let response;
-            if (!utils.isOnline()) {
-                console.log('📶 Modo Offline: Guardando en cola local');
-                const actionType = this.isUpdateMode ? 'update_result' : 'register_result';
-                offline.addToQueue(actionType, {
-                    id: this.currentAssignment.id,
-                    result: resultData, // For update, this contains updates. For new, full data.
-                    userId: auth.currentUser?.id
-                });
-                utils.showToast('Guardado localmente. Se sincronizará cuando haya conexión.', 'warning');
-                response = { data: true }; // Fake success
+            if (this.isUpdateMode) {
+                response = await db.updateResult(
+                    this.currentAssignment.id,
+                    resultData,
+                    auth.currentUser?.id
+                );
             } else {
-                if (this.isUpdateMode) {
-                    response = await db.updateResult(
-                        this.currentAssignment.id,
-                        resultData,
-                        auth.currentUser?.id
-                    );
-                } else {
-                    response = await db.registerResult(
-                        this.currentAssignment.id,
-                        resultData,
-                        auth.currentUser?.id
-                    );
-                }
+                response = await db.registerResult(
+                    this.currentAssignment.id,
+                    resultData,
+                    auth.currentUser?.id
+                );
             }
 
             // Handle response
@@ -1570,6 +1576,12 @@ const ujier = {
         } catch (error) {
             console.error('❌ Error fatal al guardar diligencia:', error);
             utils.showToast('Error al guardar: ' + error.message, 'error');
+
+            // Re-enable button on error
+            if (btnSubmit) {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = originalBtnHtml;
+            }
         } finally {
             btnSubmit.disabled = false;
             btnSubmit.innerHTML = originalBtnHtml;

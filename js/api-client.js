@@ -19,18 +19,24 @@ function initApiClient() {
 
         async request(endpoint, options = {}) {
             const url = `${this.baseUrl}/${endpoint}`;
+            const timeout = options.timeout || 30000; // Default 30s timeout
+
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
 
             const defaultOptions = {
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
+                signal: controller.signal
             };
 
             const fetchOptions = { ...defaultOptions, ...options };
 
             try {
                 const response = await fetch(url, fetchOptions);
+                clearTimeout(id);
                 const data = await response.json();
 
                 if (!data.success) {
@@ -39,8 +45,13 @@ function initApiClient() {
 
                 return { data: data.data, error: null };
             } catch (error) {
+                clearTimeout(id);
                 console.error('API Error:', error);
-                return { data: null, error: error.message };
+                const isTimeout = error.name === 'AbortError';
+                return {
+                    data: null,
+                    error: isTimeout ? 'La conexión es demasiado lenta o se agotó el tiempo de espera. Por favor reintente.' : error.message
+                };
             }
         },
 
@@ -74,18 +85,26 @@ function initApiClient() {
         },
 
         async uploadFile(file, notificationId, type = 'photo') {
+            const url = `${this.baseUrl}/upload.php`;
+            const timeout = 45000; // 45s for uploads
+
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+
             const formData = new FormData();
             formData.append('file', file);
             formData.append('notification_id', notificationId);
             formData.append('type', type);
 
             try {
-                const response = await fetch(`${this.baseUrl}/upload.php`, {
+                const response = await fetch(url, {
                     method: 'POST',
                     body: formData,
                     credentials: 'include',
+                    signal: controller.signal
                 });
 
+                clearTimeout(id);
                 const data = await response.json();
 
                 if (!data.success) {
@@ -94,8 +113,13 @@ function initApiClient() {
 
                 return { url: data.data.url, error: null };
             } catch (error) {
+                clearTimeout(id);
                 console.error('Upload Error:', error);
-                return { url: null, error: error.message };
+                const isTimeout = error.name === 'AbortError';
+                return {
+                    url: null,
+                    error: isTimeout ? 'La subida de archivo tardó demasiado. Por favor reintente con una mejor conexión.' : error.message
+                };
             }
         }
     };
