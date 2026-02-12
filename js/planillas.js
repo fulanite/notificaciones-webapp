@@ -125,7 +125,7 @@ const planillas = {
             return null;
         }
 
-        let filteredData = data || [];
+        let filteredData = (data || []).filter(n => n.eliminada != 1);
 
         // Client-side filtering
         if (zona) {

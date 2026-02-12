@@ -1062,9 +1062,11 @@
 
                         <div class="view-toggle" style="justify-content: flex-end; gap: 10px;">
                             <button id="btn-reorder-toggle" class="btn-reorder-toggle">🔃 Reordenar</button>
-                            <button id="btn-bulk-deliver-open" class="btn-bulk-deliver-open hidden"
-                                onclick="ujier.openBulkDeliverModal()">⚡ Entrega
-                                Masiva</button>
+                        </div>
+
+                        <!-- Dedicated section for Bulk Delivery - More visible -->
+                        <div id="bulk-deliver-notice-container" class="hidden">
+                            <!-- Dynamic Content from JS -->
                         </div>
 
                         <div id="assignments-list" class="assignments-list">
@@ -1894,8 +1896,7 @@
                                 <h4 class="section-subtitle">📷 Fotografías (Máx 2)</h4>
                                 <h4 class="section-subtitle">📷 Fotografías (Máx 2)</h4>
                                 <div class="photo-container">
-                                    <div class="photo-actions-row"
-                                        style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                    <div class="photo-actions-row">
                                         <!-- Camera Input -->
                                         <input type="file" id="evidencia-foto-camera" accept="image/*"
                                             capture="environment" class="hidden">

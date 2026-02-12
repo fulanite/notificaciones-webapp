@@ -1887,17 +1887,38 @@ const ujier = {
 
         listContainer.innerHTML = html;
 
-        // Check for special destinations to show/hide bulk delivery button
-        const bulkBtn = document.getElementById('btn-bulk-deliver-open');
-        if (bulkBtn) {
-            const hasSpecials = this.assignments.some(n =>
+        // Check for special destinations to show/hide bulk delivery notice
+        const noticeContainer = document.getElementById('bulk-deliver-notice-container');
+        if (noticeContainer) {
+            const specialPending = this.assignments.filter(n =>
                 utils.isSpecialDestination(n.destinatario_especial) &&
                 (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
             );
-            if (hasSpecials) {
-                bulkBtn.classList.remove('hidden');
+
+            if (specialPending.length > 0) {
+                // Group by destination to show summary
+                const counts = {};
+                specialPending.forEach(n => {
+                    const name = utils.getSpecialDestinationText(n);
+                    counts[name] = (counts[name] || 0) + 1;
+                });
+
+                const totalPoints = Object.keys(counts).length;
+
+                noticeContainer.innerHTML = `
+                    <div class="bulk-deliver-notice-box stagger-item" onclick="ujier.openBulkDeliverModal()">
+                        <div class="notice-icon">⚡</div>
+                        <div class="notice-content">
+                            <strong>Entrega Masiva Disponible</strong>
+                            <p>Tenés ${specialPending.length} notificaciones para ${totalPoints} destinos especiales.</p>
+                        </div>
+                        <button class="btn-notice-action">📦 Abrir</button>
+                    </div>
+                `;
+                noticeContainer.classList.remove('hidden');
             } else {
-                bulkBtn.classList.add('hidden');
+                noticeContainer.classList.add('hidden');
+                noticeContainer.innerHTML = '';
             }
         }
     },
