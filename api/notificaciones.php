@@ -94,9 +94,8 @@ try {
                 $where = ["1=1"];
                 $params = [];
 
-                // By default we include everything in the general list, the frontend colors them
-                // but if we wanted to filter we could add a flag here.
-                if (isset($_GET['hide_deleted']) && $_GET['hide_deleted'] == '1') {
+                // Default to hiding deleted notifications
+                if (!isset($_GET['hide_deleted']) || $_GET['hide_deleted'] == '1') {
                     $where[] = "(n.eliminada = 0 OR n.eliminada IS NULL)";
                 }
 

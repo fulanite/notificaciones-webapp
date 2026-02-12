@@ -47,6 +47,7 @@ try {
                     LEFT JOIN notificaciones n ON v.notificacion_id = n.id
                     LEFT JOIN usuarios u ON (v.ujier_id = u.id OR v.ujier_id = u.dni)
                     WHERE (u.id = ? OR (v.ujier_id IS NULL AND n.asignado_a = ?))
+                    AND (n.eliminada = 0 OR n.eliminada IS NULL)
                 ";
 
                 if ($searchTerm) {
@@ -80,6 +81,7 @@ try {
                     LEFT JOIN notificaciones n ON v.notificacion_id = n.id
                     LEFT JOIN usuarios u ON (v.ujier_id = u.id OR v.ujier_id = u.dni)
                     WHERE (n.destinatario_especial IS NULL OR n.destinatario_especial = '' OR n.destinatario_especial = '0' OR n.destinatario_especial = 'false')
+                    AND (n.eliminada = 0 OR n.eliminada IS NULL)
                 ";
 
                 if ($searchTerm) {
@@ -114,6 +116,7 @@ try {
                         LEFT JOIN notificaciones n ON v.notificacion_id = n.id
                         LEFT JOIN usuarios u ON (v.ujier_id = u.id OR v.ujier_id = u.dni)
                         WHERE DATE(v.fecha) = ?
+                        AND (n.eliminada = 0 OR n.eliminada IS NULL)
                         AND v.ubicacion_lat IS NOT NULL 
                         AND v.ubicacion_lat != ''
                         ORDER BY v.fecha ASC
@@ -128,6 +131,7 @@ try {
                         LEFT JOIN notificaciones n ON v.notificacion_id = n.id
                         WHERE (v.ujier_id = ? OR v.ujier_id = (SELECT dni FROM usuarios WHERE id = ?))
                         AND DATE(v.fecha) = ?
+                        AND (n.eliminada = 0 OR n.eliminada IS NULL)
                         AND v.ubicacion_lat IS NOT NULL 
                         AND v.ubicacion_lat != ''
                         ORDER BY v.fecha ASC
@@ -145,6 +149,7 @@ try {
                     LEFT JOIN usuarios u1 ON v.ujier_id = u1.id
                     LEFT JOIN usuarios u2 ON v.ujier_id = u2.dni
                     LEFT JOIN notificaciones n ON v.notificacion_id = n.id
+                    WHERE (n.eliminada = 0 OR n.eliminada IS NULL)
                     ORDER BY v.fecha DESC
                     LIMIT 100
                 ");
