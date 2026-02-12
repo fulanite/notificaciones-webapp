@@ -1824,123 +1824,6 @@
             </button>
         </nav>
 
-        <!-- Modal para Diligenciamiento -->
-        <div id="modal-diligenciar" class="modal hidden">
-            <div class="modal-overlay"></div>
-            <div class="modal-content">
-                <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
-                    <button type="button" onclick="ujier.closeDiligencia()"
-                        style="background:none; border:none; font-size: 1.5rem; cursor: pointer; margin-right: 15px; line-height: 1;">⬅️</button>
-                    <h2 class="modal-title" style="flex-grow: 1;">Registrar Resultado</h2>
-                    <button class="modal-close" id="modal-close">×</button>
-                </div>
-                <div class="modal-body">
-                    <form id="form-diligenciar">
-                        <input type="hidden" id="diligencia-id">
-
-                        <div class="notification-summary" id="notif-summary">
-                            <!-- Dynamic summary -->
-                        </div>
-
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label class="form-label">¿Sin Señal / Carga Diferida?</label>
-                                <label class="switch">
-                                    <input type="checkbox" id="carga-diferida">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-
-                            <div id="motivo-falla-container" class="form-group hidden">
-                                <label for="motivo-falla" class="form-label">Motivo de Falla *</label>
-                                <select id="motivo-falla" class="form-select">
-                                    <option value="">Seleccionar...</option>
-                                    <option value="sin_senal_domicilio">Falta de señal en domicilio</option>
-                                    <option value="falla_datos">Falla temporal de datos</option>
-                                    <option value="otro">Otro</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <div class="form-group">
-                                <label for="resultado-diligencia" class="form-label">Resultado *</label>
-                                <select id="resultado-diligencia" class="form-select" required>
-                                    <option value="">Seleccionar resultado...</option>
-                                    <option value="entregado">Entregado</option>
-                                    <option value="atiende">Atiende</option>
-                                    <option value="no_atiende">No Atiende</option>
-                                    <option value="pre aviso">Pre Aviso</option>
-                                    <option value="estrados">Estrados</option>
-                                    <option value="domicilio_inexistente">Domicilio Inexistente</option>
-                                    <option value="diligenciador_ausente">Diligenciador Ausente</option>
-                                    <option value="otros">Otros</option>
-                                </select>
-                            </div>
-
-                            <div id="gps-wrapper" class="form-section">
-                                <h4 class="section-subtitle">📍 Ubicación GPS</h4>
-                                <div class="gps-container" id="gps-container">
-                                    <button type="button" class="btn btn-secondary btn-gps" id="btn-capture-gps">
-                                        <span>📍</span> Capturar Ubicación
-                                    </button>
-                                    <div class="gps-info hidden" id="gps-info">
-                                        <span class="gps-status">✅ Ubicación capturada</span>
-                                    </div>
-                                </div>
-                                <input type="hidden" id="ubicacion-lat">
-                                <input type="hidden" id="ubicacion-lng">
-                            </div>
-
-                            <div class="form-section">
-                                <h4 class="section-subtitle">📷 Fotografías (Máx 2)</h4>
-                                <h4 class="section-subtitle">📷 Fotografías (Máx 2)</h4>
-                                <div class="photo-container">
-                                    <div class="photo-actions-row">
-                                        <!-- Camera Input -->
-                                        <input type="file" id="evidencia-foto-camera" accept="image/*"
-                                            capture="environment" class="hidden">
-                                        <label for="evidencia-foto-camera" class="btn btn-secondary"
-                                            style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                            <span style="font-size: 1.2rem;">📷</span>
-                                            <span>Cámara</span>
-                                        </label>
-
-                                        <!-- Gallery Input -->
-                                        <input type="file" id="evidencia-foto-gallery" accept="image/*" multiple
-                                            class="hidden">
-                                        <label for="evidencia-foto-gallery" class="btn btn-secondary"
-                                            style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                            <span style="font-size: 1.2rem;">🖼️</span>
-                                            <span>Galería</span>
-                                        </label>
-                                    </div>
-
-                                    <div id="photo-preview-grid" class="photo-preview-grid">
-                                        <!-- Multiple previews -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-section">
-                                <div class="form-group">
-                                    <label for="observaciones-resultado" class="form-label">Observaciones</label>
-                                    <textarea id="observaciones-resultado" class="form-textarea" rows="4"
-                                        placeholder="Ingresá detalles, observaciones o dictá con el micrófono del teclado..."></textarea>
-                                </div>
-                            </div>
-
-                            <div class="modal-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    <span>✅</span> Guardar Resultado
-                                </button>
-                                <button type="button" class="btn btn-secondary"
-                                    id="btn-cancel-diligencia">Cancelar</button>
-                            </div>
-                    </form>
-                </div>
-            </div>
-        </div>
 
 
 
@@ -1948,27 +1831,6 @@
 
         <!-- Toast Notifications -->
         <div id="toast-container" class="toast-container"></div>
-
-        <!-- Modal for Bulk Delivery -->
-        <div id="modal-bulk-deliver" class="modal hidden">
-            <div class="modal-overlay" onclick="ujier.closeBulkDeliverModal()"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">📦 Entrega Masiva</h2>
-                    <button class="modal-close" onclick="ujier.closeBulkDeliverModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p class="modal-subtitle">Seleccioná un grupo para marcar como entregado:</p>
-                    <div id="bulk-groups-container" class="bulk-groups-list">
-                        <!-- Dynamic groups -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary"
-                        onclick="ujier.closeBulkDeliverModal()">Cancelar</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Leaflet (Maps) -->
@@ -2103,6 +1965,183 @@
             }
         }
     </script>
+    <!-- Modales de Gestión de Campo -->
+    <!-- Modal para Entrega Masiva -->
+    <div id="modal-bulk-deliver" class="modal hidden">
+        <div class="modal-overlay" onclick="ujier.closeBulkDeliverModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📦 Entrega Masiva</h2>
+                <button class="modal-close" onclick="ujier.closeBulkDeliverModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Seleccioná un grupo para marcar como entregado:</p>
+                <div id="bulk-groups-container" class="bulk-groups-list">
+                    <!-- Dynamic groups -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                    onclick="ujier.closeBulkDeliverModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal para Diligenciamiento -->
+    <div id="modal-diligenciar" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <button type="button" onclick="ujier.closeDiligencia()"
+                    style="background:none; border:none; font-size: 1.5rem; cursor: pointer; margin-right: 15px; line-height: 1;">⬅️</button>
+                <h2 class="modal-title" style="flex-grow: 1;">Registrar Resultado</h2>
+                <button class="modal-close" id="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-diligenciar">
+                    <input type="hidden" id="diligencia-id">
+
+                    <div class="notification-summary" id="notif-summary">
+                        <!-- Dynamic summary -->
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label class="form-label">¿Sin Señal / Carga Diferida?</label>
+                            <label class="switch">
+                                <input type="checkbox" id="carga-diferida">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div id="motivo-falla-container" class="form-group hidden">
+                            <label for="motivo-falla" class="form-label">Motivo de Falla *</label>
+                            <select id="motivo-falla" class="form-select">
+                                <option value="">Seleccionar...</option>
+                                <option value="sin_senal_domicilio">Falta de señal en domicilio</option>
+                                <option value="falla_datos">Falla temporal de datos</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="resultado-diligencia" class="form-label">Resultado *</label>
+                            <select id="resultado-diligencia" class="form-select" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="atiende">Atiende y se entrega</option>
+                                <option value="no_atiende">No atiende (Cerrado)</option>
+                                <option value="domicilio_inexistente">Domicilio inexistente / No se
+                                    encuentra</option>
+                                <option value="rechazado">Se niega a recibir / Firma</option>
+                                <option value="pre_aviso">Pre-Aviso (1ra Visita)</option>
+                                <option value="pre_aviso_2">Pre-Aviso (2da Visita)</option>
+                                <option value="estrados">Cij - Estrados</option>
+                                <option value="diligenciador_ausente">Diligenciador Ausente</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-group troquel-selection" style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <label for="tipo-troquel" class="form-label">Tipo Troquel</label>
+                                <select id="tipo-troquel" class="form-select">
+                                    <option value="">Ninguno</option>
+                                    <option value="fisico">Físico</option>
+                                    <option value="manual">Manual</option>
+                                </select>
+                            </div>
+                            <div style="flex: 1;">
+                                <label for="n-troquel-resultado" class="form-label">Número</label>
+                                <input type="text" id="n-troquel-resultado" class="form-input" placeholder="Ej: 123456">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section" id="gps-wrapper">
+                        <div class="gps-location-card">
+                            <div class="gps-header">
+                                <div class="gps-status" id="gps-status">
+                                    <span class="status-dot"></span>
+                                    <span id="gps-status-text">Ubicación no capturada</span>
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-gps" id="btn-capture-gps">
+                                    📍 Capturar
+                                </button>
+                            </div>
+                            <div id="gps-preview-map" class="gps-preview-map"></div>
+                            <input type="hidden" id="ubicacion-lat">
+                            <input type="hidden" id="ubicacion-lng">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4 class="section-subtitle">📷 Fotografías (Máx 2)</h4>
+                        <div class="photo-container">
+                            <div class="photo-actions-row">
+                                <!-- Camera Input -->
+                                <input type="file" id="evidencia-foto-camera" accept="image/*" capture="environment"
+                                    class="hidden">
+                                <label for="evidencia-foto-camera" class="btn btn-secondary"
+                                    style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <span style="font-size: 1.2rem;">📷</span>
+                                    <span>Cámara</span>
+                                </label>
+
+                                <!-- Gallery Input -->
+                                <input type="file" id="evidencia-foto-gallery" accept="image/*" multiple class="hidden">
+                                <label for="evidencia-foto-gallery" class="btn btn-secondary"
+                                    style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <span style="font-size: 1.2rem;">🖼️</span>
+                                    <span>Galería</span>
+                                </label>
+                            </div>
+
+                            <div id="photo-preview-grid" class="photo-preview-grid">
+                                <!-- Multiple previews -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="observaciones-resultado" class="form-label">Observaciones</label>
+                            <textarea id="observaciones-resultado" class="form-textarea" rows="4"
+                                placeholder="Ingresá detalles, observaciones o dictá con el micrófono del teclado..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label class="form-label">Voz a Texto (Transcribir)</label>
+                            <div class="audio-recorder-container">
+                                <button type="button" id="btn-record-audio" class="btn btn-circle btn-record"
+                                    title="Grabar audio para transcribir">
+                                    🎤
+                                </button>
+                                <div id="recording-indicator" class="recording-indicator hidden">
+                                    <span class="pulse-dot"></span>
+                                    <span id="recording-timer">00:00</span>
+                                </div>
+                            </div>
+                            <textarea id="transcripcion-audio" class="form-textarea hidden" rows="2"
+                                placeholder="La transcripción del audio aparecerá aquí..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <span>✅</span> Guardar Resultado
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-diligencia">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
 </body>
 
 </html>

@@ -1906,13 +1906,13 @@ const ujier = {
                 const totalPoints = Object.keys(counts).length;
 
                 noticeContainer.innerHTML = `
-                    <div class="bulk-deliver-notice-box stagger-item" onclick="ujier.openBulkDeliverModal()">
+                    <div class="bulk-deliver-notice-box stagger-item" onclick="event.stopPropagation(); ujier.openBulkDeliverModal()">
                         <div class="notice-icon">⚡</div>
                         <div class="notice-content">
                             <strong>Entrega Masiva Disponible</strong>
                             <p>Tenés ${specialPending.length} notificaciones para ${totalPoints} destinos especiales.</p>
                         </div>
-                        <button class="btn-notice-action">📦 Abrir</button>
+                        <button class="btn-notice-action" onclick="event.stopPropagation(); ujier.openBulkDeliverModal()">📦 Abrir</button>
                     </div>
                 `;
                 noticeContainer.classList.remove('hidden');
