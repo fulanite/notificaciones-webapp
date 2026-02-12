@@ -7,7 +7,7 @@ const planillas = {
 
     init() {
         this.setupEventListeners();
-        this.setDefaultDate();
+        // this.setDefaultDate(); // Removed: user wants it blank by default
         this.populateZones();
     },
 
@@ -109,7 +109,6 @@ const planillas = {
         const fecha = document.getElementById('planilla-fecha')?.value;
 
         if (!fecha) {
-            utils.showToast('Seleccione una fecha', 'warning');
             return null;
         }
 
@@ -148,10 +147,17 @@ const planillas = {
     },
 
     async updatePreview() {
+        const fecha = document.getElementById('planilla-fecha')?.value;
+        const tbody = document.querySelector('#tabla-planillas-preview tbody');
+
+        if (!fecha) {
+            if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center">Seleccione una fecha para ver la vista previa</td></tr>';
+            return;
+        }
+
         const data = await this.fetchData();
         if (!data) return;
 
-        const tbody = document.querySelector('#tabla-planillas-preview tbody');
         if (!tbody) return;
 
         tbody.innerHTML = '';
