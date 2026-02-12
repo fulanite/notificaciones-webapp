@@ -116,6 +116,10 @@ try {
             $updates = [];
             $params = [];
 
+            if (isset($data['email'])) {
+                $updates[] = "email = ?";
+                $params[] = Database::sanitize($data['email']);
+            }
             if (isset($data['nombre'])) {
                 $updates[] = "nombre = ?";
                 $params[] = Database::sanitize($data['nombre']);
