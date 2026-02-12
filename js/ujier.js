@@ -879,35 +879,40 @@ const ujier = {
         }).join('') + `</div>`;
     },
 
-    // Ver imagen a pantalla completa (Consolidado)
+    // Ver imagen a pantalla completa (Consolidado y Unificado con Dashboard)
     viewFullImage(url, caption = '') {
         console.log('👁️ Opening image viewer for:', url);
         if (!url) return;
 
+        // Prioritize the unified dashboard viewer
+        if (typeof dashboard !== 'undefined' && dashboard.openImageViewer) {
+            dashboard.openImageViewer(url, caption);
+            return;
+        }
+
+        // Fallback to internal modal if dashboard not available
         let modal = document.getElementById('modal-image-viewer');
         const img = document.getElementById('full-image-display');
 
         if (!modal || !img) {
             console.error('Image viewer modal not found in DOM');
-            // Fallback to new tab if modal is missing for some reason
             window.open(url, '_blank');
             return;
         }
 
         img.src = url;
-
-        // Show modal
         modal.classList.remove('hidden');
-        // Force reflow for animation
         modal.offsetHeight;
         modal.classList.add('show');
-
-        // Disable body scroll
         document.body.style.overflow = 'hidden';
     },
 
     // Cerrar visor de imagen
     closeImageViewer() {
+        if (typeof dashboard !== 'undefined' && dashboard.closeImageViewer) {
+            dashboard.closeImageViewer();
+        }
+
         const modal = document.getElementById('modal-image-viewer');
         if (modal) {
             modal.classList.remove('show');

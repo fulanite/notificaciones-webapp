@@ -2229,7 +2229,7 @@ body.map-fullscreen {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.95);
-    z-index: 2000000;
+    z-index: 5000000;
     /* Higher than map fullscreen (999999) */
     display: flex;
     justify-content: center;

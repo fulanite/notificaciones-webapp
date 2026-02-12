@@ -335,7 +335,15 @@ const dashboard = {
         const cap = document.getElementById('image-viewer-caption');
 
         img.src = url;
-        cap.textContent = caption;
+        if (caption) {
+            cap.textContent = caption;
+            cap.style.display = 'block';
+        } else {
+            cap.style.display = 'none';
+        }
+
+        // Disable body scroll
+        document.body.style.overflow = 'hidden';
 
         // Timeout to ensure display block before opacity transition
         requestAnimationFrame(() => {
@@ -347,6 +355,8 @@ const dashboard = {
         const modal = document.getElementById('image-viewer-modal');
         if (modal) {
             modal.classList.remove('active');
+            // Re-enable body scroll
+            document.body.style.overflow = '';
             setTimeout(() => {
                 const img = document.getElementById('image-viewer-img');
                 if (img) img.src = '';
