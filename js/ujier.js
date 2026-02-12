@@ -203,13 +203,34 @@ const ujier = {
         const listContainer = document.getElementById('assignments-list');
         if (!listContainer) return;
 
-        // Show loading
-        listContainer.innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <div class="spinner"></div>
-                <p style="margin-top: 16px; color: var(--text-muted);">Cargando asignaciones...</p>
-            </div>
-        `;
+        // Try to load from cache first for instant feel
+        const cachedData = offline.getCachedData(`assignments_${auth.currentUser.id}`);
+        if (cachedData) {
+            console.log('📦 Usando datos en caché para carga instantánea');
+            this.assignments = cachedData.filter(n => n.eliminada != 1);
+            this.applySavedOrder();
+            this.renderAssignments();
+            this.setupDragDrop();
+            this.updateStats();
+
+            // Show a subtle indicator that we are refreshing
+            // utils.showToast('Actualizando datos...', 'info'); 
+            // Better to show nothing and just update silently unless error
+        } else {
+            // Show Skeleton Loading if no cache
+            const skeletonHTML = Array(5).fill(0).map(() => `
+                <div class="skeleton-card">
+                    <div class="skeleton-icon skeleton-pulse"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-text-lg skeleton-pulse"></div>
+                        <div class="skeleton-text-md skeleton-pulse"></div>
+                        <div class="skeleton-text-sm skeleton-pulse"></div>
+                    </div>
+                </div>
+             `).join('');
+
+            listContainer.innerHTML = `<div style="padding-top: 10px;">${skeletonHTML}</div>`;
+        }
 
         const { data, error } = await db.getMyAssignments(auth.currentUser.id, { year: 2026 });
 
@@ -231,6 +252,11 @@ const ujier = {
         this.renderAssignments();
         this.setupDragDrop();
         await this.updateStats();
+
+        // Cache the data for next time
+        if (data && data.length > 0) {
+            offline.cacheData(`assignments_${auth.currentUser.id}`, data);
+        }
     },
 
     // Render assignments list
@@ -1601,12 +1627,26 @@ const ujier = {
         if (!append) {
             this.historyOffset = 0;
             this.historyData = [];
-            listContainer.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <div class="spinner"></div>
-                    <p style="margin-top: 16px; color: var(--text-muted);">Cargando historial...</p>
-                </div>
-            `;
+
+            // Try cache for first page
+            const cachedHistory = offline.getCachedData(`history_${auth.currentUser.id}`);
+            if (cachedHistory) {
+                console.log('📦 Usando historial en caché');
+                this.historyData = cachedHistory;
+                this.filterHistory();
+            } else {
+                const skeletonHTML = Array(5).fill(0).map(() => `
+                    <div class="skeleton-card">
+                        <div class="skeleton-icon skeleton-pulse"></div>
+                        <div class="skeleton-content">
+                            <div class="skeleton-text-lg skeleton-pulse"></div>
+                            <div class="skeleton-text-md skeleton-pulse"></div>
+                        </div>
+                    </div>
+                 `).join('');
+
+                listContainer.innerHTML = `<div style="padding-top: 10px;">${skeletonHTML}</div>`;
+            }
         }
 
         this.isLoadingHistory = true;
@@ -1631,6 +1671,11 @@ const ujier = {
 
             this.historyHasMore = newVisits.length === this.historyLimit;
             this.historyOffset += newVisits.length;
+
+            // Cache first page
+            if (!append && newVisits.length > 0) {
+                offline.cacheData(`history_${auth.currentUser.id}`, newVisits);
+            }
 
             this.filterHistory();
 
