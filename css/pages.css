@@ -276,36 +276,37 @@
 }
 
 .notifications-table-container {
-    overflow-x: auto;
+    overflow-x: scroll;
+    /* Force the scrollbar to always exist */
     background: var(--bg-card);
     border-radius: var(--radius-lg);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    /* Improved native scrollbar for Firefox */
+    /* Improved native scrollbar for Firefox - explicitly forced visible */
     scrollbar-width: auto;
-    scrollbar-color: var(--primary-500) rgba(255, 255, 255, 0.05);
+    scrollbar-color: var(--primary-500) rgba(255, 255, 255, 0.1);
     margin-bottom: var(--space-4);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Webkit scrollbar styling - Made thicker and more prominent */
+/* Webkit scrollbar styling - Always visible and forced */
 .notifications-table-container::-webkit-scrollbar {
     height: 12px;
-    /* Increased from 8px */
+    display: block !important;
 }
 
 .notifications-table-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
+    /* Increased contrast specifically for the track */
     border-radius: 10px;
     margin: 4px;
 }
 
 .notifications-table-container::-webkit-scrollbar-thumb {
     background: var(--primary-500);
-    /* Use theme primary color */
     border-radius: 10px;
-    border: 3px solid var(--bg-card);
-    /* Add spacing to make it look floating */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--bg-card);
+    /* Reduced border to show more of the thumb */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     transition: background 0.2s ease;
 }
 
