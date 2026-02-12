@@ -360,6 +360,106 @@ const ujier = {
         // this.selectedCardId = null;
     },
 
+    // Open bulk delivery selector
+    openBulkDeliverModal() {
+        if (!this.assignments || this.assignments.length === 0) return;
+
+        const modal = document.getElementById('modal-bulk-deliver');
+        const container = document.getElementById('bulk-groups-container');
+        if (!modal || !container) return;
+
+        // Group special destinations
+        const specialPending = this.assignments.filter(n =>
+            utils.isSpecialDestination(n.destinatario_especial) &&
+            (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
+        );
+
+        const groups = {};
+        specialPending.forEach(n => {
+            const name = utils.getSpecialDestinationText(n);
+            if (!groups[name]) groups[name] = [];
+            groups[name].push(n);
+        });
+
+        const groupNames = Object.keys(groups);
+
+        if (groupNames.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <p style="color: var(--text-muted);">No hay destinos especiales pendientes.</p>
+                </div>
+            `;
+        } else {
+            container.innerHTML = groupNames.map(name => `
+                <button class="bulk-group-item" onclick="ujier.processBulkDelivery('${name.replace(/'/g, "\\'")}')">
+                    <div class="group-info">
+                        <span class="group-name">⭐ ${name}</span>
+                        <span class="group-count">${groups[name].length} pendientes</span>
+                    </div>
+                    <span class="group-arrow">›</span>
+                </button>
+            `).join('');
+        }
+
+        modal.classList.remove('hidden');
+        modal.classList.add('show');
+    },
+
+    closeBulkDeliverModal() {
+        const modal = document.getElementById('modal-bulk-deliver');
+        modal?.classList.add('hidden');
+        modal?.classList.remove('show');
+    },
+
+    // Process delivery for a group
+    async processBulkDelivery(groupName) {
+        if (!confirm(`¿Confirmar entrega masiva para todas las notificaciones de "${groupName}"?`)) return;
+
+        const specialPending = this.assignments.filter(n =>
+            utils.getSpecialDestinationText(n) === groupName &&
+            (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
+        );
+
+        if (specialPending.length === 0) return;
+
+        this.closeBulkDeliverModal();
+        utils.showLoading(`Entregando ${specialPending.length} notificaciones de ${groupName}...`);
+
+        let successCount = 0;
+        let lat = null;
+        let lng = null;
+
+        // Try GPS once for the batch
+        try {
+            const pos = await utils.getGPSPosition();
+            lat = pos.lat;
+            lng = pos.lng;
+        } catch (e) {
+            console.warn('GPS not available for bulk delivery, will save as deferred if needed? No, force delivery for specials.');
+        }
+
+        for (const n of specialPending) {
+            try {
+                const { error } = await db.registerResult(n.id, {
+                    resultado: 'entregado',
+                    ubicacion_lat: lat,
+                    ubicacion_lng: lng,
+                    es_carga_diferida: lat === null,
+                    observaciones: `ENTREGA MASIVA POR LOTE - ÚLTIMA VISITA: ${utils.getTodayFormatted()}`
+                }, auth.currentUser?.id);
+
+                if (!error) successCount++;
+            } catch (err) {
+                console.error(`Error delivering ${n.id}:`, err);
+            }
+        }
+
+        utils.hideLoading();
+        utils.showToast(`Se entregaron ${successCount} notificaciones correctamente`, 'success');
+
+        await this.loadAssignments();
+    },
+
     // Quick delivery for special recipients
     async quickDeliver(id) {
         const assignment = this.assignments.find(a => a.id === id);
@@ -751,13 +851,17 @@ const ujier = {
             document.querySelector('.troquel-selection')?.parentElement.classList.add('hidden');
             document.getElementById('carga-diferida')?.parentElement.parentElement.classList.add('hidden'); // Hide toggle
 
-            // Show existing photo if any (optional, or just allow adding new)
+            // Show existing photo if any
             if (assignment.evidencia_foto) {
-                const previewImg = document.getElementById('preview-img');
-                const previewContainer = document.getElementById('photo-preview');
-                if (previewImg && previewContainer) {
-                    previewImg.src = assignment.evidencia_foto;
-                    previewContainer.classList.remove('hidden');
+                const photos = assignment.evidencia_foto.split(',');
+                const grid = document.getElementById('photo-preview-grid');
+                if (grid) {
+                    grid.innerHTML = photos.map((url, index) => `
+                        <div class="photo-preview-item">
+                            <img src="${url}" alt="Foto ${index + 1}">
+                            <!-- We don't allow removing existing ones here for simplicity, or we can just leave it as is -->
+                        </div>
+                    `).join('');
                 }
             }
 
@@ -957,13 +1061,10 @@ const ujier = {
         if (gpsWrapper) gpsWrapper.classList.remove('hidden');
 
         // Reset photo
-        const photoPreview = document.getElementById('photo-preview');
-        const previewImg = document.getElementById('preview-img');
         const photoInput = document.getElementById('evidencia-foto');
-        if (photoPreview) photoPreview.classList.add('hidden');
-        if (previewImg) previewImg.src = '';
         if (photoInput) photoInput.value = '';
-        this.capturedPhoto = null;
+        this.capturedPhotos = [];
+        this.renderPhotoPreviews();
 
         // Reset audio
         document.getElementById('audio-playback')?.classList.add('hidden');
@@ -983,6 +1084,9 @@ const ujier = {
         document.getElementById('modal-close')?.addEventListener('click', () => this.closeDiligencia());
         document.getElementById('btn-cancel-diligencia')?.addEventListener('click', () => this.closeDiligencia());
         document.querySelector('.modal-overlay')?.addEventListener('click', () => this.closeDiligencia());
+
+        // Bulk delivery listener
+        document.getElementById('btn-bulk-deliver-open')?.addEventListener('click', () => this.openBulkDeliverModal());
 
         // Carga diferida toggle
         const cargaDiferidaToggle = document.getElementById('carga-diferida');
@@ -1263,37 +1367,66 @@ const ujier = {
         utils.showToast('Ubicación restaurada', 'info');
     },
 
+    // List of captured photo blobs
+    capturedPhotos: [],
+
     // Handle photo capture
     async handlePhotoCapture(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+        const files = Array.from(event.target.files);
+        if (!files.length) return;
+
+        // Limit total photos to 2
+        const remainingSlots = 2 - this.capturedPhotos.length;
+        if (remainingSlots <= 0) {
+            utils.showToast('Máximo 2 fotos permitidas', 'warning');
+            return;
+        }
+
+        const filesToProcess = files.slice(0, remainingSlots);
+
+        utils.showLoading('Procesando imágenes...');
 
         try {
-            // Compress image
-            const compressedBlob = await utils.compressImage(file);
+            for (const file of filesToProcess) {
+                // Compress image
+                const compressedBlob = await utils.compressImage(file);
+                this.capturedPhotos.push(compressedBlob);
+            }
 
-            // Show preview
-            const previewImg = document.getElementById('preview-img');
-            const previewContainer = document.getElementById('photo-preview');
-
-            previewImg.src = URL.createObjectURL(compressedBlob);
-            previewContainer?.classList.remove('hidden');
-
-            // Store for later upload
-            this.capturedPhoto = compressedBlob;
-
-            utils.showToast('Foto capturada', 'success');
+            this.renderPhotoPreviews();
+            utils.showToast(filesToProcess.length > 1 ? 'Fotos cargadas' : 'Foto cargada', 'success');
         } catch (error) {
-            utils.showToast('Error al procesar imagen', 'error');
+            console.error('Error processing photos:', error);
+            utils.showToast('Error al procesar imágenes', 'error');
+        } finally {
+            utils.hideLoading();
+            // Clear input value to allow re-selection of same files if needed
+            event.target.value = '';
         }
     },
 
-    // Remove photo
-    removePhoto() {
-        document.getElementById('photo-preview')?.classList.add('hidden');
-        document.getElementById('preview-img').src = '';
-        document.getElementById('evidencia-foto').value = '';
-        this.capturedPhoto = null;
+    // Render photo previews in the grid
+    renderPhotoPreviews() {
+        const grid = document.getElementById('photo-preview-grid');
+        if (!grid) return;
+
+        if (this.capturedPhotos.length === 0) {
+            grid.innerHTML = '';
+            return;
+        }
+
+        grid.innerHTML = this.capturedPhotos.map((blob, index) => `
+            <div class="photo-preview-item">
+                <img src="${URL.createObjectURL(blob)}" alt="Preview ${index + 1}">
+                <button type="button" class="btn-remove-photo" onclick="ujier.removePhoto(${index})">×</button>
+            </div>
+        `).join('');
+    },
+
+    // Remove specific photo
+    removePhoto(index) {
+        this.capturedPhotos.splice(index, 1);
+        this.renderPhotoPreviews();
     },
 
     // Audio recording functions removed
@@ -1361,19 +1494,21 @@ const ujier = {
 
             // Upload files if online
             if (utils.isOnline()) {
-                if (this.capturedPhoto) {
-                    console.log('📸 Subiendo foto...');
-                    // Note: uploadPhoto usually takes File/Blob.
-                    const { url, error: photoErr } = await db.uploadPhoto(this.capturedPhoto, this.currentAssignment.id);
-                    if (photoErr) {
-                        console.error('Error al subir foto:', photoErr);
-                        utils.showToast('Error al subir la foto', 'warning');
-                    } else {
-                        resultData.evidencia_foto = url;
+                if (this.capturedPhotos && this.capturedPhotos.length > 0) {
+                    console.log(`📸 Subiendo ${this.capturedPhotos.length} fotos...`);
+                    const photoUrls = [];
+                    for (const photo of this.capturedPhotos) {
+                        const { url, error: photoErr } = await db.uploadPhoto(photo, this.currentAssignment.id);
+                        if (!photoErr && url) {
+                            photoUrls.push(url);
+                        } else {
+                            console.error('Error al subir foto:', photoErr);
+                        }
+                    }
+                    if (photoUrls.length > 0) {
+                        resultData.evidencia_foto = photoUrls.join(',');
                     }
                 }
-
-                // Audio upload removed
             }
 
             // Save result
@@ -1577,6 +1712,20 @@ const ujier = {
         }
 
         listContainer.innerHTML = html;
+
+        // Check for special destinations to show/hide bulk delivery button
+        const bulkBtn = document.getElementById('btn-bulk-deliver-open');
+        if (bulkBtn) {
+            const hasSpecials = this.assignments.some(n =>
+                utils.isSpecialDestination(n.destinatario_especial) &&
+                (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
+            );
+            if (hasSpecials) {
+                bulkBtn.classList.remove('hidden');
+            } else {
+                bulkBtn.classList.add('hidden');
+            }
+        }
     },
 
     // Initialize References View (Shared by all roles)

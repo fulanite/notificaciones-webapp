@@ -1060,8 +1060,10 @@
                             </div>
                         </div>
 
-                        <div class="view-toggle" style="justify-content: flex-end;">
+                        <div class="view-toggle" style="justify-content: flex-end; gap: 10px;">
                             <button id="btn-reorder-toggle" class="btn-reorder-toggle">🔃 Reordenar</button>
+                            <button id="btn-bulk-deliver-open" class="btn-bulk-deliver-open hidden">⚡ Entrega
+                                Masiva</button>
                         </div>
 
                         <div id="assignments-list" class="assignments-list">
@@ -1888,16 +1890,15 @@
                             </div>
 
                             <div class="form-section">
-                                <h4 class="section-subtitle">📷 Fotografía</h4>
+                                <h4 class="section-subtitle">📷 Fotografías (Máx 2)</h4>
                                 <div class="photo-container">
-                                    <input type="file" id="evidencia-foto" accept="image/*" class="hidden">
+                                    <input type="file" id="evidencia-foto" accept="image/*" multiple class="hidden">
                                     <label for="evidencia-foto" class="photo-upload-btn">
-                                        <span class="upload-icon">📷</span>
-                                        <span class="upload-text">Agregar Foto</span>
+                                        <span class="upload-icon">📸</span>
+                                        <span class="upload-text">Agregar Fotos</span>
                                     </label>
-                                    <div id="photo-preview" class="photo-preview hidden">
-                                        <img id="preview-img" src="" alt="Vista previa">
-                                        <button type="button" class="btn-remove-photo" id="btn-remove-photo">×</button>
+                                    <div id="photo-preview-grid" class="photo-preview-grid">
+                                        <!-- Multiple previews -->
                                     </div>
                                 </div>
                             </div>
