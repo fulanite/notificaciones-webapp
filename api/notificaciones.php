@@ -23,6 +23,7 @@ try {
                            COALESCE(u1.nombre, u2.nombre) as ujier_nombre, 
                            COALESCE(u1.email, u2.email) as ujier_email,
                            COALESCE(u3.nombre, u4.nombre, n.usuario_carga) as cargador_nombre,
+                           (SELECT nombre FROM usuarios u_del WHERE u_del.email = n.eliminada_por OR u_del.id = n.eliminada_por LIMIT 1) as eliminada_por_nombre,
                            (SELECT resultado FROM visitas v_sub 
                             WHERE v_sub.notificacion_id = n.id 
                             ORDER BY v_sub.fecha DESC, v_sub.id DESC LIMIT 1) as resultado_ultima_visita,
@@ -66,6 +67,7 @@ try {
                             )
                             OR n.estado = 'pre_aviso'
                         )
+                        AND (n.eliminada = 0 OR n.eliminada IS NULL)
                         ORDER BY COALESCE(n.fecha_entrega_ujier, n.fecha_carga) ASC";
 
                 $stmt = $pdo->prepare($sql);
@@ -82,7 +84,7 @@ try {
                     Database::sendError('Invalid column for distinct values', 400);
                 }
 
-                $stmt = $pdo->prepare("SELECT DISTINCT $column FROM notificaciones WHERE $column IS NOT NULL AND $column != '' ORDER BY $column ASC");
+                $stmt = $pdo->prepare("SELECT DISTINCT $column FROM notificaciones WHERE $column IS NOT NULL AND $column != '' AND (eliminada = 0 OR eliminada IS NULL) ORDER BY $column ASC");
                 $stmt->execute();
 
                 $values = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -91,6 +93,12 @@ try {
                 // Get all notifications with filters
                 $where = ["1=1"];
                 $params = [];
+
+                // By default we include everything in the general list, the frontend colors them
+                // but if we wanted to filter we could add a flag here.
+                if (isset($_GET['hide_deleted']) && $_GET['hide_deleted'] == '1') {
+                    $where[] = "(n.eliminada = 0 OR n.eliminada IS NULL)";
+                }
 
                 if (!empty($_GET['estado'])) {
                     $estadosArr = explode(',', $_GET['estado']);
@@ -238,6 +246,7 @@ try {
                     SELECT n.*, 
                            MAX(COALESCE(u1.nombre, u2.nombre)) as ujier_nombre, 
                            MAX(COALESCE(u3.nombre, u4.nombre, n.usuario_carga)) as cargador_nombre,
+                           (SELECT nombre FROM usuarios u_del WHERE u_del.email = n.eliminada_por OR u_del.id = n.eliminada_por LIMIT 1) as eliminada_por_nombre,
                            (SELECT resultado FROM visitas v_sub 
                             WHERE v_sub.notificacion_id = n.id 
                             ORDER BY v_sub.fecha DESC, v_sub.id DESC LIMIT 1) as resultado_ultima_visita,
@@ -532,6 +541,26 @@ try {
                         ]);
                         break;
 
+                    case 'delete':
+                        // Soft delete notification
+                        $stmt = $pdo->prepare("
+                            UPDATE notificaciones SET
+                                eliminada = 1,
+                                eliminada_por = ?,
+                                eliminada_motivo = ?,
+                                eliminada_fecha = NOW(),
+                                updated_at = NOW(),
+                                updated_by = ?
+                            WHERE id = ?
+                        ");
+                        $stmt->execute([
+                            $data['eliminada_por'],
+                            $data['eliminada_motivo'],
+                            $data['eliminada_por'],
+                            $data['id']
+                        ]);
+                        break;
+
                     default:
                         Database::sendError('Invalid action', 400);
                 }
@@ -557,7 +586,11 @@ try {
                     'medio_pago',
                     'costo',
                     'resultado_diligencia',
-                    'fecha_diligencia'
+                    'fecha_diligencia',
+                    'eliminada',
+                    'eliminada_por',
+                    'eliminada_motivo',
+                    'eliminada_fecha'
                 ];
                 $updates = [];
                 $params = [];
