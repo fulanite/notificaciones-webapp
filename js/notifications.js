@@ -681,6 +681,9 @@ const notifications = {
 
     // Edit notification
     async edit(id) {
+        // Refresh ujieres list
+        await this.loadUjieres();
+
         const { data, error } = await db.getNotificationById(id);
 
         if (error || !data) {
@@ -873,24 +876,28 @@ const notifications = {
         const persistSelect = document.getElementById('persist-ujier');
         if (!select) return;
 
-        const { data: ujiers } = await db.getUsersByRole('ujier');
+        // Set default while loading or if none found
+        const defaultOption = '<option value="">Sin asignar (pendiente)</option>';
+        const defaultPersist = '<option value="">No fijar</option>';
 
-        if (ujiers && ujiers.length > 0) {
-            const options = ujiers.map(u =>
-                `<option value="${u.id}">${u.nombre}</option>`
-            ).join('');
+        try {
+            const { data: ujiers } = await db.getUsersByRole('ujier');
 
-            select.innerHTML = `
-                <option value="">Sin asignar (pendiente)</option>
-                ${options}
-            `;
+            if (ujiers && ujiers.length > 0) {
+                const options = ujiers.map(u =>
+                    `<option value="${u.id}">${u.nombre}</option>`
+                ).join('');
 
-            if (persistSelect) {
-                persistSelect.innerHTML = `
-                    <option value="">No fijar</option>
-                    ${options}
-                `;
+                select.innerHTML = defaultOption + options;
+                if (persistSelect) persistSelect.innerHTML = defaultPersist + options;
+            } else {
+                select.innerHTML = defaultOption;
+                if (persistSelect) persistSelect.innerHTML = defaultPersist;
             }
+        } catch (e) {
+            console.error('Error loading ujieres:', e);
+            select.innerHTML = defaultOption;
+            if (persistSelect) persistSelect.innerHTML = defaultPersist;
         }
     },
 

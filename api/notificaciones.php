@@ -231,6 +231,11 @@ try {
                     }
                 }
 
+                if (!empty($_GET['medio_pago'])) {
+                    $where[] = "n.medio_pago = ?";
+                    $params[] = $_GET['medio_pago'];
+                }
+
                 // Count total
                 $countSql = "SELECT COUNT(*) as total FROM notificaciones n WHERE " . implode(" AND ", $where);
                 $countStmt = $pdo->prepare($countSql);

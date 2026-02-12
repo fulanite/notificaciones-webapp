@@ -108,7 +108,7 @@ const db = {
     // ==================== USUARIOS ====================
     async getUsers() {
         if (!apiClient) return { data: [], error: null };
-        return apiClient.get('usuarios.php');
+        return apiClient.get('usuarios.php', { include_inactive: 1 });
     },
 
     async getUserByEmail(email) {
@@ -160,6 +160,7 @@ const db = {
         if (options.month) params.month = options.month;
         if (options.devuelta_por_ujier !== undefined) params.devuelta_por_ujier = options.devuelta_por_ujier;
         if (options.unassigned_only) params.unassigned_only = '1';
+        if (options.medio_pago) params.medio_pago = options.medio_pago;
 
         const result = await apiClient.get('notificaciones.php', params);
 

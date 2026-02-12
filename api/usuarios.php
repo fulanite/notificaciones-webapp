@@ -39,14 +39,25 @@ try {
                 } else {
                     Database::sendError('User not found', 404);
                 }
-            } elseif (isset($_GET['rol'])) {
-                // Get users by role
-                $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE rol = ? AND activo = 1 ORDER BY nombre");
-                $stmt->execute([$_GET['rol']]);
-                Database::sendResponse($stmt->fetchAll());
             } else {
-                // Get all users (including inactive for admin management)
-                $stmt = $pdo->query("SELECT * FROM usuarios ORDER BY nombre");
+                // Get users with optional filters
+                $rol = $_GET['rol'] ?? null;
+                $includeInactive = (isset($_GET['include_inactive']) && $_GET['include_inactive'] == '1');
+
+                $sql = "SELECT * FROM usuarios WHERE 1=1";
+                $params = [];
+
+                if (!$includeInactive) {
+                    $sql .= " AND activo = 1";
+                }
+
+                if ($rol) {
+                    $sql .= " AND LOWER(rol) = LOWER(?)";
+                    $params[] = $rol;
+                }
+
+                $stmt = $pdo->prepare($sql . " ORDER BY nombre");
+                $stmt->execute($params);
                 Database::sendResponse($stmt->fetchAll());
             }
             break;

@@ -549,6 +549,9 @@ const app = {
             const pBar = document.getElementById('persistent-settings-container');
             if (pBar) pBar.classList.remove('hidden-important');
 
+            // Refresh ujieres list to ensure it's up to date
+            notifications.loadUjieres();
+
             this.applyPersistentSettings();
         });
 
@@ -610,14 +613,14 @@ const app = {
     async handleLogout() {
         // Show confirmation dialog for ujier role
         const rol = auth.currentUser?.rol ? auth.currentUser.rol.toLowerCase() : '';
-        
+
         if (rol === 'ujier') {
             const confirmed = confirm('¿Estás seguro que querés salir de la aplicación?');
             if (!confirmed) {
                 return; // User cancelled logout
             }
         }
-        
+
         await auth.signOut();
         this.showLoginPage();
         utils.showToast('Sesión cerrada', 'info');
