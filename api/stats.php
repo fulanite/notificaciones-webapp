@@ -56,13 +56,13 @@ try {
                 SELECT 
                     tipo_notificacion as type,
                     COUNT(*) as count,
-                    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM notificaciones WHERE YEAR(fecha_carga) = :year2), 2) as percentage
+                    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM notificaciones WHERE YEAR(fecha_carga) = :year2 AND (eliminada = 0 OR eliminada IS NULL)), 2) as percentage
                 FROM notificaciones
                 WHERE YEAR(fecha_carga) = :year AND (eliminada = 0 OR eliminada IS NULL)
                 GROUP BY tipo_notificacion
                 ORDER BY count DESC
             ");
-            $stmt->execute(['year' => $year]);
+            $stmt->execute(['year' => $year, 'year2' => $year]);
             Database::sendResponse($stmt->fetchAll());
             break;
 
@@ -74,7 +74,7 @@ try {
                     COUNT(*) as count,
                     ROUND(
                         COUNT(*) * 100.0 / 
-                        (SELECT COUNT(*) FROM notificaciones WHERE YEAR(fecha_carga) = :year2 AND resultado_diligencia IS NOT NULL),
+                        (SELECT COUNT(*) FROM notificaciones WHERE YEAR(fecha_carga) = :year2 AND resultado_diligencia IS NOT NULL AND (eliminada = 0 OR eliminada IS NULL)),
                         2
                     ) as percentage
                 FROM notificaciones
@@ -84,7 +84,7 @@ try {
                 GROUP BY resultado_diligencia
                 ORDER BY count DESC
             ");
-            $stmt->execute(['year' => $year]);
+            $stmt->execute(['year' => $year, 'year2' => $year]);
             Database::sendResponse($stmt->fetchAll());
             break;
 
@@ -94,14 +94,14 @@ try {
                 SELECT 
                     origen as origin,
                     COUNT(*) as count,
-                    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM notificaciones WHERE YEAR(fecha_carga) = :year2), 2) as percentage
+                    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM notificaciones WHERE YEAR(fecha_carga) = :year2 AND (eliminada = 0 OR eliminada IS NULL)), 2) as percentage
                 FROM notificaciones
                 WHERE YEAR(fecha_carga) = :year AND (eliminada = 0 OR eliminada IS NULL)
                 GROUP BY origen
                 ORDER BY count DESC
                 LIMIT 15
             ");
-            $stmt->execute(['year' => $year]);
+            $stmt->execute(['year' => $year, 'year2' => $year]);
             Database::sendResponse($stmt->fetchAll());
             break;
 

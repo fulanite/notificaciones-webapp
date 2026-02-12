@@ -94,8 +94,8 @@ try {
                 $where = ["1=1"];
                 $params = [];
 
-                // Default to hiding deleted notifications
-                if (!isset($_GET['hide_deleted']) || $_GET['hide_deleted'] == '1') {
+                // Show all by default in list, unless hide_deleted is explicitly 1
+                if (isset($_GET['hide_deleted']) && $_GET['hide_deleted'] == '1') {
                     $where[] = "(n.eliminada = 0 OR n.eliminada IS NULL)";
                 }
 
