@@ -77,7 +77,7 @@ try {
                 Database::sendResponse($stmt->fetchAll());
             } elseif (isset($_GET['action']) && $_GET['action'] === 'distinct' && isset($_GET['column'])) {
                 // Get distinct values for a column
-                $allowedColumns = ['zona', 'estado', 'tipo_notificacion', 'resultado_diligencia'];
+                $allowedColumns = ['zona', 'estado', 'tipo_notificacion', 'resultado_diligencia', 'medio_pago'];
                 $column = $_GET['column'];
 
                 if (!in_array($column, $allowedColumns)) {

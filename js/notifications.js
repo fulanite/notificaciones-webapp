@@ -96,6 +96,14 @@ const notifications = {
                 filterTipo.innerHTML = '<option value="">📦 Todos los tipos</option>' +
                     tipos.map(t => `<option value="${t}">${CONFIG.NOTIFICATION_TYPES[t] || t.toUpperCase()}</option>`).join('');
             }
+
+            // Load Medio Pago dynamically
+            const filterMedioPago = document.getElementById('filter-medio-pago');
+            const { data: medios } = await db.getDistinctValues('medio_pago');
+            if (filterMedioPago && medios) {
+                filterMedioPago.innerHTML = '<option value="">💳 Todos los pagos</option>' +
+                    medios.map(m => `<option value="${m}">${m.toUpperCase()}</option>`).join('');
+            }
         } catch (e) {
             console.error('Error loading filter options:', e);
         }
@@ -893,7 +901,7 @@ const notifications = {
         utils.showLoading('Eliminando notificación...');
 
         try {
-            const { error } = await db.deleteNotification(id, auth.currentUser?.email, reason);
+            const { error } = await db.deleteNotification(id, auth.currentUser?.id, reason);
 
             if (error) {
                 utils.showToast('Error al eliminar: ' + error, 'error');
