@@ -961,48 +961,54 @@
                                 <span class="search-icon">🚀</span>
                                 <input type="text" id="search-notificaciones" class="search-input"
                                     placeholder="Super Buscador: escribí cualquier dato del expediente...">
-                                <button id="btn-refresh-list" class="action-btn-circle" title="Refrescar datos"
+                                <button id="btn-refresh-list" class="btn-refresh-text" title="Refrescar datos"
                                     onclick="notifications.loadNotifications()">
-                                    <span>🔄</span>
+                                    <span>🔄</span> Actualizar
                                 </button>
                             </div>
-                            <div class="filter-bar">
+                            <div class="filter-bar filter-bar-responsive">
                                 <select id="filter-propio" class="filter-select highlight">
-                                    <option value="none">🌎 Todas las notif.</option>
-                                    <option value="mine-all">📂 Mis cargas (Gral.)</option>
+                                    <option value="none">🌎 Todas</option>
+                                    <option value="mine-all">📂 Mis cargas</option>
                                 </select>
                                 <select id="filter-zona" class="filter-select">
-                                    <option value="">Todas las zonas</option>
-                                    <option value="NORTE">ZONA NORTE</option>
-                                    <option value="SUR">ZONA SUR</option>
-                                    <option value="CENTRO">ZONA CENTRO</option>
+                                    <option value="">Zonas</option>
+                                    <option value="NORTE">NORTE</option>
+                                    <option value="SUR">SUR</option>
+                                    <option value="CENTRO">CENTRO</option>
                                     <option value="REBOTE">REBOTE</option>
                                     <option value="INTERIOR">INTERIOR</option>
                                 </select>
                                 <select id="filter-estado" class="filter-select">
-                                    <option value="">Todos los estados</option>
+                                    <option value="">Estados</option>
                                     <option value="pendiente">Pendiente</option>
                                     <option value="diligenciada">Diligenciada</option>
                                     <option value="diferida">Carga Diferida</option>
                                 </select>
                                 <select id="filter-tipo" class="filter-select">
-                                    <option value="">Todos los tipos</option>
+                                    <option value="">Tipos</option>
                                     <option value="cedulas">Cédulas</option>
-                                    <option value="cedulas_urgentes_norte">Cédulas Urgentes Norte</option>
-                                    <option value="cedulas_urgentes_sur">Cédulas Urgentes Sur</option>
+                                    <option value="cedulas_urgentes_norte">Cédulas Urg. Norte</option>
+                                    <option value="cedulas_urgentes_sur">Cédulas Urg. Sur</option>
                                     <option value="cedulas_mandamientos_22172">Ley 22.172</option>
-                                    <option value="cedulas_correspondencia">Correspondencia (Interior)</option>
+                                    <option value="cedulas_correspondencia">Correspondencia</option>
                                     <option value="mandamientos">Mandamientos</option>
-                                    <option value="mandamientos_habilitacion_norte">Mandamientos Hab. Norte</option>
-                                    <option value="mandamientos_habilitacion_sur">Mandamientos Hab. Sur</option>
+                                    <option value="mandamientos_habilitacion_norte">Mand. Hab. Norte</option>
+                                    <option value="mandamientos_habilitacion_sur">Mand. Hab. Sur</option>
+                                </select>
+                                <select id="filter-medio-pago" class="filter-select">
+                                    <option value="">Medio de Pago</option>
+                                    <option value="efectivo">Efectivo</option>
+                                    <option value="transferencia">Transferencia</option>
+                                    <option value="gratuito">Gratuito</option>
                                 </select>
                                 <div
-                                    style="display: flex; align-items: center; gap: 8px; background: white; padding: 4px 12px; border-radius: 8px; border: 1px solid var(--border-color); height: 42px;">
+                                    style="display: flex; align-items: center; gap: 8px; background: white; padding: 4px 12px; border-radius: 8px; border: 1px solid var(--border-color); height: 42px; min-width: fit-content;">
                                     <label class="checkbox-wrapper"
-                                        style="margin:0; font-size: 0.85em; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        style="margin:0; font-size: 0.85em; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px; cursor: pointer; white-space: nowrap;">
                                         <input type="checkbox" id="filter-sin-fecha">
                                         <span class="checkbox-custom"></span>
-                                        🚫 Sin fecha de entrega
+                                        🚫 Sin fecha
                                     </label>
                                 </div>
                                 <input type="date" id="filter-fecha" class="filter-input">

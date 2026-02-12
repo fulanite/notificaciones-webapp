@@ -16,7 +16,8 @@ const notifications = {
         zona: '',
         year: '2026',
         own_only: true,
-        unassigned_only: false
+        unassigned_only: false,
+        medio_pago: ''
     },
 
     getVisitStatusColor(status) {
@@ -109,6 +110,7 @@ const notifications = {
         const filterZona = document.getElementById('filter-zona');
         const filterPropio = document.getElementById('filter-propio');
         const filterSinFecha = document.getElementById('filter-sin-fecha');
+        const filterMedioPago = document.getElementById('filter-medio-pago');
 
         const updateAndLoad = () => {
             this.currentPage = 1;
@@ -156,6 +158,11 @@ const notifications = {
 
         filterSinFecha?.addEventListener('change', () => {
             this.filters.unassigned_only = filterSinFecha.checked;
+            updateAndLoad();
+        });
+
+        filterMedioPago?.addEventListener('change', () => {
+            this.filters.medio_pago = filterMedioPago.value;
             updateAndLoad();
         });
 

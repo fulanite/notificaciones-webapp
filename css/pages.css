@@ -218,9 +218,19 @@
     /* Un poco más pequeño para móviles */
 }
 
+
 .filter-bar {
     display: flex;
     gap: var(--space-2);
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+/* Responsive filter bar for smaller screens */
+.filter-bar-responsive {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .filter-select,
@@ -231,14 +241,66 @@
     border-radius: var(--radius-md);
     color: var(--text-primary);
     font-size: 0.8rem;
+    min-width: 120px; /* Minimum width for readability */
+    flex-shrink: 0; /* Prevent shrinking below min-width */
+}
+
+/* Text-based refresh button */
+.btn-refresh-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-refresh-text:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--primary-400);
+    transform: translateY(-1px);
+}
+
+.btn-refresh-text:active {
+    transform: translateY(0);
 }
 
 .notifications-table-container {
-    overflow-x: auto;
+    overflow-x: auto; /* Enable horizontal scrolling */
     background: var(--bg-card);
     border-radius: var(--radius-lg);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    /* Add scrollbar styling for better UX */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.5) rgba(255, 255, 255, 0.1);
 }
+
+/* Webkit scrollbar styling */
+.notifications-table-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.notifications-table-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.notifications-table-container::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.5);
+    border-radius: 4px;
+}
+
+.notifications-table-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.7);
+}
+
 
 .notifications-table {
     width: 100%;
