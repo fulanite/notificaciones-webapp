@@ -879,20 +879,45 @@ const ujier = {
         }).join('') + `</div>`;
     },
 
-    // Ver imagen a pantalla completa
-    viewFullImage(url) {
-        const modal = document.getElementById('modal-image-viewer');
+    // Ver imagen a pantalla completa (Consolidado)
+    viewFullImage(url, caption = '') {
+        console.log('👁️ Opening image viewer for:', url);
+        if (!url) return;
+
+        let modal = document.getElementById('modal-image-viewer');
         const img = document.getElementById('full-image-display');
-        if (img) img.src = url;
-        modal?.classList.remove('hidden');
-        setTimeout(() => modal?.classList.add('show'), 10);
+
+        if (!modal || !img) {
+            console.error('Image viewer modal not found in DOM');
+            // Fallback to new tab if modal is missing for some reason
+            window.open(url, '_blank');
+            return;
+        }
+
+        img.src = url;
+
+        // Show modal
+        modal.classList.remove('hidden');
+        // Force reflow for animation
+        modal.offsetHeight;
+        modal.classList.add('show');
+
+        // Disable body scroll
+        document.body.style.overflow = 'hidden';
     },
 
     // Cerrar visor de imagen
     closeImageViewer() {
         const modal = document.getElementById('modal-image-viewer');
-        modal?.classList.remove('show');
-        setTimeout(() => modal?.classList.add('hidden'), 300);
+        if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+                const img = document.getElementById('full-image-display');
+                if (img) img.src = '';
+            }, 300);
+        }
     },
 
     // Reset diligencia form
@@ -1825,7 +1850,7 @@ const ujier = {
 
                 // Popup Content
                 const photoHtml = point.foto_url
-                    ? `<div style="margin-top:5px; width:100%; height:120px; background-image:url('${point.foto_url}'); background-size:cover; background-position:center; border-radius:4px; cursor:pointer;" onclick="window.open('${point.foto_url}', '_blank')"></div>`
+                    ? `<div style="margin-top:5px; width:100%; height:120px; background-image:url('${point.foto_url}'); background-size:cover; background-position:center; border-radius:4px; cursor:pointer;" onclick="ujier.viewFullImage('${point.foto_url}')"></div>`
                     : '';
 
                 const popupContent = `
@@ -1887,86 +1912,10 @@ const ujier = {
         document.getElementById('map-stat-distance').textContent = totalDist.toFixed(2) + ' km';
     },
 
-    // View full image (Dynamic Modal like Dashboard)
-    viewFullImage(url, caption = '') {
-        console.log('👁️ Opening image viewer for:', url);
-        if (!url) return;
-
-        // Use the same ID as dashboard to share styles/logic or a new one?
-        // Let's use 'ujier-image-viewer-modal' to avoid conflict if dashboard is also open
-        // But if styles are bound to 'image-viewer-modal' class, we use that class.
-        let modal = document.getElementById('image-viewer-modal');
-
-        // If modal doesn't exist, create it
-        if (!modal) {
-            const html = `
-                <div id="image-viewer-modal" class="image-viewer-modal" onclick="ujier.closeImageViewer()">
-                    <div class="image-viewer-content" onclick="event.stopPropagation()">
-                         <button class="image-viewer-close" onclick="ujier.closeImageViewer()">×</button>
-                        <img id="image-viewer-img" class="image-viewer-img" src="" alt="Vista ampliada">
-                        <div id="image-viewer-caption" class="image-viewer-caption"></div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', html);
-            modal = document.getElementById('image-viewer-modal');
-        } else {
-            // Update onclick handlers to point to ujier if they were pointing to dashboard
-            // actually, simpler to just overwrite them or assume closure is global?
-            // Let's force update them just in case
-            modal.setAttribute('onclick', 'ujier.closeImageViewer()');
-            const closeBtn = modal.querySelector('.image-viewer-close');
-            if (closeBtn) closeBtn.setAttribute('onclick', 'ujier.closeImageViewer()');
-        }
-
-        const img = document.getElementById('image-viewer-img');
-        const cap = document.getElementById('image-viewer-caption');
-
-        if (img) img.src = url;
-        if (cap) cap.textContent = caption;
-
-        // Force reflow and show
-        requestAnimationFrame(() => {
-            modal.classList.add('active');
-        });
-    },
-
-    // Close image viewer
-    closeImageViewer() {
-        const modal = document.getElementById('image-viewer-modal');
-        if (modal) {
-            modal.classList.remove('active');
-            setTimeout(() => {
-                const img = document.getElementById('image-viewer-img');
-                if (img) img.src = '';
-            }, 300);
-        }
-
-        // Legacy modal cleanup (if exists)
-        const oldModal = document.getElementById('modal-image-viewer');
-        if (oldModal) {
-            oldModal.classList.remove('show');
-            setTimeout(() => oldModal.classList.add('hidden'), 300);
-        }
-    },
-
-    // Haversine formula
-    calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // Radius of the earth in km
-        const dLat = this.deg2rad(lat2 - lat1);
-        const dLon = this.deg2rad(lon2 - lon1);
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const d = R * c;
-        return d;
-    },
-
+    // Distance calculations helper
     deg2rad(deg) {
         return deg * (Math.PI / 180);
-    }
+    },
 };
 
 // Expose globally if needed (though const ujier is usually global in browser scope)

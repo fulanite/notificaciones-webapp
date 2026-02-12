@@ -222,8 +222,6 @@ const db = {
             transcripcion_audio: resultData.transcripcion_audio,
             es_carga_diferida: resultData.es_carga_diferida,
             motivo_falla_senal: resultData.motivo_falla_senal,
-            tipo_troquel: resultData.tipo_troquel,
-            n_troquel: resultData.n_troquel,
             user_id: userId
         });
     },

@@ -79,6 +79,43 @@
             border-radius: 8px;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
+
+        /* Image Viewer Premium Styles */
+        .modal-image-content {
+            background: #111827 !important;
+            /* Darker background for photos */
+            color: white !important;
+            max-width: 90vw !important;
+            max-height: 90vh !important;
+            width: auto !important;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden !important;
+        }
+
+        .modal-image-content .modal-header {
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .modal-image-content .modal-body {
+            padding: 0 !important;
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-grow: 1;
+        }
+
+        #full-image-display {
+            max-width: 100%;
+            max-height: calc(90vh - 120px);
+            object-fit: contain;
+            display: block;
+        }
     </style>
 </head>
 
@@ -1905,11 +1942,11 @@
                             </div>
 
                             <div class="modal-actions">
-                                <button type="button" class="btn btn-secondary"
-                                    id="btn-cancel-diligencia">Cancelar</button>
                                 <button type="submit" class="btn btn-primary">
                                     <span>✅</span> Guardar Resultado
                                 </button>
+                                <button type="button" class="btn btn-secondary"
+                                    id="btn-cancel-diligencia">Cancelar</button>
                             </div>
                     </form>
                 </div>
