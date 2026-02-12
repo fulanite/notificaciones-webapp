@@ -282,6 +282,18 @@ const db = {
         });
     },
 
+    async deleteNotification(id, userId, reason) {
+        if (!apiClient) return { data: null, error: null };
+        return apiClient.put('notificaciones.php', {
+            id,
+            action: 'delete',
+            eliminada: 1,
+            eliminada_por: userId,
+            eliminada_motivo: reason,
+            eliminada_fecha: new Date().toISOString()
+        });
+    },
+
     // ==================== STATISTICS ====================
     async getStats() {
         if (!apiClient) return {

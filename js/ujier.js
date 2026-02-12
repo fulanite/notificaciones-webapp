@@ -222,8 +222,8 @@ const ujier = {
             return;
         }
 
-        // Mostrar TODAS las notificaciones pendientes/pre-aviso
-        this.assignments = data || [];
+        // Mostrar TODAS las notificaciones pendientes/pre-aviso (excluyendo eliminadas)
+        this.assignments = (data || []).filter(n => n.eliminada != 1);
 
         // Aplicar orden guardado
         this.applySavedOrder();

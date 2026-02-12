@@ -222,7 +222,8 @@
 .filter-bar {
     display: flex;
     gap: var(--space-2);
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    flex-wrap: wrap;
+    /* Allow wrapping on smaller screens */
 }
 
 /* Responsive filter bar for smaller screens */
@@ -241,8 +242,10 @@
     border-radius: var(--radius-md);
     color: var(--text-primary);
     font-size: 0.8rem;
-    min-width: 120px; /* Minimum width for readability */
-    flex-shrink: 0; /* Prevent shrinking below min-width */
+    min-width: 120px;
+    /* Minimum width for readability */
+    flex-shrink: 0;
+    /* Prevent shrinking below min-width */
 }
 
 /* Text-based refresh button */
@@ -273,7 +276,8 @@
 }
 
 .notifications-table-container {
-    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
     background: var(--bg-card);
     border-radius: var(--radius-lg);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -305,6 +309,27 @@
 .notifications-table {
     width: 100%;
     border-collapse: collapse;
+}
+
+.notifications-table tbody tr.row-is-deleted {
+    background-color: rgba(239, 68, 68, 0.05);
+    /* Soft red background */
+    opacity: 0.8;
+}
+
+.notifications-table tbody tr.row-is-deleted:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.notifications-table tbody tr.row-is-deleted td {
+    color: var(--text-muted);
+}
+
+.status-deleted {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    font-weight: 800;
 }
 
 .notifications-table th,

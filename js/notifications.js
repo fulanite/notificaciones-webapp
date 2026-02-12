@@ -317,8 +317,11 @@ const notifications = {
 
             const recipientDisplay = (notif.destinatario_nombre?.trim() || utils.getSpecialDestinationText(notif) || 'Sin destinatario');
 
+            const isDeleted = notif.eliminada == 1 || notif.eliminada === true;
+            const deletedClass = isDeleted ? 'row-is-deleted' : '';
+
             html += `
-                <tr class="stagger-item row-hover-effect" style="cursor: pointer;" onclick="notifications.viewDetails('${notif.id}')">
+                <tr class="stagger-item row-hover-effect ${deletedClass}" style="cursor: pointer;" onclick="notifications.viewDetails('${notif.id}')">
                     <td class="col-date" data-label="Fecha">${notif.fecha_entrega_ujier ? utils.formatDate(notif.fecha_entrega_ujier) : '<span style="color:var(--text-muted)">-</span>'}</td>
                     <td class="col-status" data-label="Estado">${this.getEnhancedStatusBadge(notif)}</td>
                     <td class="col-zona" data-label="Zona"><span class="badge-zona">${notif.zona || '-'}</span></td>
@@ -339,6 +342,11 @@ const notifications = {
 
     // Enhanced status badge that handles special recipients logic and latest visit result
     getEnhancedStatusBadge(notif) {
+        // Handle soft deleted status
+        if (notif.eliminada == 1 || notif.eliminada === true) {
+            return '<span class="status-badge status-deleted">❌ ELIMINADA</span>';
+        }
+
         // Priorizamos el estado procesado por la API (que incluye la última visita)
         let status = notif.estado_display || notif.resultado_diligencia || notif.estado;
 
@@ -602,13 +610,19 @@ const notifications = {
                             <span class="info-tag carga-tag">🕒 Carga: ${utils.formatDateTime(data.fecha_carga)}</span>
                             <span class="info-tag user-tag">👤 Por: <strong>${data.cargador_nombre || data.usuario_carga || '-'}</strong></span>
                             ${data.devuelta_por_ujier ? `<span class="info-tag return-tag" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">📦 Devuelta: ${utils.formatDate(data.fecha_devolucion)}</span>` : ''}
+                            ${data.eliminada == 1 ? `<span class="info-tag delete-tag" style="background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;">❌ Eliminada por ${data.eliminada_por_nombre || data.eliminada_por || 'Admin'} el ${utils.formatDate(data.eliminada_fecha)}</span>` : ''}
                             ${data.migrated_from_glide ? '<span class="badge-migrated-v2">📦 REGISTRO MIGRADO</span>' : ''}
                         </div>
                         <div class="footer-main-actions">
                             <button class="btn btn-light-glass" onclick="notifications.closeModal()">Cerrar</button>
-                            <button class="btn btn-primary btn-action-main" onclick="notifications.edit('${data.id}'); notifications.closeModal();">
-                                ✏️ Editar Diligencia
-                            </button>
+                            ${(data.eliminada != 1 && (auth.currentUser?.rol?.toLowerCase() === 'admin' || auth.currentUser?.rol?.toLowerCase() === 'administrativo' || auth.currentUser?.rol?.toLowerCase() === 'coordinador')) ? `
+                                <button class="btn btn-danger-outline" onclick="notifications.confirmDelete('${data.id}')">
+                                    🗑️ Eliminar
+                                </button>
+                                <button class="btn btn-primary btn-action-main" onclick="notifications.edit('${data.id}'); notifications.closeModal();">
+                                    ✏️ Editar Diligencia
+                                </button>
+                            ` : ''}
                         </div>
                     </div>
                 </div>
@@ -858,6 +872,41 @@ const notifications = {
                     ${options}
                 `;
             }
+        }
+    },
+
+    // Confirm and execute soft delete
+    async confirmDelete(id) {
+        const reason = prompt('Por favor, indica el motivo de la eliminación:');
+
+        if (reason === null) return; // Cancelled
+
+        if (!reason.trim()) {
+            utils.showToast('El motivo es obligatorio para eliminar.', 'warning');
+            return;
+        }
+
+        const confirmed = confirm('¿Estás seguro que deseas eliminar esta notificación? Quedará registrada como inactiva en el sistema.');
+
+        if (!confirmed) return;
+
+        utils.showLoading('Eliminando notificación...');
+
+        try {
+            const { error } = await db.deleteNotification(id, auth.currentUser?.email, reason);
+
+            if (error) {
+                utils.showToast('Error al eliminar: ' + error, 'error');
+            } else {
+                utils.showToast('Notificación eliminada correctamente.', 'success');
+                this.closeModal();
+                this.loadNotifications();
+            }
+        } catch (e) {
+            console.error(e);
+            utils.showToast('Error inesperado al eliminar.', 'error');
+        } finally {
+            utils.hideLoading();
         }
     }
 };

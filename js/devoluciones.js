@@ -52,7 +52,7 @@ const devoluciones = {
 
             if (result.error) throw result.error;
 
-            const data = result.data || [];
+            const data = (result.data || []).filter(n => n.eliminada != 1);
             this.state.notificacionesPendientes = Array.isArray(data) ? data : [];
             console.log(`[Devoluciones] Data received:`, this.state.notificacionesPendientes.length, 'records');
 

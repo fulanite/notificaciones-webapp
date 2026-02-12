@@ -211,7 +211,10 @@ const reports = {
 
         // Filter by month on fecha_entrega_ujier (Criterio real de trabajo entregado)
         const monthData = (data || []).filter(n => {
-            // Revert: Strict filter on fecha_entrega_ujier as per user request
+            // Skip deleted notifications
+            if (n.eliminada == 1) return false;
+
+            // Strict filter on fecha_entrega_ujier as per user request
             if (!n.fecha_entrega_ujier) return false;
             // fecha_entrega_ujier comes as 'YYYY-MM-DD'
             return n.fecha_entrega_ujier.startsWith(yyyy_mm);
