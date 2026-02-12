@@ -1891,12 +1891,29 @@
 
                             <div class="form-section">
                                 <h4 class="section-subtitle">📷 Fotografías (Máx 2)</h4>
+                                <h4 class="section-subtitle">📷 Fotografías (Máx 2)</h4>
                                 <div class="photo-container">
-                                    <input type="file" id="evidencia-foto" accept="image/*" multiple class="hidden">
-                                    <label for="evidencia-foto" class="photo-upload-btn">
-                                        <span class="upload-icon">📸</span>
-                                        <span class="upload-text">Agregar Fotos</span>
-                                    </label>
+                                    <div class="photo-actions-row"
+                                        style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                        <!-- Camera Input -->
+                                        <input type="file" id="evidencia-foto-camera" accept="image/*"
+                                            capture="environment" class="hidden">
+                                        <label for="evidencia-foto-camera" class="btn btn-secondary"
+                                            style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <span style="font-size: 1.2rem;">📷</span>
+                                            <span>Cámara</span>
+                                        </label>
+
+                                        <!-- Gallery Input -->
+                                        <input type="file" id="evidencia-foto-gallery" accept="image/*" multiple
+                                            class="hidden">
+                                        <label for="evidencia-foto-gallery" class="btn btn-secondary"
+                                            style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <span style="font-size: 1.2rem;">🖼️</span>
+                                            <span>Galería</span>
+                                        </label>
+                                    </div>
+
                                     <div id="photo-preview-grid" class="photo-preview-grid">
                                         <!-- Multiple previews -->
                                     </div>
@@ -1929,6 +1946,27 @@
 
         <!-- Toast Notifications -->
         <div id="toast-container" class="toast-container"></div>
+
+        <!-- Modal for Bulk Delivery -->
+        <div id="modal-bulk-deliver" class="modal hidden">
+            <div class="modal-overlay" onclick="ujier.closeBulkDeliverModal()"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">📦 Entrega Masiva</h2>
+                    <button class="modal-close" onclick="ujier.closeBulkDeliverModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-subtitle">Seleccioná un grupo para marcar como entregado:</p>
+                    <div id="bulk-groups-container" class="bulk-groups-list">
+                        <!-- Dynamic groups -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="ujier.closeBulkDeliverModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Leaflet (Maps) -->

@@ -1156,9 +1156,11 @@ const ujier = {
         // GPS capture
         document.getElementById('btn-capture-gps')?.addEventListener('click', () => this.captureGPS());
 
-        // Photo capture
-        document.getElementById('evidencia-foto')?.addEventListener('change', (e) => this.handlePhotoCapture(e));
-        document.getElementById('btn-remove-photo')?.addEventListener('click', () => this.removePhoto());
+        // Photo capture (Dual Inputs)
+        document.getElementById('evidencia-foto-camera')?.addEventListener('change', (e) => this.handlePhotoCapture(e));
+        document.getElementById('evidencia-foto-gallery')?.addEventListener('change', (e) => this.handlePhotoCapture(e));
+
+        // Remove button is handled by onclick in renderPhotoPreviews
 
         // Audio recording
         document.getElementById('btn-record-audio')?.addEventListener('click', () => this.startAudioRecording());
@@ -1476,8 +1478,9 @@ const ujier = {
 
         const btnSubmit = event.target.querySelector('button[type="submit"]');
         const originalBtnHtml = btnSubmit.innerHTML;
-        btnSubmit.disabled = true;
-        btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span> Guardando...';
+        // Move disabled state to AFTER validation
+        // btnSubmit.disabled = true; 
+        // btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span> Guardando...';
 
         const resultado = document.getElementById('resultado-diligencia').value;
         const esCargaDiferida = document.getElementById('carga-diferida').checked;
@@ -1504,6 +1507,7 @@ const ujier = {
             }
         }
 
+        // Show loading state
         // Show loading state
         btnSubmit.disabled = true;
         btnSubmit.innerHTML = '<div class="btn-spinner"></div> ' + (this.isUpdateMode ? 'Actualizando...' : 'Guardando...');
@@ -1557,6 +1561,8 @@ const ujier = {
                     }
                 }
             }
+            // IMPORTANT: Hide loading after uploading photos
+            utils.hideLoading();
 
             // Save result
             let response;
@@ -1740,6 +1746,17 @@ const ujier = {
                         </div>
                         <div class="assignment-address" style="font-size: 1.15rem; line-height: 1.3; font-weight: 700; color: var(--primary);">🏠 ${visit.domicilio || '-'}</div>
                         <div class="assignment-recipient" style="font-size: 0.95rem; line-height: 1.2; color: var(--text-muted); margin-top: 2px;">👤 <strong>${visit.destinatario_nombre || utils.getSpecialDestinationText(visit) || '-'}</strong></div>
+                        
+                        ${visit.foto_url ? `
+                            <div class="historial-photos" style="display: flex; gap: 8px; margin-top: 8px;">
+                                ${visit.foto_url.split(',').map((url, i) => `
+                                    <div onclick="event.stopPropagation(); ujier.viewFullImage('${url}')" style="width: 40px; height: 40px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-light); cursor: pointer;">
+                                        <img src="${url}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
                         <div class="historial-footer">
                             <span class="resultado-badge resultado-${status}">${(visit.resultado || 'PENDIENTE').replace(/_/g, ' ').toUpperCase()}</span>
                             ${visit.zona ? `<span class="historial-zona">${visit.zona}</span>` : ''}
@@ -1917,7 +1934,13 @@ const ujier = {
                 <div class="reference-card">
                     <div class="reference-photo-container">
                         ${hasPhoto ?
-                    `<img src="${visit.foto_url}" class="reference-photo" alt="Fachada" loading="lazy" onclick="event.stopPropagation(); ujier.viewFullImage(this.src)">` :
+                    `<div class="reference-photos-buttons" style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px;">
+                                ${visit.foto_url.split(',').map((url, i) =>
+                        `<button onclick="event.stopPropagation(); ujier.viewFullImage('${url}')" class="btn-mini-photo" style="background: rgba(255,255,255,0.9); border:none; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                                        📸 Foto ${i + 1}
+                                    </button>`
+                    ).join('')}
+                            </div>` :
                     `<div class="reference-no-photo"><span>📷</span> Sin foto disponible</div>`
                 }
                         <span class="reference-badge-zona">${visit.zona || 'SIN ZONA'}</span>
@@ -2075,7 +2098,13 @@ const ujier = {
 
                 // Popup Content
                 const photoHtml = point.foto_url
-                    ? `<div style="margin-top:5px; width:100%; height:120px; background-image:url('${point.foto_url}'); background-size:cover; background-position:center; border-radius:4px; cursor:pointer;" onclick="ujier.viewFullImage('${point.foto_url}')"></div>`
+                    ? `<div style="margin-top:5px; display:flex; gap:5px; flex-wrap:wrap;">
+                        ${point.foto_url.split(',').map((url, i) =>
+                        `<button onclick="ujier.viewFullImage('${url}')" style="background:#f3f4f6; border:1px solid #d1d5db; padding:4px 8px; border-radius:4px; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                                📸 Foto ${i + 1}
+                            </button>`
+                    ).join('')}
+                       </div>`
                     : '';
 
                 const popupContent = `

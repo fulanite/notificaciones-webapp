@@ -531,9 +531,12 @@ const adminMap = {
                         </span>
                         <div style="font-size:0.8em; margin-top:4px; color:#777;">🕒 ${utils.formatTime(point.fecha)}</div>
                         ${point.foto_url ? `
-                            <div style="margin-top:6px; width:100%; height:80px; background:url('${point.foto_url}') center/cover no-repeat; border-radius:4px; cursor: pointer;" 
-                                 onclick="dashboard.openImageViewer('${point.foto_url}', 'Visita #${index + 1} - ${point.destinatario}')"
-                                 title="Ver foto ampliada">
+                            <div style="margin-top:6px; display:flex; gap:5px; flex-wrap:wrap;">
+                                ${point.foto_url.split(',').map((url, i) =>
+                        `<button onclick="dashboard.openImageViewer('${url}', 'Visita #${index + 1} - Foto ${i + 1}')" style="background:#f3f4f6; border:1px solid #d1d5db; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">
+                                        📸 Foto ${i + 1}
+                                    </button>`
+                    ).join('')}
                             </div>
                         ` : ''}
                     `;
@@ -577,8 +580,12 @@ const adminMap = {
                         </span>
                         <br><small>🕒 ${utils.formatTime(point.fecha)}</small>
                         ${point.foto_url ? `
-                            <div style="margin-top:6px; width:100%; height:60px; background:url('${point.foto_url}') center/cover no-repeat; border-radius:4px; cursor: pointer;" 
-                                 onclick="dashboard.openImageViewer('${point.foto_url}', 'Foto de ${ujierName}')">
+                            <div style="margin-top:6px; display:flex; gap:5px; flex-wrap:wrap;">
+                                ${point.foto_url.split(',').map((url, i) =>
+                        `<button onclick="dashboard.openImageViewer('${url}', 'Foto ${i + 1} de ${ujierName}')" style="background:#f3f4f6; border:1px solid #d1d5db; padding:4px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">
+                                        📸 Foto ${i + 1}
+                                    </button>`
+                    ).join('')}
                             </div>
                         ` : ''}
                     `;
