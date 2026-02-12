@@ -608,6 +608,16 @@ const app = {
 
     // Handle logout
     async handleLogout() {
+        // Show confirmation dialog for ujier role
+        const rol = auth.currentUser?.rol ? auth.currentUser.rol.toLowerCase() : '';
+        
+        if (rol === 'ujier') {
+            const confirmed = confirm('¿Estás seguro que querés salir de la aplicación?');
+            if (!confirmed) {
+                return; // User cancelled logout
+            }
+        }
+        
         await auth.signOut();
         this.showLoginPage();
         utils.showToast('Sesión cerrada', 'info');

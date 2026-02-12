@@ -779,6 +779,13 @@ const ujier = {
             document.querySelector('.troquel-selection')?.parentElement.classList.remove('hidden');
             document.getElementById('carga-diferida')?.parentElement.parentElement.classList.remove('hidden');
 
+            // Ensure GPS wrapper is visible in normal mode (unless carga diferida is checked)
+            const gpsWrapper = document.getElementById('gps-wrapper');
+            const cargaDiferida = document.getElementById('carga-diferida');
+            if (gpsWrapper && !cargaDiferida?.checked) {
+                gpsWrapper.classList.remove('hidden');
+            }
+
             if (isPreAviso) {
                 const info = document.createElement('div');
                 info.id = 'returned-warning';
@@ -935,6 +942,7 @@ const ujier = {
         const btnCapture = document.getElementById('btn-capture-gps');
         const ubicacionLat = document.getElementById('ubicacion-lat');
         const ubicacionLng = document.getElementById('ubicacion-lng');
+        const gpsWrapper = document.getElementById('gps-wrapper');
 
         if (gpsInfo) gpsInfo.classList.add('hidden');
         if (btnCapture) {
@@ -944,6 +952,9 @@ const ujier = {
         }
         if (ubicacionLat) ubicacionLat.value = '';
         if (ubicacionLng) ubicacionLng.value = '';
+
+        // Always show GPS wrapper by default (will be hidden if carga diferida is checked)
+        if (gpsWrapper) gpsWrapper.classList.remove('hidden');
 
         // Reset photo
         const photoPreview = document.getElementById('photo-preview');
