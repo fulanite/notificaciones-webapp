@@ -232,6 +232,7 @@ const db = {
         return apiClient.put('notificaciones.php', {
             id,
             action: 'update_result',
+            resultado: updates.resultado,
             observaciones: updates.observaciones,
             transcripcion_audio: updates.transcripcion_audio,
             evidencia_foto: updates.evidencia_foto,

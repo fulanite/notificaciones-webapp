@@ -824,7 +824,7 @@ const ujier = {
             this.isUpdateMode = true;
 
             if (submitBtn) {
-                submitBtn.innerHTML = '📝 Actualizar Datos (Foto/Obs)';
+                submitBtn.innerHTML = '📝 Actualizar Datos';
                 submitBtn.classList.remove('btn-primary');
                 submitBtn.classList.add('btn-warning');
             }
@@ -832,7 +832,7 @@ const ujier = {
             // Pre-fill data
             if (resultSelect) {
                 resultSelect.value = assignment.resultado_diligencia;
-                resultSelect.disabled = true; // No cambiar resultado principal
+                // resultSelect.disabled = true; // El usuario ahora permite editar el resultado
             }
 
             // Fill observations
@@ -869,7 +869,7 @@ const ujier = {
             const info = document.createElement('div');
             info.id = 'returned-warning'; // reuse ID for simplified toggle logic
             info.style = 'background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.9rem;';
-            info.innerHTML = '<strong>Modo Edición:</strong> Podés corregir observaciones, transcripción y foto. El resultado y ubicación no se modificarán.';
+            info.innerHTML = '<strong>Modo Edición:</strong> Podés corregir el resultado, observaciones, transcripción y fotos.';
             summary.prepend(info);
 
         } else {
@@ -1488,6 +1488,9 @@ const ujier = {
                     es_carga_diferida: esCargaDiferida,
                     motivo_falla_senal: motivoFalla || null
                 });
+            } else {
+                // In update mode, the user can now change the result too
+                resultData.resultado = resultado;
             }
 
             console.log(this.isUpdateMode ? '📦 Actualizando diligencia:' : '📦 Preparando diligencia:', resultData);

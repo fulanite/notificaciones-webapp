@@ -492,8 +492,20 @@ try {
 
                     case 'update_result':
                         // Update existing result (diligencia) without creating new visit
+                        $newResult = $data['resultado'] ?? null;
+
+                        // Security check: Don't allow update if already returned
+                        $stmtCheck = $pdo->prepare("SELECT devuelta_por_ujier FROM notificaciones WHERE id = ?");
+                        $stmtCheck->execute([$data['id']]);
+                        $current = $stmtCheck->fetch();
+                        if ($current && $current['devuelta_por_ujier'] == 1) {
+                            Database::sendError('No se puede editar una notificación ya devuelta físicamente', 403);
+                        }
+
                         $stmt = $pdo->prepare("
                             UPDATE notificaciones SET
+                                resultado_diligencia = COALESCE(?, resultado_diligencia),
+                                estado = COALESCE(?, estado),
                                 observaciones_resultado = ?,
                                 transcripcion_audio = ?,
                                 evidencia_foto = COALESCE(?, evidencia_foto),
@@ -503,6 +515,8 @@ try {
                             WHERE id = ?
                         ");
                         $stmt->execute([
+                            $newResult,
+                            $newResult, // Sync state
                             $data['observaciones'] ?? null,
                             $data['transcripcion_audio'] ?? null,
                             $data['evidencia_foto'] ?? null,
@@ -514,6 +528,7 @@ try {
                         // Update the latest visit log for this notification to maintain consistency
                         $stmtVisita = $pdo->prepare("
                             UPDATE visitas SET 
+                                resultado = COALESCE(?, resultado),
                                 observaciones = ?, 
                                 transcripcion_audio = ?,
                                 foto_url = COALESCE(?, foto_url),
@@ -522,6 +537,7 @@ try {
                             ORDER BY fecha DESC LIMIT 1
                         ");
                         $stmtVisita->execute([
+                            $newResult,
                             $data['observaciones'] ?? null,
                             $data['transcripcion_audio'] ?? null,
                             $data['evidencia_foto'] ?? null,
