@@ -38,7 +38,13 @@ const ujier = {
         await this.loadAssignments();
         this.loadHistory(); // Cargar historial en segundo plano
         this.setupDiligenciaForm();
+        this.setupGlobalListeners();
         this.setupInfiniteScroll();
+    },
+
+    // Global listeners
+    setupGlobalListeners() {
+        document.getElementById('btn-bulk-deliver-open')?.addEventListener('click', () => this.openBulkDeliverModal());
     },
 
     // Update current date display
@@ -417,7 +423,7 @@ const ujier = {
             `;
         } else {
             container.innerHTML = groupNames.map(name => `
-                <button class="bulk-group-item" onclick="ujier.processBulkDelivery('${name.replace(/'/g, "\\'")}')">
+                <button class="bulk-group-item" onclick="ujier.openBulkGroupSelection('${name.replace(/'/g, "\\'")}')">
                     <div class="group-info">
                         <span class="group-name">⭐ ${name}</span>
                         <span class="group-count">${groups[name].length} pendientes</span>
@@ -431,13 +437,133 @@ const ujier = {
         modal.classList.add('show');
     },
 
+    // New: Open selection list for a group
+    openBulkGroupSelection(groupName) {
+        const container = document.getElementById('bulk-groups-container');
+
+        // Filter items
+        const groupItems = this.assignments.filter(n =>
+            utils.getSpecialDestinationText(n) === groupName &&
+            (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
+        );
+
+        if (groupItems.length === 0) return;
+
+        // Render List with Checkboxes
+        let html = `
+            <div class="bulk-selection-header" style="margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
+                <button class="btn btn-sm btn-secondary" onclick="ujier.openBulkDeliverModal()">< ⬅️ Volver</button>
+                <h3 style="font-size: 1.1rem; margin: 0;">${groupName}</h3>
+            </div>
+            <div class="bulk-list" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; display:flex; justify-content:space-between;">
+                   <span>Seleccioná las notificaciones a entregar:</span>
+                   <button onclick="ujier.toggleAllBulkSelection(true)" style="background:none; border:none; color:var(--primary); cursor:pointer;">Todas</button>
+                </div>
+        `;
+
+        html += groupItems.map(item => `
+            <label class="bulk-item-row" style="display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-bottom: 1px solid var(--border-light); cursor: pointer;">
+                <input type="checkbox" class="bulk-check" value="${item.id}" checked style="margin-top: 4px;">
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; font-size: 0.95rem;">${item.destinatario_nombre || 'Sin nombre'}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">${item.domicilio}</div>
+                    <div style="font-size: 0.75rem; color: var(--primary);">Exp: ${item.n_expediente || '-'}</div>
+                </div>
+            </label>
+        `).join('');
+
+        html += `
+            </div>
+            <div class="bulk-actions" style="display: flex; gap: 10px;">
+                <button class="btn btn-primary" style="flex: 1;" onclick="ujier.confirmBulkSelection('${groupName.replace(/'/g, "\\'")}')">
+                    ✅ Confirmar Entrega (<span id="bulk-confirm-count">${groupItems.length}</span>)
+                </button>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        // Add change listeners to update count
+        container.querySelectorAll('.bulk-check').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const count = container.querySelectorAll('.bulk-check:checked').length;
+                document.getElementById('bulk-confirm-count').textContent = count;
+            });
+        });
+    },
+
+    toggleAllBulkSelection(check) {
+        const checkboxes = document.querySelectorAll('.bulk-check');
+        checkboxes.forEach(cb => cb.checked = check);
+        document.getElementById('bulk-confirm-count').textContent = check ? checkboxes.length : 0;
+    },
+
+    // Updated: Confirm selection
+    async confirmBulkSelection(groupName) {
+        const checkboxes = document.querySelectorAll('.bulk-check:checked');
+        const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+
+        if (selectedIds.length === 0) {
+            utils.showToast('Seleccioná al menos una notificación', 'warning');
+            return;
+        }
+
+        if (!confirm(`¿Confirmar entrega para ${selectedIds.length} notificaciones de "${groupName}"?`)) return;
+
+        this.closeBulkDeliverModal();
+        utils.showLoading(`Entregando ${selectedIds.length} notificaciones...`);
+
+        // ... (rest of processing logic but filtering by ID)
+        await this.processBulkIds(selectedIds, groupName);
+    },
+
+    async processBulkIds(ids, groupName) {
+        let successCount = 0;
+        let lat = null;
+        let lng = null;
+
+        // Try GPS once for the batch
+        try {
+            const pos = await utils.getGPSPosition();
+            lat = pos.lat;
+            lng = pos.lng;
+        } catch (e) {
+            console.warn('GPS not available for bulk delivery, continuing with null location.');
+        }
+
+        for (const id of ids) {
+            try {
+                // Find the notification object to get any extra data if needed, or just submit
+                // Ideally we should have the object, but ID is enough for db update
+
+                const { error } = await db.registerResult(id, {
+                    resultado: 'entregado',
+                    ubicacion_lat: lat,
+                    ubicacion_lng: lng,
+                    es_carga_diferida: lat === null,
+                    observaciones: `ENTREGA MASIVA POR LISTA - ÚLTIMA VISITA: ${utils.getTodayFormatted()}`
+                }, auth.currentUser?.id);
+
+                if (!error) successCount++;
+            } catch (err) {
+                console.error(`Error delivering ${id}:`, err);
+            }
+        }
+
+        utils.hideLoading();
+        utils.showToast(`Se entregaron ${successCount} notificaciones correctamente`, 'success');
+
+        await this.loadAssignments();
+    },
+
     closeBulkDeliverModal() {
         const modal = document.getElementById('modal-bulk-deliver');
         modal?.classList.add('hidden');
         modal?.classList.remove('show');
     },
 
-    // Process delivery for a group
+    // Process delivery for a group (Original Legacy method, kept for reference or direct calls if needed, but updated to use processBulkIds)
     async processBulkDelivery(groupName) {
         if (!confirm(`¿Confirmar entrega masiva para todas las notificaciones de "${groupName}"?`)) return;
 
@@ -451,39 +577,8 @@ const ujier = {
         this.closeBulkDeliverModal();
         utils.showLoading(`Entregando ${specialPending.length} notificaciones de ${groupName}...`);
 
-        let successCount = 0;
-        let lat = null;
-        let lng = null;
-
-        // Try GPS once for the batch
-        try {
-            const pos = await utils.getGPSPosition();
-            lat = pos.lat;
-            lng = pos.lng;
-        } catch (e) {
-            console.warn('GPS not available for bulk delivery, will save as deferred if needed? No, force delivery for specials.');
-        }
-
-        for (const n of specialPending) {
-            try {
-                const { error } = await db.registerResult(n.id, {
-                    resultado: 'entregado',
-                    ubicacion_lat: lat,
-                    ubicacion_lng: lng,
-                    es_carga_diferida: lat === null,
-                    observaciones: `ENTREGA MASIVA POR LOTE - ÚLTIMA VISITA: ${utils.getTodayFormatted()}`
-                }, auth.currentUser?.id);
-
-                if (!error) successCount++;
-            } catch (err) {
-                console.error(`Error delivering ${n.id}:`, err);
-            }
-        }
-
-        utils.hideLoading();
-        utils.showToast(`Se entregaron ${successCount} notificaciones correctamente`, 'success');
-
-        await this.loadAssignments();
+        const ids = specialPending.map(n => n.id);
+        await this.processBulkIds(ids, groupName);
     },
 
     // Quick delivery for special recipients
@@ -1111,8 +1206,7 @@ const ujier = {
         document.getElementById('btn-cancel-diligencia')?.addEventListener('click', () => this.closeDiligencia());
         document.querySelector('.modal-overlay')?.addEventListener('click', () => this.closeDiligencia());
 
-        // Bulk delivery listener
-        document.getElementById('btn-bulk-deliver-open')?.addEventListener('click', () => this.openBulkDeliverModal());
+        // Bulk delivery listener moved to setupGlobalListeners
 
         // Carga diferida toggle
         const cargaDiferidaToggle = document.getElementById('carga-diferida');
@@ -1934,13 +2028,13 @@ const ujier = {
                 <div class="reference-card">
                     <div class="reference-photo-container">
                         ${hasPhoto ?
-                    `<div class="reference-photos-buttons" style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px;">
-                                ${visit.foto_url.split(',').map((url, i) =>
-                        `<button onclick="event.stopPropagation(); ujier.viewFullImage('${url}')" class="btn-mini-photo" style="background: rgba(255,255,255,0.9); border:none; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
-                                        📸 Foto ${i + 1}
-                                    </button>`
+                    `<div class="reference-carousel">
+                                ${visit.foto_url.split(',').map(url =>
+                        `<img src="${url}" class="reference-slide-img" alt="Fachada" loading="lazy" onclick="event.stopPropagation(); ujier.viewFullImage('${url}')">`
                     ).join('')}
-                            </div>` :
+                            </div>
+                            ${visit.foto_url.split(',').length > 1 ? `<div class="reference-photo-count">📷 ${visit.foto_url.split(',').length}</div>` : ''}
+                            ` :
                     `<div class="reference-no-photo"><span>📷</span> Sin foto disponible</div>`
                 }
                         <span class="reference-badge-zona">${visit.zona || 'SIN ZONA'}</span>
