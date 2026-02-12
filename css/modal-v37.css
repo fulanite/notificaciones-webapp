@@ -500,6 +500,47 @@
     border: 1px solid #c7d2fe;
 }
 
+/* Deletion Notice Box */
+.deletion-notice-box {
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin: 8px 20px 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.deletion-notice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #991b1b;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.deletion-metadata {
+    font-weight: 600;
+    color: #b91c1c;
+    opacity: 0.8;
+}
+
+.deletion-notice-reason {
+    font-size: 0.8rem;
+    color: #7f1d1d;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #ef4444;
+    line-height: 1.4;
+    margin-top: 2px;
+}
+
 .footer-main-actions {
     display: flex;
     gap: 8px;

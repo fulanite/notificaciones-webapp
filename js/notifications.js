@@ -528,6 +528,18 @@ const notifications = {
                             </div>
                         </div>
 
+                        ${data.eliminada == 1 ? `
+                            <div class="deletion-notice-box">
+                                <div class="deletion-notice-header">
+                                    <span>❌ NOTIFICACIÓN ELIMINADA</span>
+                                    <span class="deletion-metadata">Por ${data.eliminada_por_nombre || data.eliminada_por || 'Admin'} el ${utils.formatDateTime(data.eliminada_fecha)}</span>
+                                </div>
+                                <div class="deletion-notice-reason">
+                                    <strong>Motivo de eliminación:</strong> ${data.eliminada_motivo || 'No especificado'}
+                                </div>
+                            </div>
+                        ` : ''}
+
                         <!-- Content Grid: 3 Main Sections -->
                         <div class="modal-dashboard-grid">
                             <!-- Col 1: Datos Legales -->
@@ -618,7 +630,6 @@ const notifications = {
                             <span class="info-tag carga-tag">🕒 Carga: ${utils.formatDateTime(data.fecha_carga)}</span>
                             <span class="info-tag user-tag">👤 Por: <strong>${data.cargador_nombre || data.usuario_carga || '-'}</strong></span>
                             ${data.devuelta_por_ujier ? `<span class="info-tag return-tag" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">📦 Devuelta: ${utils.formatDate(data.fecha_devolucion)}</span>` : ''}
-                            ${data.eliminada == 1 ? `<span class="info-tag delete-tag" style="background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;">❌ Eliminada por ${data.eliminada_por_nombre || data.eliminada_por || 'Admin'} el ${utils.formatDate(data.eliminada_fecha)}</span>` : ''}
                             ${data.migrated_from_glide ? '<span class="badge-migrated-v2">📦 REGISTRO MIGRADO</span>' : ''}
                         </div>
                         <div class="footer-main-actions">
