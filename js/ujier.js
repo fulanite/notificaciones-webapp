@@ -1012,7 +1012,6 @@ const ujier = {
 
             // Hide/Disable GPS and Troquel as they are part of the core result
             document.getElementById('gps-wrapper')?.classList.add('hidden');
-            document.querySelector('.troquel-selection')?.parentElement.classList.add('hidden');
             document.getElementById('carga-diferida')?.parentElement.parentElement.classList.add('hidden'); // Hide toggle
 
             // Show existing photo if any
@@ -1044,7 +1043,6 @@ const ujier = {
                 submitBtn.classList.add('btn-primary');
                 submitBtn.classList.remove('btn-warning');
             }
-            document.querySelector('.troquel-selection')?.parentElement.classList.remove('hidden');
             document.getElementById('carga-diferida')?.parentElement.parentElement.classList.remove('hidden');
 
             // Ensure GPS wrapper is visible in normal mode (unless carga diferida is checked)
@@ -1204,17 +1202,20 @@ const ujier = {
         form?.reset();
 
         // Reset GPS safety checks
-        const gpsInfo = document.getElementById('gps-info');
+        const statusText = document.getElementById('gps-status-text');
+        const statusContainer = document.getElementById('gps-status');
         const btnCapture = document.getElementById('btn-capture-gps');
         const ubicacionLat = document.getElementById('ubicacion-lat');
         const ubicacionLng = document.getElementById('ubicacion-lng');
         const gpsWrapper = document.getElementById('gps-wrapper');
 
-        if (gpsInfo) gpsInfo.classList.add('hidden');
+        if (statusText) statusText.textContent = 'Ubicación no capturada';
+        if (statusContainer) statusContainer.classList.remove('captured');
+
         if (btnCapture) {
             btnCapture.classList.remove('hidden');
             btnCapture.disabled = false;
-            btnCapture.innerHTML = '<span>📍</span> Capturar Ubicación';
+            btnCapture.innerHTML = '📍 Capturar';
         }
         if (ubicacionLat) ubicacionLat.value = '';
         if (ubicacionLng) ubicacionLng.value = '';
@@ -1259,30 +1260,6 @@ const ujier = {
             }
         });
 
-        // Troquel Toggles
-        const toggleTroquel = (val) => {
-            const container = document.getElementById('n-troquel-container');
-            const input = document.getElementById('n-troquel-diligencia');
-            const hiddenType = document.getElementById('tipo-troquel-diligencia');
-
-            if (val === 'SIN') {
-                container?.classList.add('hidden');
-                if (input) {
-                    input.required = false;
-                    input.value = '';
-                }
-                if (hiddenType) hiddenType.value = '';
-            } else {
-                container?.classList.remove('hidden');
-                if (input) input.required = true;
-                if (hiddenType) hiddenType.value = val;
-            }
-        };
-
-        document.getElementById('radio-troquel-c')?.addEventListener('change', () => toggleTroquel('C'));
-        document.getElementById('radio-troquel-m')?.addEventListener('change', () => toggleTroquel('M'));
-        document.getElementById('radio-troquel-sin')?.addEventListener('change', () => toggleTroquel('SIN'));
-
         // GPS capture
         document.getElementById('btn-capture-gps')?.addEventListener('click', () => this.captureGPS());
 
@@ -1307,7 +1284,6 @@ const ujier = {
     // Capture GPS
     async captureGPS() {
         const btn = document.getElementById('btn-capture-gps');
-        const gpsInfo = document.getElementById('gps-info');
 
         btn.disabled = true;
         btn.innerHTML = '<div class="btn-spinner"></div> Obteniendo...';
@@ -1320,7 +1296,11 @@ const ujier = {
             document.getElementById('ubicacion-lng').value = position.lng;
 
             // Mostrar confirmación
-            gpsInfo?.classList.remove('hidden');
+            const statusText = document.getElementById('gps-status-text');
+            const statusContainer = document.getElementById('gps-status');
+
+            if (statusText) statusText.textContent = 'Ubicación capturada';
+            if (statusContainer) statusContainer.classList.add('captured');
             btn.classList.add('hidden');
 
             utils.showToast('Ubicación capturada correctamente', 'success');
@@ -1341,7 +1321,7 @@ const ujier = {
 
             // Only reset button if we are NOT retrying (recursion returns early)
             btn.disabled = false;
-            btn.innerHTML = '<span>📍</span> Capturar Ubicación';
+            btn.innerHTML = '📍 Capturar';
         }
     },
 
