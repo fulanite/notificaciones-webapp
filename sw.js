@@ -1,6 +1,6 @@
 /**
  * SGND - Service Worker for PWA
- * Version: 41.00
+ * Version: 41.10
  */
 
 const CACHE_NAME = 'sgnd-cache-v81';
