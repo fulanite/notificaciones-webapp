@@ -1949,8 +1949,17 @@
                         };
                     };
 
-                    // Periodic update check while app stays open (low impact)
-                    setInterval(() => reg.update(), 5 * 60 * 1000);
+                    // Periodic update check only when tab is visible + online (lower impact)
+                    const checkForUpdates = () => {
+                        if (!document.hidden && navigator.onLine) {
+                            reg.update().catch(() => { });
+                        }
+                    };
+
+                    const updateTimer = setInterval(checkForUpdates, 5 * 60 * 1000);
+                    document.addEventListener('visibilitychange', checkForUpdates);
+                    window.addEventListener('online', checkForUpdates);
+                    window.addEventListener('beforeunload', () => clearInterval(updateTimer), { once: true });
                 }).catch(err => console.error('SW error:', err));
             });
 
