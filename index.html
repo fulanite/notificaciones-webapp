@@ -1920,11 +1920,18 @@
     <!-- Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
+            let hasPendingReload = false;
+
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js').then(reg => {
-                    // Check if there's already a waiting worker
+                    const requestActivation = (worker) => {
+                        if (!worker) return;
+                        worker.postMessage({ type: 'SKIP_WAITING' });
+                    };
+
+                    // If there is a worker waiting from a previous visit, activate it now
                     if (reg.waiting) {
-                        showUpdateToast();
+                        requestActivation(reg.waiting);
                     }
 
                     // Check for updates every time page loads
@@ -1932,45 +1939,36 @@
 
                     reg.onupdatefound = () => {
                         const installingWorker = reg.installing;
+                        if (!installingWorker) return;
+
                         installingWorker.onstatechange = () => {
-                            if (installingWorker.state === 'installed') {
-                                if (navigator.serviceWorker.controller) {
-                                    // New update available
-                                    showUpdateToast();
-                                }
+                            // Auto-activate updates without forcing users to clear cache
+                            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                requestActivation(installingWorker);
                             }
                         };
                     };
+
+                    // Periodic update check only when tab is visible + online (lower impact)
+                    const checkForUpdates = () => {
+                        if (!document.hidden && navigator.onLine) {
+                            reg.update().catch(() => { });
+                        }
+                    };
+
+                    const updateTimer = setInterval(checkForUpdates, 5 * 60 * 1000);
+                    document.addEventListener('visibilitychange', checkForUpdates);
+                    window.addEventListener('online', checkForUpdates);
+                    window.addEventListener('beforeunload', () => clearInterval(updateTimer), { once: true });
                 }).catch(err => console.error('SW error:', err));
             });
-        }
 
-        function showUpdateToast() {
-            // Avoid duplicates
-            if (document.querySelector('.update-toast')) return;
-
-            const toast = document.createElement('div');
-            toast.className = 'update-toast';
-            toast.innerHTML = `
-                <span>🚀 Nueva versión disponible</span>
-                <button onclick="updateApp()">ACTUALIZAR</button>
-            `;
-            toast.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#1e293b; color:#fff; padding:12px 20px; border-radius:30px; display:flex; gap:15px; align-items:center; z-index:10000; box-shadow:0 10px 25px -5px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); animation: slideUp 0.3s ease-out;';
-            toast.querySelector('button').style.cssText = 'background:#3b82f6; color:white; border:none; padding:6px 14px; border-radius:15px; font-weight:bold; cursor:pointer; font-size:0.85rem; letter-spacing:0.5px;';
-            document.body.appendChild(toast);
-        }
-
-        function updateApp() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(registrations => {
-                    for (let registration of registrations) {
-                        registration.unregister(); // Unregister to force clean slate
-                    }
-                    window.location.reload(true);
-                });
-            } else {
-                window.location.reload(true);
-            }
+            // Reload only once when the new worker takes control
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (hasPendingReload) return;
+                hasPendingReload = true;
+                window.location.reload();
+            });
         }
     </script>
     <!-- Modales de Gestión de Campo -->

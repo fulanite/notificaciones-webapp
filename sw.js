@@ -2,7 +2,8 @@
  * SGND - Service Worker for PWA
  */
 
-const CACHE_NAME = 'sgnd-cache-v71';
+const CACHE_NAME = 'sgnd-cache-v73';
+const HTML_NETWORK_TIMEOUT_MS = 3500;
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache
@@ -60,7 +61,6 @@ self.addEventListener('install', (event) => {
                     );
                 });
             })
-            .then(() => self.skipWaiting())
     );
 });
 
@@ -77,13 +77,104 @@ self.addEventListener('activate', (event) => {
                         .map((name) => caches.delete(name))
                 );
             })
-            .then(() => {
+            .then(async () => {
+                if (self.registration.navigationPreload) {
+                    await self.registration.navigationPreload.enable();
+                }
+
                 if (self.registration.active) {
                     return self.clients.claim();
                 }
             })
     );
 });
+
+// Allow clients to request immediate activation of a waiting worker
+self.addEventListener('message', (event) => {
+    if (event.data?.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
+
+function isCacheableResponse(response) {
+    return response && (response.ok || response.type === 'opaque');
+}
+
+function putInCache(request, response) {
+    if (!isCacheableResponse(response) || request.url.startsWith('chrome-extension')) {
+        return;
+    }
+
+    const responseClone = response.clone();
+    caches.open(CACHE_NAME).then((cache) => {
+        cache.put(request, responseClone);
+    }).catch(() => { });
+}
+
+function getAssetCacheKey(request) {
+    const url = new URL(request.url);
+    const isSameOrigin = url.origin === self.location.origin;
+    const isVersionedAsset = /\.(js|css)$/i.test(url.pathname);
+
+    // Unify cache keys for versioned JS/CSS (?v=) to avoid duplicate entries and speed warm caches
+    if (isSameOrigin && isVersionedAsset) {
+        return new Request(url.pathname, { method: 'GET' });
+    }
+
+    return request;
+}
+
+function networkFirstHtml(event) {
+    const { request } = event;
+
+    const networkPromise = (async () => {
+        const preloadedResponse = await event.preloadResponse;
+        if (preloadedResponse) {
+            putInCache(request, preloadedResponse);
+            return preloadedResponse;
+        }
+
+        return fetch(request);
+    })()
+        .then((response) => {
+            if (response.ok) {
+                putInCache(request, response);
+            }
+            return response;
+        });
+
+    const timeoutPromise = new Promise((resolve, reject) => {
+        setTimeout(() => reject(new Error('network-timeout')), HTML_NETWORK_TIMEOUT_MS);
+    });
+
+    return Promise.race([networkPromise, timeoutPromise])
+        .catch(async () => {
+            const cachedResponse = await caches.match(request);
+            return cachedResponse || caches.match('/index.html');
+        });
+}
+
+function staleWhileRevalidateAsset(request) {
+    const cacheKey = getAssetCacheKey(request);
+
+    return caches.match(cacheKey)
+        .then((cachedResponse) => {
+            const networkUpdate = fetch(request)
+                .then((response) => {
+                    if (isCacheableResponse(response)) {
+                        putInCache(cacheKey, response);
+                    }
+                    return response;
+                })
+                .catch(() => null);
+
+            if (cachedResponse) {
+                return cachedResponse;
+            }
+
+            return networkUpdate.then((response) => response || caches.match('/index.html'));
+        });
+}
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
@@ -109,58 +200,14 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // For HTML pages - network first, then cache
-    if (request.headers.get('accept')?.includes('text/html')) {
-        event.respondWith(
-            fetch(request)
-                .then((response) => {
-                    // Clone and cache the response
-                    const responseClone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(request, responseClone);
-                    });
-                    return response;
-                })
-                .catch(() => {
-                    return caches.match(request)
-                        .then((cachedResponse) => {
-                            return cachedResponse || caches.match('/index.html');
-                        });
-                })
-        );
+    // For HTML pages - network first with timeout fallback to keep UX responsive
+    if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
+        event.respondWith(networkFirstHtml(event));
         return;
     }
 
-    // For other assets - cache first, then network
-    event.respondWith(
-        caches.match(request)
-            .then((cachedResponse) => {
-                if (cachedResponse) {
-                    // Update cache in background
-                    fetch(request).then((response) => {
-                        if (response.ok) {
-                            caches.open(CACHE_NAME).then((cache) => {
-                                cache.put(request, response);
-                            });
-                        }
-                    }).catch(() => { });
-
-                    return cachedResponse;
-                }
-
-                return fetch(request)
-                    .then((response) => {
-                        // Cache new resources (skip chrome-extension URLs)
-                        if (response.ok && !request.url.startsWith('chrome-extension')) {
-                            const responseClone = response.clone();
-                            caches.open(CACHE_NAME).then((cache) => {
-                                cache.put(request, responseClone);
-                            });
-                        }
-                        return response;
-                    });
-            })
-    );
+    // For static assets - stale-while-revalidate (fast + updates in background)
+    event.respondWith(staleWhileRevalidateAsset(request));
 });
 
 // Background sync for offline queue
