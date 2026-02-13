@@ -1024,18 +1024,11 @@ const ujier = {
             document.getElementById('carga-diferida')?.parentElement.parentElement.classList.add('hidden'); // Hide toggle
 
             // Show existing photo if any
+            this.existingPhotos = [];
             if (assignment.evidencia_foto) {
-                const photos = assignment.evidencia_foto.split(',');
-                const grid = document.getElementById('photo-preview-grid');
-                if (grid) {
-                    grid.innerHTML = photos.map((url, index) => `
-                        <div class="photo-preview-item">
-                            <img src="${url}" alt="Foto ${index + 1}">
-                            <!-- We don't allow removing existing ones here for simplicity, or we can just leave it as is -->
-                        </div>
-                    `).join('');
-                }
+                this.existingPhotos = assignment.evidencia_foto.split(',').filter(url => url.trim() !== '');
             }
+            this.renderPhotoPreviews();
 
             // Add info alert
             const info = document.createElement('div');
@@ -1239,6 +1232,8 @@ const ujier = {
         if (galleryInput) galleryInput.value = '';
 
         this.capturedPhotos = [];
+        this.existingPhotos = [];
+        this.isUpdateMode = false;
         this.renderPhotoPreviews();
 
         // Reset deferred fields
@@ -1513,6 +1508,8 @@ const ujier = {
 
     // List of captured photo blobs
     capturedPhotos: [],
+    existingPhotos: [], // URLs of photos already on server
+    isUpdateMode: false,
 
     // Handle photo capture
     async handlePhotoCapture(event) {
@@ -1520,7 +1517,9 @@ const ujier = {
         if (!files.length) return;
 
         // Limit total photos to 2
-        const remainingSlots = 2 - this.capturedPhotos.length;
+        const totalNow = this.capturedPhotos.length + this.existingPhotos.length;
+        const remainingSlots = 2 - totalNow;
+
         if (remainingSlots <= 0) {
             utils.showToast('Máximo 2 fotos permitidas', 'warning');
             return;
@@ -1558,17 +1557,36 @@ const ujier = {
         const grid = document.getElementById('photo-preview-grid');
         if (!grid) return;
 
-        if (this.capturedPhotos.length === 0) {
-            grid.innerHTML = '';
-            return;
+        let html = '';
+
+        // Render Existing Photos (already on server)
+        if (this.existingPhotos && this.existingPhotos.length > 0) {
+            html += this.existingPhotos.map((url, index) => `
+                <div class="photo-preview-item existing">
+                    <img src="${url}" alt="Foto ${index + 1}" onclick="ujier.viewFullImage('${url}')">
+                    <button type="button" class="btn-remove-photo" onclick="ujier.removeExistingPhoto(${index})">×</button>
+                    <div class="photo-badge" style="position: absolute; bottom: 5px; right: 5px; background: rgba(0,0,0,0.5); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 4px;">En servidor</div>
+                </div>
+            `).join('');
         }
 
-        grid.innerHTML = this.capturedPhotos.map((blob, index) => `
-            <div class="photo-preview-item">
-                <img src="${URL.createObjectURL(blob)}" alt="Preview ${index + 1}">
-                <button type="button" class="btn-remove-photo" onclick="ujier.removePhoto(${index})">×</button>
-            </div>
-        `).join('');
+        // Render New Captured Photos
+        if (this.capturedPhotos && this.capturedPhotos.length > 0) {
+            html += this.capturedPhotos.map((blob, index) => `
+                <div class="photo-preview-item new">
+                    <img src="${URL.createObjectURL(blob)}" alt="Nueva ${index + 1}">
+                    <button type="button" class="btn-remove-photo" onclick="ujier.removePhoto(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        grid.innerHTML = html;
+    },
+
+    // Remove existing photo (already on server)
+    removeExistingPhoto(index) {
+        this.existingPhotos.splice(index, 1);
+        this.renderPhotoPreviews();
     },
 
     // Remove specific photo
@@ -1654,9 +1672,12 @@ const ujier = {
 
             // Upload files if online
             if (utils.isOnline()) {
+                // Initialize with REMAINING existing photos (those not deleted by user)
+                let finalPhotoUrls = [...this.existingPhotos];
+
                 if (this.capturedPhotos && this.capturedPhotos.length > 0) {
-                    console.log(`📸 Subiendo ${this.capturedPhotos.length} fotos...`);
-                    const photoUrls = [];
+                    console.log(`📸 Subiendo ${this.capturedPhotos.length} nuevas fotos...`);
+                    const uploadedUrls = [];
                     for (let i = 0; i < this.capturedPhotos.length; i++) {
                         const photo = this.capturedPhotos[i];
                         const progressMsg = `Subiendo foto ${i + 1} de ${this.capturedPhotos.length}...`;
@@ -1664,17 +1685,19 @@ const ujier = {
 
                         const { url, error: photoErr } = await db.uploadPhoto(photo, this.currentAssignment.id);
                         if (!photoErr && url) {
-                            photoUrls.push(url);
+                            uploadedUrls.push(url);
                         } else {
                             console.error('Error al subir foto:', photoErr);
-                            // If one fails, we might want to warn or abort. 
-                            // For now let's just log and continue if some worked.
                         }
                     }
-                    if (photoUrls.length > 0) {
-                        resultData.evidencia_foto = photoUrls.join(',');
+                    if (uploadedUrls.length > 0) {
+                        finalPhotoUrls = [...finalPhotoUrls, ...uploadedUrls];
                     }
                 }
+
+                // Update resultData with the combined list
+                // If the list is empty, we send empty string or null to clear it on DB
+                resultData.evidencia_foto = finalPhotoUrls.length > 0 ? finalPhotoUrls.join(',') : '';
             }
             // IMPORTANT: Hide loading after uploading photos
             utils.hideLoading();
