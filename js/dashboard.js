@@ -504,7 +504,6 @@ const adminMap = {
         // Create Layer Group
         const markers = L.layerGroup();
         const latlngs = [];
-        let totalDist = 0;
 
         // --- VISTA INDIVIDUAL (RECORRIDO DETALLADO) ---
         if (userId !== 'all') {
@@ -552,14 +551,10 @@ const adminMap = {
             if (latlngs.length > 1) {
                 L.polyline(latlngs, { color: '#3b82f6', weight: 4, opacity: 0.7, lineJoin: 'round' }).addTo(markers);
 
-                // Calcular distancia total
-                for (let i = 0; i < latlngs.length - 1; i++) {
-                    totalDist += this.calculateDistance(latlngs[i][0], latlngs[i][1], latlngs[i + 1][0], latlngs[i + 1][1]);
-                }
             }
 
-            // Renderizar Timeline + Distancia
-            this.renderTimeline(data, totalDist);
+            // Renderizar Timeline
+            this.renderTimeline(data);
 
         }
         // --- VISTA GENERAL (MAPA DE CALOR / PINES SIMPLES) ---
@@ -637,25 +632,14 @@ const adminMap = {
         return '#3b82f6'; // Blue fallback
     },
 
-    calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // km
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-    },
 
-    renderTimeline(data, totalDist) {
+    renderTimeline(data) {
         const container = document.getElementById('admin-timeline-container');
         if (!container) return;
 
         let html = `
             <div class="timeline-header-stats" style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
                 <span class="timeline-title">⏱️ Secuencia de Visitas</span>
-                <span class="badge badge-primary" style="font-size: 0.85rem;">🏁 Distancia: ${totalDist.toFixed(2)} km</span>
             </div>
             <div class="timeline-steps">
         `;

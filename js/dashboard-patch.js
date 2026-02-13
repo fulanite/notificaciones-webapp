@@ -47,7 +47,6 @@
         // Create Layer Group
         const markers = L.layerGroup();
         const latlngs = [];
-        let totalDist = 0;
 
         // --- VISTA INDIVIDUAL (RECORRIDO DETALLADO) ---
         if (userId !== 'all') {
@@ -94,14 +93,10 @@
             if (latlngs.length > 1) {
                 L.polyline(latlngs, { color: '#3b82f6', weight: 4, opacity: 0.7, lineJoin: 'round' }).addTo(markers);
 
-                // Calcular distancia total
-                for (let i = 0; i < latlngs.length - 1; i++) {
-                    totalDist += this.calculateDistance(latlngs[i][0], latlngs[i][1], latlngs[i + 1][0], latlngs[i + 1][1]);
-                }
             }
 
-            // Renderizar Timeline + Distancia
-            this.renderTimeline(data, totalDist);
+            // Renderizar Timeline
+            this.renderTimeline(data);
 
         }
         // --- VISTA GENERAL (MAPA DE CALOR) ---

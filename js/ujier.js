@@ -2231,7 +2231,6 @@ const ujier = {
         if (!data || data.length === 0) {
             utils.showToast('No hay registros de GPS para esta fecha', 'info');
             document.getElementById('map-stat-visits').textContent = '0';
-            document.getElementById('map-stat-distance').textContent = '0 km';
             timelineContainer.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-muted);">Sin actividad registrada</p>';
             return;
         }
@@ -2239,7 +2238,6 @@ const ujier = {
         // Process markers and path
         const markers = L.layerGroup();
         const latlngs = [];
-        let totalDist = 0;
 
         // Custom Icon Generator
         const createNumberedIcon = (number, color) => {
@@ -2322,10 +2320,6 @@ const ujier = {
         if (latlngs.length > 1) {
             L.polyline(latlngs, { color: '#3b82f6', weight: 4, opacity: 0.6 }).addTo(markers);
 
-            // Calculate Total Distance
-            for (let i = 0; i < latlngs.length - 1; i++) {
-                totalDist += this.calculateDistance(latlngs[i][0], latlngs[i][1], latlngs[i + 1][0], latlngs[i + 1][1]);
-            }
         }
 
         // Add to map
@@ -2339,7 +2333,6 @@ const ujier = {
 
         // Update Stats
         document.getElementById('map-stat-visits').textContent = data.length;
-        document.getElementById('map-stat-distance').textContent = totalDist.toFixed(2) + ' km';
     },
 
     // Distance calculations helper
