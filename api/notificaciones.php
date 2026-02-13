@@ -145,6 +145,11 @@ try {
                     $params[] = $_GET['zona'];
                 }
 
+                if (!empty($_GET['ujier'])) {
+                    $where[] = "n.asignado_a = ?";
+                    $params[] = $_GET['ujier'];
+                }
+
                 if (!empty($_GET['unassigned_only']) && $_GET['unassigned_only'] == '1') {
                     $where[] = "(n.fecha_entrega_ujier IS NULL OR n.fecha_entrega_ujier = '')";
                 }
