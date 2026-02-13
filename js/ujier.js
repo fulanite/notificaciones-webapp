@@ -211,7 +211,10 @@ const ujier = {
         const cachedData = offline.getCachedData(`assignments_${auth.currentUser.id}`);
         if (cachedData) {
             console.log('📦 Usando datos en caché para carga instantánea');
-            this.assignments = cachedData.filter(n => n.eliminada != 1);
+            this.assignments = cachedData.filter(n =>
+                n.eliminada != 1 &&
+                (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
+            );
             this.applySavedOrder();
             this.renderAssignments();
             this.setupDragDrop();
@@ -247,8 +250,11 @@ const ujier = {
             return;
         }
 
-        // Mostrar TODAS las notificaciones pendientes/pre-aviso (excluyendo eliminadas)
-        this.assignments = (data || []).filter(n => n.eliminada != 1);
+        // Mostrar SOLO las notificaciones pendientes/pre-aviso
+        this.assignments = (data || []).filter(n =>
+            n.eliminada != 1 &&
+            (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
+        );
 
         // Aplicar orden guardado
         this.applySavedOrder();
@@ -267,6 +273,9 @@ const ujier = {
     renderAssignments() {
         const listContainer = document.getElementById('assignments-list');
         if (!listContainer) return;
+
+        // Ensure bulk notice is updated even if list is empty
+        this.updateBulkNotice();
 
         if (this.assignments.length === 0) {
             listContainer.innerHTML = `
@@ -385,7 +394,7 @@ const ujier = {
         });
 
         listContainer.innerHTML = html;
-        this.updateBulkNotice();
+        // Notice updated at start of render to catch empty cases correctly
 
         // Limpiar selección después de renderizar (opcional)
         // this.selectedCardId = null;
