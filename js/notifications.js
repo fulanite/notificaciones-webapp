@@ -17,7 +17,6 @@ const notifications = {
         year: '2026',
         own_only: true,
         unassigned_only: false,
-        ujier: '',
         medio_pago: ''
     },
 
@@ -101,24 +100,14 @@ const notifications = {
             // Load Medio Pago dynamically
             const filterMedioPago = document.getElementById('filter-medio-pago');
             const { data: medios } = await db.getDistinctValues('medio_pago');
-            filterMedioPago.innerHTML = '<option value="">💳 Todos los pagos</option>' +
-                medios.map(m => `<option value="${m}">${m.toUpperCase()}</option>`).join('');
-        }
-
-            // Load Ujieres dynamically
-            const filterUjier = document.getElementById('filter-ujier');
-        if (filterUjier) {
-            const { data: ujieres } = await apiClient.get('usuarios.php', { rol: 'ujier' });
-            if (ujieres) {
-                filterUjier.innerHTML = '<option value="">👤 Todos los ujieres</option>' +
-                    '<option value="unassigned">⚠️ Sin Asignar</option>' +
-                    ujieres.map(u => `<option value="${u.id}">${u.nombre}</option>`).join('');
+            if (filterMedioPago && medios) {
+                filterMedioPago.innerHTML = '<option value="">💳 Todos los pagos</option>' +
+                    medios.map(m => `<option value="${m}">${m.toUpperCase()}</option>`).join('');
             }
+        } catch (e) {
+            console.error('Error loading filter options:', e);
         }
-    } catch(e) {
-        console.error('Error loading filter options:', e);
-    }
-},
+    },
 
     // Setup filter listeners
     setupFilters() {
@@ -130,7 +119,6 @@ const notifications = {
         const filterPropio = document.getElementById('filter-propio');
         const filterSinFecha = document.getElementById('filter-sin-fecha');
         const filterMedioPago = document.getElementById('filter-medio-pago');
-        const filterUjier = document.getElementById('filter-ujier');
 
         const updateAndLoad = () => {
             this.currentPage = 1;
@@ -151,11 +139,6 @@ const notifications = {
 
         filterTipo?.addEventListener('change', () => {
             this.filters.tipo = filterTipo.value;
-            updateAndLoad();
-        });
-
-        filterUjier?.addEventListener('change', () => {
-            this.filters.ujier = filterUjier.value;
             updateAndLoad();
         });
 
@@ -207,50 +190,50 @@ const notifications = {
         });
     },
 
-        // Switch between years
-        setYear(year, btn) {
-    this.filters.year = year;
-    this.currentPage = 1;
+    // Switch between years
+    setYear(year, btn) {
+        this.filters.year = year;
+        this.currentPage = 1;
 
-    // Update UI
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+        // Update UI
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
 
-    this.loadNotifications();
-},
+        this.loadNotifications();
+    },
 
     // Update counts on year tabs
     async updateYearBadges() {
-    const params = {
-        own_only: this.filters.own_only ? 1 : 0,
-        user_email: auth.currentUser?.email
-    };
+        const params = {
+            own_only: this.filters.own_only ? 1 : 0,
+            user_email: auth.currentUser?.email
+        };
 
-    try {
-        const counts = await db.getYearCounts(params);
+        try {
+            const counts = await db.getYearCounts(params);
 
-        const badge2026 = document.getElementById('badge-2026');
-        const badge2025 = document.getElementById('badge-2025');
+            const badge2026 = document.getElementById('badge-2026');
+            const badge2025 = document.getElementById('badge-2025');
 
-        if (badge2026) badge2026.textContent = counts['2026'] || 0;
-        if (badge2025) badge2025.textContent = counts['2025'] || 0;
-    } catch (error) {
-        console.error('Error updating year badges:', error);
-    }
-},
+            if (badge2026) badge2026.textContent = counts['2026'] || 0;
+            if (badge2025) badge2025.textContent = counts['2025'] || 0;
+        } catch (error) {
+            console.error('Error updating year badges:', error);
+        }
+    },
 
 
     // Load notifications from database
     async loadNotifications() {
-    const requestId = ++this.lastRequestId;
+        const requestId = ++this.lastRequestId;
 
-    const tbody = document.getElementById('tabla-notificaciones');
-    const refreshBtn = document.getElementById('btn-refresh-list');
-    if (!tbody) return;
+        const tbody = document.getElementById('tabla-notificaciones');
+        const refreshBtn = document.getElementById('btn-refresh-list');
+        if (!tbody) return;
 
-    // Show loading
-    if (refreshBtn) refreshBtn.classList.add('rotating');
-    tbody.innerHTML = `
+        // Show loading
+        if (refreshBtn) refreshBtn.classList.add('rotating');
+        tbody.innerHTML = `
             <tr>
                 <td colspan="11" style="text-align: center; padding: 40px;">
                     <div class="spinner"></div>
@@ -259,57 +242,57 @@ const notifications = {
             </tr>
         `;
 
-    const options = {
-        page: this.currentPage,
-        limit: CONFIG.ITEMS_PER_PAGE,
-        ...this.filters,
-        user_id: auth.currentUser?.id,
-        user_email: auth.currentUser?.email,
-        unassigned_only: this.filters.unassigned_only ? 1 : 0
-    };
+        const options = {
+            page: this.currentPage,
+            limit: CONFIG.ITEMS_PER_PAGE,
+            ...this.filters,
+            user_id: auth.currentUser?.id,
+            user_email: auth.currentUser?.email,
+            unassigned_only: this.filters.unassigned_only ? 1 : 0
+        };
 
-    try {
-        const { data, error, count } = await db.getNotifications(options);
+        try {
+            const { data, error, count } = await db.getNotifications(options);
 
-        // Verificación de ID de petición para evitar race conditions
-        if (requestId !== this.lastRequestId) {
-            console.log('⏳ Ignorando respuesta obsoleta:', requestId);
-            return;
-        }
+            // Verificación de ID de petición para evitar race conditions
+            if (requestId !== this.lastRequestId) {
+                console.log('⏳ Ignorando respuesta obsoleta:', requestId);
+                return;
+            }
 
-        if (error) {
-            tbody.innerHTML = `
+            if (error) {
+                tbody.innerHTML = `
                     <tr>
                         <td colspan="11" style="text-align: center; padding: 40px; color: var(--error);">
                             Error al cargar notificaciones: ${error.message}
                         </td>
                     </tr>
                 `;
-            return;
+                return;
+            }
+
+            this.renderNotifications(data || []);
+            this.updatePagination(count || 0);
+
+            // Update current year badge with total count only if it's the current year
+            const badge = document.getElementById(`badge-${this.filters.year}`);
+            if (badge) badge.textContent = count || 0;
+        } finally {
+            if (refreshBtn) {
+                setTimeout(() => refreshBtn.classList.remove('rotating'), 500);
+            }
         }
+    },
 
-        this.renderNotifications(data || []);
-        this.updatePagination(count || 0);
+    // Render notifications table
+    renderNotifications(data) {
+        const tbody = document.getElementById('tabla-notificaciones');
+        if (!tbody) return;
 
-        // Update current year badge with total count only if it's the current year
-        const badge = document.getElementById(`badge-${this.filters.year}`);
-        if (badge) badge.textContent = count || 0;
-    } finally {
-        if (refreshBtn) {
-            setTimeout(() => refreshBtn.classList.remove('rotating'), 500);
-        }
-    }
-},
-
-// Render notifications table
-renderNotifications(data) {
-    const tbody = document.getElementById('tabla-notificaciones');
-    if (!tbody) return;
-
-    if (data.length === 0) {
-        const hasFilters = this.filters.estado || this.filters.search || this.filters.zona || this.filters.own_only;
-        const yearText = this.filters.year;
-        tbody.innerHTML = `
+        if (data.length === 0) {
+            const hasFilters = this.filters.estado || this.filters.search || this.filters.zona || this.filters.own_only;
+            const yearText = this.filters.year;
+            tbody.innerHTML = `
                 <tr>
                     <td colspan="11" style="text-align: center; padding: 60px; color: var(--text-muted);">
                         <div style="font-size: 3rem; margin-bottom: 16px;">🔍</div>
@@ -318,34 +301,34 @@ renderNotifications(data) {
                     </td>
                 </tr>
             `;
-        return;
-    }
+            return;
+        }
 
-    let html = '';
-    let lastDate = '';
+        let html = '';
+        let lastDate = '';
 
-    data.forEach(notif => {
-        // Grouping logic: Synchronize with what's shown in the "F. Entrega" column
-        // We use exactly the same logic to avoid group-row mismatch
-        const displayDate = notif.fecha_entrega_ujier ? notif.fecha_entrega_ujier.split(' ')[0] : 'Sin fecha';
+        data.forEach(notif => {
+            // Grouping logic: Synchronize with what's shown in the "F. Entrega" column
+            // We use exactly the same logic to avoid group-row mismatch
+            const displayDate = notif.fecha_entrega_ujier ? notif.fecha_entrega_ujier.split(' ')[0] : 'Sin fecha';
 
-        // Add date separator if grouping is active (own_only) or just as a general improvement
-        if (this.filters.own_only && displayDate !== lastDate) {
-            const headerLabel = notif.fecha_entrega_ujier ? `📅 ${utils.formatDate(notif.fecha_entrega_ujier)}` : '📅 Pendiente de Entrega';
-            html += `
+            // Add date separator if grouping is active (own_only) or just as a general improvement
+            if (this.filters.own_only && displayDate !== lastDate) {
+                const headerLabel = notif.fecha_entrega_ujier ? `📅 ${utils.formatDate(notif.fecha_entrega_ujier)}` : '📅 Pendiente de Entrega';
+                html += `
                     <tr class="date-group-row">
                         <td colspan="11">${headerLabel}</td>
                     </tr>
                 `;
-            lastDate = displayDate;
-        }
+                lastDate = displayDate;
+            }
 
-        const recipientDisplay = (notif.destinatario_nombre?.trim() || utils.getSpecialDestinationText(notif) || 'Sin destinatario');
+            const recipientDisplay = (notif.destinatario_nombre?.trim() || utils.getSpecialDestinationText(notif) || 'Sin destinatario');
 
-        const isDeleted = notif.eliminada == 1 || notif.eliminada === true;
-        const deletedClass = isDeleted ? 'row-is-deleted' : '';
+            const isDeleted = notif.eliminada == 1 || notif.eliminada === true;
+            const deletedClass = isDeleted ? 'row-is-deleted' : '';
 
-        html += `
+            html += `
                 <tr class="stagger-item row-hover-effect ${deletedClass}" style="cursor: pointer;" onclick="notifications.viewDetails('${notif.id}')">
                     <td class="col-date" data-label="Fecha">${notif.fecha_entrega_ujier ? utils.formatDate(notif.fecha_entrega_ujier) : '<span style="color:var(--text-muted)">-</span>'}</td>
                     <td class="col-status" data-label="Estado">${this.getEnhancedStatusBadge(notif)}</td>
@@ -360,85 +343,85 @@ renderNotifications(data) {
                     <td class="col-troquel" data-label="Troquel" style="font-family: monospace;">${(notif.sin_troquel == 1 || notif.sin_troquel === true) ? 'SIN' : (notif.n_troquel || '-')}</td>
                 </tr>
             `;
-    });
+        });
 
-    tbody.innerHTML = html;
-},
+        tbody.innerHTML = html;
+    },
 
-// Enhanced status badge that handles special recipients logic and latest visit result
-getEnhancedStatusBadge(notif) {
-    // Handle soft deleted status
-    if (notif.eliminada == 1 || notif.eliminada === true) {
-        return '<span class="status-badge status-deleted">❌ ELIMINADA</span>';
-    }
+    // Enhanced status badge that handles special recipients logic and latest visit result
+    getEnhancedStatusBadge(notif) {
+        // Handle soft deleted status
+        if (notif.eliminada == 1 || notif.eliminada === true) {
+            return '<span class="status-badge status-deleted">❌ ELIMINADA</span>';
+        }
 
-    // Priorizamos el estado procesado por la API (que incluye la última visita)
-    let status = notif.estado_display || notif.resultado_diligencia || notif.estado;
+        // Priorizamos el estado procesado por la API (que incluye la última visita)
+        let status = notif.estado_display || notif.resultado_diligencia || notif.estado;
 
-    // If it's a special recipient and status is 'atiende', show as 'entregado'
-    if (utils.isSpecialDestination(notif.destinatario_especial) && (status === 'atiende' || status === 'pendiente')) {
-        // Para ARCAT/Estrados, si aún está pendiente pero es receptor especial, 
-        // mantenemos la lógica visual de negocio si corresponde.
-        if (status === 'atiende') status = 'entregado';
-    }
+        // If it's a special recipient and status is 'atiende', show as 'entregado'
+        if (utils.isSpecialDestination(notif.destinatario_especial) && (status === 'atiende' || status === 'pendiente')) {
+            // Para ARCAT/Estrados, si aún está pendiente pero es receptor especial, 
+            // mantenemos la lógica visual de negocio si corresponde.
+            if (status === 'atiende') status = 'entregado';
+        }
 
 
-    let badge = utils.getStatusBadge(status);
+        let badge = utils.getStatusBadge(status);
 
-    // Add return icon if handled
-    if (notif.devuelta_por_ujier == 1) {
-        badge = `<div style="display:flex; align-items:center; gap:4px;">${badge}<span title="Devuelta físicamente" style="font-size: 1rem;">📦</span></div>`;
-    }
+        // Add return icon if handled
+        if (notif.devuelta_por_ujier == 1) {
+            badge = `<div style="display:flex; align-items:center; gap:4px;">${badge}<span title="Devuelta físicamente" style="font-size: 1rem;">📦</span></div>`;
+        }
 
-    return badge;
-},
+        return badge;
+    },
 
-// Update pagination
-updatePagination(totalCount) {
-    this.totalPages = Math.ceil(totalCount / CONFIG.ITEMS_PER_PAGE) || 1;
+    // Update pagination
+    updatePagination(totalCount) {
+        this.totalPages = Math.ceil(totalCount / CONFIG.ITEMS_PER_PAGE) || 1;
 
-    const paginationInfo = document.getElementById('pagination-info');
-    const btnPrev = document.getElementById('btn-prev-page');
-    const btnNext = document.getElementById('btn-next-page');
+        const paginationInfo = document.getElementById('pagination-info');
+        const btnPrev = document.getElementById('btn-prev-page');
+        const btnNext = document.getElementById('btn-next-page');
 
-    if (paginationInfo) {
-        paginationInfo.textContent = `Página ${this.currentPage} de ${this.totalPages}`;
-    }
+        if (paginationInfo) {
+            paginationInfo.textContent = `Página ${this.currentPage} de ${this.totalPages}`;
+        }
 
-    if (btnPrev) {
-        btnPrev.disabled = this.currentPage <= 1;
-    }
+        if (btnPrev) {
+            btnPrev.disabled = this.currentPage <= 1;
+        }
 
-    if (btnNext) {
-        btnNext.disabled = this.currentPage >= this.totalPages;
-    }
-},
+        if (btnNext) {
+            btnNext.disabled = this.currentPage >= this.totalPages;
+        }
+    },
 
     // View notification details
     async viewDetails(id) {
-    utils.showLoading('Abriendo detalle...');
-    const { data, error } = await db.getNotificationById(id);
+        utils.showLoading('Abriendo detalle...');
+        const { data, error } = await db.getNotificationById(id);
 
-    if (error || !data) {
-        utils.hideLoading();
-        utils.showToast('Error al cargar detalles', 'error');
-        return;
-    }
+        if (error || !data) {
+            utils.hideLoading();
+            utils.showToast('Error al cargar detalles', 'error');
+            return;
+        }
 
-    // Load visits for this notification
-    let visitasHtml = '';
-    try {
-        const visitasResp = await db.getVisitas(id);
-        if (visitasResp.data && visitasResp.data.length > 0) {
-            // Premium Sequence Timeline (Map Style)
-            visitasHtml = `
+        // Load visits for this notification
+        let visitasHtml = '';
+        try {
+            const visitasResp = await db.getVisitas(id);
+            if (visitasResp.data && visitasResp.data.length > 0) {
+                // Premium Sequence Timeline (Map Style)
+                visitasHtml = `
                     <div class="timeline-steps" style="padding-left: 0; margin-top: 10px;">
                 ` + visitasResp.data.map((v, index) => {
-                const visitNum = visitasResp.data.length - index;
-                const statusColor = this.getVisitStatusColor(v.resultado);
-                const hasTranscription = (v.transcripcion_audio || v.audio_transcripcion || v.transcripcion_observacion);
+                    const visitNum = visitasResp.data.length - index;
+                    const statusColor = this.getVisitStatusColor(v.resultado);
+                    const hasTranscription = (v.transcripcion_audio || v.audio_transcripcion || v.transcripcion_observacion);
 
-                return `
+                    return `
                     <div class="timeline-step" style="margin-bottom: 24px; gap: 12px;">
                         <div class="step-marker" style="background:${statusColor}; width: 28px; height: 28px; font-size: 12px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white; font-weight: 800;">
                             ${visitNum}
@@ -484,14 +467,14 @@ updatePagination(totalCount) {
                             </div>
                         </div>
                     </div>`;
-            }).join('') + `</div>`;
+                }).join('') + `</div>`;
+            }
+        } catch (e) {
+            console.log('No se pudieron cargar visitas:', e);
         }
-    } catch (e) {
-        console.log('No se pudieron cargar visitas:', e);
-    }
 
-    // Create modal HTML
-    const modalHtml = `
+        // Create modal HTML
+        const modalHtml = `
             <div class="modal" id="modal-detalle-wrapper" style="display: flex;">
                 <div class="modal-overlay" id="modal-detalle" onclick="notifications.closeModal(event)">
                     <div class="modal-content modal-panoramic-v2 light-theme" onclick="event.stopPropagation()">
@@ -605,8 +588,8 @@ updatePagination(totalCount) {
                                             <th>Estado Físico</th>
                                             <td>
                                                 ${data.devuelta_por_ujier ?
-            '<span class="badge-mini status-success">✅ DEVUELTA AL DEPTO.</span>' :
-            '<span class="badge-mini status-warning">⏳ EN PODER DEL UJIER</span>'}
+                '<span class="badge-mini status-success">✅ DEVUELTA AL DEPTO.</span>' :
+                '<span class="badge-mini status-warning">⏳ EN PODER DEL UJIER</span>'}
                                             </td>
                                         </tr>
                                         ${utils.isSpecialDestination(data.destinatario_especial) ? `
@@ -665,298 +648,298 @@ updatePagination(totalCount) {
             </div>
         `;
 
-    // Insert modal into DOM and prevent body scroll
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    utils.hideLoading();
-    document.body.style.overflow = 'hidden';
+        // Insert modal into DOM and prevent body scroll
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        utils.hideLoading();
+        document.body.style.overflow = 'hidden';
 
-    // Add escape key listener
-    document.addEventListener('keydown', this.handleModalEscape);
-},
+        // Add escape key listener
+        document.addEventListener('keydown', this.handleModalEscape);
+    },
 
-// Close modal
-closeModal(event) {
-    if (event && event.target !== event.currentTarget) return;
-    const modal = document.getElementById('modal-detalle-wrapper');
-    if (modal) {
-        const overlay = document.getElementById('modal-detalle');
-        if (overlay) overlay.classList.add('fade-out');
-        setTimeout(() => {
-            modal.remove();
-            document.body.style.overflow = '';
-        }, 200);
-    }
-    document.removeEventListener('keydown', this.handleModalEscape);
-},
+    // Close modal
+    closeModal(event) {
+        if (event && event.target !== event.currentTarget) return;
+        const modal = document.getElementById('modal-detalle-wrapper');
+        if (modal) {
+            const overlay = document.getElementById('modal-detalle');
+            if (overlay) overlay.classList.add('fade-out');
+            setTimeout(() => {
+                modal.remove();
+                document.body.style.overflow = '';
+            }, 200);
+        }
+        document.removeEventListener('keydown', this.handleModalEscape);
+    },
 
-// Handle escape key for modal
-handleModalEscape(e) {
-    if (e.key === 'Escape') {
-        notifications.closeModal();
-    }
-},
+    // Handle escape key for modal
+    handleModalEscape(e) {
+        if (e.key === 'Escape') {
+            notifications.closeModal();
+        }
+    },
 
     // Edit notification
     async edit(id) {
-    // Refresh ujieres list
-    await this.loadUjieres();
+        // Refresh ujieres list
+        await this.loadUjieres();
 
-    const { data, error } = await db.getNotificationById(id);
+        const { data, error } = await db.getNotificationById(id);
 
-    if (error || !data) {
-        utils.showToast('Error al cargar notificación', 'error');
-        return;
-    }
-
-    // Store the ID being edited
-    this.editingId = id;
-
-    // Open modal instead of navigating
-    const modal = document.getElementById('modal-nueva-notificacion');
-    if (modal) {
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        const modalTitle = modal.querySelector('.modal-title');
-        if (modalTitle) modalTitle.textContent = '📝 Editar Notificación';
-
-        // Hide persistent settings bar during edit
-        const pBar = document.getElementById('persistent-settings-container');
-        if (pBar) pBar.classList.add('hidden-important');
-
-        // Force visibility of form-specific fields during edit (they might be hidden by persistent settings)
-        const fGroupZona = document.getElementById('f-group-zona');
-        const fGroupAsignar = document.getElementById('f-group-asignar');
-        const fGroupFecha = document.getElementById('f-group-fecha-entrega');
-        if (fGroupZona) fGroupZona.classList.remove('hidden');
-        if (fGroupAsignar) fGroupAsignar.classList.remove('hidden');
-        if (fGroupFecha) fGroupFecha.classList.remove('hidden');
-    }
-
-    // Wait for DOM to be ready
-    setTimeout(() => {
-        // Populate form fields with smart normalization
-        const tipoVal = data.tipo_notificacion || '';
-        utils.setSelectByText('tipo-notificacion', tipoVal);
-
-        // Re-fetch standardized value from select (in case it matched by label)
-        const standardizedTipo = document.getElementById('tipo-notificacion').value;
-
-        // Trigger tipo change to set up correct origin field
-        if (standardizedTipo === 'cedulas_mandamientos_22172' ||
-            standardizedTipo === 'cedulas_correspondencia') {
-            app.handleTipoNotificacionChange(standardizedTipo);
-            // Wait a bit for the searchable select to be set up, then populate
-            setTimeout(() => {
-                const input = document.getElementById('origen-dinamico-input');
-                const hidden = document.getElementById('origen-dinamico');
-                if (input && hidden) {
-                    input.value = data.origen || '';
-                    hidden.value = data.origen || '';
-                }
-            }, 150);
-        } else {
-            app.handleTipoNotificacionChange(standardizedTipo || 'cedulas');
-            const iFixed = document.getElementById('origen-input');
-            const hFixed = document.getElementById('origen');
-            if (iFixed && hFixed) {
-                iFixed.value = data.origen || '';
-                hFixed.value = data.origen || '';
-            }
+        if (error || !data) {
+            utils.showToast('Error al cargar notificación', 'error');
+            return;
         }
 
-        document.getElementById('n-expediente').value = data.n_expediente || '';
-        document.getElementById('caratula').value = data.caratula || '';
-        document.getElementById('letrado').value = data.letrado || '';
-        if (utils.isSpecialDestination(data.destinatario_especial)) {
-            const specialVal = (String(data.destinatario_especial) === '1') ? (data.destinatario_nombre || data.origen || '1') : data.destinatario_especial;
-            const specialSelect = document.getElementById('destinatario-especial');
-            if (specialSelect) {
-                specialSelect.value = specialVal;
-                // Trigger change manually to update Domicilio state (required, placeholder)
-                // But we'll restore the actual address immediately after 
-                const currentAddress = data.domicilio || '';
-                specialSelect.dispatchEvent(new Event('change'));
-                if (currentAddress) {
-                    document.getElementById('domicilio').value = currentAddress;
-                }
-            }
-        } else {
-            const specialSelect = document.getElementById('destinatario-especial');
-            if (specialSelect) {
-                specialSelect.value = '';
-                specialSelect.dispatchEvent(new Event('change'));
-            }
-        }
-        if (data.domicilio) {
-            document.getElementById('domicilio').value = data.domicilio;
-        }
-        if (data.destinatario_nombre) {
-            document.getElementById('destinatario-nombre').value = data.destinatario_nombre;
+        // Store the ID being edited
+        this.editingId = id;
+
+        // Open modal instead of navigating
+        const modal = document.getElementById('modal-nueva-notificacion');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            const modalTitle = modal.querySelector('.modal-title');
+            if (modalTitle) modalTitle.textContent = '📝 Editar Notificación';
+
+            // Hide persistent settings bar during edit
+            const pBar = document.getElementById('persistent-settings-container');
+            if (pBar) pBar.classList.add('hidden-important');
+
+            // Force visibility of form-specific fields during edit (they might be hidden by persistent settings)
+            const fGroupZona = document.getElementById('f-group-zona');
+            const fGroupAsignar = document.getElementById('f-group-asignar');
+            const fGroupFecha = document.getElementById('f-group-fecha-entrega');
+            if (fGroupZona) fGroupZona.classList.remove('hidden');
+            if (fGroupAsignar) fGroupAsignar.classList.remove('hidden');
+            if (fGroupFecha) fGroupFecha.classList.remove('hidden');
         }
 
-        // Smart normalization for Zone
-        utils.setSelectByText('zona', data.zona);
+        // Wait for DOM to be ready
+        setTimeout(() => {
+            // Populate form fields with smart normalization
+            const tipoVal = data.tipo_notificacion || '';
+            utils.setSelectByText('tipo-notificacion', tipoVal);
 
-        // Populate Assignee (ID match first, then name)
-        utils.setSelectByText('asignado-a', data.asignado_a);
-        document.getElementById('tipo-troquel').value = data.tipo_troquel || '';
-        document.getElementById('n-troquel').value = data.n_troquel || '';
+            // Re-fetch standardized value from select (in case it matched by label)
+            const standardizedTipo = document.getElementById('tipo-notificacion').value;
 
-        // Sync selector-troquel
-        const troquelSelector = document.getElementById('selector-troquel');
-        if (troquelSelector) {
-            if (data.sin_troquel == 1 || data.sin_troquel === true) {
-                troquelSelector.value = 'SIN';
+            // Trigger tipo change to set up correct origin field
+            if (standardizedTipo === 'cedulas_mandamientos_22172' ||
+                standardizedTipo === 'cedulas_correspondencia') {
+                app.handleTipoNotificacionChange(standardizedTipo);
+                // Wait a bit for the searchable select to be set up, then populate
+                setTimeout(() => {
+                    const input = document.getElementById('origen-dinamico-input');
+                    const hidden = document.getElementById('origen-dinamico');
+                    if (input && hidden) {
+                        input.value = data.origen || '';
+                        hidden.value = data.origen || '';
+                    }
+                }, 150);
             } else {
-                troquelSelector.value = data.tipo_troquel || 'C';
+                app.handleTipoNotificacionChange(standardizedTipo || 'cedulas');
+                const iFixed = document.getElementById('origen-input');
+                const hFixed = document.getElementById('origen');
+                if (iFixed && hFixed) {
+                    iFixed.value = data.origen || '';
+                    hFixed.value = data.origen || '';
+                }
             }
-            app.handleTroquelChange(troquelSelector.value);
-        }
 
-        document.getElementById('medio-pago').value = data.medio_pago || '';
-        document.getElementById('costo').value = data.costo || '';
-        document.getElementById('asignado-a').value = data.asignado_a || '';
-        document.getElementById('observaciones-iniciales').value = data.observaciones_iniciales || '';
+            document.getElementById('n-expediente').value = data.n_expediente || '';
+            document.getElementById('caratula').value = data.caratula || '';
+            document.getElementById('letrado').value = data.letrado || '';
+            if (utils.isSpecialDestination(data.destinatario_especial)) {
+                const specialVal = (String(data.destinatario_especial) === '1') ? (data.destinatario_nombre || data.origen || '1') : data.destinatario_especial;
+                const specialSelect = document.getElementById('destinatario-especial');
+                if (specialSelect) {
+                    specialSelect.value = specialVal;
+                    // Trigger change manually to update Domicilio state (required, placeholder)
+                    // But we'll restore the actual address immediately after 
+                    const currentAddress = data.domicilio || '';
+                    specialSelect.dispatchEvent(new Event('change'));
+                    if (currentAddress) {
+                        document.getElementById('domicilio').value = currentAddress;
+                    }
+                }
+            } else {
+                const specialSelect = document.getElementById('destinatario-especial');
+                if (specialSelect) {
+                    specialSelect.value = '';
+                    specialSelect.dispatchEvent(new Event('change'));
+                }
+            }
+            if (data.domicilio) {
+                document.getElementById('domicilio').value = data.domicilio;
+            }
+            if (data.destinatario_nombre) {
+                document.getElementById('destinatario-nombre').value = data.destinatario_nombre;
+            }
 
-        // Populate delivery date in BOTH places for consistency
-        const fechaInput = document.getElementById('persist-fecha-entrega');
-        const fechaForm = document.getElementById('fecha-entrega');
-        if (data.fecha_entrega_ujier) {
-            const dateOnly = data.fecha_entrega_ujier.split(' ')[0];
-            if (fechaInput) fechaInput.value = dateOnly;
-            if (fechaForm) fechaForm.value = dateOnly;
-        } else {
-            if (fechaInput) fechaInput.value = '';
-            if (fechaForm) fechaForm.value = '';
-        }
+            // Smart normalization for Zone
+            utils.setSelectByText('zona', data.zona);
+
+            // Populate Assignee (ID match first, then name)
+            utils.setSelectByText('asignado-a', data.asignado_a);
+            document.getElementById('tipo-troquel').value = data.tipo_troquel || '';
+            document.getElementById('n-troquel').value = data.n_troquel || '';
+
+            // Sync selector-troquel
+            const troquelSelector = document.getElementById('selector-troquel');
+            if (troquelSelector) {
+                if (data.sin_troquel == 1 || data.sin_troquel === true) {
+                    troquelSelector.value = 'SIN';
+                } else {
+                    troquelSelector.value = data.tipo_troquel || 'C';
+                }
+                app.handleTroquelChange(troquelSelector.value);
+            }
+
+            document.getElementById('medio-pago').value = data.medio_pago || '';
+            document.getElementById('costo').value = data.costo || '';
+            document.getElementById('asignado-a').value = data.asignado_a || '';
+            document.getElementById('observaciones-iniciales').value = data.observaciones_iniciales || '';
+
+            // Populate delivery date in BOTH places for consistency
+            const fechaInput = document.getElementById('persist-fecha-entrega');
+            const fechaForm = document.getElementById('fecha-entrega');
+            if (data.fecha_entrega_ujier) {
+                const dateOnly = data.fecha_entrega_ujier.split(' ')[0];
+                if (fechaInput) fechaInput.value = dateOnly;
+                if (fechaForm) fechaForm.value = dateOnly;
+            } else {
+                if (fechaInput) fechaInput.value = '';
+                if (fechaForm) fechaForm.value = '';
+            }
 
 
 
 
-        utils.showToast('Editando notificación - Modificá los campos y guardá', 'info');
-    }, 100);
-},
+            utils.showToast('Editando notificación - Modificá los campos y guardá', 'info');
+        }, 100);
+    },
 
     // Update existing notification
     async update(id, notificationData) {
-    const { data, error } = await db.updateNotification(id, notificationData, auth.currentUser?.id);
+        const { data, error } = await db.updateNotification(id, notificationData, auth.currentUser?.id);
 
-    if (error) {
-        utils.showToast('Error al actualizar: ' + error.message, 'error');
-        return { success: false, error };
-    }
-
-    utils.showToast('Notificación actualizada exitosamente', 'success');
-    this.editingId = null;
-    return { success: true, data };
-},
-
-    // Create new notification
-    async create(notificationData) {
-    // Enforce charging user info
-    const data = {
-        ...notificationData,
-        usuario_carga: auth.currentUser?.dni || auth.currentUser?.email
-    };
-
-    // Check if online
-    if (!utils.isOnline()) {
-        offline.addToQueue('create_notification', data);
-        utils.showToast('Guardado localmente. Se sincronizará cuando haya conexión.', 'warning');
-        return { success: true, offline: true };
-    }
-
-    const { data: result, error } = await db.createNotification(data);
-
-    if (error) {
-        if (error.message && error.message.includes('1452')) {
-            utils.showToast('Error: El ujier seleccionado no es válido en la base de datos actual. Se ha limpiado la selección.', 'error');
-            // Clear invalid selection
-            const select = document.getElementById('asignado-a');
-            if (select) select.value = '';
-            // Clear persistence
-            localStorage.removeItem('sgnd-persist-ujier');
+        if (error) {
+            utils.showToast('Error al actualizar: ' + error.message, 'error');
             return { success: false, error };
         }
 
-        utils.showToast('Error al crear notificación: ' + error.message, 'error');
-        return { success: false, error };
-    }
+        utils.showToast('Notificación actualizada exitosamente', 'success');
+        this.editingId = null;
+        return { success: true, data };
+    },
 
-    utils.showToast('Notificación creada exitosamente', 'success');
-    return { success: true, data: result };
-},
+    // Create new notification
+    async create(notificationData) {
+        // Enforce charging user info
+        const data = {
+            ...notificationData,
+            usuario_carga: auth.currentUser?.dni || auth.currentUser?.email
+        };
+
+        // Check if online
+        if (!utils.isOnline()) {
+            offline.addToQueue('create_notification', data);
+            utils.showToast('Guardado localmente. Se sincronizará cuando haya conexión.', 'warning');
+            return { success: true, offline: true };
+        }
+
+        const { data: result, error } = await db.createNotification(data);
+
+        if (error) {
+            if (error.message && error.message.includes('1452')) {
+                utils.showToast('Error: El ujier seleccionado no es válido en la base de datos actual. Se ha limpiado la selección.', 'error');
+                // Clear invalid selection
+                const select = document.getElementById('asignado-a');
+                if (select) select.value = '';
+                // Clear persistence
+                localStorage.removeItem('sgnd-persist-ujier');
+                return { success: false, error };
+            }
+
+            utils.showToast('Error al crear notificación: ' + error.message, 'error');
+            return { success: false, error };
+        }
+
+        utils.showToast('Notificación creada exitosamente', 'success');
+        return { success: true, data: result };
+    },
 
     // Load ujieres for assignment dropdown
     async loadUjieres() {
-    const select = document.getElementById('asignado-a');
-    const persistSelect = document.getElementById('persist-ujier');
-    if (!select) return;
+        const select = document.getElementById('asignado-a');
+        const persistSelect = document.getElementById('persist-ujier');
+        if (!select) return;
 
-    // Set default while loading or if none found
-    const defaultOption = '<option value="">Sin asignar (pendiente)</option>';
-    const defaultPersist = '<option value="">No fijar</option>';
+        // Set default while loading or if none found
+        const defaultOption = '<option value="">Sin asignar (pendiente)</option>';
+        const defaultPersist = '<option value="">No fijar</option>';
 
-    try {
-        const { data: ujiers } = await db.getUsersByRole('ujier');
+        try {
+            const { data: ujiers } = await db.getUsersByRole('ujier');
 
-        if (ujiers && ujiers.length > 0) {
-            const options = ujiers.map(u =>
-                `<option value="${u.id}">${u.nombre}</option>`
-            ).join('');
+            if (ujiers && ujiers.length > 0) {
+                const options = ujiers.map(u =>
+                    `<option value="${u.id}">${u.nombre}</option>`
+                ).join('');
 
-            select.innerHTML = defaultOption + options;
-            if (persistSelect) persistSelect.innerHTML = defaultPersist + options;
+                select.innerHTML = defaultOption + options;
+                if (persistSelect) persistSelect.innerHTML = defaultPersist + options;
 
-            // Auto-restore persistent ujier if exists in localStorage
-            const savedUjier = localStorage.getItem('sgnd-persist-ujier');
-            if (savedUjier) {
-                if (select) select.value = savedUjier;
-                if (persistSelect) persistSelect.value = savedUjier;
+                // Auto-restore persistent ujier if exists in localStorage
+                const savedUjier = localStorage.getItem('sgnd-persist-ujier');
+                if (savedUjier) {
+                    if (select) select.value = savedUjier;
+                    if (persistSelect) persistSelect.value = savedUjier;
+                }
+            } else {
+                select.innerHTML = defaultOption;
+                if (persistSelect) persistSelect.innerHTML = defaultPersist;
             }
-        } else {
+        } catch (e) {
+            console.error('Error loading ujieres:', e);
             select.innerHTML = defaultOption;
             if (persistSelect) persistSelect.innerHTML = defaultPersist;
         }
-    } catch (e) {
-        console.error('Error loading ujieres:', e);
-        select.innerHTML = defaultOption;
-        if (persistSelect) persistSelect.innerHTML = defaultPersist;
-    }
-},
+    },
 
     // Confirm and execute soft delete
     async confirmDelete(id) {
-    const reason = prompt('Por favor, indica el motivo de la eliminación:');
+        const reason = prompt('Por favor, indica el motivo de la eliminación:');
 
-    if (reason === null) return; // Cancelled
+        if (reason === null) return; // Cancelled
 
-    if (!reason.trim()) {
-        utils.showToast('El motivo es obligatorio para eliminar.', 'warning');
-        return;
-    }
-
-    const confirmed = confirm('¿Estás seguro que deseas eliminar esta notificación? Quedará registrada como inactiva en el sistema.');
-
-    if (!confirmed) return;
-
-    utils.showLoading('Eliminando notificación...');
-
-    try {
-        const { error } = await db.deleteNotification(id, auth.currentUser?.id, reason);
-
-        if (error) {
-            utils.showToast('Error al eliminar: ' + error, 'error');
-        } else {
-            utils.showToast('Notificación eliminada correctamente.', 'success');
-            this.closeModal();
-            this.loadNotifications();
+        if (!reason.trim()) {
+            utils.showToast('El motivo es obligatorio para eliminar.', 'warning');
+            return;
         }
-    } catch (e) {
-        console.error(e);
-        utils.showToast('Error inesperado al eliminar.', 'error');
-    } finally {
-        utils.hideLoading();
+
+        const confirmed = confirm('¿Estás seguro que deseas eliminar esta notificación? Quedará registrada como inactiva en el sistema.');
+
+        if (!confirmed) return;
+
+        utils.showLoading('Eliminando notificación...');
+
+        try {
+            const { error } = await db.deleteNotification(id, auth.currentUser?.id, reason);
+
+            if (error) {
+                utils.showToast('Error al eliminar: ' + error, 'error');
+            } else {
+                utils.showToast('Notificación eliminada correctamente.', 'success');
+                this.closeModal();
+                this.loadNotifications();
+            }
+        } catch (e) {
+            console.error(e);
+            utils.showToast('Error inesperado al eliminar.', 'error');
+        } finally {
+            utils.hideLoading();
+        }
     }
-}
 };
