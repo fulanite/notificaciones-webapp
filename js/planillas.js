@@ -82,11 +82,14 @@ const planillas = {
             ],
             'Urgentes': [
                 'Urgente SUR - Cédulas', 'Urgente SUR - Mandamientos',
-                'Urgente NORTE - Cédulas', 'Urgente NORTE - Mandamiento'
+                'Urgente NORTE - Cédulas', 'Urgente NORTE - Mandamientos'
             ],
             'Fuera de Radio': [
-                'Fuera de Radio NORTE - Cèdula', 'Fuera de Radio NORTE - Mandamientos',
-                'Fuera de Radio SUR - Cédula', 'Fuera de Radio SUR - Mandamientos'
+                'Fuera de Radio NORTE - Cédulas', 'Fuera de Radio NORTE - Mandamientos',
+                'Fuera de Radio SUR - Cédulas', 'Fuera de Radio SUR - Mandamientos'
+            ],
+            'Otras': [
+                'ZONA CENTRO', 'ZONA NORTE', 'ZONA SUR', 'ZONA ESPECIAL'
             ]
         };
 
