@@ -87,9 +87,6 @@ const planillas = {
             'Fuera de Radio': [
                 'Fuera de Radio NORTE - Cédulas', 'Fuera de Radio NORTE - Mandamientos',
                 'Fuera de Radio SUR - Cédulas', 'Fuera de Radio SUR - Mandamientos'
-            ],
-            'Otras': [
-                'ZONA CENTRO', 'ZONA NORTE', 'ZONA SUR', 'ZONA ESPECIAL'
             ]
         };
 
