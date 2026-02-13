@@ -7,8 +7,6 @@ const ujier = {
     savedOrder: [],
     selectedCardId: null,
     currentAssignment: null,
-    mediaRecorder: null,
-    audioChunks: [],
     reorderMode: false,
     historyData: [], // Almacenar historial completo para filtrado local
     selectedHistoryYear: new Date().getFullYear(),
@@ -387,9 +385,47 @@ const ujier = {
         });
 
         listContainer.innerHTML = html;
+        this.updateBulkNotice();
 
         // Limpiar selección después de renderizar (opcional)
         // this.selectedCardId = null;
+    },
+
+    updateBulkNotice() {
+        const noticeContainer = document.getElementById('bulk-deliver-notice-container');
+        if (noticeContainer) {
+            const specialPending = this.assignments.filter(n =>
+                n.eliminada != 1 &&
+                utils.isSpecialDestination(n.destinatario_especial) &&
+                (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
+            );
+
+            if (specialPending.length > 0) {
+                // Group by destination to show summary
+                const counts = {};
+                specialPending.forEach(n => {
+                    const name = utils.getSpecialDestinationText(n);
+                    counts[name] = (counts[name] || 0) + 1;
+                });
+
+                const totalPoints = Object.keys(counts).length;
+
+                noticeContainer.innerHTML = `
+                    <div class="bulk-deliver-notice-box stagger-item" onclick="event.stopPropagation(); ujier.openBulkDeliverModal()">
+                        <div class="notice-icon">⚡</div>
+                        <div class="notice-content">
+                            <strong>Entrega Masiva Disponible</strong>
+                            <p>Tenés ${specialPending.length} notificaciones para ${totalPoints} destinos especiales.</p>
+                        </div>
+                        <button class="btn-notice-action" onclick="event.stopPropagation(); ujier.openBulkDeliverModal()">📦 Abrir</button>
+                    </div>
+                `;
+                noticeContainer.classList.remove('hidden');
+            } else {
+                noticeContainer.classList.add('hidden');
+                noticeContainer.innerHTML = '';
+            }
+        }
     },
 
     // Open bulk delivery selector
@@ -402,6 +438,7 @@ const ujier = {
 
         // Group special destinations
         const specialPending = this.assignments.filter(n =>
+            n.eliminada != 1 &&
             utils.isSpecialDestination(n.destinatario_especial) &&
             (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
         );
@@ -443,6 +480,7 @@ const ujier = {
 
         // Filter items
         const groupItems = this.assignments.filter(n =>
+            n.eliminada != 1 &&
             utils.getSpecialDestinationText(n) === groupName &&
             (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
         );
@@ -467,8 +505,12 @@ const ujier = {
                 <input type="checkbox" class="bulk-check" value="${item.id}" checked style="margin-top: 4px;">
                 <div style="flex: 1;">
                     <div style="font-weight: 600; font-size: 0.95rem;">${item.destinatario_nombre || 'Sin nombre'}</div>
-                    <div style="font-size: 0.85rem; color: var(--text-muted);">${item.domicilio}</div>
-                    <div style="font-size: 0.75rem; color: var(--primary);">Exp: ${item.n_expediente || '-'}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2px;">
+                        Exp: <strong>${item.n_expediente || '-'}</strong> | Troquel: <strong>${item.tipo_troquel || ''} ${item.n_troquel || 's/n'}</strong>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">
+                        ${item.caratula || 'Sin carátula'}
+                    </div>
                 </div>
             </label>
         `).join('');
@@ -568,6 +610,7 @@ const ujier = {
         if (!confirm(`¿Confirmar entrega masiva para todas las notificaciones de "${groupName}"?`)) return;
 
         const specialPending = this.assignments.filter(n =>
+            n.eliminada != 1 &&
             utils.getSpecialDestinationText(n) === groupName &&
             (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
         );
@@ -1033,11 +1076,6 @@ const ujier = {
 
     // Close diligencia modal
     closeDiligencia() {
-        // Stop recording if active
-        if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-            try { this.mediaRecorder.stop(); } catch (e) { }
-        }
-
         const modal = document.getElementById('modal-diligenciar');
         modal?.classList.add('hidden');
         modal?.classList.remove('show');
@@ -1184,19 +1222,14 @@ const ujier = {
         // Always show GPS wrapper by default (will be hidden if carga diferida is checked)
         if (gpsWrapper) gpsWrapper.classList.remove('hidden');
 
-        // Reset photo
-        const photoInput = document.getElementById('evidencia-foto');
-        if (photoInput) photoInput.value = '';
+        // Reset photos (using correct IDs from index.html)
+        const cameraInput = document.getElementById('evidencia-foto-camera');
+        const galleryInput = document.getElementById('evidencia-foto-gallery');
+        if (cameraInput) cameraInput.value = '';
+        if (galleryInput) galleryInput.value = '';
+
         this.capturedPhotos = [];
         this.renderPhotoPreviews();
-
-        // Reset audio
-        document.getElementById('audio-playback')?.classList.add('hidden');
-        document.getElementById('audio-recording')?.classList.add('hidden');
-        document.getElementById('transcripcion-audio')?.classList.add('hidden');
-        document.getElementById('btn-record-audio')?.classList.remove('hidden');
-        this.capturedAudio = null;
-        this.audioChunks = [];
 
         // Reset deferred fields
         document.getElementById('motivo-falla-container')?.classList.add('hidden');
@@ -1259,9 +1292,6 @@ const ujier = {
 
         // Remove button is handled by onclick in renderPhotoPreviews
 
-        // Audio recording
-        document.getElementById('btn-record-audio')?.addEventListener('click', () => this.startAudioRecording());
-        document.getElementById('btn-stop-audio')?.addEventListener('click', () => this.stopAudioRecording());
 
         // Form submission
         document.getElementById('form-diligenciar')?.addEventListener('submit', (e) => this.submitDiligencia(e));
@@ -1613,7 +1643,6 @@ const ujier = {
             // Prepare result data
             const commonData = {
                 observaciones: document.getElementById('observaciones-resultado').value,
-                // audio removed
             };
 
             let resultData = { ...commonData };
@@ -1887,40 +1916,6 @@ const ujier = {
 
         listContainer.innerHTML = html;
 
-        // Check for special destinations to show/hide bulk delivery notice
-        const noticeContainer = document.getElementById('bulk-deliver-notice-container');
-        if (noticeContainer) {
-            const specialPending = this.assignments.filter(n =>
-                utils.isSpecialDestination(n.destinatario_especial) &&
-                (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
-            );
-
-            if (specialPending.length > 0) {
-                // Group by destination to show summary
-                const counts = {};
-                specialPending.forEach(n => {
-                    const name = utils.getSpecialDestinationText(n);
-                    counts[name] = (counts[name] || 0) + 1;
-                });
-
-                const totalPoints = Object.keys(counts).length;
-
-                noticeContainer.innerHTML = `
-                    <div class="bulk-deliver-notice-box stagger-item" onclick="event.stopPropagation(); ujier.openBulkDeliverModal()">
-                        <div class="notice-icon">⚡</div>
-                        <div class="notice-content">
-                            <strong>Entrega Masiva Disponible</strong>
-                            <p>Tenés ${specialPending.length} notificaciones para ${totalPoints} destinos especiales.</p>
-                        </div>
-                        <button class="btn-notice-action" onclick="event.stopPropagation(); ujier.openBulkDeliverModal()">📦 Abrir</button>
-                    </div>
-                `;
-                noticeContainer.classList.remove('hidden');
-            } else {
-                noticeContainer.classList.add('hidden');
-                noticeContainer.innerHTML = '';
-            }
-        }
     },
 
     // Initialize References View (Shared by all roles)
