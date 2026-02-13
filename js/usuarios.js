@@ -88,7 +88,10 @@ const usuarios = {
 
         tbody.innerHTML = users.map(u => `
             <tr>
-                <td data-label="Usuario"><strong>${u.nombre || '-'}</strong></td>
+                <td data-label="Usuario">
+                    <strong>${u.nombre || '-'}</strong>
+                    ${u.username ? `<br><small style="color:var(--text-secondary)">@${u.username}</small>` : ''}
+                </td>
                 <td data-label="Email">${u.email}</td>
                 <td data-label="DNI">${u.dni || '-'}</td>
                 <td data-label="Rol"><span class="badge badge-${u.rol}">${this.getRolLabel(u.rol)}</span></td>
@@ -145,6 +148,7 @@ const usuarios = {
             if (user) {
                 document.getElementById('usuario-nombre').value = user.nombre || '';
                 document.getElementById('usuario-email').value = user.email || '';
+                document.getElementById('usuario-username').value = user.username || '';
                 document.getElementById('usuario-dni').value = user.dni || '';
                 document.getElementById('usuario-rol').value = user.rol ? user.rol.toLowerCase() : '';
                 document.getElementById('usuario-activo').checked = user.activo !== false;
@@ -176,6 +180,7 @@ const usuarios = {
     async saveUser() {
         const nombre = document.getElementById('usuario-nombre').value.trim();
         const email = document.getElementById('usuario-email').value.trim();
+        const username = document.getElementById('usuario-username').value.trim();
         const dni = document.getElementById('usuario-dni').value.trim();
         const rol = document.getElementById('usuario-rol').value;
         const activo = document.getElementById('usuario-activo').checked;
@@ -197,7 +202,7 @@ const usuarios = {
             return;
         }
 
-        const userData = { nombre, email, dni, rol, activo };
+        const userData = { nombre, email, username, dni, rol, activo };
 
         let result;
         if (this.editingId) {

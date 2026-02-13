@@ -86,13 +86,14 @@ try {
             }
 
             $stmt = $pdo->prepare("
-                INSERT INTO usuarios (id, email, dni, nombre, rol, foto, activo, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
+                INSERT INTO usuarios (id, email, username, dni, nombre, rol, foto, activo, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())
             ");
 
             $stmt->execute([
                 $id,
                 Database::sanitize($data['email']),
+                Database::sanitize($data['username'] ?? null),
                 Database::sanitize($data['dni'] ?? ''),
                 Database::sanitize($data['nombre']),
                 Database::sanitize($data['rol']),
@@ -134,6 +135,10 @@ try {
             if (isset($data['nombre'])) {
                 $updates[] = "nombre = ?";
                 $params[] = Database::sanitize($data['nombre']);
+            }
+            if (isset($data['username'])) {
+                $updates[] = "username = ?";
+                $params[] = Database::sanitize($data['username']);
             }
             if (isset($data['rol'])) {
                 $updates[] = "rol = ?";

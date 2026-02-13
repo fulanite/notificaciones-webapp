@@ -44,9 +44,9 @@ try {
             $email = Database::sanitize($data['email']);
             $password = $data['password']; // Don't sanitize password
 
-            // Find user by email or DNI
-            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE (email = ? OR dni = ?) AND activo = 1");
-            $stmt->execute([$email, $email]);
+            // Find user by email, DNI or username
+            $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE (email = ? OR dni = ? OR username = ?) AND activo = 1");
+            $stmt->execute([$email, $email, $email]);
             $user = $stmt->fetch();
 
             if (!$user) {
@@ -199,13 +199,14 @@ try {
             $passwordResetRequired = isset($data['password_reset_required']) ? ($data['password_reset_required'] ? 1 : 0) : 0;
 
             $stmt = $pdo->prepare("
-                INSERT INTO usuarios (id, email, dni, nombre, rol, password_hash, foto, activo, password_reset_required, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, NOW(), NOW())
+                INSERT INTO usuarios (id, email, username, dni, nombre, rol, password_hash, foto, activo, password_reset_required, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, NOW(), NOW())
             ");
 
             $stmt->execute([
                 $id,
                 Database::sanitize($data['email']),
+                Database::sanitize($data['username'] ?? null),
                 Database::sanitize($data['dni'] ?? ''),
                 Database::sanitize($data['nombre']),
                 Database::sanitize($data['rol']),

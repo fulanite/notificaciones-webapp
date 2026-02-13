@@ -605,6 +605,27 @@ const ujier = {
         utils.hideLoading();
         utils.showToast(`Se entregaron ${successCount} notificaciones correctamente`, 'success');
 
+        // Proactive update: Remove delivered IDs from local state and cache to prevent "flicker"
+        if (successCount > 0) {
+            const deliveredIds = new Set(ids);
+
+            // 1. Update memory
+            this.assignments = this.assignments.filter(n => !deliveredIds.has(n.id));
+
+            // 2. Update cache
+            const cacheKey = `assignments_${auth.currentUser.id}`;
+            const cachedData = offline.getCachedData(cacheKey);
+            if (cachedData) {
+                const updatedCache = cachedData.filter(n => !deliveredIds.has(n.id));
+                offline.cacheData(cacheKey, updatedCache);
+            }
+
+            // 3. Render immediately
+            this.renderAssignments();
+            this.updateStats();
+        }
+
+        // 4. Background refresh from server
         await this.loadAssignments();
     },
 
@@ -673,15 +694,24 @@ const ujier = {
 
             if (error) throw error;
 
-            // Optimistic UI: remove from local list immediately
+            // Optimistic UI: remove from local list and cache immediately
             this.assignments = this.assignments.filter(a => a.id !== id);
+
+            // Update cache to reflect change
+            const cacheKey = `assignments_${auth.currentUser.id}`;
+            const cachedData = offline.getCachedData(cacheKey);
+            if (cachedData) {
+                const updatedCache = cachedData.filter(n => n.id !== id);
+                offline.cacheData(cacheKey, updatedCache);
+            }
+
             this.renderAssignments();
             await this.updateStats();
 
-            utils.showToast(`Entregada: ${assignment.destinatario_nombre}`, 'success');
+            utils.showToast(`Entregada: ${recipientName}`, 'success');
 
-            // Refresh with small delay to ensure server consistency
-            setTimeout(() => this.loadAssignments(), 500);
+            // Refresh from server
+            await this.loadAssignments();
 
         } catch (error) {
             console.error('Error en quickDeliver:', error);
@@ -1732,15 +1762,28 @@ const ujier = {
             utils.showToast(this.isUpdateMode ? 'Datos actualizados correctamente' : 'Diligencia guardada correctamente', 'success');
             this.closeDiligencia();
 
-            // Refresh visuals
-            if (this.isUpdateMode) {
-                // Maybe just refresh list if needed?
-                // Update the current assignment object in memory to avoid full reload if possible?
-                // But loadAssignments() is safer.
-            } else {
-                // Remove from 'pending' if it was pending?
+            // Proactive update: Remove or update local state/cache to prevent "flicker" during refresh
+            const id = this.currentAssignment.id;
+            const finalized = !utils.isPreAviso(resultado);
+
+            if (finalized) {
+                // 1. Remove from memory
+                this.assignments = this.assignments.filter(n => n.id !== id);
+
+                // 2. Remove from cache
+                const cacheKey = `assignments_${auth.currentUser.id}`;
+                const cachedData = offline.getCachedData(cacheKey);
+                if (cachedData) {
+                    const updatedCache = cachedData.filter(n => n.id !== id);
+                    offline.cacheData(cacheKey, updatedCache);
+                }
+
+                // 3. Render immediately to hide it
+                this.renderAssignments();
+                this.updateStats();
             }
 
+            // 4. Background refresh from server to ensure full consistency
             await this.loadAssignments();
 
             // Also refresh history if open?

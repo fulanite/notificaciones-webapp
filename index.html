@@ -187,10 +187,10 @@
                         <div class="form-group">
                             <label for="login-email" class="form-label">
                                 <span class="label-icon">📧</span>
-                                Correo Electrónico
+                                Correo / Usuario
                             </label>
-                            <input type="email" id="login-email" class="form-input" placeholder="usuario@ejemplo.com"
-                                required autocomplete="email">
+                            <input type="text" id="login-email" class="form-input"
+                                placeholder="correo@ejemplo.com o usuario" required>
                         </div>
 
                         <div class="form-group">
@@ -1485,6 +1485,14 @@
                                         <div class="form-group">
                                             <label for="usuario-email" class="form-label">Email *</label>
                                             <input type="email" id="usuario-email" class="form-input" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="usuario-username" class="form-label">Usuario / Login</label>
+                                            <input type="text" id="usuario-username" class="form-input"
+                                                placeholder="ej: ujier1">
+                                            <small style="color: var(--text-secondary); font-size: 0.85em;">
+                                                Opcional. Permite entrar sin el email.
+                                            </small>
                                         </div>
                                         <div class="form-group">
                                             <label for="usuario-dni" class="form-label">DNI *</label>

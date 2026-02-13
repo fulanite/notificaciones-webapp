@@ -839,7 +839,7 @@ const notifications = {
         // Enforce charging user info
         const data = {
             ...notificationData,
-            usuario_carga: auth.currentUser?.email
+            usuario_carga: auth.currentUser?.dni || auth.currentUser?.email
         };
 
         // Check if online
