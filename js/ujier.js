@@ -1647,25 +1647,21 @@ const ujier = {
         btnSubmit.innerHTML = '<div class="btn-spinner"></div> ' + (this.isUpdateMode ? 'Actualizando...' : 'Guardando...');
 
         try {
-            // Prepare result data
-            const commonData = {
+            // Prepare result data (including transcription and result)
+            let resultData = {
+                resultado: resultado,
                 observaciones: document.getElementById('observaciones-resultado').value,
+                transcripcion_audio: this.currentAssignment.transcripcion_audio || null
             };
 
-            let resultData = { ...commonData };
-
             if (!this.isUpdateMode) {
-                // Include all fields for new registration
+                // Include all fields only for new registration
                 Object.assign(resultData, {
-                    resultado,
                     ubicacion_lat: esCargaDiferida ? null : (document.getElementById('ubicacion-lat').value || null),
                     ubicacion_lng: esCargaDiferida ? null : (document.getElementById('ubicacion-lng').value || null),
                     es_carga_diferida: esCargaDiferida,
                     motivo_falla_senal: motivoFalla || null
                 });
-            } else {
-                // In update mode, the user can now change the result too
-                resultData.resultado = resultado;
             }
 
             console.log(this.isUpdateMode ? '📦 Actualizando diligencia:' : '📦 Preparando diligencia:', resultData);
@@ -1705,6 +1701,15 @@ const ujier = {
             // Save result
             let response;
             if (this.isUpdateMode) {
+                // Reinforce: Sometimes update_result might only update the visit record
+                // We also update the notification record metadata directly to be sure
+                await db.updateNotification(this.currentAssignment.id, {
+                    resultado_diligencia: resultData.resultado,
+                    estado: resultData.resultado,
+                    observaciones_resultado: resultData.observaciones,
+                    evidencia_foto: resultData.evidencia_foto
+                }, auth.currentUser?.id);
+
                 response = await db.updateResult(
                     this.currentAssignment.id,
                     resultData,
