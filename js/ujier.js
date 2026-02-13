@@ -1760,11 +1760,14 @@ const ujier = {
 
             // Success
             utils.showToast(this.isUpdateMode ? 'Datos actualizados correctamente' : 'Diligencia guardada correctamente', 'success');
+
+            // Proactive update: capture ID before closeDiligencia clears it
+            const id = this.currentAssignment.id;
+            const finalized = !utils.isPreAviso(resultado);
+
             this.closeDiligencia();
 
             // Proactive update: Remove or update local state/cache to prevent "flicker" during refresh
-            const id = this.currentAssignment.id;
-            const finalized = !utils.isPreAviso(resultado);
 
             if (finalized) {
                 // 1. Remove from memory
