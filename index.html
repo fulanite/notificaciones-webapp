@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=41.10" as="style">
-    <link rel="preload" href="css/base.css?v=41.10" as="style">
-    <link rel="preload" href="js/config.js?v=41.10" as="script">
-    <link rel="preload" href="js/app.js?v=41.10" as="script">
+    <link rel="preload" href="css/variables.css?v=42.00" as="style">
+    <link rel="preload" href="css/base.css?v=42.00" as="style">
+    <link rel="preload" href="js/config.js?v=42.00" as="script">
+    <link rel="preload" href="js/app.js?v=42.00" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=41.10">
-    <link rel="stylesheet" href="css/base.css?v=41.10">
-    <link rel="stylesheet" href="css/components.css?v=41.10">
+    <link rel="stylesheet" href="css/variables.css?v=42.00">
+    <link rel="stylesheet" href="css/base.css?v=42.00">
+    <link rel="stylesheet" href="css/components.css?v=42.00">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=41.10" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=41.10" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=41.10" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=41.10" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=41.10" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=42.00" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=42.00" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=42.00" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=42.00" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=42.00" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -1048,6 +1048,9 @@
                     <!-- Mis Asignaciones (Ujier) View -->
                     <section id="view-mis-asignaciones" class="view">
                         <div class="ujier-header header-simplified">
+                            <div id="ujier-welcome-greeting" class="ujier-greeting-box stagger-item">
+                                <!-- Dynamic greeting from JS -->
+                            </div>
                             <div class="route-stats simplified-stats">
                                 <div class="route-stat">
                                     <span class="stat-number" id="route-pending">0</span>
@@ -1870,27 +1873,27 @@
         </div>
     </div>
 
-    <script defer src="js/lazy-loader.js?v=41.10"></script>
-    <script defer src="js/config.js?v=41.10"></script>
-    <script defer src="js/data.js?v=41.10"></script>
-    <script defer src="js/api-client.js?v=41.10"></script>
-    <script defer src="js/auth.js?v=41.10"></script>
-    <script defer src="js/utils.js?v=41.10"></script>
-    <script defer src="js/offline.js?v=41.10"></script>
-    <script defer src="js/notifications.js?v=41.10"></script>
-    <script defer src="js/ujier.js?v=41.10"></script>
-    <script defer src="js/dashboard.js?v=41.10"></script>
-    <script defer src="js/dashboard-patch.js?v=41.10"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=41.10"></script>
-    <script defer src="js/dashboard-analytics.js?v=41.10"></script>
-    <script defer src="js/reports.js?v=41.10"></script>
-    <script defer src="js/audit.js?v=41.10"></script>
-    <script defer src="js/asignaciones.js?v=41.10"></script>
-    <script defer src="js/bulk-editor.js?v=41.10"></script>
-    <script defer src="js/usuarios.js?v=41.10"></script>
-    <script defer src="js/devoluciones.js?v=41.10"></script>
-    <script defer src="js/planillas.js?v=41.10"></script>
-    <script defer src="js/app.js?v=41.10"></script>
+    <script defer src="js/lazy-loader.js?v=42.00"></script>
+    <script defer src="js/config.js?v=42.00"></script>
+    <script defer src="js/data.js?v=42.00"></script>
+    <script defer src="js/api-client.js?v=42.00"></script>
+    <script defer src="js/auth.js?v=42.00"></script>
+    <script defer src="js/utils.js?v=42.00"></script>
+    <script defer src="js/offline.js?v=42.00"></script>
+    <script defer src="js/notifications.js?v=42.00"></script>
+    <script defer src="js/ujier.js?v=42.00"></script>
+    <script defer src="js/dashboard.js?v=42.00"></script>
+    <script defer src="js/dashboard-patch.js?v=42.00"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=42.00"></script>
+    <script defer src="js/dashboard-analytics.js?v=42.00"></script>
+    <script defer src="js/reports.js?v=42.00"></script>
+    <script defer src="js/audit.js?v=42.00"></script>
+    <script defer src="js/asignaciones.js?v=42.00"></script>
+    <script defer src="js/bulk-editor.js?v=42.00"></script>
+    <script defer src="js/usuarios.js?v=42.00"></script>
+    <script defer src="js/devoluciones.js?v=42.00"></script>
+    <script defer src="js/planillas.js?v=42.00"></script>
+    <script defer src="js/app.js?v=42.00"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>
@@ -1945,11 +1948,12 @@
             const toast = document.createElement('div');
             toast.className = 'update-toast';
             toast.innerHTML = `
-                <span>🚀 Nueva versión disponible</span>
-                <button onclick="updateApp()">ACTUALIZAR</button>
+                <span style="font-size: 1.1rem;">🚀</span>
+                <span style="font-weight: 500;">Nueva versión disponible</span>
+                <button onclick="updateApp()">ACTUALIZAR AHORA</button>
             `;
-            toast.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#1e293b; color:#fff; padding:12px 20px; border-radius:30px; display:flex; gap:15px; align-items:center; z-index:10000; box-shadow:0 10px 25px -5px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); animation: slideUp 0.3s ease-out;';
-            toast.querySelector('button').style.cssText = 'background:#3b82f6; color:white; border:none; padding:6px 14px; border-radius:15px; font-weight:bold; cursor:pointer; font-size:0.85rem; letter-spacing:0.5px;';
+            toast.style.cssText = 'position:fixed; bottom:30px; left:20px; right:20px; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color:#fff; padding:16px 20px; border-radius:16px; display:flex; justify-content: space-between; gap:10px; align-items:center; z-index:10000; box-shadow:0 20px 25px -5px rgba(0,0,0,0.5); border: 2px solid var(--primary-500); animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);';
+            toast.querySelector('button').style.cssText = 'background:var(--gradient-primary); color:white; border:none; padding:10px 18px; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.85rem; letter-spacing:0.5px; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);';
             document.body.appendChild(toast);
         }
 

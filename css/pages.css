@@ -425,6 +425,25 @@
     color: var(--text-muted);
 }
 
+/* Greeting box for Ujier */
+.ujier-greeting-box {
+    margin-bottom: var(--space-4);
+    padding: var(--space-2) 0;
+}
+
+.ujier-greeting-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: -0.01em;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
 /* Header de ujier más compacto */
 .ujier-header {
     display: flex;

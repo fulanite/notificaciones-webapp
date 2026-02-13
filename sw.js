@@ -1,9 +1,9 @@
 /**
  * SGND - Service Worker for PWA
- * Version: 41.10
+ * Version: 42.00
  */
 
-const CACHE_NAME = 'sgnd-cache-v81';
+const CACHE_NAME = 'sgnd-cache-v90';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache

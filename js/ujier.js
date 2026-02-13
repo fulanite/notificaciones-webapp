@@ -30,6 +30,7 @@ const ujier = {
     // Initialize ujier view
     async init() {
         this.updateDateDisplay();
+        this.renderGreeting();
         this.setupViewToggle();
         this.setupHistoryFilters();
         this.loadSavedOrder(); // Cargar orden antes de las asignaciones
@@ -43,6 +44,19 @@ const ujier = {
     // Global listeners
     setupGlobalListeners() {
         // document.getElementById('btn-bulk-deliver-open')?.addEventListener('click', () => this.openBulkDeliverModal());
+    },
+
+    // Render personalized greeting
+    renderGreeting() {
+        const greetingEl = document.getElementById('ujier-welcome-greeting');
+        if (!greetingEl || !auth.currentUser) return;
+
+        const fullName = auth.currentUser.nombre || 'Ujier';
+        const firstName = fullName.split(' ')[0];
+
+        greetingEl.innerHTML = `
+            <h1 class="ujier-greeting-title">¡Hola ${firstName} que tengas una gran jornada hoy!</h1>
+        `;
     },
 
     // Update current date display
