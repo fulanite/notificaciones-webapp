@@ -2,7 +2,7 @@
  * SGND - Service Worker for PWA
  */
 
-const CACHE_NAME = 'sgnd-cache-v71';
+const CACHE_NAME = 'sgnd-cache-v72';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache
@@ -60,7 +60,6 @@ self.addEventListener('install', (event) => {
                     );
                 });
             })
-            .then(() => self.skipWaiting())
     );
 });
 
@@ -83,6 +82,13 @@ self.addEventListener('activate', (event) => {
                 }
             })
     );
+});
+
+// Allow clients to request immediate activation of a waiting worker
+self.addEventListener('message', (event) => {
+    if (event.data?.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
 
 // Fetch event - serve from cache, fallback to network
