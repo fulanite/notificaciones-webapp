@@ -214,6 +214,36 @@ const ujier = {
         this.filterHistory();
     },
 
+    // Filter shown assignments based on business logic
+    filterShownAssignments(list) {
+        if (!list) return [];
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        return list.filter(n => {
+            // Base filters: not deleted and pending/pre-aviso
+            const isPending = n.eliminada != 1 &&
+                (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia));
+
+            if (!isPending) return false;
+
+            // Logic for Special Destinations: Only show if delivery date is not in the future
+            if (utils.isSpecialDestination(n.destinatario_especial)) {
+                if (n.fecha_entrega_ujier) {
+                    // Parse date and remove time for proper comparison
+                    const deliveryDate = new Date(n.fecha_entrega_ujier);
+                    deliveryDate.setHours(0, 0, 0, 0);
+
+                    // Hide if delivery date is strictly in the future
+                    if (deliveryDate > today) return false;
+                }
+            }
+
+            return true;
+        });
+    },
+
     // Load user's assignments
     async loadAssignments() {
         if (!auth.currentUser) return;
@@ -225,10 +255,7 @@ const ujier = {
         const cachedData = offline.getCachedData(`assignments_${auth.currentUser.id}`);
         if (cachedData) {
             console.log('📦 Usando datos en caché para carga instantánea');
-            this.assignments = cachedData.filter(n =>
-                n.eliminada != 1 &&
-                (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
-            );
+            this.assignments = this.filterShownAssignments(cachedData);
             this.applySavedOrder();
             this.renderAssignments();
             this.setupDragDrop();
@@ -264,11 +291,8 @@ const ujier = {
             return;
         }
 
-        // Mostrar SOLO las notificaciones pendientes/pre-aviso
-        this.assignments = (data || []).filter(n =>
-            n.eliminada != 1 &&
-            (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
-        );
+        // Mostrar SOLO las notificaciones pendientes que correspondan a la fecha
+        this.assignments = this.filterShownAssignments(data);
 
         // Aplicar orden guardado
         this.applySavedOrder();
@@ -418,9 +442,7 @@ const ujier = {
         const noticeContainer = document.getElementById('bulk-deliver-notice-container');
         if (noticeContainer) {
             const specialPending = this.assignments.filter(n =>
-                n.eliminada != 1 &&
-                utils.isSpecialDestination(n.destinatario_especial) &&
-                (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
+                utils.isSpecialDestination(n.destinatario_especial)
             );
 
             if (specialPending.length > 0) {
@@ -459,11 +481,9 @@ const ujier = {
         const container = document.getElementById('bulk-groups-container');
         if (!modal || !container) return;
 
-        // Group special destinations
+        // Group special destinations (this.assignments is already filtered by date)
         const specialPending = this.assignments.filter(n =>
-            n.eliminada != 1 &&
-            utils.isSpecialDestination(n.destinatario_especial) &&
-            (!n.resultado_diligencia || utils.isPreAviso(n.resultado_diligencia))
+            utils.isSpecialDestination(n.destinatario_especial)
         );
 
         const groups = {};
