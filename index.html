@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=43.01" as="style">
-    <link rel="preload" href="css/base.css?v=43.01" as="style">
-    <link rel="preload" href="js/config.js?v=43.01" as="script">
-    <link rel="preload" href="js/app.js?v=43.01" as="script">
+    <link rel="preload" href="css/variables.css?v=43.02" as="style">
+    <link rel="preload" href="css/base.css?v=43.02" as="style">
+    <link rel="preload" href="js/config.js?v=43.02" as="script">
+    <link rel="preload" href="js/app.js?v=43.02" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=43.01">
-    <link rel="stylesheet" href="css/base.css?v=43.01">
-    <link rel="stylesheet" href="css/components.css?v=43.01">
+    <link rel="stylesheet" href="css/variables.css?v=43.02">
+    <link rel="stylesheet" href="css/base.css?v=43.02">
+    <link rel="stylesheet" href="css/components.css?v=43.02">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=43.01" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=43.01" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=43.01" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=43.01" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=43.01" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=43.02" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=43.02" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=43.02" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=43.02" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=43.02" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -1992,27 +1992,27 @@
         </div>
     </div>
 
-    <script defer src="js/lazy-loader.js?v=43.01"></script>
-    <script defer src="js/config.js?v=43.01"></script>
-    <script defer src="js/data.js?v=43.01"></script>
-    <script defer src="js/api-client.js?v=43.01"></script>
-    <script defer src="js/auth.js?v=43.01"></script>
-    <script defer src="js/utils.js?v=43.01"></script>
-    <script defer src="js/offline.js?v=43.01"></script>
-    <script defer src="js/notifications.js?v=43.01"></script>
-    <script defer src="js/ujier.js?v=43.01"></script>
-    <script defer src="js/dashboard.js?v=43.01"></script>
-    <script defer src="js/dashboard-patch.js?v=43.01"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=43.01"></script>
-    <script defer src="js/dashboard-analytics.js?v=43.01"></script>
-    <script defer src="js/reports.js?v=43.01"></script>
-    <script defer src="js/audit.js?v=43.01"></script>
-    <script defer src="js/asignaciones.js?v=43.01"></script>
-    <script defer src="js/bulk-editor.js?v=43.01"></script>
-    <script defer src="js/usuarios.js?v=43.01"></script>
-    <script defer src="js/devoluciones.js?v=43.01"></script>
-    <script defer src="js/planillas.js?v=43.01"></script>
-    <script defer src="js/app.js?v=43.01"></script>
+    <script defer src="js/lazy-loader.js?v=43.02"></script>
+    <script defer src="js/config.js?v=43.02"></script>
+    <script defer src="js/data.js?v=43.02"></script>
+    <script defer src="js/api-client.js?v=43.02"></script>
+    <script defer src="js/auth.js?v=43.02"></script>
+    <script defer src="js/utils.js?v=43.02"></script>
+    <script defer src="js/offline.js?v=43.02"></script>
+    <script defer src="js/notifications.js?v=43.02"></script>
+    <script defer src="js/ujier.js?v=43.02"></script>
+    <script defer src="js/dashboard.js?v=43.02"></script>
+    <script defer src="js/dashboard-patch.js?v=43.02"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=43.02"></script>
+    <script defer src="js/dashboard-analytics.js?v=43.02"></script>
+    <script defer src="js/reports.js?v=43.02"></script>
+    <script defer src="js/audit.js?v=43.02"></script>
+    <script defer src="js/asignaciones.js?v=43.02"></script>
+    <script defer src="js/bulk-editor.js?v=43.02"></script>
+    <script defer src="js/usuarios.js?v=43.02"></script>
+    <script defer src="js/devoluciones.js?v=43.02"></script>
+    <script defer src="js/planillas.js?v=43.02"></script>
+    <script defer src="js/app.js?v=43.02"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>
@@ -2632,6 +2632,99 @@
             background-color: #fffbeb !important;
             /* Light yellow for observations */
             border-left: 8px solid #f59e0b !important;
+        }
+
+        /* V52 Modal Experience Package (Timeline & Evidence) */
+
+        /* 7. Robust Vertical Timeline */
+        body.accessibility-mode .timeline-container {
+            border-left: 4px solid #000 !important;
+            padding-left: 20px !important;
+            margin-left: 10px !important;
+        }
+
+        body.accessibility-mode .timeline-item,
+        body.accessibility-mode .history-item {
+            position: relative !important;
+            border: 2px solid #000 !important;
+            background: #fff !important;
+            margin-bottom: 20px !important;
+            padding: 15px !important;
+            border-radius: 8px !important;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 1) !important;
+        }
+
+        /* Timeline Marker (Circle) */
+        body.accessibility-mode .timeline-item::before,
+        body.accessibility-mode .history-item::before {
+            content: '' !important;
+            position: absolute !important;
+            left: -32px !important;
+            /* Adjusted for border thickness */
+            top: 20px !important;
+            width: 16px !important;
+            height: 16px !important;
+            background: #000 !important;
+            border: 2px solid #fff !important;
+            border-radius: 50% !important;
+            box-shadow: 0 0 0 2px #000 !important;
+        }
+
+        body.accessibility-mode .timeline-date {
+            font-size: 1.1rem !important;
+            font-weight: 800 !important;
+            color: #000 !important;
+            margin-bottom: 5px !important;
+            display: block !important;
+            text-transform: uppercase !important;
+        }
+
+        /* 8. Framed Evidence (Images & Audio) */
+        body.accessibility-mode .evidence-img,
+        body.accessibility-mode img {
+            border: 4px solid #000 !important;
+            box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5) !important;
+            border-radius: 4px !important;
+            margin-top: 10px !important;
+            margin-bottom: 15px !important;
+        }
+
+        body.accessibility-mode audio {
+            border: 2px solid #000 !important;
+            border-radius: 30px !important;
+            background: #f3f4f6 !important;
+            width: 100% !important;
+            margin-top: 10px !important;
+        }
+
+        /* 9. Distinctive Action Buttons */
+        /* Edit Action */
+        body.accessibility-mode .btn-edit,
+        body.accessibility-mode .btn-primary.btn-action-main {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: 3px solid #000 !important;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            font-weight: 900 !important;
+        }
+
+        /* Delete Action */
+        body.accessibility-mode .btn-delete,
+        body.accessibility-mode .btn-danger-outline {
+            background-color: #ffe4e6 !important;
+            /* Rose-100 */
+            color: #9f1239 !important;
+            /* Rose-800 */
+            border: 3px solid #9f1239 !important;
+            font-weight: 900 !important;
+            text-transform: uppercase !important;
+        }
+
+        body.accessibility-mode .btn:hover {
+            transform: translate(-2px, -2px) !important;
+            box-shadow: 6px 6px 0px rgba(0, 0, 0, 1) !important;
         }
     </style>
 </body>
