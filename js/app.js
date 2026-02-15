@@ -345,18 +345,33 @@ const app = {
         });
 
         input.addEventListener('blur', () => {
-            // Delay to allow click on dropdown
+            // Delay to allow click on dropdown items which happens before blur
             setTimeout(() => {
                 dropdown.classList.remove('show');
-                // If nothing was selected but there's text, try to match
+
+                // If nothing was selected but there's text, try to match exactly
                 if (input.value && !hidden.value) {
-                    const match = options.find(opt => opt.toLowerCase() === input.value.toLowerCase());
+                    const match = options.find(opt => opt.toLowerCase() === input.value.trim().toLowerCase());
                     if (match) {
                         input.value = match;
                         hidden.value = match;
+                        input.style.borderColor = ''; // Valid
+                    } else {
+                        // NO MATCH: Inform the user and highlight
+                        input.style.borderColor = 'var(--error-500, #ef4444)';
+                        input.style.backgroundColor = '#fef2f2';
+                        utils.showToast('Debe seleccionar una opción de la lista', 'warning');
                     }
+                } else if (!input.value) {
+                    hidden.value = '';
+                    input.style.borderColor = '';
+                    input.style.backgroundColor = '';
+                } else {
+                    // It has a hidden value, so it's valid selection
+                    input.style.borderColor = '';
+                    input.style.backgroundColor = '';
                 }
-            }, 200);
+            }, 250);
         });
 
         // Keyboard navigation
@@ -1158,6 +1173,25 @@ const app = {
             asignado_a: getVal('asignado-a') || null,
             observaciones_iniciales: getVal('observaciones-iniciales')
         };
+
+        // VALIDA ORIGEN: Must have a selected value from dropdown (hidden input)
+        if (!notificationData.origen) {
+            utils.showToast('⚠️ Por favor, seleccione un Origen válido de la lista desplegable', 'error');
+
+            // Highlight the relevant input
+            const iFijo = document.getElementById('origen-input');
+            const iDin = document.getElementById('origen-dinamico-input');
+
+            if (iFijo && !document.getElementById('grupo-origen-fijo').classList.contains('hidden')) {
+                iFijo.focus();
+                iFijo.style.borderColor = '#ef4444';
+            } else if (iDin) {
+                iDin.focus();
+                iDin.style.borderColor = '#ef4444';
+            }
+
+            return; // Block submission
+        }
 
         console.log('📤 Enviando datos a MySQL:', notificationData);
 
