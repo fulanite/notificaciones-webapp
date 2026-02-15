@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=42.99" as="style">
-    <link rel="preload" href="css/base.css?v=42.99" as="style">
-    <link rel="preload" href="js/config.js?v=42.99" as="script">
-    <link rel="preload" href="js/app.js?v=42.99" as="script">
+    <link rel="preload" href="css/variables.css?v=43.00" as="style">
+    <link rel="preload" href="css/base.css?v=43.00" as="style">
+    <link rel="preload" href="js/config.js?v=43.00" as="script">
+    <link rel="preload" href="js/app.js?v=43.00" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=42.99">
-    <link rel="stylesheet" href="css/base.css?v=42.99">
-    <link rel="stylesheet" href="css/components.css?v=42.99">
+    <link rel="stylesheet" href="css/variables.css?v=43.00">
+    <link rel="stylesheet" href="css/base.css?v=43.00">
+    <link rel="stylesheet" href="css/components.css?v=43.00">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=42.99" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=42.99" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=42.99" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=42.99" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=42.99" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=43.00" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=43.00" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=43.00" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=43.00" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=43.00" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -1992,27 +1992,27 @@
         </div>
     </div>
 
-    <script defer src="js/lazy-loader.js?v=42.99"></script>
-    <script defer src="js/config.js?v=42.99"></script>
-    <script defer src="js/data.js?v=42.99"></script>
-    <script defer src="js/api-client.js?v=42.99"></script>
-    <script defer src="js/auth.js?v=42.99"></script>
-    <script defer src="js/utils.js?v=42.99"></script>
-    <script defer src="js/offline.js?v=42.99"></script>
-    <script defer src="js/notifications.js?v=42.99"></script>
-    <script defer src="js/ujier.js?v=42.99"></script>
-    <script defer src="js/dashboard.js?v=42.99"></script>
-    <script defer src="js/dashboard-patch.js?v=42.99"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=42.99"></script>
-    <script defer src="js/dashboard-analytics.js?v=42.99"></script>
-    <script defer src="js/reports.js?v=42.99"></script>
-    <script defer src="js/audit.js?v=42.99"></script>
-    <script defer src="js/asignaciones.js?v=42.99"></script>
-    <script defer src="js/bulk-editor.js?v=42.99"></script>
-    <script defer src="js/usuarios.js?v=42.99"></script>
-    <script defer src="js/devoluciones.js?v=42.99"></script>
-    <script defer src="js/planillas.js?v=42.99"></script>
-    <script defer src="js/app.js?v=42.99"></script>
+    <script defer src="js/lazy-loader.js?v=43.00"></script>
+    <script defer src="js/config.js?v=43.00"></script>
+    <script defer src="js/data.js?v=43.00"></script>
+    <script defer src="js/api-client.js?v=43.00"></script>
+    <script defer src="js/auth.js?v=43.00"></script>
+    <script defer src="js/utils.js?v=43.00"></script>
+    <script defer src="js/offline.js?v=43.00"></script>
+    <script defer src="js/notifications.js?v=43.00"></script>
+    <script defer src="js/ujier.js?v=43.00"></script>
+    <script defer src="js/dashboard.js?v=43.00"></script>
+    <script defer src="js/dashboard-patch.js?v=43.00"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=43.00"></script>
+    <script defer src="js/dashboard-analytics.js?v=43.00"></script>
+    <script defer src="js/reports.js?v=43.00"></script>
+    <script defer src="js/audit.js?v=43.00"></script>
+    <script defer src="js/asignaciones.js?v=43.00"></script>
+    <script defer src="js/bulk-editor.js?v=43.00"></script>
+    <script defer src="js/usuarios.js?v=43.00"></script>
+    <script defer src="js/devoluciones.js?v=43.00"></script>
+    <script defer src="js/planillas.js?v=43.00"></script>
+    <script defer src="js/app.js?v=43.00"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>
@@ -2441,6 +2441,91 @@
             color: #000 !important;
             border: 3px solid #000 !important;
             font-weight: bold !important;
+        }
+
+
+        /* V50 Accessibility Package Improvements */
+
+        /* 1. Solid Modals & Cards (No Glassmorphism) */
+        body.accessibility-mode .modal-content,
+        body.accessibility-mode .glass-card,
+        body.accessibility-mode .card,
+        body.accessibility-mode .modal-body,
+        body.accessibility-mode .modal-footer {
+            background: #ffffff !important;
+            backdrop-filter: none !important;
+            border: 2px solid #000 !important;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2) !important;
+            color: #000 !important;
+            border-radius: 8px !important;
+        }
+
+        /* 2. Full Text Readability (No Truncation) */
+        body.accessibility-mode table td,
+        body.accessibility-mode .cell-truncate,
+        body.accessibility-mode .text-truncate,
+        body.accessibility-mode .col-dom,
+        body.accessibility-mode .col-caratula,
+        body.accessibility-mode .col-dest {
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            height: auto !important;
+            padding: 12px 8px !important;
+            line-height: 1.5 !important;
+        }
+
+        /* 3. High Contrast Badges */
+        body.accessibility-mode .badge,
+        body.accessibility-mode .status-badge,
+        body.accessibility-mode .badge-mini,
+        body.accessibility-mode .badge-zona {
+            border: 2px solid #000 !important;
+            padding: 6px 12px !important;
+            font-weight: 800 !important;
+            font-size: 0.95rem !important;
+            color: #000 !important;
+            background-color: #fff !important;
+            border-radius: 4px !important;
+            display: inline-block !important;
+            /* Ensure shape is visible */
+        }
+
+        /* Maintain semantic meaning with very light backgrounds + borders */
+        body.accessibility-mode .status-success {
+            background-color: #dcfce7 !important;
+        }
+
+        body.accessibility-mode .status-warning {
+            background-color: #fef9c3 !important;
+        }
+
+        body.accessibility-mode .status-error,
+        body.accessibility-mode .status-deleted {
+            background-color: #fee2e2 !important;
+        }
+
+        body.accessibility-mode .status-info {
+            background-color: #dbeafe !important;
+        }
+
+        /* 4. Enhanced Action Buttons */
+        body.accessibility-mode .modal-footer .btn,
+        body.accessibility-mode .btn-close-modal {
+            padding: 15px 25px !important;
+            font-size: 1.1rem !important;
+            border: 3px solid #000 !important;
+            margin: 5px !important;
+            min-height: 50px !important;
+            /* Touch target size */
+        }
+
+        /* Specific Button Colors */
+        body.accessibility-mode .btn-danger,
+        body.accessibility-mode .btn-danger-outline {
+            background-color: #fee2e2 !important;
+            color: #991b1b !important;
+            border-color: #991b1b !important;
         }
     </style>
 </body>
