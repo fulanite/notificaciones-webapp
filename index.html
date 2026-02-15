@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=42.95" as="style">
-    <link rel="preload" href="css/base.css?v=42.95" as="style">
-    <link rel="preload" href="js/config.js?v=42.95" as="script">
-    <link rel="preload" href="js/app.js?v=42.95" as="script">
+    <link rel="preload" href="css/variables.css?v=42.96" as="style">
+    <link rel="preload" href="css/base.css?v=42.96" as="style">
+    <link rel="preload" href="js/config.js?v=42.96" as="script">
+    <link rel="preload" href="js/app.js?v=42.96" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=42.95">
-    <link rel="stylesheet" href="css/base.css?v=42.95">
-    <link rel="stylesheet" href="css/components.css?v=42.95">
+    <link rel="stylesheet" href="css/variables.css?v=42.96">
+    <link rel="stylesheet" href="css/base.css?v=42.96">
+    <link rel="stylesheet" href="css/components.css?v=42.96">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=42.95" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=42.95" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=42.95" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=42.95" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=42.95" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=42.96" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=42.96" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=42.96" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=42.96" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=42.96" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -1992,27 +1992,27 @@
         </div>
     </div>
 
-    <script defer src="js/lazy-loader.js?v=42.95"></script>
-    <script defer src="js/config.js?v=42.95"></script>
-    <script defer src="js/data.js?v=42.95"></script>
-    <script defer src="js/api-client.js?v=42.95"></script>
-    <script defer src="js/auth.js?v=42.95"></script>
-    <script defer src="js/utils.js?v=42.95"></script>
-    <script defer src="js/offline.js?v=42.95"></script>
-    <script defer src="js/notifications.js?v=42.95"></script>
-    <script defer src="js/ujier.js?v=42.95"></script>
-    <script defer src="js/dashboard.js?v=42.95"></script>
-    <script defer src="js/dashboard-patch.js?v=42.95"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=42.95"></script>
-    <script defer src="js/dashboard-analytics.js?v=42.95"></script>
-    <script defer src="js/reports.js?v=42.95"></script>
-    <script defer src="js/audit.js?v=42.95"></script>
-    <script defer src="js/asignaciones.js?v=42.95"></script>
-    <script defer src="js/bulk-editor.js?v=42.95"></script>
-    <script defer src="js/usuarios.js?v=42.95"></script>
-    <script defer src="js/devoluciones.js?v=42.95"></script>
-    <script defer src="js/planillas.js?v=42.95"></script>
-    <script defer src="js/app.js?v=42.95"></script>
+    <script defer src="js/lazy-loader.js?v=42.96"></script>
+    <script defer src="js/config.js?v=42.96"></script>
+    <script defer src="js/data.js?v=42.96"></script>
+    <script defer src="js/api-client.js?v=42.96"></script>
+    <script defer src="js/auth.js?v=42.96"></script>
+    <script defer src="js/utils.js?v=42.96"></script>
+    <script defer src="js/offline.js?v=42.96"></script>
+    <script defer src="js/notifications.js?v=42.96"></script>
+    <script defer src="js/ujier.js?v=42.96"></script>
+    <script defer src="js/dashboard.js?v=42.96"></script>
+    <script defer src="js/dashboard-patch.js?v=42.96"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=42.96"></script>
+    <script defer src="js/dashboard-analytics.js?v=42.96"></script>
+    <script defer src="js/reports.js?v=42.96"></script>
+    <script defer src="js/audit.js?v=42.96"></script>
+    <script defer src="js/asignaciones.js?v=42.96"></script>
+    <script defer src="js/bulk-editor.js?v=42.96"></script>
+    <script defer src="js/usuarios.js?v=42.96"></script>
+    <script defer src="js/devoluciones.js?v=42.96"></script>
+    <script defer src="js/planillas.js?v=42.96"></script>
+    <script defer src="js/app.js?v=42.96"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>
@@ -2076,18 +2076,36 @@
             document.body.appendChild(toast);
         }
 
+        let refreshing = false;
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshing) return;
+                refreshing = true;
+                window.location.reload();
+            });
+        }
+
         function updateApp() {
+            const toast = document.querySelector('.update-toast');
+            if (toast) {
+                toast.innerHTML = 'Actualizando...';
+                toast.style.opacity = '0.7';
+                toast.style.pointerEvents = 'none';
+            }
+
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(registrations => {
-                    for (let registration of registrations) {
-                        registration.unregister(); // Unregister to force clean slate
+                navigator.serviceWorker.ready.then(reg => {
+                    if (reg.waiting) {
+                        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                    } else {
+                        window.location.reload();
                     }
-                    window.location.reload(true);
                 });
             } else {
-                window.location.reload(true);
+                window.location.reload();
             }
         }
+
     </script>
     <!-- Modales de Gestión de Campo -->
     <!-- Modal para Entrega Masiva -->

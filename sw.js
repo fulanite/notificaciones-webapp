@@ -1,9 +1,9 @@
 /**
  * SGND - Service Worker for PWA
- * Version: 42.95
+ * Version: 42.96
  */
 
-const CACHE_NAME = 'sgnd-cache-v95';
+const CACHE_NAME = 'sgnd-cache-v96';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache (excluding index.html which should always be fresh)
@@ -185,3 +185,9 @@ async function syncOfflineData() {
 }
 
 console.log('[SW] Service Worker loaded');
+
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
