@@ -246,6 +246,7 @@ const asignaciones = {
                     <td data-label="Carátula" title="${n.caratula || ''}" class="cell-truncate">${utils.truncate(n.caratula || '-', 35)}</td>
                     <td data-label="Destinatario" class="cell-recipient">${n.destinatario_nombre || utils.getSpecialDestinationText(n) || '-'}</td>
                     <td data-label="N° Troquel" style="font-family: monospace; font-weight: 600; color: var(--primary-400);">${n.n_troquel || '-'}</td>
+                    <td data-label="Zona">${n.zona || '-'}</td>
                     <td data-label="Domicilio" title="${n.domicilio}" class="cell-truncate">${utils.truncate(n.domicilio, 40)}</td>
                     <td data-label="Entrega">${utils.formatDate(n.fecha_entrega_ujier) || '-'}</td>
                     <td data-label="Devuelta" class="text-center">
