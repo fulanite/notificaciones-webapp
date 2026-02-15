@@ -397,29 +397,43 @@ const ujier = {
                 </div>
                 ` : `<div class="assignment-number ${isPreAviso ? 'is-pre-aviso' : ''}">${index + 1}</div>`}
 
-                <div class="assignment-info" style="gap: 8px;">
+                <div class="assignment-info" style="gap: 8px; flex: 1; padding-right: 45px;">
                     <div class="assignment-header-row" style="margin-bottom: 4px;">
                         ${assignment.zona ? `<span class="assignment-zona" style="font-size: 0.85rem; padding: 2px 8px;">${assignment.zona}</span>` : ''}
-                        ${isSpecial ? '<span class="badge-special" style="font-size: 0.8rem;">⭐ Especial</span>' : ''}
+                        ${isSpecial ? '<span class="badge-special" style="font-size: 0.8rem; background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">⭐ Especial</span>' : ''}
                         ${assignment.devuelta_por_ujier ? '<span class="badge-returned" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; font-size:0.7rem; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:auto;">📦 DEVUELTA</span>' : ''}
                     </div>
                     
-                    <div class="assignment-address" style="font-size: 1.3rem; line-height: 1.3; font-weight: 700; color: var(--primary);">
-                        🏠 ${assignment.domicilio || '-'}
+                    <div class="assignment-address" style="font-size: 1.3rem; line-height: 1.2; font-weight: 800; color: var(--primary);">
+                        ${isSpecial ? `⭐ ${utils.getSpecialDestinationText(assignment)}` : `🏠 ${assignment.domicilio || '-'}`}
                     </div>
                     
-                    <div class="assignment-recipient" style="font-size: 1.05rem; line-height: 1.2; color: var(--text-muted); margin-top: 2px;">
-                        👤 <strong>${assignment.destinatario_nombre || utils.getSpecialDestinationText(assignment) || '-'}</strong>
+                    ${isSpecial ? `
+                        <div class="assignment-metadata-special" style="margin-top: 4px;">
+                            <div style="font-size: 0.95rem; font-weight: 800; color: #1e293b; margin-bottom: 2px;">
+                                📄 EXP: ${assignment.n_expediente || '-'}
+                            </div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic; line-height: 1.2;">
+                                ⚖️ ${assignment.caratula || 'Sin carátula'}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">
+                                🏠 ${assignment.domicilio || '-'}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div class="assignment-recipient" style="font-size: 1.05rem; line-height: 1.2; color: var(--text-muted); margin-top: ${isSpecial ? '6px' : '2px'};">
+                        👤 <strong>${assignment.destinatario_nombre || '-'}</strong>
                     </div>
                     
-                ${assignment.caratula ? `<div class="assignment-caratula" style="font-size: 0.85rem; margin-top: 4px; color: var(--text-muted);">📄 ${assignment.caratula}</div>` : ''}
+                ${!isSpecial && assignment.caratula ? `<div class="assignment-caratula" style="font-size: 0.85rem; margin-top: 4px; color: var(--text-muted);">📄 ${assignment.caratula}</div>` : ''}
                 ${assignment.fecha_entrega_ujier && !this.groupByDateEnabled ? `<div class="assignment-date" style="font-size: 0.75rem; margin-top: 2px; color: var(--text-muted); opacity: 0.8;">📅 Entrega: ${utils.formatDate(assignment.fecha_entrega_ujier)}</div>` : ''}
             </div>
                 
                 ${this.reorderMode ? `
                     <div class="reorder-position-badge">ORDEN: ${index + 1}</div>
                 ` : `
-                    <div class="assignment-actions-quick" onclick="event.stopPropagation()">
+                    <div class="assignment-actions-quick" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%);" onclick="event.stopPropagation()">
                         ${isSpecial ? `
                         <button class="btn-quick-deliver" onclick="ujier.quickDeliver('${assignment.id}')" title="Entrega rápida">
                             ⚡
