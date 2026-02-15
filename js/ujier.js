@@ -419,9 +419,11 @@ const ujier = {
                         </div>
                     ` : ''}
 
-                    <div class="assignment-recipient" style="font-size: 1.05rem; line-height: 1.2; color: var(--text-muted); margin-top: ${isSpecial ? '6px' : '2px'};">
-                        👤 <strong>${assignment.destinatario_nombre || '-'}</strong>
-                    </div>
+                    ${!isSpecial ? `
+                        <div class="assignment-recipient" style="font-size: 1.05rem; line-height: 1.2; color: var(--text-muted); margin-top: 2px;">
+                            👤 <strong>${assignment.destinatario_nombre || '-'}</strong>
+                        </div>
+                    ` : ''}
                     
                 ${!isSpecial && assignment.caratula ? `<div class="assignment-caratula" style="font-size: 0.85rem; margin-top: 4px; color: var(--text-muted);">📄 ${assignment.caratula}</div>` : ''}
                 ${assignment.fecha_entrega_ujier && !this.groupByDateEnabled ? `<div class="assignment-date" style="font-size: 0.75rem; margin-top: 2px; color: var(--text-muted); opacity: 0.8;">📅 Entrega: ${utils.formatDate(assignment.fecha_entrega_ujier)}</div>` : ''}
@@ -2198,11 +2200,11 @@ const ujier = {
                             </div>
                         ` : ''}
 
-                        <div class="reference-info-row">
-                            <span>👤 Destinatario:</span>
-                            <strong>${visit.destinatario_nombre || '-'}</strong>
-                        </div>
                         ${!utils.isSpecialDestination(visit.destinatario_especial) ? `
+                            <div class="reference-info-row">
+                                <span>👤 Destinatario:</span>
+                                <strong>${visit.destinatario_nombre || '-'}</strong>
+                            </div>
                             <div class="reference-info-row">
                                 <span>⚖️ Exp:</span>
                                 <strong>${visit.n_expediente || '-'}</strong>
