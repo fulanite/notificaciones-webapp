@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=42.96" as="style">
-    <link rel="preload" href="css/base.css?v=42.96" as="style">
-    <link rel="preload" href="js/config.js?v=42.96" as="script">
-    <link rel="preload" href="js/app.js?v=42.96" as="script">
+    <link rel="preload" href="css/variables.css?v=42.97" as="style">
+    <link rel="preload" href="css/base.css?v=42.97" as="style">
+    <link rel="preload" href="js/config.js?v=42.97" as="script">
+    <link rel="preload" href="js/app.js?v=42.97" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=42.96">
-    <link rel="stylesheet" href="css/base.css?v=42.96">
-    <link rel="stylesheet" href="css/components.css?v=42.96">
+    <link rel="stylesheet" href="css/variables.css?v=42.97">
+    <link rel="stylesheet" href="css/base.css?v=42.97">
+    <link rel="stylesheet" href="css/components.css?v=42.97">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=42.96" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=42.96" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=42.96" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=42.96" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=42.96" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=42.97" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=42.97" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=42.97" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=42.97" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=42.97" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -1992,27 +1992,27 @@
         </div>
     </div>
 
-    <script defer src="js/lazy-loader.js?v=42.96"></script>
-    <script defer src="js/config.js?v=42.96"></script>
-    <script defer src="js/data.js?v=42.96"></script>
-    <script defer src="js/api-client.js?v=42.96"></script>
-    <script defer src="js/auth.js?v=42.96"></script>
-    <script defer src="js/utils.js?v=42.96"></script>
-    <script defer src="js/offline.js?v=42.96"></script>
-    <script defer src="js/notifications.js?v=42.96"></script>
-    <script defer src="js/ujier.js?v=42.96"></script>
-    <script defer src="js/dashboard.js?v=42.96"></script>
-    <script defer src="js/dashboard-patch.js?v=42.96"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=42.96"></script>
-    <script defer src="js/dashboard-analytics.js?v=42.96"></script>
-    <script defer src="js/reports.js?v=42.96"></script>
-    <script defer src="js/audit.js?v=42.96"></script>
-    <script defer src="js/asignaciones.js?v=42.96"></script>
-    <script defer src="js/bulk-editor.js?v=42.96"></script>
-    <script defer src="js/usuarios.js?v=42.96"></script>
-    <script defer src="js/devoluciones.js?v=42.96"></script>
-    <script defer src="js/planillas.js?v=42.96"></script>
-    <script defer src="js/app.js?v=42.96"></script>
+    <script defer src="js/lazy-loader.js?v=42.97"></script>
+    <script defer src="js/config.js?v=42.97"></script>
+    <script defer src="js/data.js?v=42.97"></script>
+    <script defer src="js/api-client.js?v=42.97"></script>
+    <script defer src="js/auth.js?v=42.97"></script>
+    <script defer src="js/utils.js?v=42.97"></script>
+    <script defer src="js/offline.js?v=42.97"></script>
+    <script defer src="js/notifications.js?v=42.97"></script>
+    <script defer src="js/ujier.js?v=42.97"></script>
+    <script defer src="js/dashboard.js?v=42.97"></script>
+    <script defer src="js/dashboard-patch.js?v=42.97"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=42.97"></script>
+    <script defer src="js/dashboard-analytics.js?v=42.97"></script>
+    <script defer src="js/reports.js?v=42.97"></script>
+    <script defer src="js/audit.js?v=42.97"></script>
+    <script defer src="js/asignaciones.js?v=42.97"></script>
+    <script defer src="js/bulk-editor.js?v=42.97"></script>
+    <script defer src="js/usuarios.js?v=42.97"></script>
+    <script defer src="js/devoluciones.js?v=42.97"></script>
+    <script defer src="js/planillas.js?v=42.97"></script>
+    <script defer src="js/app.js?v=42.97"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>
@@ -2290,6 +2290,10 @@
         }
 
         /* Validation Feedback - Green check for completed required fields */
+        /* Validation Feedback - Green check for completed required fields */
+        body.accessibility-mode input:required:valid,
+        body.accessibility-mode select:required:valid,
+        body.accessibility-mode textarea:required:valid,
         body.accessibility-mode .form-input:required:valid,
         body.accessibility-mode .form-select:required:valid,
         body.accessibility-mode .form-textarea:required:valid {
@@ -2304,10 +2308,18 @@
 
         body.accessibility-mode .form-input:focus,
         body.accessibility-mode .form-select:focus,
-        body.accessibility-mode .form-textarea:focus {
+        body.accessibility-mode .form-textarea:focus,
+        body.accessibility-mode input:focus,
+        body.accessibility-mode select:focus,
+        body.accessibility-mode textarea:focus {
             outline: 3px solid #f59e0b !important;
             border-color: #000 !important;
             background-color: #fffbf0 !important;
+        }
+
+        /* Hide rocket/search icon in accessibility mode */
+        body.accessibility-mode .search-icon {
+            display: none !important;
         }
 
         /* Make rows stack vertically for easier read flow */
