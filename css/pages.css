@@ -327,17 +327,20 @@
 }
 
 .notifications-table tbody tr.row-is-deleted {
-    background-color: rgba(239, 68, 68, 0.05);
-    /* Soft red background */
-    opacity: 0.8;
+    background-color: #fee2e2 !important;
+    /* Stronger red background */
+    border-left: 4px solid #ef4444;
 }
 
 .notifications-table tbody tr.row-is-deleted:hover {
-    background-color: rgba(239, 68, 68, 0.1);
+    background-color: #fecaca !important;
 }
 
 .notifications-table tbody tr.row-is-deleted td {
-    color: var(--text-muted);
+    color: #991b1b !important;
+    /* Red text to highlight status */
+    text-decoration: line-through;
+    /* Strikethrough for deleted items */
 }
 
 .status-deleted {

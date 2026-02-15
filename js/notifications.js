@@ -248,6 +248,7 @@ const notifications = {
             ...this.filters,
             user_id: auth.currentUser?.id,
             user_email: auth.currentUser?.email,
+            show_deleted: 1, // Explicitly request deleted items for this view
             unassigned_only: this.filters.unassigned_only ? 1 : 0
         };
 
