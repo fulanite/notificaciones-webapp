@@ -29,6 +29,12 @@ const planillas = {
         } else if (tabName === 'mensual') {
             diariaContent.style.display = 'none';
             mensualContent.style.display = 'block';
+            document.getElementById('planilla-qr-content').style.display = 'none';
+        } else if (tabName === 'qr') {
+            diariaContent.style.display = 'none';
+            mensualContent.style.display = 'none';
+            document.getElementById('planilla-qr-content').style.display = 'block';
+            this.loadUjieresForQR();
         }
     },
 
@@ -41,6 +47,10 @@ const planillas = {
         ['planilla-zona', 'planilla-fecha'].forEach(id => {
             document.getElementById(id)?.addEventListener('change', () => this.updatePreview());
         });
+
+        // QR Report Listeners
+        document.getElementById('btn-generate-qr-report')?.addEventListener('click', () => this.generateQRReport());
+        document.getElementById('btn-download-qr-pdf')?.addEventListener('click', () => this.downloadQRPDF());
 
         this.listenersAttached = true;
     },
@@ -329,10 +339,6 @@ const planillas = {
                 }
             });
 
-            // Add Separator Row for Zone (Optional now since we have one PDF per zone, but keeping for consistency or maybe just remove header row inside table since title is at top)
-            // Actually, user wants individual PDFs. The Header "Zona: ..." is already at the top. 
-            // We can skip the table row header for the Zone name or keep it. Let's keep it clean and maybe just start with items.
-
             let zoneIndex = 1;
 
             const addRows = (itemList) => {
@@ -440,29 +446,9 @@ const planillas = {
                     10: { cellWidth: 18 }, // Medio de pago - reducido de 20
                     11: { cellWidth: 23 }, // Observaciones - reducido de 25
                     12: { cellWidth: 13, halign: 'center' } // Devuelta - reducido de 15
-                    // Total: 247 unidades (cabe cómodamente en ~265 disponibles)
                 },
                 theme: 'grid', // Grid theme for borders
                 rowPageBreak: 'avoid', // Prevent rows from being cut across pages
-                didDrawCell: (data) => {
-                    // Draw square checkbox for 'Devuelta' column
-                    if (data.section === 'body' && data.column.index === 12) {
-                        // Avoid drawing on sub-headers (which have text content or object content)
-                        const cellRaw = data.cell.raw;
-                        // If it's a header object with content or non-empty string, skip
-                        if (cellRaw && (typeof cellRaw === 'object' || (typeof cellRaw === 'string' && cellRaw.trim() !== ''))) {
-                            return;
-                        }
-
-                        const size = 5; // Checkbox size
-                        const x = data.cell.x + (data.cell.width - size) / 2;
-                        const y = data.cell.y + (data.cell.height - size) / 2;
-
-                        doc.setDrawColor(0); // Black border
-                        doc.setLineWidth(0.1);
-                        doc.rect(x, y, size, size);
-                    }
-                }
             });
 
             // --- FOOTER ---
@@ -489,5 +475,245 @@ const planillas = {
 
         utils.hideLoading();
         utils.showToast('Planillas generadas con éxito', 'success');
+    },
+
+    // QR Report Methods
+    async loadUjieresForQR() {
+        const select = document.getElementById('qr-ujier-select');
+        if (!select || select.dataset.loaded === 'true') return;
+
+        try {
+            const { data } = await apiClient.get('usuarios.php', { rol: 'ujier' });
+            if (data) {
+                let html = '<option value="">👤 Todos los Ujieres</option>';
+                data.forEach(u => html += `<option value="${u.id}">${u.nombre}</option>`);
+                select.innerHTML = html;
+                select.dataset.loaded = 'true';
+            }
+        } catch (e) {
+            console.error('Error loading ujieres for QR report:', e);
+        }
+    },
+
+    async generateQRReport() {
+        const dateFrom = document.getElementById('qr-date-from').value;
+        const dateTo = document.getElementById('qr-date-to').value;
+        const ujierId = document.getElementById('qr-ujier-select').value;
+
+        if (!dateFrom || !dateTo) {
+            utils.showToast('Seleccioná un rango de fechas', 'warning');
+            return;
+        }
+
+        document.getElementById('qr-report-loading').classList.remove('hidden');
+        document.getElementById('qr-report-content').classList.add('hidden');
+        document.getElementById('qr-report-empty').classList.add('hidden');
+
+        try {
+            // Fetch ALL notifications in date range
+            // Note: Ideally API should support range filtering. 
+            // For now, we'll fetch a wider range and filter on client or update API later if needed for perf.
+            // Using a loose limit for now or existing filters.
+
+            // Constructing a query. Since current API might not support ranges perfectly, 
+            // we will fetch by dates or just use a custom query if we were modifying PHP.
+            // However, based on available tools, let's filter purely client side after fetching by 'fecha_entrega' logic if possible
+            // OR use the existing 'getNotifications' and filter manually.
+
+            // To be precise with date range, we might scan a bit. 
+            // Better strategy: Fetch with a high limit for the years involved.
+
+            const params = {
+                limit: 2000,
+                // We'll filter date range strictly on client for accuracy
+                // year: 2026 // Assumption, or dynamic based on date inputs year
+            };
+
+            // Optimization: determine years involved
+            const startYear = new Date(dateFrom).getFullYear();
+            const endYear = new Date(dateTo).getFullYear();
+
+            let allData = [];
+
+            // Fetch for involved years (usually just one)
+            for (let y = startYear; y <= endYear; y++) {
+                const { data } = await db.getNotifications({ ...params, year: y });
+                if (data) allData = allData.concat(data);
+            }
+
+            // FILTER LOGIC
+            // 1. Not Deleted
+            // 2. Medio Pago = QR
+            // 3. Date Range (fecha_entrega_ujier)
+            // 4. Ujier (if selected)
+
+            const fromTime = new Date(dateFrom + 'T00:00:00').getTime();
+            const toTime = new Date(dateTo + 'T23:59:59').getTime();
+
+            const filtered = allData.filter(n => {
+                if (n.eliminada == 1) return false;
+                if (!n.medio_pago || n.medio_pago.toLowerCase() !== 'qr') return false;
+                if (!n.fecha_entrega_ujier) return false;
+
+                const deliveryTime = new Date(n.fecha_entrega_ujier).getTime();
+                if (deliveryTime < fromTime || deliveryTime > toTime) return false;
+
+                if (ujierId && n.asignado_a != ujierId) return false;
+
+                return true;
+            });
+
+            this.currentQRData = filtered; // Store for PDF generation
+            this.renderQRReport(filtered);
+
+        } catch (e) {
+            console.error('Error generating QR report:', e);
+            utils.showToast('Error generando el informe', 'error');
+        } finally {
+            document.getElementById('qr-report-loading').classList.add('hidden');
+        }
+    },
+
+    renderQRReport(data) {
+        const tbody = document.getElementById('qr-table-body');
+        const countEl = document.getElementById('qr-stat-count');
+        const totalEl = document.getElementById('qr-stat-total');
+        const contentDiv = document.getElementById('qr-report-content');
+        const emptyDiv = document.getElementById('qr-report-empty');
+
+        if (!data || data.length === 0) {
+            contentDiv.classList.add('hidden');
+            emptyDiv.classList.remove('hidden');
+            return;
+        }
+
+        // Calculate Totals
+        let totalAmount = 0;
+        let html = '';
+
+        // Sort by date
+        data.sort((a, b) => new Date(a.fecha_entrega_ujier) - new Date(b.fecha_entrega_ujier));
+
+        data.forEach(item => {
+            const costo = parseFloat(item.costo) || 0;
+            totalAmount += costo;
+            const fecha = new Date(item.fecha_entrega_ujier).toLocaleDateString();
+
+            html += `
+                <tr>
+                    <td>${fecha}</td>
+                    <td>${item.n_expediente || '-'}</td>
+                    <td>${item.caratula || '-'}</td>
+                    <td>${item.ujier_nombre || (item.usuarios ? item.usuarios.nombre : 'Sin asignar')}</td>
+                    <td style="text-align: right; font-family: monospace; font-size: 1.1em;">$${utils.formatCurrency(costo)}</td>
+                </tr>
+            `;
+        });
+
+        // Summary Row by Date (Optional, per user request "sumatoria con totales por dia")
+        // Note: For now, detail view is table. PDF will contain daily details.
+
+        tbody.innerHTML = html;
+        countEl.textContent = data.length;
+        totalEl.textContent = `$${utils.formatCurrency(totalAmount)}`;
+
+        // Footer Total
+        const tfoot = document.getElementById('qr-table-footer');
+        tfoot.innerHTML = `
+            <tr style="background-color: var(--bg-hover); font-weight: bold;">
+                <td colspan="4" style="text-align: right;">TOTAL:</td>
+                <td style="text-align: right; color: var(--success);">$${utils.formatCurrency(totalAmount)}</td>
+            </tr>
+        `;
+
+        emptyDiv.classList.add('hidden');
+        contentDiv.classList.remove('hidden');
+    },
+
+    downloadQRPDF() {
+        if (!this.currentQRData || this.currentQRData.length === 0) return;
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const dateFrom = document.getElementById('qr-date-from').value.split('-').reverse().join('/');
+        const dateTo = document.getElementById('qr-date-to').value.split('-').reverse().join('/');
+        const ujierText = document.getElementById('qr-ujier-select').selectedOptions[0].text;
+
+        // Header
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Informe de Recaudación - Pagos QR', 14, 20);
+
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Período: ${dateFrom} al ${dateTo}`, 14, 28);
+        doc.text(`Filtro Ujier: ${ujierText}`, 14, 34);
+        doc.text(`Fecha Emisión: ${new Date().toLocaleDateString()}`, 14, 40);
+
+        // Group by Date for Subtotals
+        const groupedByDate = this.currentQRData.reduce((acc, item) => {
+            const dateKey = new Date(item.fecha_entrega_ujier).toLocaleDateString();
+            if (!acc[dateKey]) acc[dateKey] = { items: [], total: 0 };
+            acc[dateKey].items.push(item);
+            acc[dateKey].total += parseFloat(item.costo || 0);
+            return acc;
+        }, {});
+
+        const tableBody = [];
+        let grandTotal = 0;
+
+        Object.keys(groupedByDate).forEach(date => {
+            const dayGroup = groupedByDate[date];
+
+            // Date Header
+            tableBody.push([{
+                content: `Fecha: ${date} - Subtotal: $${utils.formatCurrency(dayGroup.total)}`,
+                colSpan: 4,
+                styles: { fillColor: [240, 240, 240], fontStyle: 'bold' }
+            }]);
+
+            dayGroup.items.forEach(item => {
+                tableBody.push([
+                    item.n_expediente || '',
+                    item.caratula || '',
+                    item.ujier_nombre || (item.usuarios ? item.usuarios.nombre : 'Sin asignar'),
+                    `$${utils.formatCurrency(item.costo || 0)}`
+                ]);
+            });
+
+            grandTotal += dayGroup.total;
+        });
+
+        // Add Grand Total Row
+        tableBody.push([{
+            content: `TOTAL GENERAL: $${utils.formatCurrency(grandTotal)}`,
+            colSpan: 4,
+            styles: {
+                fillColor: [220, 255, 220],
+                textColor: [0, 100, 0],
+                fontStyle: 'bold',
+                halign: 'right',
+                fontSize: 12
+            }
+        }]);
+
+        doc.autoTable({
+            startY: 45,
+            head: [['Expediente', 'Carátula', 'Ujier', 'Costo']],
+            body: tableBody,
+            theme: 'grid',
+            styles: { fontSize: 10, cellPadding: 3 },
+            headStyles: { fillColor: [50, 50, 50] },
+            columnStyles: {
+                0: { cellWidth: 30 },
+                1: { cellWidth: 80 },
+                2: { cellWidth: 50 },
+                3: { cellWidth: 20, halign: 'right' }
+            }
+        });
+
+        doc.save(`informe_qr_${dateFrom.replace(/\//g, '-')}_${dateTo.replace(/\//g, '-')}.pdf`);
     }
+
 };
