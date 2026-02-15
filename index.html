@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=42.50" as="style">
-    <link rel="preload" href="css/base.css?v=42.50" as="style">
-    <link rel="preload" href="js/config.js?v=42.50" as="script">
-    <link rel="preload" href="js/app.js?v=42.50" as="script">
+    <link rel="preload" href="css/variables.css?v=42.40" as="style">
+    <link rel="preload" href="css/base.css?v=42.40" as="style">
+    <link rel="preload" href="js/config.js?v=42.40" as="script">
+    <link rel="preload" href="js/app.js?v=42.40" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=42.50">
-    <link rel="stylesheet" href="css/base.css?v=42.50">
-    <link rel="stylesheet" href="css/components.css?v=42.50">
+    <link rel="stylesheet" href="css/variables.css?v=42.40">
+    <link rel="stylesheet" href="css/base.css?v=42.40">
+    <link rel="stylesheet" href="css/components.css?v=42.40">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=42.50" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=42.50" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=42.50" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=42.50" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=42.50" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=42.40" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=42.40" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=42.40" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=42.40" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=42.40" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -1166,9 +1166,6 @@
                                 onclick="planillas.switchTab('mensual', this)">
                                 📊 Informe Mensual
                             </button>
-                            <button class="tab-btn" data-planilla-tab="qr" onclick="planillas.switchTab('qr', this)">
-                                📱 Informe Pagos QR
-                            </button>
                         </div>
 
                         <!-- Planilla Diaria Tab Content -->
@@ -1270,117 +1267,6 @@
                                             <span>📄</span> Generar Informe PDF
                                         </button>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Informe Pagos QR Content -->
-                        <div id="planilla-qr-content" class="planilla-tab-content" style="display: none;">
-                            <div class="dashboard-card" style="max-width: 900px; margin: 0 auto; margin-bottom: 20px;">
-                                <div class="card-header">
-                                    <h3 class="card-title">📱 Informe de Notificaciones QR</h3>
-                                    <p class="text-secondary" style="font-size: 0.9em;">
-                                        Generar reporte de pagos QR confirmados por rango de fechas y ujier.
-                                    </p>
-                                </div>
-                                <div class="card-body">
-                                    <!-- Filters -->
-                                    <div class="filter-bar"
-                                        style="flex-wrap: wrap; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 8px;">
-                                        <div class="form-group" style="flex: 1; min-width: 150px;">
-                                            <label class="form-label"
-                                                style="font-size: 0.8rem; margin-bottom: 4px;">Desde</label>
-                                            <input type="date" id="qr-date-from" class="form-input">
-                                        </div>
-                                        <div class="form-group" style="flex: 1; min-width: 150px;">
-                                            <label class="form-label"
-                                                style="font-size: 0.8rem; margin-bottom: 4px;">Hasta</label>
-                                            <input type="date" id="qr-date-to" class="form-input">
-                                        </div>
-                                        <div class="form-group" style="flex: 1.5; min-width: 200px;">
-                                            <label class="form-label"
-                                                style="font-size: 0.8rem; margin-bottom: 4px;">Ujier Asignado</label>
-                                            <select id="qr-ujier-select" class="form-select">
-                                                <option value="">👤 Todos los Ujieres</option>
-                                                <!-- Dynamic content -->
-                                            </select>
-                                        </div>
-                                        <div class="form-group"
-                                            style="flex: 0 0 auto; display: flex; align-items: flex-end;">
-                                            <button id="btn-generate-qr-report" class="btn btn-primary"
-                                                style="height: 42px;">
-                                                <span>🔍</span> Buscar
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Report Content (Hidden by default) -->
-                                    <div id="qr-report-content" class="hidden">
-                                        <!-- Actions -->
-                                        <div
-                                            style="display: flex; justify-content: flex-end; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);">
-                                            <button id="btn-download-qr-pdf" class="btn btn-secondary btn-sm">
-                                                <span>📄</span> Descargar PDF
-                                            </button>
-                                        </div>
-
-                                        <!-- Summary Stats -->
-                                        <div class="stats-grid"
-                                            style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px;">
-                                            <div class="stat-card stat-info">
-                                                <div class="stat-icon">📑</div>
-                                                <div class="stat-content">
-                                                    <span class="stat-value" id="qr-stat-count">0</span>
-                                                    <span class="stat-label">Notificaciones QR</span>
-                                                </div>
-                                            </div>
-                                            <div class="stat-card stat-success">
-                                                <div class="stat-icon">💰</div>
-                                                <div class="stat-content">
-                                                    <span class="stat-value" id="qr-stat-total">$0</span>
-                                                    <span class="stat-label">Total Recaudado</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Detail Table -->
-                                        <div class="table-responsive">
-                                            <table class="data-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Fecha Entrega</th>
-                                                        <th>Expediente</th>
-                                                        <th>Carátula</th>
-                                                        <th>Ujier</th>
-                                                        <th style="text-align: right;">Costo</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="qr-table-body">
-                                                    <!-- Dynamic Content -->
-                                                </tbody>
-                                                <tfoot id="qr-table-footer">
-                                                    <!-- Dynamic Totals -->
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <!-- Loading State -->
-                                    <div id="qr-report-loading" class="hidden"
-                                        style="text-align: center; padding: 40px;">
-                                        <div class="spinner"
-                                            style="width: 30px; height: 30px; border-width: 3px; margin: 0 auto 10px;">
-                                        </div>
-                                        <p class="text-secondary">Generando informe...</p>
-                                    </div>
-
-                                    <!-- Empty State -->
-                                    <div id="qr-report-empty" class="text-center p-5 hidden">
-                                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
-                                        <h3>No se encontraron resultados</h3>
-                                        <p class="text-secondary">Ajustá los filtros y volvé a intentar.</p>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
@@ -1987,27 +1873,27 @@
         </div>
     </div>
 
-    <script defer src="js/lazy-loader.js?v=42.50"></script>
-    <script defer src="js/config.js?v=42.50"></script>
-    <script defer src="js/data.js?v=42.50"></script>
-    <script defer src="js/api-client.js?v=42.50"></script>
-    <script defer src="js/auth.js?v=42.50"></script>
-    <script defer src="js/utils.js?v=42.50"></script>
-    <script defer src="js/offline.js?v=42.50"></script>
-    <script defer src="js/notifications.js?v=42.50"></script>
-    <script defer src="js/ujier.js?v=42.50"></script>
-    <script defer src="js/dashboard.js?v=42.50"></script>
-    <script defer src="js/dashboard-patch.js?v=42.50"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=42.50"></script>
-    <script defer src="js/dashboard-analytics.js?v=42.50"></script>
-    <script defer src="js/reports.js?v=42.50"></script>
-    <script defer src="js/audit.js?v=42.50"></script>
-    <script defer src="js/asignaciones.js?v=42.50"></script>
-    <script defer src="js/bulk-editor.js?v=42.50"></script>
-    <script defer src="js/usuarios.js?v=42.50"></script>
-    <script defer src="js/devoluciones.js?v=42.50"></script>
-    <script defer src="js/planillas.js?v=42.50"></script>
-    <script defer src="js/app.js?v=42.50"></script>
+    <script defer src="js/lazy-loader.js?v=42.40"></script>
+    <script defer src="js/config.js?v=42.40"></script>
+    <script defer src="js/data.js?v=42.40"></script>
+    <script defer src="js/api-client.js?v=42.40"></script>
+    <script defer src="js/auth.js?v=42.40"></script>
+    <script defer src="js/utils.js?v=42.40"></script>
+    <script defer src="js/offline.js?v=42.40"></script>
+    <script defer src="js/notifications.js?v=42.40"></script>
+    <script defer src="js/ujier.js?v=42.40"></script>
+    <script defer src="js/dashboard.js?v=42.40"></script>
+    <script defer src="js/dashboard-patch.js?v=42.40"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=42.40"></script>
+    <script defer src="js/dashboard-analytics.js?v=42.40"></script>
+    <script defer src="js/reports.js?v=42.40"></script>
+    <script defer src="js/audit.js?v=42.40"></script>
+    <script defer src="js/asignaciones.js?v=42.40"></script>
+    <script defer src="js/bulk-editor.js?v=42.40"></script>
+    <script defer src="js/usuarios.js?v=42.40"></script>
+    <script defer src="js/devoluciones.js?v=42.40"></script>
+    <script defer src="js/planillas.js?v=42.40"></script>
+    <script defer src="js/app.js?v=42.40"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>
