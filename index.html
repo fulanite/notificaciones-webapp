@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=43.07" as="style">
-    <link rel="preload" href="css/base.css?v=43.07" as="style">
-    <link rel="preload" href="js/config.js?v=43.07" as="script">
-    <link rel="preload" href="js/app.js?v=43.07" as="script">
+    <link rel="preload" href="css/variables.css?v=43.08" as="style">
+    <link rel="preload" href="css/base.css?v=43.08" as="style">
+    <link rel="preload" href="js/config.js?v=43.08" as="script">
+    <link rel="preload" href="js/app.js?v=43.08" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=43.07">
-    <link rel="stylesheet" href="css/base.css?v=43.07">
-    <link rel="stylesheet" href="css/components.css?v=43.07">
+    <link rel="stylesheet" href="css/variables.css?v=43.08">
+    <link rel="stylesheet" href="css/base.css?v=43.08">
+    <link rel="stylesheet" href="css/components.css?v=43.08">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=43.07" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=43.07" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=43.07" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=43.07" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=43.07" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=43.08" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=43.08" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=43.08" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=43.08" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=43.08" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -2001,27 +2001,27 @@
         </div>
     </div>
 
-    <script defer src="js/lazy-loader.js?v=43.07"></script>
-    <script defer src="js/config.js?v=43.07"></script>
-    <script defer src="js/data.js?v=43.07"></script>
-    <script defer src="js/api-client.js?v=43.07"></script>
-    <script defer src="js/auth.js?v=43.07"></script>
-    <script defer src="js/utils.js?v=43.07"></script>
-    <script defer src="js/offline.js?v=43.07"></script>
-    <script defer src="js/notifications.js?v=43.07"></script>
-    <script defer src="js/ujier.js?v=43.07"></script>
-    <script defer src="js/dashboard.js?v=43.07"></script>
-    <script defer src="js/dashboard-patch.js?v=43.07"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=43.07"></script>
-    <script defer src="js/dashboard-analytics.js?v=43.07"></script>
-    <script defer src="js/reports.js?v=43.07"></script>
-    <script defer src="js/audit.js?v=43.07"></script>
-    <script defer src="js/asignaciones.js?v=43.07"></script>
-    <script defer src="js/bulk-editor.js?v=43.07"></script>
-    <script defer src="js/usuarios.js?v=43.07"></script>
-    <script defer src="js/devoluciones.js?v=43.07"></script>
-    <script defer src="js/planillas.js?v=43.07"></script>
-    <script defer src="js/app.js?v=43.07"></script>
+    <script defer src="js/lazy-loader.js?v=43.08"></script>
+    <script defer src="js/config.js?v=43.08"></script>
+    <script defer src="js/data.js?v=43.08"></script>
+    <script defer src="js/api-client.js?v=43.08"></script>
+    <script defer src="js/auth.js?v=43.08"></script>
+    <script defer src="js/utils.js?v=43.08"></script>
+    <script defer src="js/offline.js?v=43.08"></script>
+    <script defer src="js/notifications.js?v=43.08"></script>
+    <script defer src="js/ujier.js?v=43.08"></script>
+    <script defer src="js/dashboard.js?v=43.08"></script>
+    <script defer src="js/dashboard-patch.js?v=43.08"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=43.08"></script>
+    <script defer src="js/dashboard-analytics.js?v=43.08"></script>
+    <script defer src="js/reports.js?v=43.08"></script>
+    <script defer src="js/audit.js?v=43.08"></script>
+    <script defer src="js/asignaciones.js?v=43.08"></script>
+    <script defer src="js/bulk-editor.js?v=43.08"></script>
+    <script defer src="js/usuarios.js?v=43.08"></script>
+    <script defer src="js/devoluciones.js?v=43.08"></script>
+    <script defer src="js/planillas.js?v=43.08"></script>
+    <script defer src="js/app.js?v=43.08"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>
@@ -2494,28 +2494,54 @@
             font-weight: 800 !important;
             font-size: 0.95rem !important;
             color: #000 !important;
-            background-color: #fff !important;
+            background-color: #fff;
+            /* Default, overridden by specific status below */
             border-radius: 4px !important;
             display: inline-block !important;
             /* Ensure shape is visible */
         }
 
         /* Maintain semantic meaning with very light backgrounds + borders */
+        body.accessibility-mode .status-completed,
         body.accessibility-mode .status-success {
             background-color: #dcfce7 !important;
+            /* Green 100 */
+            border-color: #166534 !important;
+            /* Green 800 */
         }
 
+        body.accessibility-mode .status-pending,
         body.accessibility-mode .status-warning {
             background-color: #fef9c3 !important;
+            /* Yellow 100 */
+            border-color: #854d0e !important;
+            /* Amber 800 */
         }
 
+        body.accessibility-mode .status-deferred,
         body.accessibility-mode .status-error,
         body.accessibility-mode .status-deleted {
             background-color: #fee2e2 !important;
+            /* Red 100 */
+            border-color: #991b1b !important;
+            /* Red 800 */
         }
 
         body.accessibility-mode .status-info {
             background-color: #dbeafe !important;
+            /* Blue 100 */
+            border-color: #1e40af !important;
+            /* Blue 800 */
+        }
+
+        /* Visit History Status in Modal */
+        body.accessibility-mode .step-status {
+            background-color: #eee !important;
+            color: #000 !important;
+            border: 2px solid #000 !important;
+            padding: 4px 10px !important;
+            border-radius: 4px !important;
+            font-weight: 800 !important;
         }
 
         /* 4. Enhanced Action Buttons */
