@@ -17,7 +17,8 @@ const notifications = {
         year: '2026',
         own_only: true,
         unassigned_only: false,
-        medio_pago: ''
+        medio_pago: '',
+        ujier_id: ''
     },
 
     getVisitStatusColor(status) {
@@ -104,6 +105,16 @@ const notifications = {
                 filterMedioPago.innerHTML = '<option value="">💳 Todos los pagos</option>' +
                     medios.map(m => `<option value="${m}">${m.toUpperCase()}</option>`).join('');
             }
+
+            // Load Ujieres
+            const filterUjier = document.getElementById('filter-ujier');
+            if (filterUjier) {
+                const { data: ujieres } = await db.getUjieres();
+                if (ujieres) {
+                    filterUjier.innerHTML = '<option value="">👤 Todos los ujieres</option>' +
+                        ujieres.map(u => `<option value="${u.id}">${u.nombre}</option>`).join('');
+                }
+            }
         } catch (e) {
             console.error('Error loading filter options:', e);
         }
@@ -119,6 +130,7 @@ const notifications = {
         const filterPropio = document.getElementById('filter-propio');
         const filterSinFecha = document.getElementById('filter-sin-fecha');
         const filterMedioPago = document.getElementById('filter-medio-pago');
+        const filterUjier = document.getElementById('filter-ujier');
 
         const updateAndLoad = () => {
             this.currentPage = 1;
@@ -174,6 +186,11 @@ const notifications = {
             updateAndLoad();
         });
 
+        filterUjier?.addEventListener('change', () => {
+            this.filters.ujier_id = filterUjier.value;
+            updateAndLoad();
+        });
+
         // Pagination
         document.getElementById('btn-prev-page')?.addEventListener('click', () => {
             if (this.currentPage > 1) {
@@ -203,7 +220,8 @@ const notifications = {
             year: currentYear,
             own_only: false, // Default to TODOS
             unassigned_only: false,
-            medio_pago: ''
+            medio_pago: '',
+            ujier_id: ''
         };
 
         // Reset UI elements
@@ -215,6 +233,7 @@ const notifications = {
         const filterPropio = document.getElementById('filter-propio');
         const filterSinFecha = document.getElementById('filter-sin-fecha');
         const filterMedioPago = document.getElementById('filter-medio-pago');
+        const filterUjier = document.getElementById('filter-ujier');
 
         if (searchInput) searchInput.value = '';
         if (filterEstado) filterEstado.value = '';
@@ -224,6 +243,7 @@ const notifications = {
         if (filterPropio) filterPropio.value = 'none';
         if (filterSinFecha) filterSinFecha.checked = false;
         if (filterMedioPago) filterMedioPago.value = '';
+        if (filterUjier) filterUjier.value = '';
 
         // Reset page and reload
         this.currentPage = 1;
