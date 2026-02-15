@@ -261,6 +261,13 @@ try {
                 $params = [$userId, $userId, $userId, $userId];
             }
 
+            if (!empty($_GET['asignado_a'])) {
+                $ujier = $_GET['asignado_a'];
+                $whereClause .= " AND (n.asignado_a = ? OR n.asignado_a = (SELECT dni FROM usuarios WHERE id = ?))";
+                $params[] = $ujier;
+                $params[] = $ujier;
+            }
+
 
             $stmt2026 = $pdo->prepare("SELECT COUNT(*) FROM notificaciones n WHERE (YEAR(n.fecha_carga) = 2026 OR YEAR(n.created_at) = 2026) AND (n.eliminada = 0 OR n.eliminada IS NULL) AND $whereClause");
             $stmt2026->execute($params);
