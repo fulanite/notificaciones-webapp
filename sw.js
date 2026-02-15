@@ -1,15 +1,13 @@
 /**
  * SGND - Service Worker for PWA
- * Version: 42.90
+ * Version: 42.91
  */
 
-const CACHE_NAME = 'sgnd-cache-v90';
+const CACHE_NAME = 'sgnd-cache-v91';
 const OFFLINE_URL = '/offline.html';
 
-// Assets to cache
+// Assets to cache (excluding index.html which should always be fresh)
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
     '/manifest.json',
     '/css/variables.css',
     '/css/base.css',
@@ -93,6 +91,15 @@ self.addEventListener('fetch', (event) => {
 
     // Skip non-GET requests
     if (request.method !== 'GET') {
+        return;
+    }
+
+    // NEVER cache index.html - always fetch fresh to get latest asset versions
+    if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname.endsWith('index.html')) {
+        event.respondWith(
+            fetch(request)
+                .catch(() => caches.match('/offline.html'))
+        );
         return;
     }
 
