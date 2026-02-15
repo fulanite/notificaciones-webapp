@@ -166,8 +166,8 @@ const db = {
         const params = {};
         if (options.estado) params.estado = options.estado;
         if (options.tipo) params.tipo = options.tipo;
-        if (options.asignado_a) params.asignado_a = options.asignado_a;
-        if (options.ujier_id) params.asignado_a = options.ujier_id; // Support alias
+        if (options.asignado_a) params.asignado_a = options.asignado_a; // Dedicated lookup (mobile)
+        if (options.ujier_id) params.filter_ujier = options.ujier_id; // List filtering (admin)
         if (options.fecha) {
             params.fecha = options.fecha;
             if (options.dateField) params.date_field = options.dateField; // Support custom date field
@@ -219,6 +219,7 @@ const db = {
         };
         return apiClient.get('notificaciones.php', params);
     },
+
 
     async createNotification(notificationData) {
         if (!apiClient) return { data: null, error: null };

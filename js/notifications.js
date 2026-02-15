@@ -270,7 +270,7 @@ const notifications = {
         const params = {
             own_only: this.filters.own_only ? 1 : 0,
             user_email: auth.currentUser?.email,
-            asignado_a: this.filters.ujier_id || ''
+            filter_ujier: this.filters.ujier_id || ''
         };
 
         try {

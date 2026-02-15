@@ -261,8 +261,8 @@ try {
                 $params = [$userId, $userId, $userId, $userId];
             }
 
-            if (!empty($_GET['asignado_a'])) {
-                $ujier = $_GET['asignado_a'];
+            if (!empty($_GET['filter_ujier'])) {
+                $ujier = $_GET['filter_ujier'];
                 $whereClause .= " AND (n.asignado_a = ? OR n.asignado_a = (SELECT dni FROM usuarios WHERE id = ?))";
                 $params[] = $ujier;
                 $params[] = $ujier;
