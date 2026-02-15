@@ -419,6 +419,11 @@
                     </div>
 
                     <div class="header-actions" id="header-actions">
+                        <button type="button" id="btn-toggle-accessibility"
+                            class="btn btn-sm btn-accessibility-toggle hidden"
+                            title="Activar vista para disminución visual">
+                            👁️ Modo Accesible
+                        </button>
                         <button id="btn-open-nueva-notif" class="btn btn-primary btn-sm hidden">
                             <span>➕</span> NUEVA NOTIFICACIÓN
                         </button>
@@ -653,14 +658,7 @@
                         <div class="modal-container modal-xl">
                             <div class="modal-header">
                                 <h2 class="modal-title">📦 Nueva Notificación</h2>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <button type="button" id="btn-toggle-accessibility" class="btn btn-sm"
-                                        style="background: transparent; border: 1px solid currentColor; padding: 4px 8px; font-size: 0.9em;"
-                                        title="Activar vista para disminución visual">
-                                        👁️ Modo Accesible
-                                    </button>
-                                    <button class="btn-close-modal" id="btn-close-modal-nueva-notif">×</button>
-                                </div>
+                                <button class="btn-close-modal" id="btn-close-modal-nueva-notif">×</button>
                             </div>
                             <div class="modal-body">
                                 <form id="form-nueva-notificacion" class="compact-form">
@@ -2275,6 +2273,19 @@
             /* Larger touch targets */
         }
 
+        /* Validation Feedback - Green check for completed required fields */
+        body.accessibility-mode .form-input:required:valid,
+        body.accessibility-mode .form-select:required:valid,
+        body.accessibility-mode .form-textarea:required:valid {
+            border-color: #15803d !important;
+            border-width: 4px !important;
+            background-color: #f0fdf4 !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2315803d' width='24px' height='24px'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 10px center !important;
+            background-size: 24px !important;
+        }
+
         body.accessibility-mode .form-input:focus,
         body.accessibility-mode .form-select:focus,
         body.accessibility-mode .form-textarea:focus {
@@ -2296,13 +2307,40 @@
             margin-bottom: 10px !important;
         }
 
-        /* Hide non-essential visual elements to reduce noise */
+        /* Persistent settings visible but adapted */
         body.accessibility-mode .persistent-settings-bar {
-            display: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 15px !important;
+            padding: 20px !important;
+            background: #f3f4f6 !important;
+            border: 2px dashed #000 !important;
+            margin-bottom: 25px !important;
+        }
+
+        body.accessibility-mode .p-setting {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+        }
+
+        body.accessibility-mode .p-setting label {
+            font-size: 1.2rem !important;
+            color: #000 !important;
+            font-weight: bold !important;
+        }
+
+        body.accessibility-mode .select-mini,
+        body.accessibility-mode .persistent-settings-bar input {
+            font-size: 1.1rem !important;
+            padding: 10px !important;
+            height: auto !important;
+            border: 2px solid #000 !important;
         }
 
         body.accessibility-mode .modal-title {
             font-size: 2.2rem !important;
+            color: #000000 !important;
             text-decoration: underline;
         }
 
@@ -2334,9 +2372,37 @@
 
         /* Modal Header specific */
         body.accessibility-mode .modal-header {
-            background: #eee !important;
+            background: #ffffff !important;
             color: #000 !important;
             border-bottom: 3px solid #000 !important;
+        }
+
+        /* Fix for titles being white in dark mode */
+        body.accessibility-mode h2,
+        body.accessibility-mode h3,
+        body.accessibility-mode .card-title {
+            color: #000 !important;
+        }
+
+        /* Accessibility Toggle Button Style */
+        .btn-accessibility-toggle {
+            background: transparent;
+            border: 1px solid currentColor;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        body.accessibility-mode .btn-accessibility-toggle {
+            background: #fff !important;
+            color: #000 !important;
+            border: 3px solid #000 !important;
+            font-weight: bold !important;
         }
     </style>
 </body>

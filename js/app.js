@@ -76,40 +76,23 @@ const app = {
             btn.parentNode.replaceChild(newBtn, btn);
 
             newBtn.addEventListener('click', (e) => {
-                e.preventDefault(); // Prevent form submission if inside form
+                e.preventDefault();
                 document.body.classList.toggle('accessibility-mode');
                 const newState = document.body.classList.contains('accessibility-mode');
                 localStorage.setItem('sgnd-accessibility-mode', newState);
 
                 if (newState) {
-                    newBtn.style.background = '#fff';
-                    newBtn.style.color = '#000';
-                    newBtn.style.fontWeight = 'bold';
-                    newBtn.innerHTML = '👁️ Desactivar Modo Accesible';
-                    // Force white background on modal content immediately
-                    document.querySelectorAll('.modal-content').forEach(el => {
-                        el.style.backgroundColor = '#ffffff';
-                        el.style.color = '#000000';
-                    });
+                    newBtn.innerHTML = '👁️ Desactivar';
+                    utils.showToast('Modo accesible activado', 'success');
                 } else {
-                    newBtn.style.background = 'transparent';
-                    newBtn.style.color = 'inherit';
-                    newBtn.style.fontWeight = 'normal';
                     newBtn.innerHTML = '👁️ Modo Accesible';
-                    // Restore modal styles
-                    document.querySelectorAll('.modal-content').forEach(el => {
-                        el.style.backgroundColor = '';
-                        el.style.color = '';
-                    });
+                    utils.showToast('Modo accesible desactivado', 'info');
                 }
             });
 
             // Set initial state
             if (isAccessible) {
-                newBtn.style.background = '#fff';
-                newBtn.style.color = '#000';
-                newBtn.style.fontWeight = 'bold';
-                newBtn.innerHTML = '👁️ Desactivar Modo Accesible';
+                newBtn.innerHTML = '👁️ Desactivar';
             }
         }
     },
