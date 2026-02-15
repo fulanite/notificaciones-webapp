@@ -190,6 +190,49 @@ const notifications = {
         });
     },
 
+    // Clear all filters and reload
+    clearFilters() {
+        // Reset filters object (keeping current year)
+        const currentYear = this.filters.year;
+        this.filters = {
+            estado: '',
+            tipo: '',
+            fecha: '',
+            search: '',
+            zona: '',
+            year: currentYear,
+            own_only: false, // Default to TODOS
+            unassigned_only: false,
+            medio_pago: ''
+        };
+
+        // Reset UI elements
+        const searchInput = document.getElementById('search-notificaciones');
+        const filterEstado = document.getElementById('filter-estado');
+        const filterTipo = document.getElementById('filter-tipo');
+        const filterFecha = document.getElementById('filter-fecha');
+        const filterZona = document.getElementById('filter-zona');
+        const filterPropio = document.getElementById('filter-propio');
+        const filterSinFecha = document.getElementById('filter-sin-fecha');
+        const filterMedioPago = document.getElementById('filter-medio-pago');
+
+        if (searchInput) searchInput.value = '';
+        if (filterEstado) filterEstado.value = '';
+        if (filterTipo) filterTipo.value = '';
+        if (filterFecha) filterFecha.value = '';
+        if (filterZona) filterZona.value = '';
+        if (filterPropio) filterPropio.value = 'none';
+        if (filterSinFecha) filterSinFecha.checked = false;
+        if (filterMedioPago) filterMedioPago.value = '';
+
+        // Reset page and reload
+        this.currentPage = 1;
+        this.loadNotifications();
+        this.updateYearBadges();
+
+        utils.showToast('Filtros limpiados', 'info');
+    },
+
     // Switch between years
     setYear(year, btn) {
         this.filters.year = year;
