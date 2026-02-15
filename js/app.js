@@ -18,6 +18,9 @@ const app = {
         // Initialize theme
         this.initTheme();
 
+        // Initialize accessibility
+        this.initAccessibility();
+
         // Setup event listeners
         this.setupEventListeners();
 
@@ -57,6 +60,58 @@ const app = {
         }
 
         utils.showToast(`Tema ${newTheme === 'dark' ? 'oscuro' : 'claro'} activado`, 'info');
+    },
+
+    // Initialize accessibility mode for visual impairment
+    initAccessibility() {
+        const isAccessible = localStorage.getItem('sgnd-accessibility-mode') === 'true';
+        if (isAccessible) {
+            document.body.classList.add('accessibility-mode');
+        }
+
+        const btn = document.getElementById('btn-toggle-accessibility');
+        if (btn) {
+            // Remove old listeners to be safe (though init runs once usually)
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+
+            newBtn.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent form submission if inside form
+                document.body.classList.toggle('accessibility-mode');
+                const newState = document.body.classList.contains('accessibility-mode');
+                localStorage.setItem('sgnd-accessibility-mode', newState);
+
+                if (newState) {
+                    newBtn.style.background = '#fff';
+                    newBtn.style.color = '#000';
+                    newBtn.style.fontWeight = 'bold';
+                    newBtn.innerHTML = '👁️ Desactivar Modo Accesible';
+                    // Force white background on modal content immediately
+                    document.querySelectorAll('.modal-content').forEach(el => {
+                        el.style.backgroundColor = '#ffffff';
+                        el.style.color = '#000000';
+                    });
+                } else {
+                    newBtn.style.background = 'transparent';
+                    newBtn.style.color = 'inherit';
+                    newBtn.style.fontWeight = 'normal';
+                    newBtn.innerHTML = '👁️ Modo Accesible';
+                    // Restore modal styles
+                    document.querySelectorAll('.modal-content').forEach(el => {
+                        el.style.backgroundColor = '';
+                        el.style.color = '';
+                    });
+                }
+            });
+
+            // Set initial state
+            if (isAccessible) {
+                newBtn.style.background = '#fff';
+                newBtn.style.color = '#000';
+                newBtn.style.fontWeight = 'bold';
+                newBtn.innerHTML = '👁️ Desactivar Modo Accesible';
+            }
+        }
     },
 
     // View notification details (Delegate to notifications module)
