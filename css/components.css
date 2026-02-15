@@ -2412,16 +2412,16 @@
 
 /* === Compact Form & Grid === */
 .persistent-settings-bar {
-    background: #eff6ff !important;
-    border: 1.5px solid #bfdbfe !important;
-    border-radius: 12px !important;
-    padding: 10px 20px !important;
-    margin-bottom: 24px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 24px !important;
-    flex-wrap: wrap !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    background: #eff6ff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 10px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .p-setting {

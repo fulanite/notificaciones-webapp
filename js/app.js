@@ -763,6 +763,12 @@ const app = {
             }
         }
 
+        // Always show accessibility toggle for authenticated users
+        const btnAccessibility = document.getElementById('btn-toggle-accessibility');
+        if (btnAccessibility) {
+            btnAccessibility.classList.remove('hidden');
+        }
+
         // --- Mobile Bottom Nav Logic ---
         const mobileNav = document.getElementById('mobile-bottom-nav');
         if (mobileNav) {
