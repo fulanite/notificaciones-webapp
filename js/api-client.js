@@ -185,6 +185,7 @@ const db = {
         if (options.devuelta_por_ujier !== undefined) params.devuelta_por_ujier = options.devuelta_por_ujier;
         if (options.unassigned_only) params.unassigned_only = '1';
         if (options.medio_pago) params.medio_pago = options.medio_pago;
+        if (options.show_deleted) params.show_deleted = options.show_deleted;
 
         const result = await apiClient.get('notificaciones.php', params);
 

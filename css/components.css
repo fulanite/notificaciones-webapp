@@ -2640,3 +2640,17 @@
     padding: 8px 16px;
     border-radius: 8px;
 }
+/* Global Form Validation Feedback (requested by UX) */
+input:required:valid,
+select:required:valid,
+textarea:required:valid,
+.form-input:required:valid,
+.form-select:required:valid,
+.form-textarea:required:valid {
+    border-color: #15803d !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2315803d' width='24px' height='24px'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 10px center !important;
+    background-size: 20px !important;
+    padding-right: 35px !important; /* Ensure text doesn't overlap icon */
+}
