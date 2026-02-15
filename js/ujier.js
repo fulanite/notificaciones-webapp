@@ -416,9 +416,6 @@ const ujier = {
                             <div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic; line-height: 1.2;">
                                 ⚖️ ${assignment.caratula || 'Sin carátula'}
                             </div>
-                            <div style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">
-                                🏠 ${assignment.domicilio || '-'}
-                            </div>
                         </div>
                     ` : ''}
 
@@ -1977,12 +1974,28 @@ const ujier = {
             html += `
                 <div class="assignment-card historial-card stagger-item" onclick="ujier.openDiligencia('${visit.notificacion_id}')">
                     <div class="historial-icon">${statusIcons[status] || '📄'}</div>
-                    <div class="assignment-info">
+                    <div class="assignment-info" style="flex: 1; padding-right: 25px;">
                         <div class="historial-header">
                             <span class="historial-fecha">${this.groupByDateEnabledHistory ? utils.formatTime(visit.fecha) : utils.formatDateTime(visit.fecha)}</span>
                         </div>
-                        <div class="assignment-address" style="font-size: 1.15rem; line-height: 1.3; font-weight: 700; color: var(--primary);">🏠 ${visit.domicilio || '-'}</div>
-                        <div class="assignment-recipient" style="font-size: 0.95rem; line-height: 1.2; color: var(--text-muted); margin-top: 2px;">👤 <strong>${visit.destinatario_nombre || utils.getSpecialDestinationText(visit) || '-'}</strong></div>
+                        
+                        <div class="assignment-address" style="font-size: 1.2rem; line-height: 1.25; font-weight: 800; color: var(--primary);">
+                             ${utils.isSpecialDestination(visit.destinatario_especial) ? `⭐ ${utils.getSpecialDestinationText(visit)}` : `🏠 ${visit.domicilio || '-'}`}
+                        </div>
+
+                        ${utils.isSpecialDestination(visit.destinatario_especial) ? `
+                            <div class="assignment-metadata-special" style="margin-top: 4px;">
+                                <div style="font-size: 0.9rem; font-weight: 800; color: #1e293b; margin-bottom: 2px;">
+                                    📄 EXP: ${visit.n_expediente || '-'}
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; line-height: 1.2;">
+                                    ⚖️ ${visit.caratula || 'Sin carátula'}
+                                </div>
+                            </div>
+                        ` : `
+                             <div class="assignment-recipient" style="font-size: 0.95rem; line-height: 1.2; color: var(--text-muted); margin-top: 2px;">👤 <strong>${visit.destinatario_nombre || '-'}</strong></div>
+                             ${visit.caratula ? `<div class="assignment-caratula" style="font-size: 0.8rem; margin-top: 4px; color: var(--text-muted);">📄 ${visit.caratula}</div>` : ''}
+                        `}
                         
                         ${visit.foto_url ? `
                             <div class="historial-photos" style="display: flex; gap: 8px; margin-top: 8px;">
@@ -2170,18 +2183,31 @@ const ujier = {
                         <span class="reference-badge-zona">${visit.zona || 'SIN ZONA'}</span>
                     </div>
                     <div class="reference-content">
-                        <div class="reference-address">
-                            <span>📍</span>
-                            ${visit.domicilio || 'Sin domicilio registrado'}
+                        <div class="reference-address" style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 6px;">
+                            ${utils.isSpecialDestination(visit.destinatario_especial) ? `⭐ ${utils.getSpecialDestinationText(visit)}` : `📍 ${visit.domicilio || '-'}`}
                         </div>
+
+                        ${utils.isSpecialDestination(visit.destinatario_especial) ? `
+                            <div class="assignment-metadata-special" style="margin-bottom: 8px;">
+                                <div style="font-size: 0.9rem; font-weight: 800; color: #1e293b; margin-bottom: 2px;">
+                                    📄 EXP: ${visit.n_expediente || '-'}
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; line-height: 1.2;">
+                                    ⚖️ ${visit.caratula || 'Sin carátula'}
+                                </div>
+                            </div>
+                        ` : ''}
+
                         <div class="reference-info-row">
                             <span>👤 Destinatario:</span>
-                            <strong>${visit.destinatario_nombre || utils.getSpecialDestinationText(visit) || '-'}</strong>
+                            <strong>${visit.destinatario_nombre || '-'}</strong>
                         </div>
-                        <div class="reference-info-row">
-                            <span>⚖️ Exp:</span>
-                            <strong>${visit.n_expediente || '-'}</strong>
-                        </div>
+                        ${!utils.isSpecialDestination(visit.destinatario_especial) ? `
+                            <div class="reference-info-row">
+                                <span>⚖️ Exp:</span>
+                                <strong>${visit.n_expediente || '-'}</strong>
+                            </div>
+                        ` : ''}
                         ${visit.observaciones ? `
                             <div class="reference-obs">
                                 ${visit.observaciones}
