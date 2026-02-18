@@ -278,10 +278,17 @@ const bulkEditor = {
                 const chunk = ids.slice(i, i + chunkSize);
                 const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');
                 await Promise.all(chunk.map(id => {
+                    if (newStatus === 'pendiente') {
+                        return db.updateNotification(id, {
+                            resultado_diligencia: null,
+                            fecha_diligencia: null,
+                            estado: 'pendiente'
+                        });
+                    }
+
                     // Determinar el estado general (workflow) basado en el resultado específico
                     let highLevelEstado = 'entregado'; // Por defecto para resultados finales
-                    if (newStatus === 'pendiente') highLevelEstado = 'pendiente';
-                    else if (newStatus === 'pre_aviso') highLevelEstado = 'pre_aviso';
+                    if (newStatus === 'pre_aviso') highLevelEstado = 'pre_aviso';
                     else if (newStatus === 'diligenciada') highLevelEstado = 'diligenciada';
 
                     return db.updateNotification(id, {
