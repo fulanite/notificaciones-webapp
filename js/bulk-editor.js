@@ -277,12 +277,19 @@ const bulkEditor = {
             for (let i = 0; i < ids.length; i += chunkSize) {
                 const chunk = ids.slice(i, i + chunkSize);
                 const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');
-                await Promise.all(chunk.map(id => db.updateNotification(id, {
-                    resultado_diligencia: newStatus,
-                    fecha_diligencia: fechaActual,
-                    // If we are forcing a result, we might also want to update the state if it was 'pendiente'
-                    estado: newStatus === 'pre_aviso' ? 'pre_aviso' : (newStatus === 'diligenciada' ? 'diligenciada' : (newStatus === 'atiende' || newStatus === 'entregado' ? 'entregado' : 'pendiente'))
-                })));
+                await Promise.all(chunk.map(id => {
+                    // Determinar el estado general (workflow) basado en el resultado específico
+                    let highLevelEstado = 'entregado'; // Por defecto para resultados finales
+                    if (newStatus === 'pendiente') highLevelEstado = 'pendiente';
+                    else if (newStatus === 'pre_aviso') highLevelEstado = 'pre_aviso';
+                    else if (newStatus === 'diligenciada') highLevelEstado = 'diligenciada';
+
+                    return db.updateNotification(id, {
+                        resultado_diligencia: newStatus,
+                        fecha_diligencia: fechaActual,
+                        estado: highLevelEstado
+                    });
+                }));
             }
 
             utils.showToast(`${count} notificaciones actualizadas correctamente`, 'success');

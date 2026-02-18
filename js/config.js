@@ -39,6 +39,7 @@ const CONFIG = {
 
     // Result Options
     RESULT_OPTIONS: {
+        pendiente: 'Pendiente',
         atiende: 'Atiende',
         entregado: 'Entregado',
         no_atiende: 'No atiende',
