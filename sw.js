@@ -3,11 +3,13 @@
  * Version: 43.13
  */
 
-const CACHE_NAME = 'sgnd-cache-v113';
+const CACHE_NAME = 'sgnd-cache-v114';
 const OFFLINE_URL = '/offline.html';
 
-// Assets to cache (excluding index.html which should always be fresh)
+// Assets to cache
 const ASSETS_TO_CACHE = [
+    '/',
+    '/index.html',
     '/manifest.json',
     '/css/variables.css',
     '/css/base.css',
@@ -94,15 +96,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // NEVER cache index.html - always fetch fresh to get latest asset versions
-    if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname.endsWith('index.html')) {
-        event.respondWith(
-            fetch(request)
-                .catch(() => caches.match('/offline.html'))
-        );
-        return;
-    }
-
     // Skip API calls - always go to network to get fresh data
     if (url.pathname.includes('/api/')) {
         event.respondWith(
@@ -117,8 +110,8 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // For HTML pages - network first, then cache
-    if (request.headers.get('accept')?.includes('text/html')) {
+    // Network-first for HTML pages and root
+    if (request.headers.get('accept')?.includes('text/html') || url.pathname === '/' || url.pathname.endsWith('index.html')) {
         event.respondWith(
             fetch(request)
                 .then((response) => {
@@ -132,7 +125,15 @@ self.addEventListener('fetch', (event) => {
                 .catch(() => {
                     return caches.match(request)
                         .then((cachedResponse) => {
-                            return cachedResponse || caches.match('/index.html');
+                            if (cachedResponse) return cachedResponse;
+                            return caches.match('/index.html')
+                                .then(idxResponse => {
+                                    return idxResponse || new Response('Offline - No cache available', {
+                                        status: 503,
+                                        statusText: 'Service Unavailable',
+                                        headers: new Headers({ 'Content-Type': 'text/plain' })
+                                    });
+                                });
                         });
                 })
         );
@@ -166,6 +167,10 @@ self.addEventListener('fetch', (event) => {
                             });
                         }
                         return response;
+                    })
+                    .catch(() => {
+                        // Crucial: always return a Response, never undefined/reject to avoid Safari crash
+                        return new Response('', { status: 408, statusText: 'Request Timeout' });
                     });
             })
     );
