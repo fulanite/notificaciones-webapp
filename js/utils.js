@@ -416,6 +416,17 @@ const utils = {
         return false;
     },
 
+    // Map raw zone values to their visual display labels.
+    // Only the label changes; the underlying value stored in the DB stays the same.
+    formatZoneLabel(zone) {
+        if (!zone) return zone;
+        const map = {
+            'Fuera de Radio NORTE - Mandamientos': 'Turno permanente norte mandamiento',
+            'Fuera de Radio SUR - Mandamientos': 'Turno permanente sur mandamiento'
+        };
+        return map[zone] ?? zone;
+    },
+
     // Show Permission Help Modal
     showPermissionHelp(type) {
         return new Promise((resolve, reject) => {

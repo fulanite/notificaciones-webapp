@@ -178,7 +178,7 @@ const devoluciones = {
                     <div class="zone-badge">${stats.count}</div>
                 </div>
                 <div class="zone-card-body">
-                    <h3 class="zone-name">${stats.name}</h3>
+                    <h3 class="zone-name">${utils.formatZoneLabel(stats.name)}</h3>
                     <p class="zone-desc">Pendientes de devolución</p>
                 </div>
                 <div class="zone-card-footer">
@@ -197,7 +197,7 @@ const devoluciones = {
             (n.zona || 'SIN_ZONA') === id
         );
 
-        document.getElementById('current-zone-title').textContent = `Zona: ${name}`;
+        document.getElementById('current-zone-title').textContent = `Zona: ${utils.formatZoneLabel(name)}`;
         document.getElementById('devoluciones-zones-grid').classList.add('hidden');
         document.getElementById('devoluciones-list-container').classList.remove('hidden');
 

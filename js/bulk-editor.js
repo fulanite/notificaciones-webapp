@@ -114,7 +114,7 @@ const bulkEditor = {
 
             if (filterZona && zonasResp.data) {
                 filterZona.innerHTML = '<option value="">🌎 Todas las zonas</option>' +
-                    zonasResp.data.map(z => `<option value="${z}">${z.toUpperCase()}</option>`).join('');
+                    zonasResp.data.map(z => `<option value="${z}">${utils.formatZoneLabel(z).toUpperCase()}</option>`).join('');
             }
         } catch (e) {
             console.error('Error loading bulk editor filters:', e);
