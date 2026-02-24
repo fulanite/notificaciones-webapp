@@ -792,6 +792,17 @@
     z-index: 5;
 }
 
+.zone-premium-card.zone-mandamiento {
+    border-left: 4px solid var(--primary-500);
+    background: linear-gradient(145deg, var(--bg-card), rgba(59, 130, 246, 0.05));
+}
+
+.zone-premium-card.zone-cedula {
+    border-left: 4px solid #10b981;
+    /* green-500 */
+    background: linear-gradient(145deg, var(--bg-card), rgba(16, 185, 129, 0.05));
+}
+
 .zone-icon {
     font-size: 2rem;
     /* Smaller icon */

@@ -93,7 +93,7 @@ try {
             $stmt->execute([
                 $id,
                 Database::sanitize($data['email']),
-                Database::sanitize($data['username'] ?? null),
+                empty($data['username']) ? null : Database::sanitize($data['username']),
                 Database::sanitize($data['dni'] ?? ''),
                 Database::sanitize($data['nombre']),
                 Database::sanitize($data['rol']),
@@ -136,9 +136,9 @@ try {
                 $updates[] = "nombre = ?";
                 $params[] = Database::sanitize($data['nombre']);
             }
-            if (isset($data['username'])) {
+            if (array_key_exists('username', $data)) {
                 $updates[] = "username = ?";
-                $params[] = Database::sanitize($data['username']);
+                $params[] = empty($data['username']) ? null : Database::sanitize($data['username']);
             }
             if (isset($data['rol'])) {
                 $updates[] = "rol = ?";

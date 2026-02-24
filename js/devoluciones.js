@@ -171,8 +171,15 @@ const devoluciones = {
             return;
         }
 
-        grid.innerHTML = filtered.map(([id, stats]) => `
-            <div class="zone-premium-card clickable-card" onclick="devoluciones.openZone('${id}', '${stats.name}')">
+        grid.innerHTML = filtered.map(([id, stats]) => {
+            let zoneClass = '';
+            if (stats.name.toLowerCase().includes('mandamiento')) {
+                zoneClass = 'zone-mandamiento';
+            } else if (stats.name.toLowerCase().includes('cédula') || stats.name.toLowerCase().includes('cedula')) {
+                zoneClass = 'zone-cedula';
+            }
+            return `
+            <div class="zone-premium-card clickable-card ${zoneClass}" onclick="devoluciones.openZone('${id}', '${stats.name}')">
                 <div class="zone-card-header">
                     <div class="zone-icon">📍</div>
                     <div class="zone-badge">${stats.count}</div>
@@ -185,7 +192,7 @@ const devoluciones = {
                     <span>Ver lista para retorno →</span>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     },
 
     openZone(id, name) {
