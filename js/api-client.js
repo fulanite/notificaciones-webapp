@@ -4,10 +4,10 @@
  */
 
 // API Base URL - Your Hostinger domain
-// Full URL: https://darkblue-caribou-343892.hostingersite.com/api
+// Full URL: https://sgnd.click/api
 // API Base URL - Configuración dinámica para local/producción
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'https://darkblue-caribou-343892.hostingersite.com/api'
+    ? 'https://sgnd.click/api'
     : '/api';
 
 // Global API client instance

@@ -33,7 +33,8 @@ $allowed_origins = [
     'http://localhost',
     'http://localhost:3000',
     'https://darkblue-caribou-343892.hostingersite.com',
-    'http://darkblue-caribou-343892.hostingersite.com',
+    'https://sgnd.click',
+    'http://sgnd.click',
 ];
 
 // Set CORS headers

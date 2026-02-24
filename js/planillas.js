@@ -222,7 +222,7 @@ const planillas = {
             const renderRows = (itemList) => {
                 itemList.forEach(item => {
                     const row = `
-                        <tr>
+                        <tr class="row-hover-effect" style="cursor: pointer;" onclick="if(window.notifications) notifications.viewDetails('${item.id}')" title="Click para ver/editar detalles">
                             <td style="padding-left: 20px;">${zoneIndex++}</td>
                             <td>${item.n_expediente || ''}</td>
                             <td>${item.caratula || ''}</td>
