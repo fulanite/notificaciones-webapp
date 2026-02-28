@@ -202,11 +202,9 @@ try {
 
         case 'by_hour_visits':
         case 'by_hour_loads':
-            // Calculate dynamic offset between PHP time (local Argentina) and MySQL session time
-            // This ensures charts show local Argentina time regardless of server location
+            // Detect dynamic offset ONLY for loads (as visits are already correct per user)
             $timeCheck = $pdo->query("SELECT HOUR(NOW()) as mysql_h, " . date('H') . " as php_h")->fetch();
             $offset = intval($timeCheck['php_h'] ?? 0) - intval($timeCheck['mysql_h'] ?? 0);
-
             // Adjust offset if it's too large due to date change (e.g. 23 vs 02)
             if ($offset > 12)
                 $offset -= 24;
@@ -216,12 +214,15 @@ try {
             $column = ($type === 'by_hour_visits') ? 'fecha_diligencia' : 'fecha_carga';
             $whereYear = ($type === 'by_hour_visits') ? 'YEAR(fecha_diligencia) = :year AND fecha_diligencia IS NOT NULL' : 'YEAR(fecha_carga) = :year';
 
+            // If it's visits, we use raw hour ($offset = 0). If loads, use calculated offset.
+            $appliedOffset = ($type === 'by_hour_visits') ? 0 : $offset;
+
             // Special case: Migrated data is almost certainly in UTC (from Glide CSV)
             // If the database is NOT already in UTC, we might need a fixed shift for those records.
             // But the dynamic $offset approach is safer for live data.
             $stmt = $pdo->prepare("
                 SELECT 
-                    HOUR(DATE_ADD($column, INTERVAL $offset HOUR)) as hour,
+                    HOUR(DATE_ADD($column, INTERVAL $appliedOffset HOUR)) as hour,
                     COUNT(*) as count
                 FROM notificaciones
                 WHERE $whereYear AND (eliminada = 0 OR eliminada IS NULL)
