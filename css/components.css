@@ -150,6 +150,14 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
+.form-select-sm {
+    padding-top: var(--space-1) !important;
+    padding-bottom: var(--space-1) !important;
+    height: 36px !important;
+    font-size: 0.875rem !important;
+    line-height: 1.2 !important;
+}
+
 .form-input::placeholder {
     color: var(--text-muted);
 }
