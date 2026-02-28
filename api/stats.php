@@ -201,35 +201,38 @@ try {
             break;
 
         case 'by_hour_visits':
+            $stmt = $pdo->prepare("
+                    SELECT 
+                        HOUR(fecha) as hour,
+                        COUNT(*) as count
+                    FROM visitas
+                    WHERE YEAR(fecha) = :year
+                    GROUP BY hour
+                    ORDER BY hour
+                ");
+            $stmt->execute(['year' => $year]);
+            Database::sendResponse($stmt->fetchAll());
+            break;
+
         case 'by_hour_loads':
-            // Detect dynamic offset ONLY for loads (as visits are already correct per user)
+            // Detect dynamic offset for loads (assumed to be based on server time)
             $timeCheck = $pdo->query("SELECT HOUR(NOW()) as mysql_h, " . date('H') . " as php_h")->fetch();
             $offset = intval($timeCheck['php_h'] ?? 0) - intval($timeCheck['mysql_h'] ?? 0);
-            // Adjust offset if it's too large due to date change (e.g. 23 vs 02)
             if ($offset > 12)
                 $offset -= 24;
             if ($offset < -12)
                 $offset += 24;
 
-            $column = ($type === 'by_hour_visits') ? 'fecha_diligencia' : 'fecha_carga';
-            $whereYear = ($type === 'by_hour_visits') ? 'YEAR(fecha_diligencia) = :year AND fecha_diligencia IS NOT NULL' : 'YEAR(fecha_carga) = :year';
-
-            // If it's visits, we use raw hour ($offset = 0). If loads, use calculated offset.
-            $appliedOffset = ($type === 'by_hour_visits') ? 0 : $offset;
-
-            // Special case: Migrated data is almost certainly in UTC (from Glide CSV)
-            // If the database is NOT already in UTC, we might need a fixed shift for those records.
-            // But the dynamic $offset approach is safer for live data.
             $stmt = $pdo->prepare("
-                SELECT 
-                    HOUR(DATE_ADD($column, INTERVAL $appliedOffset HOUR)) as hour,
-                    COUNT(*) as count
-                FROM notificaciones
-                WHERE $whereYear AND (eliminada = 0 OR eliminada IS NULL)
-                GROUP BY hour
-                ORDER BY hour
-            ");
-            $stmt->execute(['year' => $year]);
+                    SELECT 
+                        HOUR(DATE_ADD(fecha_carga, INTERVAL :offset HOUR)) as hour,
+                        COUNT(*) as count
+                    FROM notificaciones
+                    WHERE YEAR(fecha_carga) = :year AND (eliminada = 0 OR eliminada IS NULL)
+                    GROUP BY hour
+                    ORDER BY hour
+                ");
+            $stmt->execute(['year' => $year, 'offset' => $offset]);
             Database::sendResponse($stmt->fetchAll());
             break;
 
