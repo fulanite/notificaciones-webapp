@@ -67,10 +67,22 @@ try {
             break;
 
         case 'by_result':
-            // Statistics by result (detailed)
+            // Statistics by result (detailed) with normalization
             $stmt = $pdo->prepare("
                 SELECT 
-                    COALESCE(resultado_diligencia, 'Sin resultado') as result,
+                    CASE 
+                        WHEN resultado_diligencia IS NULL THEN 'Sin resultado'
+                        WHEN LOWER(TRIM(REPLACE(resultado_diligencia, '_', ' '))) = 'domicilio inexistente' THEN 'Domicilio Inexistente'
+                        WHEN LOWER(TRIM(REPLACE(resultado_diligencia, '_', ' '))) = 'atiende' THEN 'Atiende'
+                        WHEN LOWER(TRIM(REPLACE(resultado_diligencia, '_', ' '))) = 'no atiende' THEN 'No Atiende'
+                        WHEN LOWER(TRIM(REPLACE(resultado_diligencia, '_', ' '))) = 'entregada' THEN 'Entregada'
+                        WHEN LOWER(TRIM(REPLACE(resultado_diligencia, '_', ' '))) = 'pre aviso' THEN 'Pre Aviso'
+                        WHEN LOWER(TRIM(REPLACE(resultado_diligencia, '_', ' '))) = 'estrados' THEN 'Estrados'
+                        WHEN LOWER(TRIM(REPLACE(resultado_diligencia, '_', ' '))) = 'diligenciador ausente' THEN 'Diligenciador Ausente'
+                        WHEN LOWER(TRIM(REPLACE(resultado_diligencia, '_', ' '))) = 'traslado' THEN 'Traslado'
+                        WHEN LOWER(TRIM(REPLACE(resultado_diligencia, '_', ' '))) = 'fallecido' THEN 'Fallecido'
+                        ELSE TRIM(REPLACE(resultado_diligencia, '_', ' '))
+                    END as result,
                     COUNT(*) as count,
                     ROUND(
                         COUNT(*) * 100.0 / 
@@ -81,7 +93,7 @@ try {
                 WHERE YEAR(fecha_carga) = :year 
                 AND resultado_diligencia IS NOT NULL 
                 AND (eliminada = 0 OR eliminada IS NULL)
-                GROUP BY resultado_diligencia
+                GROUP BY result
                 ORDER BY count DESC
             ");
             $stmt->execute(['year' => $year, 'year2' => $year]);
@@ -189,16 +201,18 @@ try {
             break;
 
         case 'by_hour_visits':
-            // Statistics by hour of day for VISITS (fecha_diligencia - ujier activity)
+            // Statistics by hour of day for VISITS (fecha_diligencia)
+            // Adjusting for UTC to Argentina (-3h) shift if detected
+            // We use DATE_SUB because fecha_diligencia is DATETIME (no TZ awareness in MySQL for this type)
             $stmt = $pdo->prepare("
                 SELECT 
-                    HOUR(fecha_diligencia) as hour,
+                    HOUR(DATE_SUB(fecha_diligencia, INTERVAL 3 HOUR)) as hour,
                     COUNT(*) as count
                 FROM notificaciones
                 WHERE YEAR(fecha_diligencia) = :year 
                 AND fecha_diligencia IS NOT NULL 
                 AND (eliminada = 0 OR eliminada IS NULL)
-                GROUP BY HOUR(fecha_diligencia)
+                GROUP BY hour
                 ORDER BY hour
             ");
             $stmt->execute(['year' => $year]);
@@ -206,14 +220,14 @@ try {
             break;
 
         case 'by_hour_loads':
-            // Statistics by hour of day for LOADS (fecha_carga - administrative activity)
+            // Statistics by hour of day for LOADS (fecha_carga)
             $stmt = $pdo->prepare("
                 SELECT 
-                    HOUR(fecha_carga) as hour,
+                    HOUR(DATE_SUB(fecha_carga, INTERVAL 3 HOUR)) as hour,
                     COUNT(*) as count
                 FROM notificaciones
                 WHERE YEAR(fecha_carga) = :year AND (eliminada = 0 OR eliminada IS NULL)
-                GROUP BY HOUR(fecha_carga)
+                GROUP BY hour
                 ORDER BY hour
             ");
             $stmt->execute(['year' => $year]);
