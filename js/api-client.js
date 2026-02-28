@@ -407,5 +407,16 @@ const db = {
             user_id: userId,
             date: date
         });
+    },
+
+    // ==================== SETTINGSContent ====================
+    async getSettings() {
+        if (!apiClient) return { data: {}, error: null };
+        return apiClient.get('settings.php');
+    },
+
+    async updateSettings(settings) {
+        if (!apiClient) return { data: null, error: null };
+        return apiClient.post('settings.php', settings);
     }
 };

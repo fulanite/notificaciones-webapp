@@ -861,8 +861,17 @@ const notifications = {
                 app.handleTroquelChange(troquelSelector.value);
             }
 
-            document.getElementById('medio-pago').value = data.medio_pago || '';
-            document.getElementById('costo').value = data.costo || '';
+            const medioPago = data.medio_pago || 'gratuito';
+            document.getElementById('medio-pago').value = medioPago;
+            document.getElementById('costo').value = data.costo || '0';
+
+            // Show/hide costo group during edit based on loaded value
+            const costoGroup = document.getElementById('grupo-costo');
+            if (medioPago !== 'gratuito') {
+                costoGroup?.classList.remove('hidden');
+            } else {
+                costoGroup?.classList.add('hidden');
+            }
             document.getElementById('asignado-a').value = data.asignado_a || '';
             document.getElementById('observaciones-iniciales').value = data.observaciones_iniciales || '';
 

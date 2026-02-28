@@ -2739,3 +2739,46 @@ textarea:required:valid,
     font-weight: 700;
 }
 
+
+/* Coordinator Settings Bar */
+.coordinator-settings-bar {
+    background: rgba(var(--primary-rgb), 0.05);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-6);
+    margin-bottom: var(--space-4);
+    border: 1px dashed rgba(var(--primary-rgb), 0.3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    transition: var(--transition-normal);
+}
+
+.coordinator-settings-bar:hover {
+    background: rgba(var(--primary-rgb), 0.08);
+    border-color: rgba(var(--primary-rgb), 0.5);
+}
+
+.settings-input-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--bg-card);
+    padding: 4px 8px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.settings-input-group input {
+    width: 80px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-weight: 700;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.settings-input-group input:focus {
+    outline: none;
+}
+

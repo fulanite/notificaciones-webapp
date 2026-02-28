@@ -4,6 +4,7 @@
 
 const app = {
     currentView: 'lista-notificaciones',
+    appSettings: {},
 
     // Initialize application
     async init() {
@@ -577,6 +578,14 @@ const app = {
                 costoInput.value = '0';
             } else {
                 costoGroup?.classList.remove('hidden');
+                // Auto-fill with fixed value if available and not already set
+                // Only auto-fill if the current value is 0 or empty, to avoid overwriting existing data when editing
+                if (this.appSettings && this.appSettings.valor_troquel) {
+                    const currentVal = parseFloat(costoInput.value) || 0;
+                    if (currentVal === 0) {
+                        costoInput.value = this.appSettings.valor_troquel;
+                    }
+                }
             }
         });
 
@@ -594,6 +603,7 @@ const app = {
 
             // Reset for new entry
             document.getElementById('form-nueva-notificacion')?.reset();
+            document.getElementById('grupo-costo')?.classList.add('hidden');
             notifications.editingId = null;
             const modalTitle = modalNuevaNotif?.querySelector('.modal-title');
             if (modalTitle) modalTitle.textContent = '📦 Nueva Notificación';
@@ -898,6 +908,7 @@ const app = {
             await notifications.loadUjieres();
             planillas.init();
             reports.init();
+            await this.loadSettings(); // Cargar configuración
         }
 
         // Devoluciones: Solo admin y coordinador
@@ -1393,6 +1404,51 @@ const app = {
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = '🔒 Cambiar Contraseña';
+        }
+    },
+
+    // Load application settings
+    async loadSettings() {
+        try {
+            const { data, error } = await db.getSettings();
+            if (!error && data) {
+                this.appSettings = data;
+
+                // Si es coordinador o admin, mostrar barra y popular input
+                const rol = auth.currentUser?.rol ? auth.currentUser.rol.toLowerCase() : '';
+                if (rol === 'coordinador' || rol === 'admin') {
+                    const settingInput = document.getElementById('setting-valor-troquel');
+                    if (settingInput && data.valor_troquel) {
+                        settingInput.value = data.valor_troquel;
+                    }
+                    document.getElementById('coordinator-settings-bar')?.classList.remove('hidden');
+                }
+            }
+        } catch (e) {
+            console.error('Error loading settings:', e);
+        }
+    },
+
+    // Update troquel price setting
+    async updateTroquelSetting() {
+        const settingInput = document.getElementById('setting-valor-troquel');
+        if (!settingInput) return;
+
+        const value = settingInput.value;
+        if (value === '' || isNaN(value)) {
+            utils.showToast('Por favor ingresá un valor válido', 'warning');
+            return;
+        }
+
+        utils.showLoading('Guardando configuración...');
+        const { error } = await db.updateSettings({ valor_troquel: value });
+        utils.hideLoading();
+
+        if (error) {
+            utils.showToast('Error al guardar: ' + error, 'error');
+        } else {
+            this.appSettings.valor_troquel = value;
+            utils.showToast(`Valor fijo del troquel actualizado a: $${value}`, 'success');
         }
     }
 };
