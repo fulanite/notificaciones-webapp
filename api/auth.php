@@ -119,6 +119,13 @@ try {
 
             if ($user) {
                 $user['password_reset_required'] = (bool) ($user['password_reset_required'] ?? false);
+
+                // RESTORE SESSION if found
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_nombre'] = $user['nombre'];
+                $_SESSION['user_rol'] = $user['rol'];
+                $_SESSION['user_dni'] = $user['dni'];
+
                 Database::sendResponse($user);
             } else {
                 Database::sendError('User not found', 404);

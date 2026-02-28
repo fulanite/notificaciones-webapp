@@ -42,7 +42,7 @@ try {
         case 'POST':
         case 'PUT':
             // Only Coordinator and Admin can update settings
-            $userRol = $_SESSION['user_rol'] ?? '';
+            $userRol = strtolower($_SESSION['user_rol'] ?? '');
             if ($userRol !== 'coordinador' && $userRol !== 'admin') {
                 Database::sendError('No tenés permisos para cambiar la configuración', 403);
             }
