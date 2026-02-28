@@ -20,7 +20,7 @@ $pdo = $db->getConnection();
 echo "<pre>Starting Zone Rename Migration...\n";
 
 $migrations = [
-    'Fuera de Radio NORTE - Mandamientos' => 'Turno permanente norte mandamiento',
+    'Fuera de Radio NORTE - Mandamientos' => 'Turno permanente norte mandamientos',
     'Fuera de Radio SUR - Mandamientos' => 'Turno permanente sur mandamientos'
 ];
 
@@ -28,11 +28,16 @@ $total_updated = 0;
 
 try {
     foreach ($migrations as $old => $new) {
-        // Also fix variations with 'Mandamiento' (singular)
+        // Handle transitions from:
+        // 1. Original: Fuera de Radio ... Mandamientos
+        // 2. Original singular: Fuera de Radio ... Mandamiento
+        // 3. New singular (if already run): Turno permanente ... mandamiento
         $old_variations = [
             $old,
             str_replace('Mandamientos', 'Mandamiento', $old),
-            str_replace('Mandamientos', 'Mandamientos', $old) // no-op
+            str_replace('Mandamientos', 'Mandamientos', $old),
+            'Turno permanente norte mandamiento', // Case-specific from previous run
+            'Turno permanente sur mandamiento'
         ];
 
         foreach (array_unique($old_variations) as $old_variant) {
