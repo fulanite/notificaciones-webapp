@@ -94,9 +94,9 @@ const planillas = {
                 'Urgente SUR - Cédulas', 'Urgente SUR - Mandamientos',
                 'Urgente NORTE - Cédulas', 'Urgente NORTE - Mandamientos'
             ],
-            'Fuera de Radio': [
-                'Fuera de Radio NORTE - Cédulas', 'Fuera de Radio NORTE - Mandamientos',
-                'Fuera de Radio SUR - Cédulas', 'Fuera de Radio SUR - Mandamientos'
+            'Turno Permanente': [
+                'Fuera de Radio NORTE - Cédulas', 'Turno permanente norte mandamiento',
+                'Fuera de Radio SUR - Cédulas', 'Turno permanente sur mandamientos'
             ]
         };
 

@@ -422,7 +422,7 @@ const utils = {
         if (!zone) return zone;
         const map = {
             'Fuera de Radio NORTE - Mandamientos': 'Turno permanente norte mandamiento',
-            'Fuera de Radio SUR - Mandamientos': 'Turno permanente sur mandamiento'
+            'Fuera de Radio SUR - Mandamientos': 'Turno permanente sur mandamientos'
         };
         return map[zone] ?? zone;
     },
