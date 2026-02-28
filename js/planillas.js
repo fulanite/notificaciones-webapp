@@ -226,7 +226,6 @@ const planillas = {
                             <td style="padding-left: 20px; color: var(--text-muted); font-size: 0.85rem;">${zoneIndex++}</td>
                             <td data-label="Expediente"><strong class="cell-primary">${item.n_expediente || 'S/N'}</strong></td>
                             <td data-label="Carátula" title="${item.caratula || ''}">${utils.truncate(item.caratula || '-', 30)}</td>
-                            <td data-label="Origen" title="${item.origen || ''}">${utils.truncate(item.origen || '-', 25)}</td>
                             <td data-label="Tipo" style="font-size: 0.85rem; color: var(--text-secondary);">${item.tipo_notificacion || ''}</td>
                             <td data-label="Destinatario" class="cell-recipient">${item.destinatario_nombre || utils.getSpecialDestinationText(item) || '-'}</td>
                             <td data-label="Domicilio" title="${item.domicilio}">${utils.truncate(item.domicilio, 35)}</td>

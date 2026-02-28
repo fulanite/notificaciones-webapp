@@ -2738,37 +2738,51 @@ textarea:required:valid,
 }
 
 /* Premium columns widths for preview */
+#tabla-planillas-preview th,
+#tabla-planillas-preview td {
+    padding: var(--space-3) var(--space-2) !important;
+    white-space: nowrap;
+}
+
 #tabla-planillas-preview th:nth-child(2),
 #tabla-planillas-preview td:nth-child(2) {
-    width: 120px;
+    width: 100px;
     /* Expediente */
-}
-
-#tabla-planillas-preview th:nth-child(6),
-#tabla-planillas-preview td:nth-child(6) {
-    max-width: 180px;
-    /* Destinatario */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-#tabla-planillas-preview th:nth-child(7),
-#tabla-planillas-preview td:nth-child(7) {
-    max-width: 240px;
-    /* Domicilio */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 #tabla-planillas-preview th:nth-child(3),
 #tabla-planillas-preview td:nth-child(3) {
-    max-width: 250px;
+    max-width: 180px;
     /* Caratula */
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+#tabla-planillas-preview th:nth-child(4),
+#tabla-planillas-preview td:nth-child(4) {
+    width: 80px;
+    /* Tipo */
+    font-size: 0.75rem;
+}
+
+#tabla-planillas-preview th:nth-child(5),
+#tabla-planillas-preview td:nth-child(5) {
+    max-width: 150px;
+    /* Destinatario */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#tabla-planillas-preview th:nth-child(6),
+#tabla-planillas-preview td:nth-child(6) {
+    max-width: 200px;
+    /* Domicilio */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#tabla-planillas-preview th:last-child {
+    width: 60px;
 }
 
 .badge-mini {
