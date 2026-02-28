@@ -568,6 +568,39 @@ try {
                         ]);
                         break;
 
+                    case 'revert_return':
+                        // Only Coordinator and Admin can revert return
+                        $userRol = strtolower($_SESSION['user_rol'] ?? '');
+                        if ($userRol !== 'coordinador' && $userRol !== 'admin') {
+                            Database::sendError('No tenés permisos para esta acción', 403);
+                        }
+
+                        $stmt = $pdo->prepare("
+                            UPDATE notificaciones SET
+                                devuelta_por_ujier = 0,
+                                fecha_devolucion = NULL,
+                                updated_at = NOW(),
+                                updated_by = ?
+                            WHERE id = ?
+                        ");
+                        $stmt->execute([
+                            $data['user_id'] ?? ($_SESSION['user_id'] ?? 'system'),
+                            $data['id']
+                        ]);
+
+                        // Log action
+                        $logger->log([
+                            'usuario_id' => $_SESSION['user_id'] ?? null,
+                            'usuario_nombre' => $_SESSION['user_nombre'] ?? 'Sistema',
+                            'usuario_rol' => $_SESSION['user_rol'] ?? null,
+                            'accion' => 'REVERT_RETURN',
+                            'entidad' => 'notificacion',
+                            'entidad_id' => $data['id'],
+                            'descripcion' => "Deshizo la devolución de la notificación #" . $data['id'],
+                            'severidad' => 'warning'
+                        ]);
+                        break;
+
                     case 'delete':
                         // Soft delete notification
                         $stmt = $pdo->prepare("

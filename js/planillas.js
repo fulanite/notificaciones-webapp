@@ -225,11 +225,11 @@ const planillas = {
                         <tr class="row-hover-effect" style="cursor: pointer;" onclick="app.viewNotificationDetail('${item.id}')" title="Click para ver/editar detalles">
                             <td style="padding-left: 20px; color: var(--text-muted); font-size: 0.85rem;">${zoneIndex++}</td>
                             <td data-label="Expediente"><strong class="cell-primary">${item.n_expediente || 'S/N'}</strong></td>
-                            <td data-label="Carátula" title="${item.caratula || ''}">${utils.truncate(item.caratula || '-', 60)}</td>
-                            <td data-label="Origen" title="${item.origen || ''}">${utils.truncate(item.origen || '-', 40)}</td>
+                            <td data-label="Carátula" title="${item.caratula || ''}">${utils.truncate(item.caratula || '-', 30)}</td>
+                            <td data-label="Origen" title="${item.origen || ''}">${utils.truncate(item.origen || '-', 25)}</td>
                             <td data-label="Tipo" style="font-size: 0.85rem; color: var(--text-secondary);">${item.tipo_notificacion || ''}</td>
                             <td data-label="Destinatario" class="cell-recipient">${item.destinatario_nombre || utils.getSpecialDestinationText(item) || '-'}</td>
-                            <td data-label="Domicilio" title="${item.domicilio}">${utils.truncate(item.domicilio, 80)}</td>
+                            <td data-label="Domicilio" title="${item.domicilio}">${utils.truncate(item.domicilio, 35)}</td>
                             <td data-label="Troquel" style="font-family: monospace; font-weight: 600; color: var(--primary-500);">${item.n_troquel || '-'}</td>
                             <td data-label="Ujier">${item.ujier_nombre ? item.ujier_nombre.split(' ')[0] : (item.usuarios ? item.usuarios.nombre.split(' ')[0] : '-')}</td>
                             <td data-label="Fecha">${item.fecha_entrega_ujier ? utils.formatDate(item.fecha_entrega_ujier) : '-'}</td>

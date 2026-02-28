@@ -699,6 +699,11 @@ const notifications = {
                         </div>
                         <div class="footer-main-actions">
                             <button class="btn btn-light-glass" onclick="notifications.closeModal()">Cerrar</button>
+                            ${(data.devuelta_por_ujier == 1 && (auth.currentUser?.rol?.toLowerCase() === 'admin' || auth.currentUser?.rol?.toLowerCase() === 'coordinador')) ? `
+                                <button class="btn btn-warning-outline" onclick="notifications.revertReturn('${data.id}')" style="color: var(--warning-600); border-color: var(--warning-300);">
+                                    🔄 Deshacer Devolución
+                                </button>
+                            ` : ''}
                             ${(data.eliminada != 1 && (auth.currentUser?.rol?.toLowerCase() === 'admin' || auth.currentUser?.rol?.toLowerCase() === 'administrativo' || auth.currentUser?.rol?.toLowerCase() === 'coordinador')) ? `
                                 <button class="btn btn-danger-outline" onclick="notifications.confirmDelete('${data.id}')">
                                     🗑️ Eliminar
@@ -1012,6 +1017,30 @@ const notifications = {
         } catch (e) {
             console.error(e);
             utils.showToast('Error inesperado al eliminar.', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    },
+
+    // Revert return status
+    async revertReturn(id) {
+        if (!confirm('¿Estás seguro que deseas deshacer la devolución física de esta notificación? Volverá al estado "Pendiente de Devolución".')) {
+            return;
+        }
+
+        utils.showLoading('Revirtiendo devolución...');
+        try {
+            const { error } = await db.revertReturnNotification(id, auth.currentUser?.id || 'system');
+            if (error) {
+                utils.showToast('Error: ' + error, 'error');
+            } else {
+                utils.showToast('Devolución revertida correctamente', 'success');
+                this.closeModal();
+                this.loadNotifications(); // Refresh list
+            }
+        } catch (e) {
+            console.error(e);
+            utils.showToast('Error inesperado.', 'error');
         } finally {
             utils.hideLoading();
         }

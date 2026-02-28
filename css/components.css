@@ -2640,6 +2640,7 @@
     padding: 8px 16px;
     border-radius: 8px;
 }
+
 /* Global Form Validation Feedback (requested by UX) */
 input:required:valid,
 select:required:valid,
@@ -2652,7 +2653,31 @@ textarea:required:valid,
     background-repeat: no-repeat !important;
     background-position: right 10px center !important;
     background-size: 20px !important;
-    padding-right: 35px !important; /* Ensure text doesn't overlap icon */
+    padding-right: 35px !important;
+    /* Ensure text doesn't overlap icon */
+}
+
+/* === Responsive Tables === */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: rgba(var(--primary-rgb), 0.2);
+    border-radius: 6px;
 }
 
 /* === Data Tables (Modern Premium) === */
@@ -2678,7 +2703,8 @@ textarea:required:valid,
 
 .data-table tbody tr {
     transition: background 0.15s ease;
-    border-bottom: 1px solid #edf2f7; /* Row lines */
+    border-bottom: 1px solid #edf2f7;
+    /* Row lines */
 }
 
 .data-table tbody tr:hover {
@@ -2712,24 +2738,37 @@ textarea:required:valid,
 }
 
 /* Premium columns widths for preview */
-#tabla-planillas-preview th:nth-child(2), 
+#tabla-planillas-preview th:nth-child(2),
 #tabla-planillas-preview td:nth-child(2) {
-    min-width: 130px; /* Expediente */
+    width: 120px;
+    /* Expediente */
 }
 
-#tabla-planillas-preview th:nth-child(6), 
+#tabla-planillas-preview th:nth-child(6),
 #tabla-planillas-preview td:nth-child(6) {
-    min-width: 200px; /* Destinatario */
+    max-width: 180px;
+    /* Destinatario */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-#tabla-planillas-preview th:nth-child(7), 
+#tabla-planillas-preview th:nth-child(7),
 #tabla-planillas-preview td:nth-child(7) {
-    min-width: 280px; /* Domicilio */
+    max-width: 240px;
+    /* Domicilio */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-#tabla-planillas-preview th:nth-child(3), 
+#tabla-planillas-preview th:nth-child(3),
 #tabla-planillas-preview td:nth-child(3) {
-    max-width: 300px; /* Caratula */
+    max-width: 250px;
+    /* Caratula */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .badge-mini {
@@ -2781,4 +2820,3 @@ textarea:required:valid,
 .settings-input-group input:focus {
     outline: none;
 }
-

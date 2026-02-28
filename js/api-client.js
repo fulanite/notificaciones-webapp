@@ -310,6 +310,15 @@ const db = {
         });
     },
 
+    async revertReturnNotification(id, userId) {
+        if (!apiClient) return { data: null, error: null };
+        return apiClient.put('notificaciones.php', {
+            id,
+            action: 'revert_return',
+            user_id: userId
+        });
+    },
+
     async deleteNotification(id, userId, reason) {
         if (!apiClient) return { data: null, error: null };
         return apiClient.put('notificaciones.php', {
