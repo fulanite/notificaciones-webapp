@@ -2654,3 +2654,88 @@ textarea:required:valid,
     background-size: 20px !important;
     padding-right: 35px !important; /* Ensure text doesn't overlap icon */
 }
+
+/* === Data Tables (Modern Premium) === */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--space-2);
+    background: white;
+}
+
+.data-table thead th {
+    background: #f8fafc;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--space-4) var(--space-4);
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.data-table tbody tr {
+    transition: background 0.15s ease;
+    border-bottom: 1px solid #edf2f7; /* Row lines */
+}
+
+.data-table tbody tr:hover {
+    background: #f1f5f9;
+}
+
+.data-table td {
+    padding: var(--space-4) var(--space-4);
+    vertical-align: middle;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+/* Cell utility helpers */
+.cell-primary {
+    color: var(--primary-600);
+    font-weight: 700;
+}
+
+.cell-recipient {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.cell-truncate {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Premium columns widths for preview */
+#tabla-planillas-preview th:nth-child(2), 
+#tabla-planillas-preview td:nth-child(2) {
+    min-width: 130px; /* Expediente */
+}
+
+#tabla-planillas-preview th:nth-child(6), 
+#tabla-planillas-preview td:nth-child(6) {
+    min-width: 200px; /* Destinatario */
+}
+
+#tabla-planillas-preview th:nth-child(7), 
+#tabla-planillas-preview td:nth-child(7) {
+    min-width: 280px; /* Domicilio */
+}
+
+#tabla-planillas-preview th:nth-child(3), 
+#tabla-planillas-preview td:nth-child(3) {
+    max-width: 300px; /* Caratula */
+}
+
+.badge-mini {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+

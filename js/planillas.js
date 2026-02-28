@@ -209,9 +209,9 @@ const planillas = {
 
             // Add Group Header with Count
             const headerRow = `
-                <tr style="background-color: var(--bg-hover); font-weight: bold;">
-                    <td colspan="11" style="padding: 10px;">
-                        📂 ${zonaName} <span class="badge" style="margin-left: 10px; font-size: 0.8em;">${items.length} items</span>
+                <tr style="background: #e2e8f0; font-weight: 700; color: #334155;">
+                    <td colspan="11" style="padding: 12px 20px; border-top: 2px solid #cbd5e1;">
+                        📂 ZONA: ${zonaName} <span class="badge-mini" style="background: var(--primary-600); color: white; margin-left: 10px;">${items.length} items</span>
                     </td>
                 </tr>
             `;
@@ -221,18 +221,17 @@ const planillas = {
 
             const renderRows = (itemList) => {
                 itemList.forEach(item => {
-                    const status = item.resultado_ultima_visita || item.resultado_diligencia || item.estado || 'pendiente';
                     const row = `
                         <tr class="row-hover-effect" style="cursor: pointer;" onclick="app.viewNotificationDetail('${item.id}')" title="Click para ver/editar detalles">
                             <td style="padding-left: 20px; color: var(--text-muted); font-size: 0.85rem;">${zoneIndex++}</td>
                             <td data-label="Expediente"><strong class="cell-primary">${item.n_expediente || 'S/N'}</strong></td>
-                            <td data-label="Carátula" class="cell-truncate" title="${item.caratula || ''}">${utils.truncate(item.caratula || '-', 30)}</td>
-                            <td data-label="Origen" class="cell-truncate" title="${item.origen || ''}">${utils.truncate(item.origen || '-', 25)}</td>
+                            <td data-label="Carátula" title="${item.caratula || ''}">${utils.truncate(item.caratula || '-', 60)}</td>
+                            <td data-label="Origen" title="${item.origen || ''}">${utils.truncate(item.origen || '-', 40)}</td>
                             <td data-label="Tipo" style="font-size: 0.85rem; color: var(--text-secondary);">${item.tipo_notificacion || ''}</td>
                             <td data-label="Destinatario" class="cell-recipient">${item.destinatario_nombre || utils.getSpecialDestinationText(item) || '-'}</td>
-                            <td data-label="Domicilio" class="cell-truncate" title="${item.domicilio}">${utils.truncate(item.domicilio, 35)}</td>
+                            <td data-label="Domicilio" title="${item.domicilio}">${utils.truncate(item.domicilio, 80)}</td>
                             <td data-label="Troquel" style="font-family: monospace; font-weight: 600; color: var(--primary-500);">${item.n_troquel || '-'}</td>
-                            <td data-label="Ujier" class="cell-truncate">${item.ujier_nombre ? item.ujier_nombre.split(' ')[0] : (item.usuarios ? item.usuarios.nombre.split(' ')[0] : '-')}</td>
+                            <td data-label="Ujier">${item.ujier_nombre ? item.ujier_nombre.split(' ')[0] : (item.usuarios ? item.usuarios.nombre.split(' ')[0] : '-')}</td>
                             <td data-label="Fecha">${item.fecha_entrega_ujier ? utils.formatDate(item.fecha_entrega_ujier) : '-'}</td>
                             <td class="text-center">
                                 <button class="btn-icon-mini" onclick="event.stopPropagation(); app.viewNotificationDetail('${item.id}')">👁️</button>
@@ -249,9 +248,9 @@ const planillas = {
             // Render Destinos Especiales
             if (specialItems.length > 0) {
                 const specialHeader = `
-                    <tr style="background-color: #f0f0f0; font-weight: bold;">
-                        <td colspan="11" style="padding: 8px 10px; text-align: left; color: #555;">
-                            DESTINOS ESPECIALES
+                    <tr style="background: #f1f5f9; font-weight: 700; color: #64748b; font-size: 0.75rem;">
+                        <td colspan="11" style="padding: 10px 20px; text-align: left; letter-spacing: 1px; border-top: 1px solid #e2e8f0;">
+                            ✨ DESTINOS ESPECIALES
                         </td>
                     </tr>
                 `;
@@ -636,7 +635,7 @@ const planillas = {
                 <tr class="row-hover-effect" style="cursor: pointer;" onclick="app.viewNotificationDetail('${item.id}')" title="Click para ver detalle">
                     <td data-label="Fecha">${fechaDisplay}</td>
                     <td data-label="Expediente"><strong class="cell-primary">${item.n_expediente || 'S/N'}</strong></td>
-                    <td data-label="Carátula" class="cell-truncate" title="${item.caratula || ''}">${utils.truncate(item.caratula || '-', 35)}</td>
+                    <td data-label="Carátula" title="${item.caratula || ''}">${utils.truncate(item.caratula || '-', 60)}</td>
                     <td data-label="Ujier">${item.ujier_nombre || (item.usuarios ? item.usuarios.nombre : '-')}</td>
                     <td data-label="Costo" style="text-align: right; font-family: monospace; font-weight: 600; color: var(--success-600);">$${utils.formatCurrency(costo)}</td>
                 </tr>
