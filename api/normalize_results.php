@@ -53,8 +53,30 @@ try {
         $stmt->execute([$new_value, $old_keyword, $old_keyword]);
         $rows = $stmt->rowCount();
 
-        if ($rows > 0) {
-            echo "Standardized $rows records: '$old_keyword' -> '$new_value'\n";
+        // Also update 'estado' column if it matches the same logic
+        $stmtEstado = $pdo->prepare("
+            UPDATE notificaciones 
+            SET estado = ? 
+            WHERE 
+                LOWER(REPLACE(estado, '_', ' ')) = ? OR
+                LOWER(estado) = ?
+        ");
+        $stmtEstado->execute([$new_value, $old_keyword, $old_keyword]);
+        $rowsEstado = $stmtEstado->rowCount();
+
+        // Also update 'visitas' table
+        $stmtVisitas = $pdo->prepare("
+            UPDATE visitas 
+            SET resultado = ? 
+            WHERE 
+                LOWER(REPLACE(resultado, '_', ' ')) = ? OR
+                LOWER(resultado) = ?
+        ");
+        $stmtVisitas->execute([$new_value, $old_keyword, $old_keyword]);
+        $rowsVisitas = $stmtVisitas->rowCount();
+
+        if ($rows > 0 || $rowsEstado > 0 || $rowsVisitas > 0) {
+            echo "Standardized '$old_keyword' -> '$new_value' ($rows notif, $rowsEstado estado, $rowsVisitas visitas)\n";
             $total_updated += $rows;
         }
     }

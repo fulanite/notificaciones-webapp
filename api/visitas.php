@@ -166,6 +166,29 @@ try {
             }
 
             $id = Database::generateUUID();
+
+            // Normalize result
+            if (isset($data['resultado']) && !empty($data['resultado'])) {
+                $rawResult = trim(str_replace('_', ' ', $data['resultado']));
+                $normMap = [
+                    'atiende' => 'Atiende',
+                    'entregado' => 'Entregada',
+                    'entregada' => 'Entregada',
+                    'no atiende' => 'No Atiende',
+                    'no_atiende' => 'No Atiende',
+                    'domicilio inexistente' => 'Domicilio Inexistente',
+                    'domicilio_inexistente' => 'Domicilio Inexistente',
+                    'pre aviso' => 'Pre Aviso',
+                    'pre_aviso' => 'Pre Aviso',
+                    'estrados' => 'Estrados',
+                    'diligenciador ausente' => 'Diligenciador Ausente',
+                    'diligenciador_ausente' => 'Diligenciador Ausente',
+                    'traslado' => 'Traslado',
+                    'fallecido' => 'Fallecido'
+                ];
+                $data['resultado'] = $normMap[strtolower($rawResult)] ?? ucwords(strtolower($rawResult));
+            }
+
             $stmt = $pdo->prepare("
                 INSERT INTO visitas (id, notificacion_id, ujier_id, resultado, observaciones, ubicacion_lat, ubicacion_lng, foto_url, audio_url, fecha)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
