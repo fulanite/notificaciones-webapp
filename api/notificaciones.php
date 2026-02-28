@@ -623,6 +623,74 @@ try {
                         ]);
                         break;
 
+                    case 'mark_retirada':
+                        // Only Administrative, Coordinator and Admin can mark as withdrawn
+                        $userRol = strtolower($_SESSION['user_rol'] ?? '');
+                        if ($userRol !== 'administrativo' && $userRol !== 'coordinador' && $userRol !== 'admin') {
+                            Database::sendError('No tenés permisos para esta acción', 403);
+                        }
+
+                        $stmt = $pdo->prepare("
+                            UPDATE notificaciones SET
+                                retirada_por_profesional = 1,
+                                fecha_retiro_profesional = NOW(),
+                                retirado_por_usuario = ?,
+                                updated_at = NOW(),
+                                updated_by = ?
+                            WHERE id = ?
+                        ");
+                        $stmt->execute([
+                            $_SESSION['user_nombre'] ?? 'Administrativo',
+                            $data['user_id'] ?? ($_SESSION['user_id'] ?? 'system'),
+                            $data['id']
+                        ]);
+
+                        // Log action
+                        $logger->log([
+                            'usuario_id' => $_SESSION['user_id'] ?? null,
+                            'usuario_nombre' => $_SESSION['user_nombre'] ?? 'Sistema',
+                            'usuario_rol' => $_SESSION['user_rol'] ?? null,
+                            'accion' => 'MARK_RETIRADA',
+                            'entidad' => 'notificacion',
+                            'entidad_id' => $data['id'],
+                            'descripcion' => "Marcó notificación #" . $data['id'] . " como retirada por profesional",
+                            'severidad' => 'info'
+                        ]);
+                        break;
+
+                    case 'revert_retirada':
+                        // Only Administrative, Coordinator and Admin can revert
+                        $userRol = strtolower($_SESSION['user_rol'] ?? '');
+                        if ($userRol !== 'administrativo' && $userRol !== 'coordinador' && $userRol !== 'admin') {
+                            Database::sendError('No tenés permisos para esta acción', 403);
+                        }
+
+                        $stmt = $pdo->prepare("
+                            UPDATE notificaciones SET
+                                retirada_por_profesional = 0,
+                                fecha_retiro_profesional = NULL,
+                                retirado_por_usuario = NULL,
+                                updated_at = NOW(),
+                                updated_by = ?
+                            WHERE id = ?
+                        ");
+                        $stmt->execute([
+                            $data['user_id'] ?? ($_SESSION['user_id'] ?? 'system'),
+                            $data['id']
+                        ]);
+
+                        $logger->log([
+                            'usuario_id' => $_SESSION['user_id'] ?? null,
+                            'usuario_nombre' => $_SESSION['user_nombre'] ?? 'Sistema',
+                            'usuario_rol' => $_SESSION['user_rol'] ?? null,
+                            'accion' => 'REVERT_RETIRADA',
+                            'entidad' => 'notificacion',
+                            'entidad_id' => $data['id'],
+                            'descripcion' => "Deshizo el retiro por profesional de la notificación #" . $data['id'],
+                            'severidad' => 'info'
+                        ]);
+                        break;
+
                     case 'delete':
                         // Soft delete notification
                         $stmt = $pdo->prepare("

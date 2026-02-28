@@ -319,6 +319,24 @@ const db = {
         });
     },
 
+    async markRetiradaNotification(id, userId) {
+        if (!apiClient) return { data: null, error: null };
+        return apiClient.put('notificaciones.php', {
+            id,
+            action: 'mark_retirada',
+            user_id: userId
+        });
+    },
+
+    async revertRetiradaNotification(id, userId) {
+        if (!apiClient) return { data: null, error: null };
+        return apiClient.put('notificaciones.php', {
+            id,
+            action: 'revert_retirada',
+            user_id: userId
+        });
+    },
+
     async deleteNotification(id, userId, reason) {
         if (!apiClient) return { data: null, error: null };
         return apiClient.put('notificaciones.php', {

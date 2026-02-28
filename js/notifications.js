@@ -433,9 +433,17 @@ const notifications = {
 
         let badge = utils.getStatusBadge(status);
 
-        // Add return icon if handled
+        // Add action icons if handled
+        const icons = [];
         if (notif.devuelta_por_ujier == 1) {
-            badge = `<div style="display:flex; align-items:center; gap:4px;">${badge}<span title="Devuelta físicamente" style="font-size: 1rem;">📦</span></div>`;
+            icons.push('<span title="Devuelta físicamente" style="font-size: 1rem;">📦</span>');
+        }
+        if (notif.retirada_por_profesional == 1) {
+            icons.push('<span title="Retirada por Profesional" style="font-size: 1rem;">🏢</span>');
+        }
+
+        if (icons.length > 0) {
+            badge = `<div style="display:flex; align-items:center; gap:4px;">${badge}${icons.join('')}</div>`;
         }
 
         return badge;
@@ -605,6 +613,25 @@ const notifications = {
                             </div>
                         ` : ''}
 
+                        ${data.retirada_por_profesional == 1 ? `
+                            <div class="retirada-notice-box" style="background: rgba(var(--primary-rgb), 0.05); border: 2px solid rgba(var(--primary-rgb), 0.3); border-radius: 12px; padding: 15px; margin: 15px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 2rem; background: var(--primary); color: white; width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">🏢</div>
+                                    <div>
+                                        <div style="font-weight: 800; color: var(--primary); font-size: 1.1rem; letter-spacing: -0.01em;">RETIRA PROFESIONAL/DILIGENCIADOR</div>
+                                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+                                            Confirmado por <strong>${data.retirado_por_usuario || 'Personal autorizado'}</strong> el ${utils.formatDate(data.fecha_retiro_profesional)}
+                                        </div>
+                                    </div>
+                                </div>
+                                ${(auth.currentUser?.rol?.toLowerCase() === 'admin' || auth.currentUser?.rol?.toLowerCase() === 'coordinador') ? `
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="notifications.revertRetirada('${data.id}')" style="font-size: 0.75rem; font-weight: 600; padding: 6px 12px; border-radius: 8px;">
+                                        🔄 Deshacer Retiro
+                                    </button>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+
                         <!-- Content Grid: 3 Main Sections -->
                         <div class="modal-dashboard-grid">
                             <!-- Col 1: Datos Legales -->
@@ -712,11 +739,16 @@ const notifications = {
                                     ✏️ Editar Diligencia
                                 </button>
                             ` : ''}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+                            ${(data.retirada_por_profesional != 1 && (data.sin_troquel != 1 && data.n_troquel) && (auth.currentUser?.rol?.toLowerCase() === 'admin' || auth.currentUser?.rol?.toLowerCase() === 'administrativo' || auth.currentUser?.rol?.toLowerCase() === 'coordinador')) ? `
+                                <button class="btn btn-info-outline" onclick="notifications.markRetirada('${data.id}')" style="border-width: 2px; font-weight: 700; background: rgba(var(--primary-rgb), 0.05); border-color: var(--primary); color: var(--primary);">
+                                    🏢 Retira profesional/diligenciador
+                                </button>
+                            ` : ''}
+                        </div >
+                    </div >
+                </div >
+            </div >
+    `;
 
         // Insert modal into DOM and prevent body scroll
         document.body.insertAdjacentHTML('beforeend', modalHtml);
@@ -964,7 +996,7 @@ const notifications = {
 
             if (ujiers && ujiers.length > 0) {
                 const options = ujiers.map(u =>
-                    `<option value="${u.id}">${u.nombre}</option>`
+                    `< option value = "${u.id}" > ${u.nombre}</option > `
                 ).join('');
 
                 select.innerHTML = defaultOption + options;
@@ -1037,6 +1069,54 @@ const notifications = {
                 utils.showToast('Devolución revertida correctamente', 'success');
                 this.closeModal();
                 this.loadNotifications(); // Refresh list
+            }
+        } catch (e) {
+            console.error(e);
+            utils.showToast('Error inesperado.', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    },
+
+    // Mark as withdrawn by professional
+    async markRetirada(id) {
+        if (!confirm('¿Marcar esta notificación como "Retirada por Profesional/Diligenciador"?')) {
+            return;
+        }
+
+        utils.showLoading('Procesando retiro...');
+        try {
+            const { error } = await db.markRetiradaNotification(id, auth.currentUser?.id);
+            if (error) {
+                utils.showToast('Error: ' + error, 'error');
+            } else {
+                utils.showToast('Marcar como retirado exitoso', 'success');
+                this.closeModal();
+                this.loadNotifications();
+            }
+        } catch (e) {
+            console.error(e);
+            utils.showToast('Error inesperado.', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    },
+
+    // Revert withdrawal by professional
+    async revertRetirada(id) {
+        if (!confirm('¿Deseas quitar la marca de "Retirada por Profesional/Diligenciador"?')) {
+            return;
+        }
+
+        utils.showLoading('Revirtiendo...');
+        try {
+            const { error } = await db.revertRetiradaNotification(id, auth.currentUser?.id);
+            if (error) {
+                utils.showToast('Error: ' + error, 'error');
+            } else {
+                utils.showToast('Acción revertida correctamente', 'success');
+                this.closeModal();
+                this.loadNotifications();
             }
         } catch (e) {
             console.error(e);
