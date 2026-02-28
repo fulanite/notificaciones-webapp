@@ -201,32 +201,30 @@ try {
             break;
 
         case 'by_hour_visits':
-            // Statistics by hour of day for VISITS (fecha_diligencia)
-            // Adjusting for UTC to Argentina (-3h) shift if detected
-            // We use DATE_SUB because fecha_diligencia is DATETIME (no TZ awareness in MySQL for this type)
-            $stmt = $pdo->prepare("
-                SELECT 
-                    HOUR(DATE_SUB(fecha_diligencia, INTERVAL 3 HOUR)) as hour,
-                    COUNT(*) as count
-                FROM notificaciones
-                WHERE YEAR(fecha_diligencia) = :year 
-                AND fecha_diligencia IS NOT NULL 
-                AND (eliminada = 0 OR eliminada IS NULL)
-                GROUP BY hour
-                ORDER BY hour
-            ");
-            $stmt->execute(['year' => $year]);
-            Database::sendResponse($stmt->fetchAll());
-            break;
-
         case 'by_hour_loads':
-            // Statistics by hour of day for LOADS (fecha_carga)
+            // Calculate dynamic offset between PHP time (local Argentina) and MySQL session time
+            // This ensures charts show local Argentina time regardless of server location
+            $timeCheck = $pdo->query("SELECT HOUR(NOW()) as mysql_h, " . date('H') . " as php_h")->fetch();
+            $offset = intval($timeCheck['php_h'] ?? 0) - intval($timeCheck['mysql_h'] ?? 0);
+
+            // Adjust offset if it's too large due to date change (e.g. 23 vs 02)
+            if ($offset > 12)
+                $offset -= 24;
+            if ($offset < -12)
+                $offset += 24;
+
+            $column = ($type === 'by_hour_visits') ? 'fecha_diligencia' : 'fecha_carga';
+            $whereYear = ($type === 'by_hour_visits') ? 'YEAR(fecha_diligencia) = :year AND fecha_diligencia IS NOT NULL' : 'YEAR(fecha_carga) = :year';
+
+            // Special case: Migrated data is almost certainly in UTC (from Glide CSV)
+            // If the database is NOT already in UTC, we might need a fixed shift for those records.
+            // But the dynamic $offset approach is safer for live data.
             $stmt = $pdo->prepare("
                 SELECT 
-                    HOUR(DATE_SUB(fecha_carga, INTERVAL 3 HOUR)) as hour,
+                    HOUR(DATE_ADD($column, INTERVAL $offset HOUR)) as hour,
                     COUNT(*) as count
                 FROM notificaciones
-                WHERE YEAR(fecha_carga) = :year AND (eliminada = 0 OR eliminada IS NULL)
+                WHERE $whereYear AND (eliminada = 0 OR eliminada IS NULL)
                 GROUP BY hour
                 ORDER BY hour
             ");
