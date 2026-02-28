@@ -39,15 +39,25 @@ const CONFIG = {
 
     // Result Options
     RESULT_OPTIONS: {
-        pendiente: 'Pendiente',
-        atiende: 'Atiende',
-        entregado: 'Entregado',
-        no_atiende: 'No atiende',
-        pre_aviso: 'Pre aviso',
-        estrados: 'Estrados',
-        domicilio_inexistente: 'Domicilio inexistente',
-        diligenciador_ausente: 'Diligenciador ausente',
-        diligenciada: 'Diligenciada'
+        'pendiente': 'Pendiente',
+        'atiende': 'Atiende',
+        'entregado': 'Entregada',
+        'no_atiende': 'No Atiende',
+        'pre_aviso': 'Pre Aviso',
+        'estrados': 'Estrados',
+        'domicilio_inexistente': 'Domicilio Inexistente',
+        'diligenciador_ausente': 'Diligenciador Ausente',
+        'diligenciada': 'Diligenciada',
+        // Standardized keys
+        'Pendiente': 'Pendiente',
+        'Atiende': 'Atiende',
+        'No Atiende': 'No Atiende',
+        'Domicilio Inexistente': 'Domicilio Inexistente',
+        'Pre Aviso': 'Pre Aviso',
+        'Estrados': 'Estrados',
+        'Diligenciador Ausente': 'Diligenciador Ausente',
+        'Entregada': 'Entregada',
+        'Diligenciada': 'Diligenciada'
     },
 
     // Payment Methods

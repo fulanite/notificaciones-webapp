@@ -198,10 +198,10 @@ const bulkEditor = {
 
     getStatusClass(status) {
         if (!status) return 'pending';
-        const s = status.toLowerCase();
-        if (['atiende', 'entregado', 'positivo', 'diligenciada'].includes(s)) return 'success';
-        if (['no_atiende', 'negativo', 'rechazado', 'domicilio_inexistente'].includes(s)) return 'error';
-        if (['pre_aviso', 'pre aviso', 'estrados'].includes(s)) return 'warning';
+        const s = status.toLowerCase().replace(/_/g, ' ');
+        if (['atiende', 'entregada', 'entregado', 'positivo', 'diligenciada'].includes(s)) return 'success';
+        if (['no atiende', 'no_atiende', 'negativo', 'rechazado', 'domicilio inexistente', 'domicilio_inexistente'].includes(s)) return 'error';
+        if (['pre aviso', 'pre_aviso', 'estrados'].includes(s)) return 'warning';
         return 'pending';
     },
 
@@ -287,9 +287,11 @@ const bulkEditor = {
                     }
 
                     // Determinar el estado general (workflow) basado en el resultado específico
-                    let highLevelEstado = 'entregado'; // Por defecto para resultados finales
-                    if (newStatus === 'pre_aviso') highLevelEstado = 'pre_aviso';
-                    else if (newStatus === 'diligenciada') highLevelEstado = 'diligenciada';
+                    let highLevelEstado = 'diligenciada'; // Default for results that mean it's done
+                    const lowStatus = newStatus.toLowerCase().replace(/_/g, ' ');
+
+                    if (lowStatus === 'pendiente') highLevelEstado = 'pendiente';
+                    else if (lowStatus === 'pre aviso') highLevelEstado = 'pendiente';
 
                     return db.updateNotification(id, {
                         resultado_diligencia: newStatus,

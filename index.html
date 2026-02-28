@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=43.27" as="style">
-    <link rel="preload" href="css/base.css?v=43.27" as="style">
-    <link rel="preload" href="js/config.js?v=43.27" as="script">
-    <link rel="preload" href="js/app.js?v=43.27" as="script">
+    <link rel="preload" href="css/variables.css?v=43.28" as="style">
+    <link rel="preload" href="css/base.css?v=43.28" as="style">
+    <link rel="preload" href="js/config.js?v=43.28" as="script">
+    <link rel="preload" href="js/app.js?v=43.28" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=43.27">
-    <link rel="stylesheet" href="css/base.css?v=43.27">
-    <link rel="stylesheet" href="css/components.css?v=43.27">
+    <link rel="stylesheet" href="css/variables.css?v=43.28">
+    <link rel="stylesheet" href="css/base.css?v=43.28">
+    <link rel="stylesheet" href="css/components.css?v=43.28">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=43.27" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=43.27" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=43.27" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=43.27" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=43.27" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=43.28" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=43.28" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=43.28" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=43.28" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=43.28" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -397,7 +397,7 @@
                     </button>
                     <div id="app-version" class="app-version" onclick="window.location.reload(true)"
                         style="text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 15px; cursor: pointer; padding: 5px;">
-                        v1.5.7 - Actualizar ↻
+                        v1.5.8 - Actualizar ↻
                     </div>
                 </div>
             </aside>
@@ -1832,9 +1832,12 @@
                                         Actual</label>
                                     <select id="bulk-filter-estado" class="form-select" style="width: 100%;">
                                         <option value="">Estado...</option>
-                                        <option value="pendiente">Pendiente</option>
-                                        <option value="pre_aviso">Pre Aviso</option>
-                                        <option value="entregado">Entregado/Finalizado</option>
+                                        <option value="Pendiente">Pendiente</option>
+                                        <option value="Pre Aviso">Pre Aviso</option>
+                                        <option value="Entregada">Entregada</option>
+                                        <option value="Atiende">Atiende</option>
+                                        <option value="No Atiende">No Atiende</option>
+                                        <option value="Domicilio Inexistente">Domicilio Inexistente</option>
                                     </select>
                                 </div>
                                 <div class="filter-group">
@@ -1877,15 +1880,17 @@
 
                                     <div style="display: flex; align-items: center; gap: 8px;">
                                         <select id="bulk-new-status" class="form-select form-select-sm"
-                                            style="width: 160px; height: 36px;">
+                                            style="width: 220px; height: 36px;">
                                             <option value="">⚙️ Nuevo Estado...</option>
-                                            <option value="pendiente">Pendiente</option>
-                                            <option value="diligenciada">Diligenciada</option>
-                                            <option value="atiende">Atiende</option>
-                                            <option value="entregado">Entregado</option>
-                                            <option value="pre_aviso">Pre aviso</option>
-                                            <option value="estrados">Estrados</option>
-                                            <option value="domicilio_inexistente">Docimilio Inexistente</option>
+                                            <option value="Pendiente">Pendiente</option>
+                                            <option value="Diligenciada">Diligenciada</option>
+                                            <option value="Atiende">Atiende</option>
+                                            <option value="Entregada">Entregada</option>
+                                            <option value="No Atiende">No Atiende</option>
+                                            <option value="Pre Aviso">Pre Aviso</option>
+                                            <option value="Estrados">Estrados</option>
+                                            <option value="Domicilio Inexistente">Domicilio Inexistente</option>
+                                            <option value="Diligenciador Ausente">Diligenciador Ausente</option>
                                         </select>
                                         <button id="btn-apply-bulk-status" class="btn btn-primary btn-sm" disabled>
                                             ⚡ Aplicar Cambio
@@ -2035,27 +2040,27 @@
         </div>
     </div>
 
-    <script defer src="js/lazy-loader.js?v=43.27"></script>
-    <script defer src="js/config.js?v=43.27"></script>
-    <script defer src="js/data.js?v=43.27"></script>
-    <script defer src="js/api-client.js?v=43.27"></script>
-    <script defer src="js/auth.js?v=43.27"></script>
-    <script defer src="js/utils.js?v=43.27"></script>
-    <script defer src="js/offline.js?v=43.27"></script>
-    <script defer src="js/notifications.js?v=43.27"></script>
-    <script defer src="js/ujier.js?v=43.27"></script>
-    <script defer src="js/dashboard.js?v=43.27"></script>
-    <script defer src="js/dashboard-patch.js?v=43.27"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=43.27"></script>
-    <script defer src="js/dashboard-analytics.js?v=43.27"></script>
-    <script defer src="js/reports.js?v=43.27"></script>
-    <script defer src="js/audit.js?v=43.27"></script>
-    <script defer src="js/asignaciones.js?v=43.27"></script>
-    <script defer src="js/bulk-editor.js?v=43.27"></script>
-    <script defer src="js/usuarios.js?v=43.27"></script>
-    <script defer src="js/devoluciones.js?v=43.27"></script>
-    <script defer src="js/planillas.js?v=43.27"></script>
-    <script defer src="js/app.js?v=43.27"></script>
+    <script defer src="js/lazy-loader.js?v=43.28"></script>
+    <script defer src="js/config.js?v=43.28"></script>
+    <script defer src="js/data.js?v=43.28"></script>
+    <script defer src="js/api-client.js?v=43.28"></script>
+    <script defer src="js/auth.js?v=43.28"></script>
+    <script defer src="js/utils.js?v=43.28"></script>
+    <script defer src="js/offline.js?v=43.28"></script>
+    <script defer src="js/notifications.js?v=43.28"></script>
+    <script defer src="js/ujier.js?v=43.28"></script>
+    <script defer src="js/dashboard.js?v=43.28"></script>
+    <script defer src="js/dashboard-patch.js?v=43.28"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=43.28"></script>
+    <script defer src="js/dashboard-analytics.js?v=43.28"></script>
+    <script defer src="js/reports.js?v=43.28"></script>
+    <script defer src="js/audit.js?v=43.28"></script>
+    <script defer src="js/asignaciones.js?v=43.28"></script>
+    <script defer src="js/bulk-editor.js?v=43.28"></script>
+    <script defer src="js/usuarios.js?v=43.28"></script>
+    <script defer src="js/devoluciones.js?v=43.28"></script>
+    <script defer src="js/planillas.js?v=43.28"></script>
+    <script defer src="js/app.js?v=43.28"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>
