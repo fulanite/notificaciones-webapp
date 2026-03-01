@@ -996,7 +996,7 @@ const notifications = {
 
             if (ujiers && ujiers.length > 0) {
                 const options = ujiers.map(u =>
-                    `< option value = "${u.id}" > ${u.nombre}</option > `
+                    `<option value="${u.id}">${u.nombre}</option>`
                 ).join('');
 
                 select.innerHTML = defaultOption + options;
