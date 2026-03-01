@@ -43,7 +43,8 @@ const planillas = {
 
         document.getElementById('btn-generar-planilla')?.addEventListener('click', () => this.generatePDF());
         document.getElementById('btn-actualizar-planilla')?.addEventListener('click', () => {
-            utils.showToast('Actualizando datos...', 'info', 1500);
+            console.log('🔄 Click en actualizar planilla detectado');
+            utils.showToast('Actualizando datos de la planilla...', 'info', 1500);
             this.updatePreview();
         });
 
