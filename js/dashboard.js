@@ -13,6 +13,82 @@ const dashboard = {
         // REMOVED: Recent activity section eliminated per user request
         // await this.loadRecentActivity();
         await this.loadUjierPerformance();
+        this.setupKPIListeners();
+    },
+
+    setupKPIListeners() {
+        document.getElementById('card-kpi-pending')?.addEventListener('click', () => this.showKPIDetails('pendiente'));
+        document.getElementById('card-kpi-deferred')?.addEventListener('click', () => this.showKPIDetails('diferida'));
+
+        // Modal close listeners
+        document.getElementById('btn-close-modal-kpi-list')?.addEventListener('click', () => this.closeKPIModal());
+        document.getElementById('btn-close-kpi-list-footer')?.addEventListener('click', () => this.closeKPIModal());
+        document.querySelector('#modal-kpi-list .modal-overlay')?.addEventListener('click', () => this.closeKPIModal());
+    },
+
+    async showKPIDetails(type) {
+        const titleEl = document.getElementById('kpi-list-title');
+        const tbody = document.getElementById('kpi-list-table-body');
+
+        if (titleEl) {
+            titleEl.textContent = type === 'pendiente' ? '📋 Notificaciones Pendientes' : '📡 Notificaciones en Carga Diferida';
+        }
+
+        if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="text-center">Cargando...</td></tr>';
+
+        // Open modal
+        const modal = document.getElementById('modal-kpi-list');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        try {
+            // Fetch notifications by status
+            // We use a high limit to show most relevant ones, or filter current year
+            const currentYear = new Date().getFullYear();
+            const { data, error } = await db.getNotifications({
+                estado: type,
+                limit: 100,
+                year: currentYear
+            });
+
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay notificaciones en este estado</td></tr>';
+                return;
+            }
+
+            if (tbody) {
+                tbody.innerHTML = data.map(n => `
+                    <tr>
+                        <td><strong>${n.n_expediente || 'S/N'}</strong></td>
+                        <td title="${n.caratula || ''}">${utils.truncate(n.caratula || '-', 30)}</td>
+                        <td>${n.destinatario_nombre || utils.getSpecialDestinationText(n) || '-'}</td>
+                        <td title="${n.domicilio}">${utils.truncate(n.domicilio, 35)}</td>
+                        <td>${n.ujier_nombre ? n.ujier_nombre.split(' ')[0] : '-'}</td>
+                        <td>${utils.formatDate(n.fecha_carga)}</td>
+                        <td class="text-center">
+                            <button class="btn-icon-mini" onclick="dashboard.closeKPIModal(); app.viewNotificationDetail('${n.id}')" title="Ver Detalle">
+                                👁️
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        } catch (e) {
+            console.error('Error loading KPI details:', e);
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="text-center color-error">Error al cargar datos</td></tr>';
+        }
+    },
+
+    closeKPIModal() {
+        const modal = document.getElementById('modal-kpi-list');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
     },
 
     // Load statistics
