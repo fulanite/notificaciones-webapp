@@ -42,6 +42,10 @@ const planillas = {
         if (this.listenersAttached) return;
 
         document.getElementById('btn-generar-planilla')?.addEventListener('click', () => this.generatePDF());
+        document.getElementById('btn-actualizar-planilla')?.addEventListener('click', () => {
+            utils.showToast('Actualizando datos...', 'info', 1500);
+            this.updatePreview();
+        });
 
         // Update preview on filter change
         ['planilla-zona', 'planilla-fecha'].forEach(id => {
