@@ -186,6 +186,7 @@ const db = {
         if (options.unassigned_only) params.unassigned_only = '1';
         if (options.medio_pago) params.medio_pago = options.medio_pago;
         if (options.show_deleted) params.show_deleted = options.show_deleted;
+        if (options.diferida_only) params.diferida_only = '1';
 
         const result = await apiClient.get('notificaciones.php', params);
 

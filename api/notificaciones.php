@@ -242,6 +242,10 @@ try {
                     $params[] = $_GET['medio_pago'];
                 }
 
+                if (!empty($_GET['diferida_only']) && $_GET['diferida_only'] == '1') {
+                    $where[] = "n.es_carga_diferida = 1";
+                }
+
                 // Count total
                 $countSql = "SELECT COUNT(*) as total FROM notificaciones n WHERE " . implode(" AND ", $where);
                 $countStmt = $pdo->prepare($countSql);

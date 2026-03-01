@@ -45,13 +45,19 @@ const dashboard = {
 
         try {
             // Fetch notifications by status
-            // We use a high limit to show most relevant ones, or filter current year
             const currentYear = new Date().getFullYear();
-            const { data, error } = await db.getNotifications({
-                estado: type,
+            const fetchOptions = {
                 limit: 100,
                 year: currentYear
-            });
+            };
+
+            if (type === 'diferida') {
+                fetchOptions.diferida_only = true;
+            } else {
+                fetchOptions.estado = type;
+            }
+
+            const { data, error } = await db.getNotifications(fetchOptions);
 
             if (error) throw error;
 
