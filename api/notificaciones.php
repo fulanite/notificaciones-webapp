@@ -795,7 +795,7 @@ try {
                 }
 
                 $updates[] = "updated_at = NOW()";
-                if (isset($data['updated_by'])) {
+                if (!empty($data['updated_by'])) {
                     $updates[] = "updated_by = ?";
                     $params[] = $data['updated_by'];
                 }

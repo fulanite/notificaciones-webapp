@@ -279,37 +279,53 @@ const bulkEditor = {
                 const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');
                 const currentUserId = auth.currentUser ? auth.currentUser.id : null;
 
-                await Promise.all(chunk.map(id => {
-                    // Check case-insensitive for 'pendiente'
-                    if (newStatus.toLowerCase() === 'pendiente') {
-                        return db.updateNotification(id, {
-                            resultado_diligencia: null,
-                            fecha_diligencia: null,
-                            estado: 'pendiente'
-                        }, currentUserId);
+                const results = await Promise.all(chunk.map(async id => {
+                    try {
+                        let updates = {};
+                        const statusLower = newStatus.toLowerCase().trim();
+
+                        if (statusLower === 'pendiente') {
+                            updates = {
+                                resultado_diligencia: null,
+                                fecha_diligencia: null,
+                                estado: 'pendiente'
+                            };
+                        } else {
+                            // Determinar el estado general (workflow) basado en el resultado específico
+                            let highLevelEstado = 'diligenciada';
+                            if (['pendiente', 'pre aviso', 'pre_aviso'].includes(statusLower)) {
+                                highLevelEstado = 'pendiente';
+                            }
+
+                            updates = {
+                                resultado_diligencia: newStatus,
+                                fecha_diligencia: fechaActual,
+                                estado: highLevelEstado
+                            };
+                        }
+
+                        // Use the 3rd argument which api-client.js handles
+                        const res = await db.updateNotification(id, updates, currentUserId);
+                        if (res.error) throw new Error(res.error);
+                        return true;
+                    } catch (err) {
+                        console.error(`Error actualizando notificación ${id}:`, err);
+                        return false;
                     }
-
-                    // Determinar el estado general (workflow) basado en el resultado específico
-                    let highLevelEstado = 'diligenciada'; // Default for results that mean it's done
-                    const lowStatus = newStatus.toLowerCase().replace(/_/g, ' ');
-
-                    if (lowStatus === 'pendiente') highLevelEstado = 'pendiente';
-                    else if (lowStatus === 'pre aviso') highLevelEstado = 'pendiente';
-
-                    return db.updateNotification(id, {
-                        resultado_diligencia: newStatus,
-                        fecha_diligencia: fechaActual,
-                        estado: highLevelEstado
-                    }, currentUserId);
                 }));
+
+                const failedCount = results.filter(r => !r).length;
+                if (failedCount > 0) {
+                    console.warn(`En este lote de ${chunk.length}, fallaron ${failedCount} actualizaciones.`);
+                }
             }
 
-            utils.showToast(`${count} notificaciones actualizadas correctamente`, 'success');
+            utils.showToast(`${count} notificaciones procesadas`, 'success');
             this.state.selectedIds.clear();
             await this.loadData();
         } catch (e) {
-            console.error('Error in bulk update:', e);
-            utils.showToast('Error al procesar algunos cambios', 'error');
+            console.error('Error in bulk update main loop:', e);
+            utils.showToast('Error crítico al procesar cambios', 'error');
         } finally {
             utils.hideLoading();
         }
