@@ -119,6 +119,31 @@ class Database
         );
     }
 
+    /**
+     * Helper: Generar un ID secuencial legible
+     * Formato: N-YY-XXXX (Ej: N-26-0001)
+     */
+    public static function generateSequentialId($pdo, $prefix = 'N-', $digits = 4)
+    {
+        $yearCode = date('y'); // 26
+        $fullPrefix = $prefix . $yearCode . '-';
+
+        $stmt = $pdo->prepare("SELECT id FROM notificaciones WHERE id LIKE ? ORDER BY id DESC LIMIT 1");
+        $stmt->execute([$fullPrefix . '%']);
+        $lastId = $stmt->fetchColumn();
+
+        if (!$lastId) {
+            $nextNumber = 1;
+        } else {
+            // Extraer número final
+            $parts = explode('-', $lastId);
+            $lastNumber = (int) end($parts);
+            $nextNumber = $lastNumber + 1;
+        }
+
+        return $fullPrefix . str_pad($nextNumber, $digits, '0', STR_PAD_LEFT);
+    }
+
     // Helper: Sanitize input
     public static function sanitize($input)
     {
