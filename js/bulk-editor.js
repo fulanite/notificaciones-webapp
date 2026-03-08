@@ -277,13 +277,16 @@ const bulkEditor = {
             for (let i = 0; i < ids.length; i += chunkSize) {
                 const chunk = ids.slice(i, i + chunkSize);
                 const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                const currentUserId = auth.currentUser ? auth.currentUser.id : null;
+
                 await Promise.all(chunk.map(id => {
-                    if (newStatus === 'pendiente') {
+                    // Check case-insensitive for 'pendiente'
+                    if (newStatus.toLowerCase() === 'pendiente') {
                         return db.updateNotification(id, {
                             resultado_diligencia: null,
                             fecha_diligencia: null,
                             estado: 'pendiente'
-                        });
+                        }, currentUserId);
                     }
 
                     // Determinar el estado general (workflow) basado en el resultado específico
@@ -297,7 +300,7 @@ const bulkEditor = {
                         resultado_diligencia: newStatus,
                         fecha_diligencia: fechaActual,
                         estado: highLevelEstado
-                    });
+                    }, currentUserId);
                 }));
             }
 
