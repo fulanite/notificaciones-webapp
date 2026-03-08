@@ -60,9 +60,32 @@ class AuditLogger
 
             return $this->pdo->lastInsertId();
         } catch (Exception $e) {
-            error_log("Error en AuditLogger: " . $e->getMessage());
+            // Write to a local file too since error_log might be disabled or hard to find on Hostinger
+            $logMsg = date('[Y-m-d H:i:s] ') . "AuditLogger Error: " . $e->getMessage() . PHP_EOL;
+            file_put_contents(__DIR__ . '/audit_error.log', $logMsg, FILE_APPEND);
             return false;
         }
+    }
+
+    /**
+     * Helper para loguear desde la sesión actual
+     */
+    public function logAction($accion, $entidad, $entidad_id, $descripcion, $datos = null, $severidad = 'info')
+    {
+        if (!isset($_SESSION['user_id']))
+            return false;
+
+        return $this->log([
+            'usuario_id' => $_SESSION['user_id'],
+            'usuario_nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+            'usuario_rol' => $_SESSION['user_rol'] ?? 'unknown',
+            'accion' => $accion,
+            'entidad' => $entidad,
+            'entidad_id' => $entidad_id,
+            'descripcion' => $descripcion,
+            'datos_nuevos' => $datos,
+            'severidad' => $severidad
+        ]);
     }
 
     /**

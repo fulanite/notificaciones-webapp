@@ -148,6 +148,9 @@ try {
             $stmt = $pdo->prepare("UPDATE usuarios SET password_hash = ?, password_reset_required = 0, updated_at = NOW() WHERE id = ?");
             $stmt->execute([$hashedPassword, $data['user_id']]);
 
+            // Log password change
+            $logger->logAction('UPDATE', 'usuario', $data['user_id'], "Usuario cambió su propia contraseña", null, 'info');
+
             Database::sendResponse(['success' => true, 'message' => 'Password updated']);
             break;
 
@@ -167,6 +170,9 @@ try {
             // Set password_reset_required flag
             $stmt = $pdo->prepare("UPDATE usuarios SET password_hash = ?, password_reset_required = 1, updated_at = NOW() WHERE id = ?");
             $stmt->execute([$hashedPassword, $data['user_id']]);
+
+            // Log password reset by admin
+            $logger->logAction('UPDATE', 'usuario', $data['user_id'], "Admin reseteó contraseña de usuario", null, 'warning');
 
             Database::sendResponse(['success' => true, 'message' => 'Password reset to DNI']);
             break;
@@ -229,6 +235,10 @@ try {
             if ($user) {
                 $user['password_reset_required'] = (bool) ($user['password_reset_required'] ?? false);
             }
+
+            // Log user creation
+            $logger->logAction('CREATE', 'usuario', $id, "Admin creó nuevo usuario: {$user['nombre']} ({$user['rol']})", $user);
+
             Database::sendResponse($user, 201);
             break;
 
