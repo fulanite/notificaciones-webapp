@@ -31,7 +31,7 @@ const CONFIG = {
         cedulas_urgentes_norte: 'Cédulas Urgentes Norte',
         cedulas_urgentes_sur: 'Cédulas Urgentes Sur',
         cedulas_mandamientos_22172: 'Cédulas o Mandamientos Ley 22172',
-        cedulas_correspondencia: 'Cédulas por Correspondencia (Interior)',
+        cedulas_correspondencia: 'Cédulas Interior',
         mandamientos: 'Mandamientos',
         mandamientos_habilitacion_norte: 'Mandamientos con habilitación Norte',
         mandamientos_habilitacion_sur: 'Mandamientos con habilitación Sur'

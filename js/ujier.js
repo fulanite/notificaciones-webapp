@@ -618,6 +618,8 @@ const ujier = {
 
     async processBulkIds(ids, groupName) {
         let successCount = 0;
+        let failCount = 0;
+        let successfulIds = [];
         let lat = null;
         let lng = null;
 
@@ -643,18 +645,29 @@ const ujier = {
                     observaciones: `ENTREGA MASIVA POR LISTA - ÚLTIMA VISITA: ${utils.getTodayFormatted()}`
                 }, auth.currentUser?.id);
 
-                if (!error) successCount++;
+                if (!error) {
+                    successCount++;
+                    successfulIds.push(id);
+                } else {
+                    failCount++;
+                }
             } catch (err) {
                 console.error(`Error delivering ${id}:`, err);
+                failCount++;
             }
         }
 
         utils.hideLoading();
-        utils.showToast(`Se entregaron ${successCount} notificaciones correctamente`, 'success');
+
+        if (failCount > 0) {
+            utils.showToast(`Se entregaron ${successCount} notif. Fallaron ${failCount}. Intente nuevamente.`, 'warning');
+        } else {
+            utils.showToast(`Se entregaron ${successCount} notificaciones correctamente`, 'success');
+        }
 
         // Proactive update: Remove delivered IDs from local state and cache to prevent "flicker"
         if (successCount > 0) {
-            const deliveredIds = new Set(ids);
+            const deliveredIds = new Set(successfulIds);
 
             // 1. Update memory
             this.assignments = this.assignments.filter(n => !deliveredIds.has(n.id));
@@ -739,7 +752,7 @@ const ujier = {
                 auth.currentUser?.id
             );
 
-            if (error) throw error;
+            if (error) throw new Error(error);
 
             // Optimistic UI: remove from local list and cache immediately
             this.assignments = this.assignments.filter(a => a.id !== id);
@@ -762,7 +775,7 @@ const ujier = {
 
         } catch (error) {
             console.error('Error en quickDeliver:', error);
-            utils.showToast('Error al entregar: ' + error.message, 'error');
+            utils.showToast('Error al entregar: ' + (error.message || error), 'error');
         } finally {
             utils.hideLoading();
         }

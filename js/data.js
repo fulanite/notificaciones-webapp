@@ -21,7 +21,7 @@ const SGND_DATA = {
         { value: 'cedulas_urgentes_norte', label: 'Cédulas Urgentes Norte' },
         { value: 'cedulas_urgentes_sur', label: 'Cédulas Urgentes Sur' },
         { value: 'cedulas_mandamientos_22172', label: 'Cédulas o mandamientos Ley 22.172' },
-        { value: 'cedulas_correspondencia', label: 'Cédulas por correspondencia (interior)' },
+        { value: 'cedulas_correspondencia', label: 'Cédulas Interior' },
         { value: 'mandamientos', label: 'Mandamientos' },
         { value: 'mandamientos_habilitacion_norte', label: 'Mandamientos con Habilitación Norte' },
         { value: 'mandamientos_habilitacion_sur', label: 'Mandamientos con Habilitación Sur' }
