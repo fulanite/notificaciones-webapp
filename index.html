@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=43.44" as="style">
-    <link rel="preload" href="css/base.css?v=43.44" as="style">
-    <link rel="preload" href="js/config.js?v=43.44" as="script">
-    <link rel="preload" href="js/app.js?v=43.44" as="script">
+    <link rel="preload" href="css/variables.css?v=43.45" as="style">
+    <link rel="preload" href="css/base.css?v=43.45" as="style">
+    <link rel="preload" href="js/config.js?v=43.45" as="script">
+    <link rel="preload" href="js/app.js?v=43.45" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=43.44">
-    <link rel="stylesheet" href="css/base.css?v=43.44">
-    <link rel="stylesheet" href="css/components.css?v=43.44">
+    <link rel="stylesheet" href="css/variables.css?v=43.45">
+    <link rel="stylesheet" href="css/base.css?v=43.45">
+    <link rel="stylesheet" href="css/components.css?v=43.45">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=43.44" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=43.44" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=43.44" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=43.44" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=43.44" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=43.45" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=43.45" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=43.45" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=43.45" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=43.45" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -397,7 +397,7 @@
                     </button>
                     <div id="app-version" class="app-version" onclick="window.location.reload(true)"
                         style="text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 15px; cursor: pointer; padding: 5px;">
-                        v1.6.2 - Actualizar ↻
+                        v1.6.3 - Actualizar ↻
                     </div>
                 </div>
             </aside>
@@ -948,41 +948,41 @@
                             </div>
                         </div> <!-- modal-container end -->
                     </div> <!-- modal end -->
- 
- <!-- Modal: Listado KPIs Dashboard -->
- <div id="modal-kpi-list" class="modal hidden">
- <div class="modal-overlay"></div>
- <div class="modal-container modal-xl">
- <div class="modal-header">
- <h2 class="modal-title" id="kpi-list-title">📋 Detalle de Notificaciones</h2>
- <button class="btn-close-modal" id="btn-close-modal-kpi-list">×</button>
- </div>
- <div class="modal-body">
- <div class="table-responsive">
- <table class="data-table">
- <thead>
- <tr>
- <th>Expediente</th>
- <th>Carátula</th>
- <th>Destinatario</th>
- <th>Domicilio</th>
- <th>Ujier</th>
- <th>Fecha</th>
- <th class="text-center">Acciones</th>
- </tr>
- </thead>
- <tbody id="kpi-list-table-body">
- <!-- Dynamic content -->
- </tbody>
- </table>
- </div>
- </div>
- <div class="modal-footer">
- <button type="button" class="btn btn-secondary btn-sm"
+
+                    <!-- Modal: Listado KPIs Dashboard -->
+                    <div id="modal-kpi-list" class="modal hidden">
+                        <div class="modal-overlay"></div>
+                        <div class="modal-container modal-xl">
+                            <div class="modal-header">
+                                <h2 class="modal-title" id="kpi-list-title">📋 Detalle de Notificaciones</h2>
+                                <button class="btn-close-modal" id="btn-close-modal-kpi-list">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="table-responsive">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Expediente</th>
+                                                <th>Carátula</th>
+                                                <th>Destinatario</th>
+                                                <th>Domicilio</th>
+                                                <th>Ujier</th>
+                                                <th>Fecha</th>
+                                                <th class="text-center">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="kpi-list-table-body">
+                                            <!-- Dynamic content -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm"
                                     id="btn-close-kpi-list-footer">Cerrar</button>
- </div>
- </div>
- </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Lista de Notificaciones View -->
                     <section id="view-lista-notificaciones" class="view active">
@@ -2081,27 +2081,27 @@
         </div>
     </div>
 
-    <script defer src="js/lazy-loader.js?v=43.44"></script>
-    <script defer src="js/config.js?v=43.44"></script>
-    <script defer src="js/data.js?v=43.44"></script>
-    <script defer src="js/api-client.js?v=43.44"></script>
-    <script defer src="js/auth.js?v=43.44"></script>
-    <script defer src="js/utils.js?v=43.44"></script>
-    <script defer src="js/offline.js?v=43.44"></script>
-    <script defer src="js/notifications.js?v=43.44"></script>
-    <script defer src="js/ujier.js?v=43.44"></script>
-    <script defer src="js/dashboard.js?v=43.44"></script>
-    <script defer src="js/dashboard-patch.js?v=43.44"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=43.44"></script>
-    <script defer src="js/dashboard-analytics.js?v=43.44"></script>
-    <script defer src="js/reports.js?v=43.44"></script>
-    <script defer src="js/audit.js?v=43.44"></script>
-    <script defer src="js/asignaciones.js?v=43.44"></script>
-    <script defer src="js/bulk-editor.js?v=43.44"></script>
-    <script defer src="js/usuarios.js?v=43.44"></script>
-    <script defer src="js/devoluciones.js?v=43.44"></script>
-    <script defer src="js/planillas.js?v=43.44"></script>
-    <script defer src="js/app.js?v=43.44"></script>
+    <script defer src="js/lazy-loader.js?v=43.45"></script>
+    <script defer src="js/config.js?v=43.45"></script>
+    <script defer src="js/data.js?v=43.45"></script>
+    <script defer src="js/api-client.js?v=43.45"></script>
+    <script defer src="js/auth.js?v=43.45"></script>
+    <script defer src="js/utils.js?v=43.45"></script>
+    <script defer src="js/offline.js?v=43.45"></script>
+    <script defer src="js/notifications.js?v=43.45"></script>
+    <script defer src="js/ujier.js?v=43.45"></script>
+    <script defer src="js/dashboard.js?v=43.45"></script>
+    <script defer src="js/dashboard-patch.js?v=43.45"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=43.45"></script>
+    <script defer src="js/dashboard-analytics.js?v=43.45"></script>
+    <script defer src="js/reports.js?v=43.45"></script>
+    <script defer src="js/audit.js?v=43.45"></script>
+    <script defer src="js/asignaciones.js?v=43.45"></script>
+    <script defer src="js/bulk-editor.js?v=43.45"></script>
+    <script defer src="js/usuarios.js?v=43.45"></script>
+    <script defer src="js/devoluciones.js?v=43.45"></script>
+    <script defer src="js/planillas.js?v=43.45"></script>
+    <script defer src="js/app.js?v=43.45"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>
