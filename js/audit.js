@@ -343,69 +343,139 @@ const audit = {
         const container = document.getElementById('audit-details-content');
         if (!container) return;
 
-        const formatJson = (json) => {
-            if (!json) return '<i style="color: #9ca3af;">N/A</i>';
-            try {
-                return `<pre style="background: #f3f4f6; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 0.85em; max-height: 200px;">${JSON.stringify(json, null, 2)}</pre>`;
-            } catch (e) {
-                return json;
-            }
-        };
-
         container.innerHTML = `
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
                 <div>
-                    <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">Información General</h4>
-                    <table class="detail-table" style="width: 100%; font-size: 0.9em;">
-                        <tr><td style="font-weight: 600; padding: 4px 0;">ID Log:</td><td>#${log.id}</td></tr>
-                        <tr><td style="font-weight: 600; padding: 4px 0;">Fecha:</td><td>${this.formatDate(log.created_at)}</td></tr>
-                        <tr><td style="font-weight: 600; padding: 4px 0;">Usuario:</td><td>${log.usuario_nombre || 'Sistema'} (ID: ${log.usuario_id || '-'})</td></tr>
-                        <tr><td style="font-weight: 600; padding: 4px 0;">Rol:</td><td>${log.usuario_rol || '-'}</td></tr>
-                        <tr><td style="font-weight: 600; padding: 4px 0;">Acción:</td><td><span class="badge badge-action">${this.getActionLabel(log.accion)}</span></td></tr>
-                        <tr><td style="font-weight: 600; padding: 4px 0;">Entidad:</td><td>${log.entidad} (ID: ${log.entidad_id || '-'})</td></tr>
-                    </table>
+                    <h4 style="margin-bottom: 12px; color: #374151; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px;">Información General</h4>
+                    <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
+                        <table style="width: 100%; font-size: 0.9em; border-collapse: collapse;">
+                            <tr><td style="font-weight: 500; padding: 10px 15px; background: #f9fafb; border-bottom: 1px solid #f3f4f6; width: 120px;">ID Log:</td><td style="padding: 10px 15px; border-bottom: 1px solid #f3f4f6;">#${log.id}</td></tr>
+                            <tr><td style="font-weight: 500; padding: 10px 15px; background: #f9fafb; border-bottom: 1px solid #f3f4f6;">Fecha:</td><td style="padding: 10px 15px; border-bottom: 1px solid #f3f4f6;">${this.formatDate(log.created_at)}</td></tr>
+                            <tr><td style="font-weight: 500; padding: 10px 15px; background: #f9fafb; border-bottom: 1px solid #f3f4f6;">Usuario:</td><td style="padding: 10px 15px; border-bottom: 1px solid #f3f4f6;">${log.usuario_nombre || 'Sistema'}</td></tr>
+                            <tr><td style="font-weight: 500; padding: 10px 15px; background: #f9fafb;">Acción:</td><td style="padding: 10px 15px;"><span class="badge badge-action">${this.getActionLabel(log.accion)}</span></td></tr>
+                        </table>
+                    </div>
                 </div>
                 <div>
-                    <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">Detalles Técnicos</h4>
-                    <table class="detail-table" style="width: 100%; font-size: 0.9em;">
-                        <tr><td style="font-weight: 600; padding: 4px 0;">IP:</td><td>${log.ip_address || '-'}</td></tr>
-                        <tr><td style="font-weight: 600; padding: 4px 0;">Método:</td><td>${log.metodo || '-'}</td></tr>
-                        <tr><td style="font-weight: 600; padding: 4px 0;">Ruta:</td><td style="word-break: break-all;">${log.ruta || '-'}</td></tr>
-                        <tr><td style="font-weight: 600; padding: 4px 0;">Resultado:</td><td><span class="badge badge-${log.resultado === 'exito' ? 'success' : 'danger'}">${log.resultado}</span></td></tr>
-                    </table>
+                    <h4 style="margin-bottom: 12px; color: #374151; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px;">Contexto</h4>
+                    <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden;">
+                        <table style="width: 100%; font-size: 0.9em; border-collapse: collapse;">
+                            <tr><td style="font-weight: 500; padding: 10px 15px; background: #f9fafb; border-bottom: 1px solid #f3f4f6; width: 120px;">Entidad:</td><td style="padding: 10px 15px; border-bottom: 1px solid #f3f4f6;">${log.entidad} (ID: ${log.entidad_id || '-'})</td></tr>
+                            <tr><td style="font-weight: 500; padding: 10px 15px; background: #f9fafb; border-bottom: 1px solid #f3f4f6;">IP:</td><td style="padding: 10px 15px; border-bottom: 1px solid #f3f4f6;">${log.ip_address || '-'}</td></tr>
+                            <tr><td style="font-weight: 500; padding: 10px 15px; background: #f9fafb; border-bottom: 1px solid #f3f4f6;">Método:</td><td style="padding: 10px 15px; border-bottom: 1px solid #f3f4f6;">${log.metodo || '-'}</td></tr>
+                            <tr><td style="font-weight: 500; padding: 10px 15px; background: #f9fafb;">Resultado:</td><td style="padding: 10px 15px;"><span class="badge badge-${log.resultado === 'exito' ? 'success' : 'danger'}">${log.resultado}</span></td></tr>
+                        </table>
+                    </div>
                 </div>
             </div>
             
-            <div style="margin-top: 20px;">
-                <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">Descripción</h4>
-                <p style="padding: 12px; background: #f9fafb; border-radius: 6px; border-left: 4px solid #667eea;">${log.descripcion}</p>
+            <div style="margin-bottom: 24px;">
+                <h4 style="margin-bottom: 12px; color: #374151; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px;">Descripción del Evento</h4>
+                <div style="padding: 15px 20px; background: #f0f7ff; border-radius: 10px; border-left: 5px solid #3b82f6; font-size: 1.05em; color: #1e40af; font-weight: 500;">
+                    ${log.descripcion}
+                </div>
             </div>
 
-            <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div>
-                    <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">🔄 Datos Anteriores</h4>
-                    ${formatJson(log.datos_anteriores)}
-                </div>
-                <div>
-                    <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">🆕 Datos Nuevos</h4>
-                    ${formatJson(log.datos_nuevos)}
-                </div>
+            <div style="margin-bottom: 24px;">
+                <h4 style="margin-bottom: 12px; color: #374151; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px;">🔍 Comparativa de Datos</h4>
+                ${this.renderDiff(log.datos_anteriores, log.datos_nuevos)}
             </div>
 
             ${log.metadatos ? `
-                <div style="margin-top: 20px;">
-                    <h4 style="margin-bottom: 8px; color: #374151; font-size: 0.9em; text-transform: uppercase;">📦 Metadatos</h4>
-                    ${formatJson(log.metadatos)}
+                <div>
+                    <h4 style="margin-bottom: 12px; color: #374151; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.5px;">� Metadatos Adicionales</h4>
+                    <div style="background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 0.85em;">
+                        ${this.formatJson(log.metadatos)}
+                    </div>
                 </div>
             ` : ''}
 
             ${log.mensaje_error ? `
-                <div style="margin-top: 20px; padding: 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #b91c1c;">
-                    <h4 style="margin-bottom: 4px; font-size: 0.9em; text-transform: uppercase;">Error Registrado</h4>
-                    <p style="font-family: monospace;">${log.mensaje_error}</p>
+                <div style="margin-top: 24px; padding: 15px; background: #fff1f2; border: 1px solid #fecaca; border-radius: 10px; color: #991b1b;">
+                    <h4 style="margin-bottom: 8px; font-size: 0.85em; text-transform: uppercase; font-weight: 700;">Error Técnico Registrado</h4>
+                    <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.85em; margin: 0;">${log.mensaje_error}</p>
                 </div>
             ` : ''}
         `;
+    },
+
+    // Generar tabla comparativa (Diff)
+    renderDiff(oldData, newData) {
+        if (!oldData && !newData) return '<p style="color: #9ca3af; font-style: italic; text-align: center; padding: 20px;">Sin datos para comparar</p>';
+
+        // Si es una creación pura (no había datos antes)
+        if (!oldData && newData) {
+            return `<div style="padding: 15px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; color: #065f46;">
+                <strong>Objeto Creado:</strong>
+                ${this.formatJson(newData)}
+            </div>`;
+        }
+
+        // Si es una eliminación pura
+        if (oldData && !newData) {
+            return `<div style="padding: 15px; background: #fff1f2; border: 1px solid #fecaca; border-radius: 10px; color: #991b1b;">
+                <strong>Objeto Eliminado (Último estado):</strong>
+                ${this.formatJson(oldData)}
+            </div>`;
+        }
+
+        const allKeys = Array.from(new Set([...Object.keys(oldData), ...Object.keys(newData)]));
+        const ignoreKeys = ['updated_at', 'created_at', 'updated_by'];
+
+        const rows = allKeys
+            .filter(key => !ignoreKeys.includes(key))
+            .map(key => {
+                const oldVal = oldData[key];
+                const newVal = newData[key];
+
+                // Normalizar para comparación (evitar diferencias por tipo string vs int)
+                const isChanged = JSON.stringify(oldVal) !== JSON.stringify(newVal);
+
+                if (!isChanged) return ''; // No mostrar campos que no cambiaron para limpiar la vista
+
+                return `
+                    <tr style="background: #fff;">
+                        <td style="padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-weight: 600; font-size: 0.8em; color: #64748b; width: 150px; text-transform: uppercase;">${key.replace(/_/g, ' ')}</td>
+                        <td style="padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.9em; color: #ef4444; background: #fef2f2; border-radius: 4px; text-decoration: line-through;">${this.formatDiffValue(oldVal)}</td>
+                        <td style="padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.9em; color: #10b981; background: #ecfdf5; border-radius: 4px; font-weight: 600;">${this.formatDiffValue(newVal)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+        if (!rows) {
+            return '<p style="color: #6b7280; text-align: center; padding: 20px; background: #f9fafb; border-radius: 10px;">No se detectaron cambios en los valores de los campos registrados.</p>';
+        }
+
+        return `
+            <div style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #fff;">
+                <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+                    <thead>
+                        <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                            <th style="text-align: left; padding: 12px 15px; font-size: 0.7em; text-transform: uppercase; color: #94a3b8; width: 150px;">Atributo</th>
+                            <th style="text-align: left; padding: 12px 15px; font-size: 0.7em; text-transform: uppercase; color: #ef4444;">Valor Anterior</th>
+                            <th style="text-align: left; padding: 12px 15px; font-size: 0.7em; text-transform: uppercase; color: #10b981;">Valor Nuevo</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    },
+
+    formatDiffValue(val) {
+        if (val === null || val === undefined || val === '') return '<span style="color: #cbd5e1; font-style: italic;">vacío</span>';
+        if (typeof val === 'object') return `<pre style="margin:0; font-size:0.85em;">${JSON.stringify(val)}</pre>`;
+        if (typeof val === 'boolean') return val ? 'SÍ' : 'NO';
+        return val;
+    },
+
+    formatJson(json) {
+        if (!json) return '<i style="color: #9ca3af;">Sin datos</i>';
+        try {
+            return `<pre style="background: #f8fafc; padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 0.85em; max-height: 250px; border: 1px solid #e2e8f0; font-family: 'JetBrains Mono', monospace;">${JSON.stringify(json, null, 2)}</pre>`;
+        } catch (e) {
+            return json;
+        }
     },
 
     closeDetails() {
@@ -456,14 +526,4 @@ const audit = {
         };
         return labels[action] || action;
     }
-};
-
-// Guardar array de logs localmente para los detalles
-audit.currentLogs = [];
-
-// Envolver el renderLogs original para guardar el estado
-const originalRenderLogs = audit.renderLogs;
-audit.renderLogs = function (logs) {
-    this.currentLogs = logs || [];
-    originalRenderLogs.call(this, logs);
 };
