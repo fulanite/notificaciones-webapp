@@ -28,13 +28,13 @@ class AuditLogger
                     accion, entidad, entidad_id,
                     descripcion, datos_anteriores, datos_nuevos, metadatos,
                     ip_address, user_agent, ruta, metodo,
-                    severidad, resultado, mensaje_error
+                    severidad, resultado, mensaje_error, created_at
                 ) VALUES (
                     :usuario_id, :usuario_nombre, :usuario_rol,
                     :accion, :entidad, :entidad_id,
                     :descripcion, :datos_anteriores, :datos_nuevos, :metadatos,
                     :ip_address, :user_agent, :ruta, :metodo,
-                    :severidad, :resultado, :mensaje_error
+                    :severidad, :resultado, :mensaje_error, NOW()
                 )
             ");
 
@@ -329,16 +329,16 @@ class AuditLogger
         try {
             $stats = [];
 
-            // Acciones hoy
-            $stats['acciones_hoy'] = $this->pdo->query("SELECT COUNT(*) FROM audit_log WHERE DATE(created_at) = CURDATE()")->fetchColumn();
+            // Acciones hoy (usando NOW() que respeta el timezone de la sesión)
+            $stats['acciones_hoy'] = $this->pdo->query("SELECT COUNT(*) FROM audit_log WHERE created_at >= DATE(NOW())")->fetchColumn();
 
             // Reportes última semana
             $stats['reportes_semana'] = $this->pdo->query("SELECT COUNT(*) FROM audit_log WHERE accion = 'GENERATE_REPORT' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
 
             // Usuarios activos hoy (únicos)
-            $stats['usuarios_activos'] = $this->pdo->query("SELECT COUNT(DISTINCT usuario_id) FROM audit_log WHERE DATE(created_at) = CURDATE() AND usuario_id IS NOT NULL")->fetchColumn();
+            $stats['usuarios_activos'] = $this->pdo->query("SELECT COUNT(DISTINCT usuario_id) FROM audit_log WHERE created_at >= DATE(NOW()) AND usuario_id IS NOT NULL")->fetchColumn();
 
-            // Alertas (severidad warning/error/critical) hoy
+            // Alertas (severidad warning/error/critical) de las últimas 24h
             $stats['alertas'] = $this->pdo->query("SELECT COUNT(*) FROM audit_log WHERE severidad IN ('warning', 'error', 'critical') AND created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)")->fetchColumn();
 
             // Top usuarios (últimos 30 días)

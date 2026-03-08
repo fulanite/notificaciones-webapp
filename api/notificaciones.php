@@ -405,6 +405,14 @@ try {
         case 'PUT':
             $data = Database::getJsonBody();
 
+            // Get original notification data before any changes for audit logging
+            $beforeUpdate = null;
+            if (!empty($data['id'])) {
+                $stmtBefore = $pdo->prepare("SELECT * FROM notificaciones WHERE id = ?");
+                $stmtBefore->execute([$data['id']]);
+                $beforeUpdate = $stmtBefore->fetch();
+            }
+
             if (empty($data['id'])) {
                 Database::sendError('Notification ID is required', 400);
             }
@@ -713,6 +721,15 @@ try {
                             $data['eliminada_por'],
                             $data['id']
                         ]);
+
+                        // Log soft delete immediately as a DELETE action
+                        if ($beforeUpdate && isset($_SESSION['user_id'])) {
+                            $logger->logDelete('notificacion', $data['id'], $beforeUpdate, [
+                                'id' => $_SESSION['user_id'],
+                                'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+                                'rol' => $_SESSION['user_rol'] ?? 'unknown'
+                            ], "Eliminó (marcó para borrar) notificación #{$data['id']} - Motivo: {$data['eliminada_motivo']}");
+                        }
                         break;
 
                     default:
@@ -796,20 +813,22 @@ try {
 
             // Log update
             if (isset($_SESSION['user_id'])) {
-                $action = $data['action'] ?? 'update';
-                $description = "Actualizó notificación #{$data['id']}";
-                if ($action === 'assign')
-                    $description = "Asignó notificación #{$data['id']} a ujier";
-                if ($action === 'result')
-                    $description = "Registró resultado en notificación #{$data['id']}";
-                if ($action === 'return')
-                    $description = "Marcó notificación #{$data['id']} como devuelta";
+                $raw_action = $data['action'] ?? 'update';
+                if ($raw_action !== 'delete') {
+                    $description = "Actualizó notificación #{$data['id']}";
+                    if ($raw_action === 'assign')
+                        $description = "Asignó notificación #{$data['id']} a ujier";
+                    if ($raw_action === 'result')
+                        $description = "Registró resultado en notificación #{$data['id']}";
+                    if ($raw_action === 'return')
+                        $description = "Marcó notificación #{$data['id']} como devuelta";
 
-                $logger->logUpdate('notificacion', $data['id'], null, $updatedNotif, [
-                    'id' => $_SESSION['user_id'],
-                    'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
-                    'rol' => $_SESSION['user_rol'] ?? 'unknown'
-                ], $description);
+                    $logger->logUpdate('notificacion', $data['id'], $beforeUpdate, $updatedNotif, [
+                        'id' => $_SESSION['user_id'],
+                        'nombre' => $_SESSION['user_nombre'] ?? 'Usuario',
+                        'rol' => $_SESSION['user_rol'] ?? 'unknown'
+                    ], $description);
+                }
             }
 
             Database::sendResponse($updatedNotif);

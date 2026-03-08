@@ -15,9 +15,13 @@ const audit = {
             console.error('❌ Audit table container not found in DOM');
             return;
         }
-        await this.loadStats();
-        await this.loadLogs();
+
         this.setupEventListeners();
+        await Promise.all([
+            this.loadStats(),
+            this.loadLogs(),
+            this.loadUsers()
+        ]);
         console.log('✅ Audit module init complete');
     },
 
@@ -29,9 +33,10 @@ const audit = {
             btnRefresh.addEventListener('click', () => this.refresh());
         }
 
-        // Filtros
+        // Filtros (auto-apply on change)
         const filterForm = document.getElementById('audit-filters');
         if (filterForm) {
+            filterForm.addEventListener('change', () => this.applyFilters());
             filterForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.applyFilters();
@@ -108,16 +113,38 @@ const audit = {
             console.log('📡 Audit logs data received:', data);
 
             if (data.success && data.data) {
-                console.log(`📝 Rendering ${data.data.logs?.length || 0} logs`);
-                this.renderLogs(data.data.logs || []);
+                this.currentLogs = data.data.logs || [];
+                console.log(`📝 Rendering ${this.currentLogs.length} logs`);
+                this.renderLogs(this.currentLogs);
                 this.renderPagination(data.data);
             } else {
                 console.warn('⚠️ Audit API returned success:false or missing data');
                 this.renderLogs([]);
             }
         } catch (error) {
-            console.error('❌ Error loading audit logs:', error);
             this.renderLogs([]);
+        }
+    },
+
+    // Cargar usuarios para el filtro
+    async loadUsers() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/usuarios.php`);
+            const data = await response.json();
+
+            if (data.success) {
+                const select = document.getElementById('audit-filter-user');
+                if (!select) return;
+
+                // Guardar opción por defecto
+                const defaultValue = select.options[0].outerHTML;
+
+                select.innerHTML = defaultValue + data.data.map(u => `
+                    <option value="${u.id}">${u.nombre} (${u.rol})</option>
+                `).join('');
+            }
+        } catch (error) {
+            console.error('Error loading users for audit filter:', error);
         }
     },
 
@@ -128,8 +155,17 @@ const audit = {
 
         const updateText = (id, val) => {
             const el = document.getElementById(id);
-            if (el) el.textContent = val || 0;
-            else console.warn(`Element #${id} not found for audit stats`);
+            if (el) {
+                // Ensure we show 0 if null/undefined
+                const count = (val === null || val === undefined) ? 0 : val;
+                el.textContent = count;
+
+                // Add a small animation if value > 0
+                if (count > 0) {
+                    el.style.color = 'var(--primary-600)';
+                    setTimeout(() => el.style.color = '', 300);
+                }
+            }
         };
 
         updateText('stat-acciones-hoy', stats.acciones_hoy);
