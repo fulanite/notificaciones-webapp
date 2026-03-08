@@ -984,7 +984,10 @@ const app = {
 
         // Show target view
         const targetView = document.getElementById(`view-${viewId}`);
-        targetView?.classList.add('active');
+        if (targetView) {
+            targetView.classList.remove('hidden');
+            targetView.classList.add('active');
+        }
 
         // Update nav active state
         document.querySelectorAll('.nav-link').forEach(link => {
