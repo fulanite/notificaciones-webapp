@@ -120,28 +120,58 @@ class Database
     }
 
     /**
-     * Helper: Generar un ID secuencial legible
+     * Generar un ID secuencial atómico y seguro para concurrencia
      * Formato: N-YY-XXXX (Ej: N-26-0001)
      */
-    public static function generateSequentialId($pdo, $prefix = 'N-', $digits = 4)
+    public static function getNextId($pdo, $entity = 'notificacion', $prefix = 'N-')
     {
-        $yearCode = date('y'); // 26
-        $fullPrefix = $prefix . $yearCode . '-';
+        $year = date('y');
+        $fullPrefix = $prefix . $year . '-';
 
-        $stmt = $pdo->prepare("SELECT id FROM notificaciones WHERE id LIKE ? ORDER BY id DESC LIMIT 1");
-        $stmt->execute([$fullPrefix . '%']);
-        $lastId = $stmt->fetchColumn();
+        try {
+            $pdo->beginTransaction();
 
-        if (!$lastId) {
+            // 1. Asegurar que exista la tabla de secuencias
+            $pdo->exec("CREATE TABLE IF NOT EXISTS id_sequences (
+                entity VARCHAR(50),
+                year CHAR(2),
+                last_number INT DEFAULT 0,
+                PRIMARY KEY (entity, year)
+            ) ENGINE=InnoDB");
+
+            // 2. Bloquear la fila para el año actual (Atomicidad)
+            $stmt = $pdo->prepare("SELECT last_number FROM id_sequences WHERE entity = ? AND year = ? FOR UPDATE");
+            $stmt->execute([$entity, $year]);
+            $current = $stmt->fetchColumn();
+
+            if ($current === false) {
+                // Primer ID del año
+                $next = 1;
+                $stmt = $pdo->prepare("INSERT INTO id_sequences (entity, year, last_number) VALUES (?, ?, ?)");
+                $stmt->execute([$entity, $year, $next]);
+            } else {
+                $next = $current + 1;
+                $stmt = $pdo->prepare("UPDATE id_sequences SET last_number = ? WHERE entity = ? AND year = ?");
+                $stmt->execute([$next, $entity, $year]);
+            }
+
+            $pdo->commit();
+            return $fullPrefix . str_pad($next, 4, '0', STR_PAD_LEFT);
+
+        } catch (Exception $e) {
+            if ($pdo->inTransaction())
+                $pdo->rollBack();
+            // Fallback: Si la tabla falla por alguna razón (permisos, etc), intentar leer directamente (menos seguro pero funcional)
+            $stmt = $pdo->prepare("SELECT id FROM notificaciones WHERE id LIKE ? ORDER BY id DESC LIMIT 1");
+            $stmt->execute([$fullPrefix . '%']);
+            $lastId = $stmt->fetchColumn();
             $nextNumber = 1;
-        } else {
-            // Extraer número final
-            $parts = explode('-', $lastId);
-            $lastNumber = (int) end($parts);
-            $nextNumber = $lastNumber + 1;
+            if ($lastId) {
+                $parts = explode('-', $lastId);
+                $nextNumber = (int) end($parts) + 1;
+            }
+            return $fullPrefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
         }
-
-        return $fullPrefix . str_pad($nextNumber, $digits, '0', STR_PAD_LEFT);
     }
 
     // Helper: Sanitize input

@@ -331,7 +331,7 @@ try {
                 }
             }
 
-            $id = Database::generateSequentialId($pdo);
+            $id = Database::getNextId($pdo);
             $stmt = $pdo->prepare("
                 INSERT INTO notificaciones (
                     id, fecha_carga, fecha_entrega_ujier, usuario_carga, estado,

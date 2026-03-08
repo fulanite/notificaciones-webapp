@@ -71,6 +71,23 @@ try {
 
     $pdo->commit();
     $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
+
+    // 2. Inicializar la tabla de secuencias para que la próxima carga siga el orden
+    echo "⚙️ Inicializando tabla de secuencias...\n";
+    $pdo->exec("CREATE TABLE IF NOT EXISTS id_sequences (
+        entity VARCHAR(50),
+        year CHAR(2),
+        last_number INT DEFAULT 0,
+        PRIMARY KEY (entity, year)
+    ) ENGINE=InnoDB");
+
+    foreach ($counts as $year => $last) {
+        if ($last > 0) {
+            $stmtSeq = $pdo->prepare("REPLACE INTO id_sequences (entity, year, last_number) VALUES ('notificacion', ?, ?)");
+            $stmtSeq->execute([$year, $last]);
+        }
+    }
+
     echo "\n✨ Migración finalizada con éxito!\n";
     echo "📊 Resumen por año:\n";
     foreach ($counts as $year => $total) {
