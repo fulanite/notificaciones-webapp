@@ -1127,11 +1127,6 @@ const app = {
                             : Promise.resolve()
                     ]);
                     break;
-                case 'auditoria':
-                    loadPromise = typeof audit !== 'undefined' && audit.init
-                        ? audit.init()
-                        : Promise.resolve();
-                    break;
                 default:
                     loadPromise = Promise.resolve();
             }

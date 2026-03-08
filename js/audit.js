@@ -9,9 +9,16 @@ const audit = {
 
     // Inicializar módulo
     async init() {
+        console.log('🔍 Audit module init...');
+        const container = document.getElementById('audit-logs-table');
+        if (!container) {
+            console.error('❌ Audit table container not found in DOM');
+            return;
+        }
         await this.loadStats();
         await this.loadLogs();
         this.setupEventListeners();
+        console.log('✅ Audit module init complete');
     },
 
     // Configurar event listeners
@@ -98,28 +105,39 @@ const audit = {
 
             const response = await fetch(`${API_BASE_URL}/audit.php?${params}`);
             const data = await response.json();
+            console.log('📡 Audit logs data received:', data);
 
-            if (data.success) {
-                this.renderLogs(data.data.logs);
+            if (data.success && data.data) {
+                console.log(`📝 Rendering ${data.data.logs?.length || 0} logs`);
+                this.renderLogs(data.data.logs || []);
                 this.renderPagination(data.data);
+            } else {
+                console.warn('⚠️ Audit API returned success:false or missing data');
+                this.renderLogs([]);
             }
         } catch (error) {
-            console.error('Error loading audit logs:', error);
+            console.error('❌ Error loading audit logs:', error);
+            this.renderLogs([]);
         }
     },
 
     // Renderizar estadísticas
     renderStats(stats) {
-        // Métricas principales
-        document.getElementById('stat-acciones-hoy').textContent = stats.acciones_hoy || 0;
-        document.getElementById('stat-reportes-semana').textContent = stats.reportes_semana || 0;
-        document.getElementById('stat-usuarios-activos').textContent = stats.usuarios_activos || 0;
-        document.getElementById('stat-alertas').textContent = stats.alertas || 0;
+        console.log('📊 Rendering audit stats:', stats);
+        if (!stats) return;
 
-        // Top usuarios
+        const updateText = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val || 0;
+            else console.warn(`Element #${id} not found for audit stats`);
+        };
+
+        updateText('stat-acciones-hoy', stats.acciones_hoy);
+        updateText('stat-reportes-semana', stats.reportes_semana);
+        updateText('stat-usuarios-activos', stats.usuarios_activos);
+        updateText('stat-alertas', stats.alertas);
+
         this.renderTopUsers(stats.top_usuarios || []);
-
-        // Distribución de acciones
         this.renderActionDistribution(stats.distribucion_acciones || []);
     },
 
@@ -177,7 +195,7 @@ const audit = {
         if (logs.length === 0) {
             container.innerHTML = `
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 40px; color: #6b7280;">
+                    <td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">
                         No se encontraron registros
                     </td>
                 </tr>
