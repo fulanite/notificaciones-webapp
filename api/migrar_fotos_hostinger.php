@@ -106,64 +106,93 @@ function migrarFoto($url, $id, $prefix)
     }
 }
 
-// 1. Procesar NOTIFICACIONES
-echo "📦 Procesando Notificaciones...\n";
-$stmt = $pdo->query("SELECT id, evidencia_foto FROM notificaciones WHERE evidencia_foto LIKE 'http%'");
-$count = 0;
+// 1. Configuración de lotes
+$batchSize = 50;
+$totalMigrated = 0;
+
+if (!$isCli) {
+    echo "📦 Procesando lote actual (máx $batchSize archivos)...\n";
+}
+
+$pdo = Database::getInstance()->getConnection();
+
+// --- AYUDANTE PARA CONTAR PENDIENTES ---
+function getPendingCount($pdo)
+{
+    $q1 = $pdo->query("SELECT COUNT(*) FROM notificaciones WHERE evidencia_foto LIKE 'http%' AND evidencia_foto NOT LIKE '%sgnd.click%' AND evidencia_foto NOT LIKE '%hostingersite.com%'")->fetchColumn();
+    $q2 = $pdo->query("SELECT COUNT(*) FROM visitas WHERE (foto_url LIKE 'http%' AND foto_url NOT LIKE '%sgnd.click%' AND foto_url NOT LIKE '%hostingersite.com%') OR (audio_url LIKE 'http%' AND audio_url NOT LIKE '%sgnd.click%' AND audio_url NOT LIKE '%hostingersite.com%')")->fetchColumn();
+    $q3 = $pdo->query("SELECT COUNT(*) FROM usuarios WHERE foto LIKE 'http%' AND foto NOT LIKE '%sgnd.click%' AND foto NOT LIKE '%hostingersite.com%'")->fetchColumn();
+    return $q1 + $q2 + $q3;
+}
+
+// A. Procesar NOTIFICACIONES (Lote)
+$stmt = $pdo->prepare("SELECT id, evidencia_foto FROM notificaciones WHERE evidencia_foto LIKE 'http%' AND evidencia_foto NOT LIKE '%sgnd.click%' AND evidencia_foto NOT LIKE '%hostingersite.com%' LIMIT ?");
+$stmt->execute([$batchSize]);
 while ($row = $stmt->fetch()) {
     $newPath = migrarFoto($row['evidencia_foto'], $row['id'], 'notif');
     if ($newPath) {
         $update = $pdo->prepare("UPDATE notificaciones SET evidencia_foto = ? WHERE id = ?");
         $update->execute([$newPath, $row['id']]);
-        $count++;
+        $totalMigrated++;
     }
 }
-echo "✅ $count fotos de notificaciones migradas.\n\n";
 
-// 2. Procesar VISITAS (Fotos)
-echo "📍 Procesando Fotos de Visitas...\n";
-$stmt = $pdo->query("SELECT id, foto_url FROM visitas WHERE foto_url LIKE 'http%'");
-$count = 0;
-while ($row = $stmt->fetch()) {
-    $newPath = migrarFoto($row['foto_url'], $row['id'], 'visita');
-    if ($newPath) {
-        $update = $pdo->prepare("UPDATE visitas SET foto_url = ? WHERE id = ?");
-        $update->execute([$newPath, $row['id']]);
-        $count++;
+// B. Procesar VISITAS (Fotos - Lote)
+if ($totalMigrated < $batchSize) {
+    $stmt = $pdo->prepare("SELECT id, foto_url FROM visitas WHERE foto_url LIKE 'http%' AND foto_url NOT LIKE '%sgnd.click%' AND foto_url NOT LIKE '%hostingersite.com%' LIMIT ?");
+    $stmt->execute([$batchSize - $totalMigrated]);
+    while ($row = $stmt->fetch()) {
+        $newPath = migrarFoto($row['foto_url'], $row['id'], 'visita');
+        if ($newPath) {
+            $update = $pdo->prepare("UPDATE visitas SET foto_url = ? WHERE id = ?");
+            $update->execute([$newPath, $row['id']]);
+            $totalMigrated++;
+        }
     }
 }
-echo "✅ $count fotos de visitas migradas.\n\n";
 
-// 2b. Procesar VISITAS (Audios)
-echo "🎙️ Procesando Audios de Visitas...\n";
-$stmt = $pdo->query("SELECT id, audio_url FROM visitas WHERE audio_url LIKE 'http%'");
-$count = 0;
-while ($row = $stmt->fetch()) {
-    $newPath = migrarFoto($row['audio_url'], $row['id'], 'audio');
-    if ($newPath) {
-        $update = $pdo->prepare("UPDATE visitas SET audio_url = ? WHERE id = ?");
-        $update->execute([$newPath, $row['id']]);
-        $count++;
+// C. Procesar VISITAS (Audios - Lote)
+if ($totalMigrated < $batchSize) {
+    $stmt = $pdo->prepare("SELECT id, audio_url FROM visitas WHERE audio_url LIKE 'http%' AND audio_url NOT LIKE '%sgnd.click%' AND audio_url NOT LIKE '%hostingersite.com%' LIMIT ?");
+    $stmt->execute([$batchSize - $totalMigrated]);
+    while ($row = $stmt->fetch()) {
+        $newPath = migrarFoto($row['audio_url'], $row['id'], 'audio');
+        if ($newPath) {
+            $update = $pdo->prepare("UPDATE visitas SET audio_url = ? WHERE id = ?");
+            $update->execute([$newPath, $row['id']]);
+            $totalMigrated++;
+        }
     }
 }
-echo "✅ $count audios de visitas migrados.\n\n";
 
-// 3. Procesar USUARIOS
-echo "👤 Procesando Usuarios...\n";
-$stmt = $pdo->query("SELECT id, foto FROM usuarios WHERE foto LIKE 'http%'");
-$count = 0;
-while ($row = $stmt->fetch()) {
-    $newPath = migrarFoto($row['foto'], $row['id'], 'user');
-    if ($newPath) {
-        $update = $pdo->prepare("UPDATE usuarios SET foto = ? WHERE id = ?");
-        $update->execute([$newPath, $row['id']]);
-        $count++;
+// D. Procesar USUARIOS (Lote)
+if ($totalMigrated < $batchSize) {
+    $stmt = $pdo->prepare("SELECT id, foto FROM usuarios WHERE foto LIKE 'http%' AND foto NOT LIKE '%sgnd.click%' AND foto NOT LIKE '%hostingersite.com%' LIMIT ?");
+    $stmt->execute([$batchSize - $totalMigrated]);
+    while ($row = $stmt->fetch()) {
+        $newPath = migrarFoto($row['foto'], $row['id'], 'user');
+        if ($newPath) {
+            $update = $pdo->prepare("UPDATE usuarios SET foto = ? WHERE id = ?");
+            $update->execute([$newPath, $row['id']]);
+            $totalMigrated++;
+        }
     }
 }
-echo "✅ $count fotos de perfiles migradas.\n\n";
 
-echo "---------------------------------\n";
-echo "✨ Proceso Finalizado con éxito.\n";
-if (!$isCli) {
-    echo "\nPodés cerrar esta ventana.";
+$remaining = getPendingCount($pdo);
+
+echo "✅ Se migraron $totalMigrated archivos en este lote.\n";
+echo "📊 Archivos pendientes totales: $remaining\n";
+
+if ($remaining > 0) {
+    echo "\n🔄 REINICIANDO PARA EL SIGUIENTE LOTE EN 2 SEGUNDOS...\n";
+    if (!$isCli) {
+        echo "<script>setTimeout(() => { window.location.href = '?run=true&t=" . time() . "'; }, 2000);</script>";
+    }
+} else {
+    echo "\n---------------------------------\n";
+    echo "✨ TODOS LOS ARCHIVOS HAN SIDO MIGRADOS CON ÉXITO.\n";
+    if (!$isCli) {
+        echo "\nYa podés cerrar esta ventana.";
+    }
 }
