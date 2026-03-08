@@ -120,8 +120,8 @@ while ($row = $stmt->fetch()) {
 }
 echo "✅ $count fotos de notificaciones migradas.\n\n";
 
-// 2. Procesar VISITAS
-echo "📍 Procesando Visitas...\n";
+// 2. Procesar VISITAS (Fotos)
+echo "📍 Procesando Fotos de Visitas...\n";
 $stmt = $pdo->query("SELECT id, foto_url FROM visitas WHERE foto_url LIKE 'http%'");
 $count = 0;
 while ($row = $stmt->fetch()) {
@@ -133,6 +133,20 @@ while ($row = $stmt->fetch()) {
     }
 }
 echo "✅ $count fotos de visitas migradas.\n\n";
+
+// 2b. Procesar VISITAS (Audios)
+echo "🎙️ Procesando Audios de Visitas...\n";
+$stmt = $pdo->query("SELECT id, audio_url FROM visitas WHERE audio_url LIKE 'http%'");
+$count = 0;
+while ($row = $stmt->fetch()) {
+    $newPath = migrarFoto($row['audio_url'], $row['id'], 'audio');
+    if ($newPath) {
+        $update = $pdo->prepare("UPDATE visitas SET audio_url = ? WHERE id = ?");
+        $update->execute([$newPath, $row['id']]);
+        $count++;
+    }
+}
+echo "✅ $count audios de visitas migrados.\n\n";
 
 // 3. Procesar USUARIOS
 echo "👤 Procesando Usuarios...\n";
