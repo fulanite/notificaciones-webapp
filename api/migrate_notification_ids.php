@@ -31,6 +31,8 @@ try {
 
     echo "📊 Total a migrar: " . count($notificaciones) . "\n";
 
+    // IMPORTANT: Disable foreign key checks for the ID swap
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
     $pdo->beginTransaction();
 
     $counts = [
@@ -63,13 +65,12 @@ try {
         $stmtA->execute([$newId, $oldId]);
 
         // C. Actualizar Notificación (Maestro)
-        // Desactivamos verificación de FK temporalmente si fuera necesario, 
-        // pero por ahora lo hacemos manual.
         $stmtN = $pdo->prepare("UPDATE notificaciones SET id = ? WHERE id = ?");
         $stmtN->execute([$newId, $oldId]);
     }
 
     $pdo->commit();
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
     echo "\n✨ Migración finalizada con éxito!\n";
     echo "📊 Resumen por año:\n";
     foreach ($counts as $year => $total) {
@@ -80,5 +81,6 @@ try {
 } catch (Exception $e) {
     if ($pdo->inTransaction())
         $pdo->rollBack();
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
     die("\n❌ ERROR DURANTE LA MIGRACIÓN: " . $e->getMessage());
 }
