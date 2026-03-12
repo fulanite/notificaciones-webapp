@@ -267,8 +267,10 @@ const app = {
 
         } else {
             grupoFixed?.classList.remove('hidden');
-            document.getElementById('origen').required = true;
-            document.getElementById('origen-input').required = true;
+            const originFijo = document.getElementById('origen');
+            const originFijoInput = document.getElementById('origen-input');
+            if (originFijo) originFijo.required = false; // Never require hidden inputs
+            if (originFijoInput) originFijoInput.required = true;
 
             grupoDinamico.classList.add('hidden');
             newInput.required = false;
@@ -616,6 +618,10 @@ const app = {
             await notifications.loadUjieres();
 
             this.applyPersistentSettings();
+
+            // Force a refresh of the notification type logic to reset required fields and visibility
+            const currentTipo = document.getElementById('tipo-notificacion')?.value || 'cedulas';
+            this.handleTipoNotificacionChange(currentTipo);
         });
 
         const closeModal = () => {
@@ -1183,6 +1189,50 @@ const app = {
             observaciones_iniciales: getVal('observaciones-iniciales')
         };
 
+        // --- MANUAL VALIDATION (Needed because of novalidate) ---
+        const errors = [];
+        const validate = (val, name, id) => {
+            if (!val || val === '') {
+                errors.push(name);
+                const el = document.getElementById(id);
+                if (el) el.style.borderColor = '#ef4444';
+                return false;
+            }
+            const el = document.getElementById(id);
+            if (el) el.style.borderColor = '';
+            return true;
+        };
+
+        validate(notificationData.n_expediente, 'N° Expediente', 'n-expediente');
+        validate(notificationData.caratula, 'Carátula', 'caratula');
+        validate(notificationData.domicilio, 'Domicilio', 'domicilio');
+        validate(notificationData.destinatario_nombre, 'Destinatario', 'destinatario-nombre');
+
+        // Zona is mandatory
+        if (!notificationData.zona) {
+            errors.push('Zona');
+            const zEl = document.getElementById('zona');
+            if (zEl) zEl.style.borderColor = '#ef4444';
+        } else {
+            const zEl = document.getElementById('zona');
+            if (zEl) zEl.style.borderColor = '';
+        }
+
+        // Troquel is mandatory unless 'sin troquel'
+        if (!notificationData.sin_troquel && !notificationData.n_troquel) {
+            errors.push('N° Troquel');
+            const ntEl = document.getElementById('n-troquel');
+            if (ntEl) ntEl.style.borderColor = '#ef4444';
+        } else {
+            const ntEl = document.getElementById('n-troquel');
+            if (ntEl) ntEl.style.borderColor = '';
+        }
+
+        if (errors.length > 0) {
+            utils.showToast('⚠️ Por favor, complete los campos obligatorios: ' + errors.join(', '), 'error');
+            return;
+        }
+
         // VALIDA ORIGEN: Must have a selected value from dropdown (hidden input)
         if (!notificationData.origen) {
             utils.showToast('⚠️ Por favor, seleccione un Origen válido de la lista desplegable', 'error');
@@ -1243,8 +1293,7 @@ const app = {
                 if (origenHidden) origenHidden.value = '';
 
                 // Reset dynamic origin field
-                document.getElementById('grupo-origen-dinamico')?.classList.add('hidden');
-                document.getElementById('grupo-origen-fijo')?.classList.remove('hidden');
+                this.handleTipoNotificacionChange('cedulas');
 
                 // Close modal
                 const modal = document.getElementById('modal-nueva-notificacion');
