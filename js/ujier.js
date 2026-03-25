@@ -1083,71 +1083,22 @@ const ujier = {
                 }
             });
         } else if (isCompleted) {
-            // EDIT MODE
-            this.isUpdateMode = true;
-
-            if (submitBtn) {
-                submitBtn.innerHTML = '📝 Actualizar Datos';
-                submitBtn.classList.remove('btn-primary');
-                submitBtn.classList.add('btn-warning');
-            }
-
-            // Pre-fill data
-            if (resultSelect) {
-                resultSelect.value = assignment.resultado_diligencia;
-                // resultSelect.disabled = true; // El usuario ahora permite editar el resultado
-            }
-
-            // Fill observations
-            const obsField = document.getElementById('observaciones-resultado');
-            if (obsField) obsField.value = assignment.observaciones_resultado || '';
-
-            // Fill transcription
-            const transField = document.getElementById('transcripcion-audio');
-            if (transField) {
-                transField.value = assignment.transcripcion_audio || '';
-                transField.classList.remove('hidden');
-            }
-
-            // Show GPS in update mode UNLESS it's carga diferida
-            if (assignment.es_carga_diferida == 1) {
-                document.getElementById('gps-wrapper')?.classList.add('hidden');
-            } else {
-                document.getElementById('gps-wrapper')?.classList.remove('hidden');
-            }
-            document.getElementById('carga-diferida')?.parentElement.parentElement.classList.add('hidden'); // Hide toggle
-
-            // Show existing photo if any
-            this.existingPhotos = [];
-            if (assignment.evidencia_foto) {
-                this.existingPhotos = assignment.evidencia_foto.split(',').filter(url => url.trim() !== '');
-            }
-            this.renderPhotoPreviews();
-
-            // Add info alert
+            // ADD MODE SELECTOR
             const info = document.createElement('div');
-            info.id = 'returned-warning'; // reuse ID for simplified toggle logic
-            info.style = 'background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 0.9rem;';
-            info.innerHTML = '<strong>Modo Edición:</strong> Podés corregir el resultado, observaciones, transcripción y fotos.';
+            info.id = 'returned-warning'; 
+            info.style = 'background: #f8fafc; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; margin-bottom: 12px; text-align: center;';
+            info.innerHTML = `
+                <div style="font-size:0.95rem; color:#334155; font-weight:700; margin-bottom:12px;">Esta notificación ya registra un resultado. ¿Qué querés hacer?</div>
+                <div style="display:flex; gap:10px; justify-content:center;">
+                   <button type="button" id="btn-mode-update" onclick="ujier.setDiligenciaMode(true)" class="btn btn-primary btn-sm" style="flex:1;">🖋️ Revisar/Corregir Visita</button>
+                   <button type="button" id="btn-mode-new" onclick="ujier.setDiligenciaMode(false)" class="btn btn-outline btn-sm" style="flex:1;">➕ Agregar Nueva Visita</button>
+                </div>
+            `;
             summary.prepend(info);
-
+            
+            this.setDiligenciaMode(true); // Default to update
         } else {
-            // NORMAL MODE
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '💾 Guardar Resultado';
-                submitBtn.classList.add('btn-primary');
-                submitBtn.classList.remove('btn-warning');
-            }
-            document.getElementById('carga-diferida')?.parentElement.parentElement.classList.remove('hidden');
-
-            // Ensure GPS wrapper is visible in normal mode (unless carga diferida is checked)
-            const gpsWrapper = document.getElementById('gps-wrapper');
-            const cargaDiferida = document.getElementById('carga-diferida');
-            if (gpsWrapper && !cargaDiferida?.checked) {
-                gpsWrapper.classList.remove('hidden');
-            }
-
+            // NORMAL/INCOMPLETE MODE
             if (isPreAviso) {
                 const info = document.createElement('div');
                 info.id = 'returned-warning';
@@ -1155,6 +1106,8 @@ const ujier = {
                 info.innerHTML = '<strong>📝 Seguimiento de Pre-Aviso:</strong> Registrá la nueva visita a continuación. La anterior quedará en el historial.';
                 summary.prepend(info);
             }
+            
+            this.setDiligenciaMode(false); // Default to capture new visit
         }
 
         // Show modal
@@ -1175,6 +1128,89 @@ const ujier = {
         modal?.classList.remove('show');
         this.currentAssignment = null;
         this.resetDiligenciaForm();
+    },
+
+    setDiligenciaMode(isUpdate) {
+        this.isUpdateMode = isUpdate;
+        const assignment = this.currentAssignment;
+        if (!assignment) return;
+
+        const form = document.getElementById('form-diligenciar');
+        const submitBtn = form?.querySelector('button[type="submit"]');
+        const resultSelect = document.getElementById('resultado-diligencia');
+        const obsField = document.getElementById('observaciones-resultado');
+        const transField = document.getElementById('transcripcion-audio');
+
+        if (isUpdate) {
+            if (submitBtn) {
+                submitBtn.innerHTML = '📝 Actualizar Datos';
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-warning');
+            }
+
+            // Pre-fill data
+            if (resultSelect) resultSelect.value = assignment.resultado_diligencia || '';
+            if (obsField) obsField.value = assignment.observaciones_resultado || '';
+
+            if (transField) {
+                transField.value = assignment.transcripcion_audio || '';
+                transField.classList.remove('hidden');
+            }
+
+            // Show GPS in update mode UNLESS it's carga diferida
+            if (assignment.es_carga_diferida == 1) {
+                document.getElementById('gps-wrapper')?.classList.add('hidden');
+            } else {
+                document.getElementById('gps-wrapper')?.classList.remove('hidden');
+            }
+            document.getElementById('carga-diferida')?.parentElement.parentElement.classList.add('hidden'); // Hide toggle
+
+            // Show existing photo if any
+            this.existingPhotos = [];
+            if (assignment.evidencia_foto) {
+                this.existingPhotos = assignment.evidencia_foto.split(',').filter(url => url.trim() !== '');
+            }
+            this.capturedPhotos = [];
+            this.renderPhotoPreviews();
+
+            // Highlight buttons
+            document.getElementById('btn-mode-update')?.classList.add('btn-primary');
+            document.getElementById('btn-mode-update')?.classList.remove('btn-outline');
+            document.getElementById('btn-mode-new')?.classList.add('btn-outline');
+            document.getElementById('btn-mode-new')?.classList.remove('btn-primary');
+        } else {
+            // NEW VISIT MODE
+            if (submitBtn) {
+                submitBtn.innerHTML = '💾 Guardar Nueva Visita';
+                submitBtn.classList.add('btn-primary');
+                submitBtn.classList.remove('btn-warning');
+            }
+            document.getElementById('carga-diferida')?.parentElement.parentElement.classList.remove('hidden');
+
+            const gpsWrapper = document.getElementById('gps-wrapper');
+            const cargaDiferida = document.getElementById('carga-diferida');
+            if (gpsWrapper && !cargaDiferida?.checked) {
+                gpsWrapper.classList.remove('hidden');
+            }
+
+            // Clear values
+            if (resultSelect) {
+               const isSpecial = utils.isSpecialDestination(assignment.destinatario_especial);
+               resultSelect.value = isSpecial ? 'entregado' : '';
+            }
+            if (obsField) obsField.value = '';
+            if (transField) transField.classList.add('hidden');
+
+            this.existingPhotos = [];
+            this.capturedPhotos = [];
+            this.renderPhotoPreviews();
+
+            // Highlight buttons
+            document.getElementById('btn-mode-new')?.classList.add('btn-primary');
+            document.getElementById('btn-mode-new')?.classList.remove('btn-outline');
+            document.getElementById('btn-mode-update')?.classList.add('btn-outline');
+            document.getElementById('btn-mode-update')?.classList.remove('btn-primary');
+        }
     },
 
     // Cargar visitas de una notificación específica
