@@ -857,13 +857,112 @@
 }
 
 /* Media Queries Specifics */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .top-header {
         padding: var(--space-3) var(--space-4);
     }
 
     .header-title h1 {
         font-size: 1.1rem;
+    }
+
+    /* Asignaciones & Devoluciones Mobile Adaptation */
+    #view-asignaciones .dashboard-header,
+    #view-devoluciones .dashboard-header {
+        text-align: center;
+        padding-bottom: 20px;
+    }
+
+    #view-asignaciones .header-actions,
+    #view-devoluciones .header-actions {
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    #view-asignaciones .search-bar,
+    #view-devoluciones .search-bar {
+        max-width: 100% !important;
+        margin: 10px 0;
+    }
+
+    /* Primary View Buttons full-width on mobile */
+    #view-asignaciones .btn:not(.btn-sm), 
+    #view-devoluciones .btn:not(.btn-sm),
+    .reasign-actions .btn {
+        width: 100% !important;
+        justify-content: center;
+        padding: 14px !important;
+        font-size: 1.1rem !important;
+        height: auto !important;
+        margin-top: 5px;
+    }
+
+    /* Back buttons and Select All labels on mobile */
+    .card-header {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center;
+        gap: 15px !important;
+    }
+
+    #btn-back-to-ujieres, #btn-back-to-zones, #btn-select-all-reasign, #btn-select-all-returns {
+        width: 100% !important;
+        padding: 10px !important;
+    }
+
+    /* Card Footer Sticky/Actions */
+    #view-asignaciones .card-footer,
+    #view-devoluciones .card-footer {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        position: sticky !important;
+        bottom: 50px !important; /* Above bottom nav */
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: var(--bg-card) !important;
+        border-top: 2px solid var(--primary-500) !important;
+        box-shadow: 0 -10px 25px rgba(0,0,0,0.3) !important;
+        padding: 20px !important;
+        margin: 0 -15px -15px -15px; /* Offset parent padding if necessary */
+        border-radius: 20px 20px 0 0;
+    }
+
+    .selected-msg {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 1.1rem !important;
+    }
+
+    .reasign-actions {
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 15px !important;
+    }
+
+    #select-target-ujier {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 50px !important;
+        font-size: 1rem !important;
+    }
+
+    /* Grid adjustments */
+    .zones-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+
+    .zone-premium-card {
+        min-height: auto !important;
+        padding: 25px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .top-header {
+        padding: var(--space-2) var(--space-3);
     }
 }
 
