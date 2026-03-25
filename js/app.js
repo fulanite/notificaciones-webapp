@@ -817,42 +817,37 @@ const app = {
                 ujierItems.forEach(el => el.style.display = 'flex');
             } else {
                 // Admin, Administrativo, Coordinador, Auditor
-                adminItems.forEach(el => el.style.display = 'flex');
-
-                // Hide Mapa for Administrativo and Auditor (same as desktop)
-                const mapBtn = mobileNav.querySelector('[data-view="mapa-seguimiento"]');
-                if (mapBtn) {
-                    if (lowerRol === 'admin' || lowerRol === 'coordinador') {
-                        mapBtn.style.display = 'flex';
+                // Only allowed views on mobile based on request: Asignar (asignaciones), Devoluciones, Usuarios
+                const allowedViews = ['asignaciones', 'devoluciones', 'usuarios'];
+                
+                adminItems.forEach(el => {
+                    const view = el.dataset.view;
+                    if (allowedViews.includes(view)) {
+                        el.style.display = 'flex';
                     } else {
-                        mapBtn.style.display = 'none';
+                        el.style.display = 'none';
                     }
-                }
+                });
 
+                // Hide specific views based on role even if they are in the allowed list
                 // Hide Usuarios for Auditor
                 const usersBtn = mobileNav.querySelector('[data-view="usuarios"]');
-                if (usersBtn) {
-                    if (lowerRol === 'auditor') {
-                        usersBtn.style.display = 'none';
-                    } else {
-                        // Admin, Administrativo, Coordinador
-                        usersBtn.style.display = 'flex';
-                    }
+                if (usersBtn && lowerRol === 'auditor') {
+                    usersBtn.style.display = 'none';
                 }
 
                 // Hide Devoluciones for Administrativo and Auditor
                 const devolucionesBtn = mobileNav.querySelector('[data-view="devoluciones"]');
-                if (devolucionesBtn) {
-                    if (lowerRol === 'admin' || lowerRol === 'coordinador') {
-                        devolucionesBtn.style.display = 'flex';
-                    } else {
-                        devolucionesBtn.style.display = 'none';
-                    }
+                if (devolucionesBtn && (lowerRol === 'administrativo' || lowerRol === 'auditor')) {
+                    devolucionesBtn.style.display = 'none';
+                }
+
+                // Hide Shared Explorador for Admin roles (per request)
+                const sharedExplorador = mobileNav.querySelector('[data-view="referencias-gral"]');
+                if (sharedExplorador) {
+                    sharedExplorador.style.display = 'none';
                 }
             }
-
-
-
         }
     },
 
