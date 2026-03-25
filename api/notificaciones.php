@@ -156,6 +156,10 @@ try {
                     $where[] = "(n.fecha_entrega_ujier IS NULL OR n.fecha_entrega_ujier = '')";
                 }
 
+                if (!empty($_GET['assigned_only']) && $_GET['assigned_only'] == '1') {
+                    $where[] = "(n.asignado_a IS NOT NULL AND n.asignado_a != '')";
+                }
+
                 if (!empty($_GET['year'])) {
                     $year = (int) $_GET['year'];
                     // Mas robusto para fechas migradas que pueden ser strings o NULL
