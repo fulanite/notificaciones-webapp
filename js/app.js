@@ -759,26 +759,28 @@ const app = {
 
         const lowerRol = rol ? rol.toLowerCase() : '';
 
+        const defaultAdminView = (window.innerWidth <= 1024) ? 'asignaciones' : 'lista-notificaciones';
+
         if (lowerRol === 'admin') {
             // Admin: acceso completo
             document.getElementById('menu-admin')?.classList.remove('hidden');
             document.getElementById('menu-auditor')?.classList.remove('hidden');
-            this.navigateTo('lista-notificaciones');
+            this.navigateTo(defaultAdminView);
         } else if (lowerRol === 'administrativo') {
             // Administrativo: acceso admin pero sin auditoría
             document.getElementById('menu-admin')?.classList.remove('hidden');
-            this.navigateTo('lista-notificaciones');
+            this.navigateTo(defaultAdminView);
         } else if (lowerRol === 'coordinador') {
             // Coordinador: acceso admin pero sin auditoría
             document.getElementById('menu-admin')?.classList.remove('hidden');
-            this.navigateTo('lista-notificaciones');
+            this.navigateTo(defaultAdminView);
         } else if (lowerRol === 'ujier') {
             document.getElementById('menu-ujier')?.classList.remove('hidden');
             this.navigateTo('mis-asignaciones');
         } else if (lowerRol === 'auditor') {
             document.getElementById('menu-auditor')?.classList.remove('hidden');
             document.getElementById('menu-admin')?.classList.remove('hidden');
-            this.navigateTo('lista-notificaciones');
+            this.navigateTo(defaultAdminView);
         }
 
         // Hide specific menu items based on role
@@ -1000,6 +1002,14 @@ const app = {
             link.classList.remove('active');
             if (link.dataset.view === viewId) {
                 link.classList.add('active');
+            }
+        });
+
+        // Update bottom nav active state (mobile)
+        document.querySelectorAll('.bottom-nav-item').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.view === viewId) {
+                btn.classList.add('active');
             }
         });
 
