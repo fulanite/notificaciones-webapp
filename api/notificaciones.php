@@ -554,6 +554,8 @@ try {
                                 transcripcion_audio = ?,
                                 evidencia_foto = COALESCE(?, evidencia_foto),
                                 observacion_audio = COALESCE(?, observacion_audio),
+                                ubicacion_lat = COALESCE(?, ubicacion_lat),
+                                ubicacion_lng = COALESCE(?, ubicacion_lng),
                                 updated_at = NOW(),
                                 updated_by = ?
                             WHERE id = ?
@@ -565,6 +567,8 @@ try {
                             $data['transcripcion_audio'] ?? null,
                             $data['evidencia_foto'] ?? null,
                             $data['observacion_audio'] ?? null,
+                            $data['ubicacion_lat'] ?? null,
+                            $data['ubicacion_lng'] ?? null,
                             $data['user_id'],
                             $data['id']
                         ]);
@@ -576,7 +580,9 @@ try {
                                 observaciones = ?, 
                                 transcripcion_audio = ?,
                                 foto_url = COALESCE(?, foto_url),
-                                audio_url = COALESCE(?, audio_url)
+                                audio_url = COALESCE(?, audio_url),
+                                ubicacion_lat = COALESCE(?, ubicacion_lat),
+                                ubicacion_lng = COALESCE(?, ubicacion_lng)
                             WHERE notificacion_id = ? 
                             ORDER BY fecha DESC LIMIT 1
                         ");
@@ -586,6 +592,8 @@ try {
                             $data['transcripcion_audio'] ?? null,
                             $data['evidencia_foto'] ?? null,
                             $data['observacion_audio'] ?? null,
+                            $data['ubicacion_lat'] ?? null,
+                            $data['ubicacion_lng'] ?? null,
                             $data['id']
                         ]);
                         break;

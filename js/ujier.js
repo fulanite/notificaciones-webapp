@@ -1109,8 +1109,12 @@ const ujier = {
                 transField.classList.remove('hidden');
             }
 
-            // Hide/Disable GPS and Troquel as they are part of the core result
-            document.getElementById('gps-wrapper')?.classList.add('hidden');
+            // Show GPS in update mode UNLESS it's carga diferida
+            if (assignment.es_carga_diferida == 1) {
+                document.getElementById('gps-wrapper')?.classList.add('hidden');
+            } else {
+                document.getElementById('gps-wrapper')?.classList.remove('hidden');
+            }
             document.getElementById('carga-diferida')?.parentElement.parentElement.classList.add('hidden'); // Hide toggle
 
             // Show existing photo if any
@@ -1717,18 +1721,7 @@ const ujier = {
                 return;
             }
 
-            if (!esCargaDiferida) {
-                const lat = document.getElementById('ubicacion-lat').value;
-                const lng = document.getElementById('ubicacion-lng').value;
-
-                if (!lat || !lng) {
-                    // Double check if deferred is checked again just in case
-                    if (!document.getElementById('carga-diferida').checked) {
-                        utils.showToast('La ubicación GPS es obligatoria para guardar', 'warning');
-                        return;
-                    }
-                }
-            }
+            // GPS position is no longer obligatory
         }
 
         // Show loading state
@@ -1744,11 +1737,18 @@ const ujier = {
                 transcripcion_audio: this.currentAssignment.transcripcion_audio || null
             };
 
+            // Update location if they captured a new one (input not empty)
+            const latInput = document.getElementById('ubicacion-lat').value;
+            const lngInput = document.getElementById('ubicacion-lng').value;
+            
+            if (latInput && lngInput) {
+                resultData.ubicacion_lat = latInput;
+                resultData.ubicacion_lng = lngInput;
+            }
+
             if (!this.isUpdateMode) {
                 // Include all fields only for new registration
                 Object.assign(resultData, {
-                    ubicacion_lat: esCargaDiferida ? null : (document.getElementById('ubicacion-lat').value || null),
-                    ubicacion_lng: esCargaDiferida ? null : (document.getElementById('ubicacion-lng').value || null),
                     es_carga_diferida: esCargaDiferida,
                     motivo_falla_senal: motivoFalla || null
                 });
