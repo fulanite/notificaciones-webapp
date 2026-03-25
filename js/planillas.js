@@ -135,7 +135,9 @@ const planillas = {
             limit: 1000
         };
 
-        if (!isTurnoPermanenteMandamientos && fecha) {
+        if (isTurnoPermanenteMandamientos) {
+            filters.search = zona; // Pass zona as search to ensure DB filters out unrelated zones 
+        } else if (fecha) {
             filters.fecha = fecha;
             filters.dateField = 'fecha_entrega_ujier'; // Filter by delivery date, not creation date
         }
