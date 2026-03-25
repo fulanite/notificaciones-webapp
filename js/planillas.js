@@ -123,15 +123,22 @@ const planillas = {
         const zona = document.getElementById('planilla-zona').value;
         const fecha = document.getElementById('planilla-fecha')?.value;
 
-        if (!fecha) {
+        const isTurnoPermanenteMandamientos = 
+            zona === 'Turno permanente norte mandamientos' || 
+            zona === 'Turno permanente sur mandamientos';
+
+        if (!fecha && !isTurnoPermanenteMandamientos) {
             return null;
         }
 
         const filters = {
-            fecha: fecha,
-            limit: 1000,
-            dateField: 'fecha_entrega_ujier' // Filter by delivery date, not creation date
+            limit: 1000
         };
+
+        if (!isTurnoPermanenteMandamientos && fecha) {
+            filters.fecha = fecha;
+            filters.dateField = 'fecha_entrega_ujier'; // Filter by delivery date, not creation date
+        }
 
         const { data, error } = await db.getNotifications(filters);
 
@@ -163,9 +170,14 @@ const planillas = {
 
     async updatePreview() {
         const fecha = document.getElementById('planilla-fecha')?.value;
+        const zona = document.getElementById('planilla-zona')?.value;
         const tbody = document.querySelector('#tabla-planillas-preview tbody');
 
-        if (!fecha) {
+        const isTurnoPermanenteMandamientos = 
+            zona === 'Turno permanente norte mandamientos' || 
+            zona === 'Turno permanente sur mandamientos';
+
+        if (!fecha && !isTurnoPermanenteMandamientos) {
             if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="text-center">Seleccione una fecha para ver la vista previa</td></tr>';
             return;
         }
@@ -275,7 +287,7 @@ const planillas = {
 
         const { jsPDF } = window.jspdf;
         const fecha = document.getElementById('planilla-fecha').value;
-        const formattedDate = fecha.split('-').reverse().join('/');
+        const formattedDate = fecha ? fecha.split('-').reverse().join('/') : 'Sin Fecha';
 
         // Group data by Zona
         const groupedData = data.reduce((acc, item) => {
