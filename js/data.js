@@ -22,6 +22,7 @@ const SGND_DATA = {
         { value: 'cedulas_urgentes_sur', label: 'Cédulas Urgentes Sur' },
         { value: 'cedulas_mandamientos_22172', label: 'Cédulas o mandamientos Ley 22.172' },
         { value: 'cedulas_correspondencia', label: 'Cédulas Interior' },
+        { value: 'mandamientos_interior', label: 'Mandamientos Interior' },
         { value: 'mandamientos', label: 'Mandamientos' },
         { value: 'mandamientos_habilitacion_norte', label: 'Mandamientos con Habilitación Norte' },
         { value: 'mandamientos_habilitacion_sur', label: 'Mandamientos con Habilitación Sur' }
@@ -97,6 +98,7 @@ const SGND_DATA = {
         'Juzgado de Familia 1',
         'Juzgado de Familia 2',
         'Juzgado de Familia 3',
+        'Juzgado de Familia 4',
         'Juzgado de Garantías 1',
         'Juzgado de Garantías 2',
         'Juzgado de Garantías 3',

@@ -9,7 +9,7 @@ const CONFIG = {
 
     // App Settings
     APP_NAME: 'SGND',
-    APP_VERSION: '1.7.2',
+    APP_VERSION: '1.7.3',
 
     // Pagination
     ITEMS_PER_PAGE: 20,
@@ -32,6 +32,7 @@ const CONFIG = {
         cedulas_urgentes_sur: 'Cédulas Urgentes Sur',
         cedulas_mandamientos_22172: 'Cédulas o Mandamientos Ley 22172',
         cedulas_correspondencia: 'Cédulas Interior',
+        mandamientos_interior: 'Mandamientos Interior',
         mandamientos: 'Mandamientos',
         mandamientos_habilitacion_norte: 'Mandamientos con habilitación Norte',
         mandamientos_habilitacion_sur: 'Mandamientos con habilitación Sur'
@@ -69,7 +70,7 @@ const CONFIG = {
     },
 
     // Zones
-    ZONES: ['norte', 'sur', 'centro', 'este', 'oeste', 'interior'],
+    ZONES: ['norte', 'sur', 'centro', 'este', 'oeste', 'interior', 'sin_zona'],
 
     // User Roles
     ROLES: {
