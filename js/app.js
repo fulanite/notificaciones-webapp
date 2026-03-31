@@ -216,7 +216,7 @@ const app = {
         const isHabilitacion = tipo.includes('habilitacion');
 
         if (!notifications?.editingId) {
-            if (tipo === 'mandamientos' || isHabilitacion) {
+            if (isMandamiento || isHabilitacion) {
                 if (troquelSelect) {
                     troquelSelect.value = 'M';
                     this.handleTroquelChange('M');
@@ -254,7 +254,7 @@ const app = {
             newInput.placeholder = 'Escribí para buscar provincia...';
             options = SGND_DATA.PROVINCIAS;
 
-        } else if (tipo === 'cedulas_correspondencia') {
+        } else if (tipo === 'cedulas_correspondencia' || tipo === 'mandamientos_interior') {
             grupoFixed?.classList.add('hidden');
             document.getElementById('origen').required = false;
             document.getElementById('origen-input').required = false;

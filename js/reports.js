@@ -89,7 +89,7 @@ function categorizeAndCount(rows) {
         if (tipoNot === 'cedulas_mandamientos_22172') {
             // Agrupar por el texto exacto del Origen (Provincia)
             category = origen || 'Otras Provincias (Ley 22.172 - Sin especificar)';
-        } else if (tipoNot === 'cedulas_correspondencia') {
+        } else if (tipoNot === 'cedulas_correspondencia' || tipoNot === 'mandamientos_interior') {
             // Agrupar todo bajo 'Juzgados del interior'
             category = 'Juzgados del interior';
         }

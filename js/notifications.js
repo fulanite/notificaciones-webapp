@@ -828,7 +828,8 @@ const notifications = {
 
             // Trigger tipo change to set up correct origin field
             if (standardizedTipo === 'cedulas_mandamientos_22172' ||
-                standardizedTipo === 'cedulas_correspondencia') {
+                standardizedTipo === 'cedulas_correspondencia' ||
+                standardizedTipo === 'mandamientos_interior') {
                 app.handleTipoNotificacionChange(standardizedTipo);
                 // Wait a bit for the searchable select to be set up, then populate
                 setTimeout(() => {
