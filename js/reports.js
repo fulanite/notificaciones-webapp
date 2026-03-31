@@ -2,34 +2,42 @@
  * SGND - Reports Module
  */
 
-const JUZGADOS_PENALES_MAP = new Map([
-    ['Fiscalía de Instrucción', [/^Fiscalía de Instrucción/i]],
-    ['Fiscalía Penal Juvenil', [/^Fiscalía Penal Juvenil$/i]],
-    ['Cámaras Penales', [/^Cámara de Apelaciones Penal y de Exhorto$/i, /^Cámara en lo Criminal/i]],
-    ['Juzgados Correcionales', [/^Juzgado Correcional/i]],
-    ['Control y garantías', [/^Juzgado de Garantías/i]],
-    ['Ejecución Penal', [/^Juzgado de Ejecución Penal/i]],
+const CORTE_Y_MEDIACION_MAP = new Map([
+    ['Corte de Justicia', [/^Corte de Justicia/i]],
+    ['Centro de Mediación Judicial', [/^Centro de Mediación Judicial$/i]]
 ]);
 
-const DEMAS_JUZGADOS_MAP = new Map([
-    ['Corte de justicia', [/^Corte de Justicia - Secretaría/i]],
-    ['Cámara de apelaciones', [/^Cámara Civil/i]],
+const CAMARAS_MAP = new Map([
+    ['Cámaras Penales', [/^Cámara de Apelaciones Penal y de Exhorto/i, /^Cámara en lo Criminal/i]],
+    ['Cámaras de Apelación Civil', [/^Cámara Civil/i]],
     ['Civiles', [/^Juzgado Civil/i]],
-    ['Comercial y Ejecución', [/^Juzgado Comercial/i]],
-    ['Ejecución Fiscal', [/^Ejecución Fiscal$/i]],
-    ['Electoral y Minas', [/^Juzgado Electoral y Minas$/i]],
+    ['Comerciales y de Ejecución', [/^Juzgado Comercial/i]]
+]);
+
+const JUZGADOS_MAP = new Map([
+    ['Laborales', [/^Juzgado Laboral/i]],
+    ['Correccionales', [/^Juzgado Correccional/i]],
+    ['Control de Garantías', [/^Juzgado de Garantías/i]],
+    ['Ejecución Penal', [/^Juzgado de Ejecución Penal/i]],
+    ['Ejecución Fiscal', [/^Ejecución Fiscal/i]],
+    ['Electoral y Minas', [/^Juzgado Electoral y Minas/i]],
     ['Familia', [/^Juzgado de Familia/i]],
-    ['Centro de Mediación Judicial', [/^Centro de Mediación Judicial$/i]],
-    ['Defensorías Civiles', [/^Defensoría Civil/i]],
+    ['Responsabilidad Penal Juvenil', [/^Tribunal de Responsabilidad Penal Juvenil/i]]
+]);
+
+const MINISTERIO_PUBLICO_MAP = new Map([
+    ['Ministerio Público', [/^Ministerio Público/i, /^Procuración/i]],
+    ['Fiscalías de Instrucción', [/^Fiscalía de Instrucción/i]],
+    ['Asesoría de Menores', [/^Asesoría de Menores e Incapaces/i]],
+    ['Defensorías Civiles', [/^Defensoría Civil/i]]
+]);
+
+const OTROS_MAP = new Map([
     ['Juzgados del interior', [/^Andalgalá$/i, /^Belén$/i, /^Tinogasta$/i, /^Santa Maria$/i, /^Recreo$/i]],
     ['De otras provincias', [/^(Buenos Aires|Catamarca|Chaco|Chubut|Ciudad Autónoma de Buenos Aires \(CABA\)|Córdoba|Corrientes|Entre Ríos|Formosa|Jujuy|La Pampa|La Rioja|Mendoza|Misiones|Neuquén|Río Negro|Salta|San Juan|San Luis|Santa Cruz|Santa Fe|Santiago del Estero|Tierra del Fuego, Antártida e Islas del Atlántico Sur|Tucumán)$/i]],
-    ['Asesorías de menores', [/^Asesoría de Menores e Incapaces$/i]],
-    ['Tribunal Penal Juvenil', [/^Tribunal de Responsabilidad Penal Juvenil/i]],
-    ['Laborales', [/^Juzgado Laboral/i]],
-    ['Ministerio Público', [/^Ministerio Público$/i]],
-    ['Procuración', [/^Procuración$/i]],
+    ['Fiscalía Penal Juvenil', [/^Fiscalía Penal Juvenil$/i]],
     ['Ley 22.172 / Otras Provincias', [/^Cédulas o Mandamientos Ley 22172$/i]],
-    ['Interior / Otras Jurisdicciones', [/^Andalgalá$/i, /^Belén$/i, /^Tinogasta$/i, /^Santa Maria$/i, /^Recreo$/i, /^Cédulas por Correspondencia/i]],
+    ['Interior / Otras Jurisdicciones', [/^Cédulas por Correspondencia/i]]
 ]);
 
 function getCategory(origen, categoryMap) {
@@ -46,8 +54,11 @@ function getCategory(origen, categoryMap) {
 function categorizeAndCount(rows) {
     const counts = {
         tipos: new Map(),
-        juzgadosPenales: new Map(),
-        demasJuzgados: new Map(),
+        corteYMediacion: new Map(),
+        camaras: new Map(),
+        juzgados: new Map(),
+        ministerioPublico: new Map(),
+        otros: new Map()
     };
 
     rows.forEach(row => {
@@ -63,8 +74,6 @@ function categorizeAndCount(rows) {
 
         let displayTipo = officialType ? officialType.label : (tipoNot || 'No especificado');
 
-        // Normalización final de visualización para agrupar variantes que escaparon al match
-        // Ej: si en la base dice "cedula" y no matcheó con "Cédulas"
         if (normInput === 'cedulas') displayTipo = 'Cédulas';
         if (normInput === 'mandamientos') displayTipo = 'Mandamientos';
 
@@ -78,33 +87,32 @@ function categorizeAndCount(rows) {
         // Categorization by 'origen'
         const origen = (row.origen || '').trim();
 
-        // 1. Check if it belongs to Juzgados Penales (Prioridad Base)
-        let category = getCategory(origen, JUZGADOS_PENALES_MAP);
-        if (category) {
-            counts.juzgadosPenales.set(category, (counts.juzgadosPenales.get(category) || 0) + 1);
-            return;
-        }
+        // 1. Check Maps
+        let category = getCategory(origen, CORTE_Y_MEDIACION_MAP);
+        if (category) { counts.corteYMediacion.set(category, (counts.corteYMediacion.get(category) || 0) + 1); return; }
+
+        category = getCategory(origen, CAMARAS_MAP);
+        if (category) { counts.camaras.set(category, (counts.camaras.get(category) || 0) + 1); return; }
+
+        category = getCategory(origen, JUZGADOS_MAP);
+        if (category) { counts.juzgados.set(category, (counts.juzgados.get(category) || 0) + 1); return; }
+
+        category = getCategory(origen, MINISTERIO_PUBLICO_MAP);
+        if (category) { counts.ministerioPublico.set(category, (counts.ministerioPublico.get(category) || 0) + 1); return; }
 
         // 2. Special Logic for Specific Notification Types (Overrides Generic Maps)
         if (tipoNot === 'cedulas_mandamientos_22172') {
-            // Agrupar por el texto exacto del Origen (Provincia)
             category = origen || 'Otras Provincias (Ley 22.172 - Sin especificar)';
         } else if (tipoNot === 'cedulas_correspondencia' || tipoNot === 'mandamientos_interior') {
-            // Agrupar todo bajo 'Juzgados del interior'
             category = 'Juzgados del interior';
         }
 
-        // 3. If not handled by special logic, use Generic Map for Demas Juzgados
+        // 3. Fallbacks
         if (!category) {
-            category = getCategory(origen, DEMAS_JUZGADOS_MAP);
+            category = getCategory(origen, OTROS_MAP) || origen || 'Otros / No clasificados';
         }
 
-        // 4. Fallback
-        if (!category) {
-            category = origen || 'Otros / No clasificados';
-        }
-
-        counts.demasJuzgados.set(category, (counts.demasJuzgados.get(category) || 0) + 1);
+        counts.otros.set(category, (counts.otros.get(category) || 0) + 1);
     });
 
     return counts;
@@ -280,33 +288,30 @@ const reports = {
         });
         finalY = doc.lastAutoTable.finalY;
 
-        // --- TABLE 2: Juzgados Penales ---
-        if (counts.juzgadosPenales.size > 0) {
-            doc.autoTable({
-                ...tableOptions,
-                startY: finalY + 20,
-                head: [['JUZGADOS PENALES', 'Cantidad']],
-                body: Array.from(counts.juzgadosPenales.entries()).sort((a, b) => a[0].localeCompare(b[0])),
-            });
-            finalY = doc.lastAutoTable.finalY;
-        }
-
-        // --- TABLE 3: Demás Juzgados ---
-        if (counts.demasJuzgados.size > 0) {
-            const demasBody = Array.from(counts.demasJuzgados.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-            if (finalY + (demasBody.length * 25) > pageHeight - 50) {
-                doc.addPage();
-                finalY = 50;
+        // --- HELPER PARA TABLAS ---
+        const renderTable = (title, mapData) => {
+            if (mapData.size > 0) {
+                const bodyArray = Array.from(mapData.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+                if (finalY + (bodyArray.length * 25) > pageHeight - 50) {
+                    doc.addPage();
+                    finalY = 50;
+                }
+                doc.autoTable({
+                    ...tableOptions,
+                    startY: finalY + 20,
+                    head: [[title, 'Cantidad']],
+                    body: bodyArray,
+                });
+                finalY = doc.lastAutoTable.finalY;
             }
+        };
 
-            doc.autoTable({
-                ...tableOptions,
-                startY: finalY + 20,
-                head: [['DEMÁS JUZGADOS', 'Cantidad']],
-                body: demasBody,
-            });
-            finalY = doc.lastAutoTable.finalY;
-        }
+        // --- RENDERIZADO DE TABLAS NUEVAS ---
+        renderTable('CORTE DE JUSTICIA Y CENTRO DE MEDIACIÓN JUDICIAL', counts.corteYMediacion);
+        renderTable('CÁMARAS', counts.camaras);
+        renderTable('JUZGADOS', counts.juzgados);
+        renderTable('MINISTERIO PÚBLICO', counts.ministerioPublico);
+        renderTable('OTROS / DEMÁS JUZGADOS', counts.otros);
 
         // --- FINAL TOTAL ---
         if (finalY > pageHeight - 50) {
