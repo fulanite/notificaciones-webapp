@@ -22,7 +22,8 @@ const JUZGADOS_MAP = new Map([
     ['Ejecución Fiscal', [/^Ejecución Fiscal/i]],
     ['Electoral y Minas', [/^Juzgado Electoral y Minas/i]],
     ['Familia', [/^Juzgado de Familia/i]],
-    ['Responsabilidad Penal Juvenil', [/^Tribunal de Responsabilidad Penal Juvenil/i]]
+    ['Responsabilidad Penal Juvenil', [/^Tribunal de Responsabilidad Penal Juvenil/i]],
+    ['Fiscalía Penal Juvenil', [/^Fiscalía Penal Juvenil$/i]]
 ]);
 
 const MINISTERIO_PUBLICO_MAP = new Map([
@@ -33,11 +34,7 @@ const MINISTERIO_PUBLICO_MAP = new Map([
 ]);
 
 const OTROS_MAP = new Map([
-    ['Juzgados del interior', [/^Andalgalá$/i, /^Belén$/i, /^Tinogasta$/i, /^Santa Maria$/i, /^Recreo$/i]],
-    ['De otras provincias', [/^(Buenos Aires|Catamarca|Chaco|Chubut|Ciudad Autónoma de Buenos Aires \(CABA\)|Córdoba|Corrientes|Entre Ríos|Formosa|Jujuy|La Pampa|La Rioja|Mendoza|Misiones|Neuquén|Río Negro|Salta|San Juan|San Luis|Santa Cruz|Santa Fe|Santiago del Estero|Tierra del Fuego, Antártida e Islas del Atlántico Sur|Tucumán)$/i]],
-    ['Fiscalía Penal Juvenil', [/^Fiscalía Penal Juvenil$/i]],
-    ['Ley 22.172 / Otras Provincias', [/^Cédulas o Mandamientos Ley 22172$/i]],
-    ['Interior / Otras Jurisdicciones', [/^Cédulas por Correspondencia/i]]
+    // Queda vacío u opcional para futuros mapeos
 ]);
 
 function getCategory(origen, categoryMap) {
@@ -100,11 +97,16 @@ function categorizeAndCount(rows) {
         category = getCategory(origen, MINISTERIO_PUBLICO_MAP);
         if (category) { counts.ministerioPublico.set(category, (counts.ministerioPublico.get(category) || 0) + 1); return; }
 
-        // 2. Special Logic for Specific Notification Types (Overrides Generic Maps)
-        if (tipoNot === 'cedulas_mandamientos_22172') {
-            category = origen || 'Otras Provincias (Ley 22.172 - Sin especificar)';
-        } else if (tipoNot === 'cedulas_correspondencia' || tipoNot === 'mandamientos_interior') {
-            category = 'Juzgados del interior';
+        // 2. Excluir específicamente localidades y otras provincias para que NO aparezcan en el cuadro Otros
+        if (
+            tipoNot === 'cedulas_mandamientos_22172' || 
+            tipoNot === 'cedulas_correspondencia' || 
+            tipoNot === 'mandamientos_interior' ||
+            /^(Buenos Aires|Catamarca|Chaco|Chubut|Ciudad Autónoma de Buenos Aires \(CABA\)|Córdoba|Corrientes|Entre Ríos|Formosa|Jujuy|La Pampa|La Rioja|Mendoza|Misiones|Neuquén|Río Negro|Salta|San Juan|San Luis|Santa Cruz|Santa Fe|Santiago del Estero|Tierra del Fuego, Antártida e Islas del Atlántico Sur|Tucumán)$/i.test(origen) ||
+            /^(Andalgalá|Belén|Tinogasta|Santa Maria|Recreo|Cédulas por Correspondencia)$/i.test(origen) ||
+            /^Cédulas o Mandamientos Ley 22172$/i.test(origen)
+        ) {
+            return; // Se omiten del cuadro Otros (pero ya sumaron en el cuadro Tipos de Notificación superior)
         }
 
         // 3. Fallbacks
