@@ -55,6 +55,8 @@ function categorizeAndCount(rows) {
         camaras: new Map(),
         juzgados: new Map(),
         ministerioPublico: new Map(),
+        interior: new Map(),
+        provincias: new Map(),
         otros: new Map()
     };
 
@@ -97,16 +99,23 @@ function categorizeAndCount(rows) {
         category = getCategory(origen, MINISTERIO_PUBLICO_MAP);
         if (category) { counts.ministerioPublico.set(category, (counts.ministerioPublico.get(category) || 0) + 1); return; }
 
-        // 2. Excluir específicamente localidades y otras provincias para que NO aparezcan en el cuadro Otros
-        if (
-            tipoNot === 'cedulas_mandamientos_22172' || 
-            tipoNot === 'cedulas_correspondencia' || 
-            tipoNot === 'mandamientos_interior' ||
+        // 2. Extraer a los cuadros correspondientes de Interior y Provincias
+        const esProvincia = tipoNot === 'cedulas_mandamientos_22172' || 
             /^(Buenos Aires|Catamarca|Chaco|Chubut|Ciudad Autónoma de Buenos Aires \(CABA\)|Córdoba|Corrientes|Entre Ríos|Formosa|Jujuy|La Pampa|La Rioja|Mendoza|Misiones|Neuquén|Río Negro|Salta|San Juan|San Luis|Santa Cruz|Santa Fe|Santiago del Estero|Tierra del Fuego, Antártida e Islas del Atlántico Sur|Tucumán)$/i.test(origen) ||
-            /^(Andalgalá|Belén|Tinogasta|Santa Maria|Recreo|Cédulas por Correspondencia)$/i.test(origen) ||
-            /^Cédulas o Mandamientos Ley 22172$/i.test(origen)
-        ) {
-            return; // Se omiten del cuadro Otros (pero ya sumaron en el cuadro Tipos de Notificación superior)
+            /^Cédulas o Mandamientos Ley 22172$/i.test(origen);
+
+        const esInterior = tipoNot === 'cedulas_correspondencia' || 
+            tipoNot === 'mandamientos_interior' ||
+            /^(Andalgalá|Belén|Tinogasta|Santa Maria|Recreo|Cédulas por Correspondencia)$/i.test(origen);
+
+        if (esProvincia) {
+            counts.provincias.set(origen || 'Sin especificar', (counts.provincias.get(origen || 'Sin especificar') || 0) + 1);
+            return;
+        }
+
+        if (esInterior) {
+            counts.interior.set(origen || 'Sin especificar', (counts.interior.get(origen || 'Sin especificar') || 0) + 1);
+            return;
         }
 
         // 3. Fallbacks
@@ -313,6 +322,8 @@ const reports = {
         renderTable('CÁMARAS', counts.camaras);
         renderTable('JUZGADOS', counts.juzgados);
         renderTable('MINISTERIO PÚBLICO', counts.ministerioPublico);
+        renderTable('JUZGADOS DEL INTERIOR', counts.interior);
+        renderTable('OTRAS PROVINCIAS', counts.provincias);
         renderTable('OTROS / DEMÁS JUZGADOS', counts.otros);
 
         // --- FINAL TOTAL ---
