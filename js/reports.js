@@ -324,7 +324,6 @@ const reports = {
         renderTable('MINISTERIO PÚBLICO', counts.ministerioPublico);
         renderTable('JUZGADOS DEL INTERIOR', counts.interior);
         renderTable('OTRAS PROVINCIAS', counts.provincias);
-        renderTable('OTROS / DEMÁS JUZGADOS', counts.otros);
 
         // --- FINAL TOTAL ---
         if (finalY > pageHeight - 50) {
