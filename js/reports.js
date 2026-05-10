@@ -23,7 +23,8 @@ const JUZGADOS_MAP = new Map([
     ['Electoral y Minas', [/^Juzgado Electoral y Minas/i]],
     ['Familia', [/^Juzgado de Familia/i]],
     ['Responsabilidad Penal Juvenil', [/^Tribunal de Responsabilidad Penal Juvenil/i]],
-    ['Fiscalía Penal Juvenil', [/^Fiscalía Penal Juvenil$/i]]
+    ['Fiscalía Penal Juvenil', [/^Fiscalía Penal Juvenil$/i]],
+    ['Fiscalía Penal de Violencia Familiar y de Género', [/^Fiscalía Penal de Violencia Familiar y de Género$/i]]
 ]);
 
 const MINISTERIO_PUBLICO_MAP = new Map([
@@ -57,6 +58,7 @@ function categorizeAndCount(rows) {
         ministerioPublico: new Map(),
         interior: new Map(),
         provincias: new Map(),
+        particulares: new Map(),
         otros: new Map()
     };
 
@@ -85,6 +87,14 @@ function categorizeAndCount(rows) {
 
         // Categorization by 'origen'
         const origen = (row.origen || '').trim();
+
+        // Check if it's a cédula with troquel
+        const tieneTroquel = row.n_troquel || (row.sin_troquel == 0 && row.tipo_troquel);
+        const isCedula = normInput.includes('cedula') || normInput === 'cedulas';
+
+        if (isCedula && tieneTroquel) {
+            counts.particulares.set('Cédulas Particulares / Con Troquel', (counts.particulares.get('Cédulas Particulares / Con Troquel') || 0) + 1);
+        }
 
         // 1. Check Maps
         let category = getCategory(origen, CORTE_Y_MEDIACION_MAP);
@@ -324,6 +334,7 @@ const reports = {
         renderTable('MINISTERIO PÚBLICO', counts.ministerioPublico);
         renderTable('JUZGADOS DEL INTERIOR', counts.interior);
         renderTable('OTRAS PROVINCIAS', counts.provincias);
+        renderTable('CÉDULAS PARTICULARES / CON TROQUEL', counts.particulares);
 
         // --- FINAL TOTAL ---
         if (finalY > pageHeight - 50) {

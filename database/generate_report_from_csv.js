@@ -5,6 +5,7 @@ const path = require('path');
 const JUZGADOS_PENALES_MAP = new Map([
     ['Fiscalía de Instrucción', [/^Fiscalía de Instrucción/i]],
     ['Fiscalía Penal Juvenil', [/^Fiscalía Penal Juvenil$/i]],
+    ['Fiscalía Penal de Violencia Familiar y de Género', [/^Fiscalía Penal de Violencia Familiar y de Género$/i]],
     ['Cámaras Penales', [/^Cámara de Apelaciones Penal y de Exhorto$/i, /^Cámara en lo Criminal/i]],
     ['Juzgados Correcionales', [/^Juzgado Correcional/i]],
     ['Control y garantías', [/^Juzgado de Garantías/i]],
@@ -77,6 +78,7 @@ const counts = {
     tipos: new Map(),
     juzgadosPenales: new Map(),
     demasJuzgados: new Map(),
+    particulares: new Map(),
 };
 
 diciembre.forEach(row => {
@@ -84,6 +86,16 @@ diciembre.forEach(row => {
     counts.tipos.set(tipoNot, (counts.tipos.get(tipoNot) || 0) + 1);
 
     const origen = (row.origen || '').trim();
+    
+    // Check if it's a cédula with troquel
+    const normInput = tipoNot.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const tieneTroquel = row.n_troquel || (row.sin_troquel == '0' && row.tipo_troquel);
+    const isCedula = normInput.includes('cedula') || normInput === 'cedulas';
+
+    if (isCedula && tieneTroquel) {
+        counts.particulares.set('Cédulas Particulares / Con Troquel', (counts.particulares.get('Cédulas Particulares / Con Troquel') || 0) + 1);
+    }
+
     let category = getCategory(origen, JUZGADOS_PENALES_MAP);
     if (category) {
         counts.juzgadosPenales.set(category, (counts.juzgadosPenales.get(category) || 0) + 1);
@@ -112,6 +124,12 @@ penalesSorted.forEach(([cat, count]) => {
 console.log('\nDEMÁS JUZGADOS:');
 const demasSorted = Array.from(counts.demasJuzgados.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 demasSorted.forEach(([cat, count]) => {
+    console.log(`  ${cat}: ${count}`);
+});
+
+console.log('\nCÉDULAS PARTICULARES / CON TROQUEL:');
+const particularesSorted = Array.from(counts.particulares.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+particularesSorted.forEach(([cat, count]) => {
     console.log(`  ${cat}: ${count}`);
 });
 

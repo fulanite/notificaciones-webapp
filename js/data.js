@@ -77,6 +77,7 @@ const SGND_DATA = {
         'Fiscalía de Instrucción 9',
         'Fiscalía de Instrucción 10',
         'Fiscalía Penal Juvenil',
+        'Fiscalía Penal de Violencia Familiar y de Género',
         'Juzgado Civil 1',
         'Juzgado Civil 2',
         'Juzgado Civil 3',
