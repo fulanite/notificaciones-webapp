@@ -18,10 +18,10 @@
     <link rel="apple-touch-icon" href="assets/icons/icon.svg">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/variables.css?v=43.73" as="style">
-    <link rel="preload" href="css/base.css?v=43.73" as="style">
-    <link rel="preload" href="js/config.js?v=43.73" as="script">
-    <link rel="preload" href="js/app.js?v=43.73" as="script">
+    <link rel="preload" href="css/variables.css?v=43.74" as="style">
+    <link rel="preload" href="css/base.css?v=43.74" as="style">
+    <link rel="preload" href="js/config.js?v=43.74" as="script">
+    <link rel="preload" href="js/app.js?v=43.74" as="script">
 
     <!-- Google Fonts - Non-blocking -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,16 +34,16 @@
     </noscript>
 
     <!-- Critical Styles - Inline or Load First -->
-    <link rel="stylesheet" href="css/variables.css?v=43.73">
-    <link rel="stylesheet" href="css/base.css?v=43.73">
-    <link rel="stylesheet" href="css/components.css?v=43.73">
+    <link rel="stylesheet" href="css/variables.css?v=43.74">
+    <link rel="stylesheet" href="css/base.css?v=43.74">
+    <link rel="stylesheet" href="css/components.css?v=43.74">
 
     <!-- Non-Critical Styles - Deferred -->
-    <link rel="stylesheet" href="css/references.css?v=43.73" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/layout.css?v=43.73" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/pages.css?v=43.73" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/mobile-tables.css?v=43.73" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="css/animations.css?v=43.73" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/references.css?v=43.74" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/layout.css?v=43.74" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/pages.css?v=43.74" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/mobile-tables.css?v=43.74" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/animations.css?v=43.74" media="print" onload="this.media='all'">
 
     <!-- Leaflet Maps - Lazy Load (only when needed) -->
     <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
@@ -741,33 +741,40 @@
                                     </div>
 
                                     <div class="form-grid-compact">
-                                        <!-- Row 1: Type, Exp, Caratula -->
+                                        <!-- Row 0: Tipo de Notificacion -->
                                         <div class="f-row">
-                                            <div class="f-group" style="width: 25%;">
-                                                <label>Tipo *</label>
-                                                <select id="tipo-notificacion" name="tipo-notificacion" required
-                                                    onchange="app.handleTipoNotificacionChange(this.value)">
-                                                    <option value="cedulas">Cédulas</option>
-                                                    <option value="cedulas_urgentes_norte">Cédulas Urgentes Norte
-                                                    </option>
-                                                    <option value="cedulas_urgentes_sur">Cédulas Urgentes Sur</option>
-                                                    <option value="cedulas_mandamientos_22172">Cédulas o mandamientos
-                                                        Ley 22.172</option>
-                                                    <option value="cedulas_correspondencia">Cédulas interior</option>
-                                                    <option value="mandamientos_interior">Mandamientos interior</option>
-                                                    <option value="mandamientos">Mandamientos</option>
-                                                    <option value="mandamientos_habilitacion_norte">Mandamientos con
-                                                        Habilitación Norte</option>
-                                                    <option value="mandamientos_habilitacion_sur">Mandamientos con
-                                                        Habilitación Sur</option>
-                                                </select>
+                                            <div class="f-group" style="width: 100%;">
+                                                <label>Tipo de Notificación *</label>
+                                                <div class="notification-type-chips">
+                                                    <input type="hidden" id="tipo-notificacion" name="tipo-notificacion" required>
+                                                    
+                                                    <div class="chips-group">
+                                                        <button type="button" class="chip-btn chip-neutral" data-value="cedulas" onclick="app.selectNotificationType('cedulas', 'Cédula', this)">📄 Cédulas</button>
+                                                        <button type="button" class="chip-btn chip-neutral" data-value="mandamientos" onclick="app.selectNotificationType('mandamientos', 'Mandamiento', this)">📄 Mandamientos</button>
+                                                        <button type="button" class="chip-btn chip-neutral" data-value="cedulas_correspondencia" onclick="app.selectNotificationType('cedulas_correspondencia', 'Cédula Interior', this)">Cédulas interior</button>
+                                                        <button type="button" class="chip-btn chip-neutral" data-value="mandamientos_interior" onclick="app.selectNotificationType('mandamientos_interior', 'Mandamiento Interior', this)">Mandamientos interior</button>
+                                                        <button type="button" class="chip-btn chip-neutral" data-value="cedulas_mandamientos_22172" onclick="app.selectNotificationType('cedulas_mandamientos_22172', 'Ley 22.172', this)">Ley 22.172</button>
+                                                    </div>
+                                                    
+                                                    <div class="chips-group urgent-group">
+                                                        <button type="button" class="chip-btn chip-urgent" data-value="cedulas_urgentes_norte" onclick="app.selectNotificationType('cedulas_urgentes_norte', 'Cédula Urgente Norte', this)">🚨 Cédula Urgente Norte</button>
+                                                        <button type="button" class="chip-btn chip-urgent" data-value="cedulas_urgentes_sur" onclick="app.selectNotificationType('cedulas_urgentes_sur', 'Cédula Urgente Sur', this)">🚨 Cédula Urgente Sur</button>
+                                                        <button type="button" class="chip-btn chip-urgent" data-value="mandamientos_habilitacion_norte" onclick="app.selectNotificationType('mandamientos_habilitacion_norte', 'Mand. Hab. Norte', this)">⚡ Mand. Habilitación Norte</button>
+                                                        <button type="button" class="chip-btn chip-urgent" data-value="mandamientos_habilitacion_sur" onclick="app.selectNotificationType('mandamientos_habilitacion_sur', 'Mand. Hab. Sur', this)">⚡ Mand. Habilitación Sur</button>
+                                                    </div>
+                                                </div>
+                                                <div id="tipo-notificacion-alert" class="tipo-alert hidden"></div>
                                             </div>
-                                            <div class="f-group" style="width: 20%;">
+                                        </div>
+
+                                        <!-- Row 1: Exp, Caratula -->
+                                        <div class="f-row">
+                                            <div class="f-group" style="width: 30%;">
                                                 <label>Expediente *</label>
                                                 <input type="text" id="n-expediente" name="n-expediente"
                                                     placeholder="123/24" required>
                                             </div>
-                                            <div class="f-group" style="width: 55%;">
+                                            <div class="f-group" style="width: 70%;">
                                                 <label>Carátula *</label>
                                                 <input type="text" id="caratula" name="caratula"
                                                     placeholder="Nombre del expediente" required>
@@ -2093,27 +2100,27 @@
         </div>
     </div>
 
-    <script defer src="js/lazy-loader.js?v=43.73"></script>
-    <script defer src="js/config.js?v=43.73"></script>
-    <script defer src="js/data.js?v=43.73"></script>
-    <script defer src="js/api-client.js?v=43.73"></script>
-    <script defer src="js/auth.js?v=43.73"></script>
-    <script defer src="js/utils.js?v=43.73"></script>
-    <script defer src="js/offline.js?v=43.73"></script>
-    <script defer src="js/notifications.js?v=43.73"></script>
-    <script defer src="js/ujier.js?v=43.73"></script>
-    <script defer src="js/dashboard.js?v=43.73"></script>
-    <script defer src="js/dashboard-patch.js?v=43.73"></script>
-    <script defer src="js/dashboard-ui-patch.js?v=43.73"></script>
-    <script defer src="js/dashboard-analytics.js?v=43.73"></script>
-    <script defer src="js/reports.js?v=43.73"></script>
-    <script defer src="js/audit.js?v=43.73"></script>
-    <script defer src="js/asignaciones.js?v=43.73"></script>
-    <script defer src="js/bulk-editor.js?v=43.73"></script>
-    <script defer src="js/usuarios.js?v=43.73"></script>
-    <script defer src="js/devoluciones.js?v=43.73"></script>
-    <script defer src="js/planillas.js?v=43.73"></script>
-    <script defer src="js/app.js?v=43.73"></script>
+    <script defer src="js/lazy-loader.js?v=43.74"></script>
+    <script defer src="js/config.js?v=43.74"></script>
+    <script defer src="js/data.js?v=43.74"></script>
+    <script defer src="js/api-client.js?v=43.74"></script>
+    <script defer src="js/auth.js?v=43.74"></script>
+    <script defer src="js/utils.js?v=43.74"></script>
+    <script defer src="js/offline.js?v=43.74"></script>
+    <script defer src="js/notifications.js?v=43.74"></script>
+    <script defer src="js/ujier.js?v=43.74"></script>
+    <script defer src="js/dashboard.js?v=43.74"></script>
+    <script defer src="js/dashboard-patch.js?v=43.74"></script>
+    <script defer src="js/dashboard-ui-patch.js?v=43.74"></script>
+    <script defer src="js/dashboard-analytics.js?v=43.74"></script>
+    <script defer src="js/reports.js?v=43.74"></script>
+    <script defer src="js/audit.js?v=43.74"></script>
+    <script defer src="js/asignaciones.js?v=43.74"></script>
+    <script defer src="js/bulk-editor.js?v=43.74"></script>
+    <script defer src="js/usuarios.js?v=43.74"></script>
+    <script defer src="js/devoluciones.js?v=43.74"></script>
+    <script defer src="js/planillas.js?v=43.74"></script>
+    <script defer src="js/app.js?v=43.74"></script>
 
     <!-- Leaflet Maps - Lazy Load (only when map view is accessed) -->
     <script>

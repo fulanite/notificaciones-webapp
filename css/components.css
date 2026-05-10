@@ -1,4 +1,4 @@
-﻿/* ========================================
+/* ========================================
    SGND - Component Styles
    ======================================== */
 
@@ -2847,4 +2847,112 @@ textarea:required:valid,
 
 .settings-input-group input:focus {
     outline: none;
+}
+
+/* === Notification Type Chips === */
+.notification-type-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.chips-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chips-group.urgent-group {
+    background: rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.chips-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    width: 100%;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.chip-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: var(--radius-full);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.chip-btn.chip-neutral {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+
+.chip-btn.chip-neutral:hover {
+    background: var(--primary-500);
+    color: white;
+    border-color: var(--primary-500);
+}
+
+.chip-btn.chip-neutral.selected {
+    background: var(--primary-600);
+    color: white;
+    border-color: var(--primary-600);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.chip-btn.chip-urgent {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.chip-btn.chip-urgent:hover {
+    background: var(--error);
+    color: white;
+}
+
+.chip-btn.chip-urgent.selected {
+    background: var(--error);
+    color: white;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+    transform: scale(1.05);
+}
+
+/* Alert Banner */
+.tipo-alert {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+    margin-top: 8px;
+    animation: fadeIn 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tipo-alert.alert-urgent {
+    background: var(--error);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.tipo-alert.alert-normal {
+    background: var(--primary-600);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }

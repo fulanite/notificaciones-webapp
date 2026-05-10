@@ -198,6 +198,55 @@ const app = {
         this.applyPersistentSettings();
     },
 
+    // Handle notification type selection from chips
+    selectNotificationType(value, label, button) {
+        // Update hidden input
+        const hiddenInput = document.getElementById('tipo-notificacion');
+        if (hiddenInput) {
+            hiddenInput.value = value;
+        }
+        
+        // Remove 'selected' class from all chips
+        document.querySelectorAll('.chip-btn').forEach(btn => btn.classList.remove('selected'));
+        
+        // Add 'selected' class to clicked chip
+        if (button) {
+            button.classList.add('selected');
+        }
+        
+        // Update alert banner
+        const alertBanner = document.getElementById('tipo-notificacion-alert');
+        if (alertBanner) {
+            alertBanner.innerHTML = '';
+            alertBanner.className = 'tipo-alert'; // Reset classes
+            
+            if (value.includes('urgentes') || value.includes('habilitacion')) {
+                alertBanner.innerHTML = `⚠️ ATENCIÓN: ESTÁS CARGANDO UNA ${label.toUpperCase()}`;
+                alertBanner.classList.add('alert-urgent');
+                alertBanner.classList.remove('hidden');
+            } else {
+                alertBanner.innerHTML = `✅ ${label.toUpperCase()} SELECCIONADA`;
+                alertBanner.classList.add('alert-normal');
+                alertBanner.classList.remove('hidden');
+            }
+        }
+        
+        // Trigger the original handler to update dynamic fields
+        this.handleTipoNotificacionChange(value);
+    },
+
+    // Reset the chips UI
+    resetNotificationTypeChips() {
+        document.querySelectorAll('.chip-btn').forEach(btn => btn.classList.remove('selected'));
+        const alertBanner = document.getElementById('tipo-notificacion-alert');
+        if (alertBanner) {
+            alertBanner.className = 'tipo-alert hidden';
+            alertBanner.innerHTML = '';
+        }
+        const hiddenInput = document.getElementById('tipo-notificacion');
+        if (hiddenInput) hiddenInput.value = '';
+    },
+
     // Handle notification type change - show/populate dynamic origin
     handleTipoNotificacionChange(tipo) {
         const grupoDinamico = document.getElementById('grupo-origen-dinamico');
@@ -594,6 +643,7 @@ const app = {
         // Clear form button
         document.getElementById('btn-limpiar-form')?.addEventListener('click', () => {
             document.getElementById('form-nueva-notificacion')?.reset();
+            app.resetNotificationTypeChips();
         });
 
         // Modal Nueva Notificación
@@ -605,6 +655,7 @@ const app = {
 
             // Reset for new entry
             document.getElementById('form-nueva-notificacion')?.reset();
+            app.resetNotificationTypeChips();
             document.getElementById('grupo-costo')?.classList.add('hidden');
             notifications.editingId = null;
             const modalTitle = modalNuevaNotif?.querySelector('.modal-title');
