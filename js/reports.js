@@ -88,12 +88,17 @@ function categorizeAndCount(rows) {
         // Categorization by 'origen'
         const origen = (row.origen || '').trim();
 
-        // Check if it's a cédula with troquel
+        // Check for troquel (both cédulas and mandamientos)
         const tieneTroquel = row.n_troquel || (row.sin_troquel == 0 && row.tipo_troquel);
-        const isCedula = normInput.includes('cedula') || normInput === 'cedulas';
 
-        if (isCedula && tieneTroquel) {
-            counts.particulares.set('Cédulas Particulares / Con Troquel', (counts.particulares.get('Cédulas Particulares / Con Troquel') || 0) + 1);
+        if (tieneTroquel) {
+            let label = 'Otros con Troquel';
+            if (row.tipo_troquel === 'C' || normInput.includes('cedula')) {
+                label = 'Cédulas con Troquel (C)';
+            } else if (row.tipo_troquel === 'M' || normInput.includes('mandamiento')) {
+                label = 'Mandamientos con Troquel (M)';
+            }
+            counts.particulares.set(label, (counts.particulares.get(label) || 0) + 1);
         }
 
         // 1. Check Maps
@@ -334,7 +339,7 @@ const reports = {
         renderTable('MINISTERIO PÚBLICO', counts.ministerioPublico);
         renderTable('JUZGADOS DEL INTERIOR', counts.interior);
         renderTable('OTRAS PROVINCIAS', counts.provincias);
-        renderTable('CÉDULAS PARTICULARES / CON TROQUEL', counts.particulares);
+        renderTable('PARTICULARES / CON TROQUEL', counts.particulares);
 
         // --- FINAL TOTAL ---
         if (finalY > pageHeight - 50) {

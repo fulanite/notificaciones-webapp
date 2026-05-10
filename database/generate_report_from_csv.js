@@ -87,13 +87,18 @@ diciembre.forEach(row => {
 
     const origen = (row.origen || '').trim();
     
-    // Check if it's a cédula with troquel
+    // Check for troquel (both cédulas and mandamientos)
     const normInput = tipoNot.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const tieneTroquel = row.n_troquel || (row.sin_troquel == '0' && row.tipo_troquel);
-    const isCedula = normInput.includes('cedula') || normInput === 'cedulas';
 
-    if (isCedula && tieneTroquel) {
-        counts.particulares.set('Cédulas Particulares / Con Troquel', (counts.particulares.get('Cédulas Particulares / Con Troquel') || 0) + 1);
+    if (tieneTroquel) {
+        let label = 'Otros con Troquel';
+        if (row.tipo_troquel === 'C' || normInput.includes('cedula')) {
+            label = 'Cédulas con Troquel (C)';
+        } else if (row.tipo_troquel === 'M' || normInput.includes('mandamiento')) {
+            label = 'Mandamientos con Troquel (M)';
+        }
+        counts.particulares.set(label, (counts.particulares.get(label) || 0) + 1);
     }
 
     let category = getCategory(origen, JUZGADOS_PENALES_MAP);
@@ -127,7 +132,7 @@ demasSorted.forEach(([cat, count]) => {
     console.log(`  ${cat}: ${count}`);
 });
 
-console.log('\nCÉDULAS PARTICULARES / CON TROQUEL:');
+console.log('\nPARTICULARES / CON TROQUEL:');
 const particularesSorted = Array.from(counts.particulares.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 particularesSorted.forEach(([cat, count]) => {
     console.log(`  ${cat}: ${count}`);
