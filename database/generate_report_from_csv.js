@@ -134,9 +134,14 @@ demasSorted.forEach(([cat, count]) => {
 
 console.log('\nPARTICULARES / CON TROQUEL:');
 const particularesSorted = Array.from(counts.particulares.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+let totalParticulares = 0;
 particularesSorted.forEach(([cat, count]) => {
     console.log(`  ${cat}: ${count}`);
+    totalParticulares += count;
 });
+if (totalParticulares > 0) {
+    console.log(`  TOTAL: ${totalParticulares}`);
+}
 
 const totalGeneral = Array.from(counts.tipos.values()).reduce((sum, count) => sum + count, 0);
 console.log(`\nTOTAL GENERAL DE DILIGENCIAS: ${totalGeneral}`);

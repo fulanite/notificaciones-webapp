@@ -315,9 +315,15 @@ const reports = {
         finalY = doc.lastAutoTable.finalY;
 
         // --- HELPER PARA TABLAS ---
-        const renderTable = (title, mapData) => {
+        const renderTable = (title, mapData, addTotal = false) => {
             if (mapData.size > 0) {
                 const bodyArray = Array.from(mapData.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+                
+                if (addTotal) {
+                    const total = bodyArray.reduce((sum, row) => sum + row[1], 0);
+                    bodyArray.push([{ content: 'TOTAL', styles: { fontStyle: 'bold' } }, { content: total, styles: { fontStyle: 'bold' } }]);
+                }
+
                 if (finalY + (bodyArray.length * 25) > pageHeight - 50) {
                     doc.addPage();
                     finalY = 50;
@@ -339,7 +345,7 @@ const reports = {
         renderTable('MINISTERIO PÚBLICO', counts.ministerioPublico);
         renderTable('JUZGADOS DEL INTERIOR', counts.interior);
         renderTable('OTRAS PROVINCIAS', counts.provincias);
-        renderTable('PARTICULARES / CON TROQUEL', counts.particulares);
+        renderTable('PARTICULARES / CON TROQUEL', counts.particulares, true);
 
         // --- FINAL TOTAL ---
         if (finalY > pageHeight - 50) {
