@@ -820,18 +820,23 @@ const notifications = {
         // Wait for DOM to be ready
         setTimeout(() => {
             // Populate form fields with smart normalization
-            const tipoVal = data.tipo_notificacion || '';
-            utils.setSelectByText('tipo-notificacion', tipoVal);
+            const tipoVal = data.tipo_notificacion || 'cedulas';
+            const chip = document.querySelector(`.chip-btn[data-value="${tipoVal}"]`);
+            
+            if (chip) {
+                app.selectNotificationType(tipoVal, chip.textContent.replace(/[^\w\s\u00C0-\u017F]/g, '').trim(), chip);
+            } else {
+                app.selectNotificationType(tipoVal, tipoVal, null);
+            }
 
-            // Re-fetch standardized value from select (in case it matched by label)
             const standardizedTipo = document.getElementById('tipo-notificacion').value;
 
             // Trigger tipo change to set up correct origin field
             if (standardizedTipo === 'cedulas_mandamientos_22172' ||
                 standardizedTipo === 'cedulas_correspondencia' ||
                 standardizedTipo === 'mandamientos_interior') {
-                app.handleTipoNotificacionChange(standardizedTipo);
-                // Wait a bit for the searchable select to be set up, then populate
+                // handleTipoNotificacionChange was already called by selectNotificationType,
+                // but we need to wait for it to finish setting up the searchable select
                 setTimeout(() => {
                     const input = document.getElementById('origen-dinamico-input');
                     const hidden = document.getElementById('origen-dinamico');
@@ -841,7 +846,6 @@ const notifications = {
                     }
                 }, 150);
             } else {
-                app.handleTipoNotificacionChange(standardizedTipo || 'cedulas');
                 const iFixed = document.getElementById('origen-input');
                 const hFixed = document.getElementById('origen');
                 if (iFixed && hFixed) {
