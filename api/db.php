@@ -162,7 +162,7 @@ class Database
             if ($pdo->inTransaction())
                 $pdo->rollBack();
             // Fallback: Si la tabla falla por alguna razón (permisos, etc), intentar leer directamente (menos seguro pero funcional)
-            $stmt = $pdo->prepare("SELECT id FROM notificaciones WHERE id LIKE ? ORDER BY id DESC LIMIT 1");
+            $stmt = $pdo->prepare("SELECT id FROM notificaciones WHERE id LIKE ? ORDER BY LENGTH(id) DESC, id DESC LIMIT 1");
             $stmt->execute([$fullPrefix . '%']);
             $lastId = $stmt->fetchColumn();
             $nextNumber = 1;
