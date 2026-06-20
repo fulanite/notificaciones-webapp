@@ -272,6 +272,7 @@ const app = {
                 }
             } else if (tipo === 'cedulas' ||
                 tipo === 'cedulas_mandamientos_22172' ||
+                tipo === 'ley_22172_bus' ||
                 tipo === 'cedulas_correspondencia' ||
                 tipo.includes('urgentes')) {
                 if (troquelSelect) {
@@ -292,7 +293,7 @@ const app = {
 
         let options = [];
 
-        if (tipo === 'cedulas_mandamientos_22172' || tipo === 'mandamientos_22172') {
+        if (tipo === 'cedulas_mandamientos_22172' || tipo === 'mandamientos_22172' || tipo === 'ley_22172_bus') {
             grupoFixed?.classList.add('hidden');
             document.getElementById('origen').required = false;
             document.getElementById('origen-input').required = false;

@@ -115,7 +115,7 @@ function categorizeAndCount(rows) {
         if (category) { counts.ministerioPublico.set(category, (counts.ministerioPublico.get(category) || 0) + 1); return; }
 
         // 2. Extraer a los cuadros correspondientes de Interior y Provincias
-        const esProvincia = tipoNot === 'cedulas_mandamientos_22172' || 
+        const esProvincia = tipoNot === 'cedulas_mandamientos_22172' || tipoNot === 'ley_22172_bus' || 
             /^(Buenos Aires|Catamarca|Chaco|Chubut|Ciudad Autónoma de Buenos Aires \(CABA\)|Córdoba|Corrientes|Entre Ríos|Formosa|Jujuy|La Pampa|La Rioja|Mendoza|Misiones|Neuquén|Río Negro|Salta|San Juan|San Luis|Santa Cruz|Santa Fe|Santiago del Estero|Tierra del Fuego, Antártida e Islas del Atlántico Sur|Tucumán)$/i.test(origen) ||
             /^Cédulas o Mandamientos Ley 22172$/i.test(origen);
 
