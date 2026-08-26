@@ -320,12 +320,13 @@ const db = {
         });
     },
 
-    async markRetiradaNotification(id, userId) {
+    async markRetiradaNotification(id, userId, nombreProfesional) {
         if (!apiClient) return { data: null, error: null };
         return apiClient.put('notificaciones.php', {
             id,
             action: 'mark_retirada',
-            user_id: userId
+            user_id: userId,
+            nombre_profesional_retiro: nombreProfesional
         });
     },
 

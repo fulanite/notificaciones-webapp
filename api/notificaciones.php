@@ -654,17 +654,21 @@ try {
                             Database::sendError('No tenés permisos para esta acción', 403);
                         }
 
+                        $nombreProfesional = $data['nombre_profesional_retiro'] ?? null;
+
                         $stmt = $pdo->prepare("
                             UPDATE notificaciones SET
                                 retirada_por_profesional = 1,
                                 fecha_retiro_profesional = NOW(),
                                 retirado_por_usuario = ?,
+                                nombre_profesional_retiro = ?,
                                 updated_at = NOW(),
                                 updated_by = ?
                             WHERE id = ?
                         ");
                         $stmt->execute([
                             $_SESSION['user_nombre'] ?? 'Administrativo',
+                            $nombreProfesional,
                             $data['user_id'] ?? ($_SESSION['user_id'] ?? 'system'),
                             $data['id']
                         ]);
