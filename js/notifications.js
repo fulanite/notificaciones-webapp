@@ -620,7 +620,7 @@ const notifications = {
                                     <div>
                                         <div style="font-weight: 800; color: var(--primary); font-size: 1.1rem; letter-spacing: -0.01em;">RETIRA PROFESIONAL/DILIGENCIADOR</div>
                                         <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
-                                            Confirmado por <strong>${data.retirado_por_usuario || 'Personal autorizado'}</strong>. Retira: <strong>${data.nombre_profesional_retiro || 'No especificado'}</strong> el ${utils.formatDate(data.fecha_retiro_profesional)}
+                                            Confirmado por <strong>${data.retirado_por_usuario || 'Personal autorizado'}</strong> el ${utils.formatDate(data.fecha_retiro_profesional)}
                                         </div>
                                     </div>
                                 </div>
@@ -1085,14 +1085,13 @@ const notifications = {
 
     // Mark as withdrawn by professional
     async markRetirada(id) {
-        let nombreProfesional = prompt('Ingrese el nombre y título de quien retira (Ej: Dr. Juan Pérez):');
-        if (!nombreProfesional) {
+        if (!confirm('¿Marcar esta notificación como "Retirada por Profesional/Diligenciador"?')) {
             return;
         }
 
         utils.showLoading('Procesando retiro...');
         try {
-            const { error } = await db.markRetiradaNotification(id, auth.currentUser?.id, nombreProfesional);
+            const { error } = await db.markRetiradaNotification(id, auth.currentUser?.id);
             if (error) {
                 utils.showToast('Error: ' + error, 'error');
             } else {
