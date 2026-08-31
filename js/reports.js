@@ -16,7 +16,7 @@ const CAMARAS_MAP = new Map([
 
 const JUZGADOS_MAP = new Map([
     ['Laborales', [/^Juzgado Laboral/i]],
-    ['Correccionales', [/^Juzgado Correccional/i]],
+    ['Correccionales', [/^Juzgado Correcc?ional/i]],
     ['Control de Garantías', [/^Juzgado de Garantías/i]],
     ['Ejecución Penal', [/^Juzgado de Ejecución Penal/i]],
     ['Ejecución Fiscal', [/^Ejecución Fiscal/i]],
@@ -37,6 +37,15 @@ const MINISTERIO_PUBLICO_MAP = new Map([
 const OTROS_MAP = new Map([
     // Queda vacío u opcional para futuros mapeos
 ]);
+
+function normalizeReportLabel(value) {
+    return utils.normalizeLabel(value).replace(/[().]/g, '').trim();
+}
+
+function matchesStaticOption(value, options = []) {
+    const normalizedValue = normalizeReportLabel(value);
+    return options.some(option => normalizeReportLabel(option) === normalizedValue);
+}
 
 function getCategory(origen, categoryMap) {
     for (const [category, patterns] of categoryMap.entries()) {
@@ -115,12 +124,13 @@ function categorizeAndCount(rows) {
         if (category) { counts.ministerioPublico.set(category, (counts.ministerioPublico.get(category) || 0) + 1); return; }
 
         // 2. Extraer a los cuadros correspondientes de Interior y Provincias
-        const esProvincia = tipoNot === 'cedulas_mandamientos_22172' || tipoNot === 'ley_22172_bus' || 
-            /^(Buenos Aires|Catamarca|Chaco|Chubut|Ciudad Autónoma de Buenos Aires \(CABA\)|Córdoba|Corrientes|Entre Ríos|Formosa|Jujuy|La Pampa|La Rioja|Mendoza|Misiones|Neuquén|Río Negro|Salta|San Juan|San Luis|Santa Cruz|Santa Fe|Santiago del Estero|Tierra del Fuego, Antártida e Islas del Atlántico Sur|Tucumán)$/i.test(origen) ||
+        const esProvincia = tipoNot === 'cedulas_mandamientos_22172' || tipoNot === 'ley_22172_bus' ||
+            matchesStaticOption(origen, SGND_DATA.PROVINCIAS) ||
             /^Cédulas o Mandamientos Ley 22172$/i.test(origen);
 
-        const esInterior = tipoNot === 'cedulas_correspondencia' || 
+        const esInterior = tipoNot === 'cedulas_correspondencia' ||
             tipoNot === 'mandamientos_interior' ||
+            matchesStaticOption(origen, SGND_DATA.LOCALIDADES_CATAMARCA) ||
             /^(Andalgalá|Belén|Tinogasta|Santa Maria|Recreo|Cédulas por Correspondencia)$/i.test(origen);
 
         if (esProvincia) {
