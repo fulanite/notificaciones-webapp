@@ -3,7 +3,7 @@
  * Version: 43.76
  */
 
-const CACHE_NAME = 'sgnd-cache-v161';
+const CACHE_NAME = 'sgnd-cache-v162';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache
