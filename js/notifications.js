@@ -391,10 +391,16 @@ const notifications = {
             const recipientDisplay = (notif.destinatario_nombre?.trim() || utils.getSpecialDestinationText(notif) || 'Sin destinatario');
 
             const isDeleted = notif.eliminada == 1 || notif.eliminada === true;
-            const deletedClass = isDeleted ? 'row-is-deleted' : '';
+            const isRetirada = notif.retirada_por_profesional == 1;
+            const rowClasses = [
+                'stagger-item',
+                'row-hover-effect',
+                isDeleted ? 'row-is-deleted' : '',
+                isRetirada ? 'row-retirada-profesional' : ''
+            ].filter(Boolean).join(' ');
 
             html += `
-                <tr class="stagger-item row-hover-effect ${deletedClass}" style="cursor: pointer;" onclick="notifications.viewDetails('${notif.id}')">
+                <tr class="${rowClasses}" style="cursor: pointer;" onclick="notifications.viewDetails('${notif.id}')">
                     <td class="col-date" data-label="Fecha">${notif.fecha_entrega_ujier ? utils.formatDate(notif.fecha_entrega_ujier) : '<span style="color:var(--text-muted)">-</span>'}</td>
                     <td class="col-status" data-label="Estado">${this.getEnhancedStatusBadge(notif)}</td>
                     <td class="col-zona" data-label="Zona"><span class="badge-zona">${notif.zona || '-'}</span></td>

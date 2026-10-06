@@ -2956,3 +2956,11 @@ textarea:required:valid,
     color: white;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
+
+/* Highlight para notificaciones retiradas por profesional */
+.row-retirada-profesional td {
+    background-color: rgba(64, 169, 255, 0.08) !important;
+}
+.row-retirada-profesional:hover td {
+    background-color: rgba(64, 169, 255, 0.15) !important;
+}
