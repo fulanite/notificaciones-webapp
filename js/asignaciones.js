@@ -211,7 +211,8 @@ const asignaciones = {
                 (n.n_expediente || '').toLowerCase().includes(this.state.searchTerm) ||
                 (n.destinatario_nombre || '').toLowerCase().includes(this.state.searchTerm) ||
                 (n.caratula || '').toLowerCase().includes(this.state.searchTerm) ||
-                (n.domicilio || '').toLowerCase().includes(this.state.searchTerm);
+                (n.domicilio || '').toLowerCase().includes(this.state.searchTerm) ||
+                (n.nombre_profesional_retiro || '').toLowerCase().includes(this.state.searchTerm);
 
             return matchesUjier && matchesSearch;
         });

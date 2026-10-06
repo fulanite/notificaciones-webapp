@@ -233,10 +233,11 @@ try {
                         n.tipo_notificacion LIKE ? OR 
                         n.observaciones_iniciales LIKE ? OR 
                         n.observaciones_resultado LIKE ? OR 
-                        n.destinatario_especial LIKE ?
+                        n.destinatario_especial LIKE ? OR
+                        n.nombre_profesional_retiro LIKE ?
                     )";
-                    // Add params for each field (14 fields now)
-                    for ($i = 0; $i < 14; $i++) {
+                    // Add params for each field (15 fields now)
+                    for ($i = 0; $i < 15; $i++) {
                         $params[] = $search;
                     }
                 }
