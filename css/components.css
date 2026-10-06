@@ -2959,8 +2959,10 @@ textarea:required:valid,
 
 /* Highlight para notificaciones retiradas por profesional */
 .row-retirada-profesional td {
-    background-color: rgba(64, 169, 255, 0.08) !important;
+    background-color: #d1ecf1 !important; /* Cyan claro más notorio */
+    border-left: 4px solid #0c5460 !important; /* Borde oscuro para destacar más */
+    color: #0c5460;
 }
 .row-retirada-profesional:hover td {
-    background-color: rgba(64, 169, 255, 0.15) !important;
+    background-color: #bee5eb !important;
 }
