@@ -34,6 +34,14 @@ const MINISTERIO_PUBLICO_MAP = new Map([
     ['Defensorías Civiles', [/^Defensoría Civil/i]]
 ]);
 
+const OGA_MAP = new Map([
+    ['OGA Civil', [/^OGA\s+Civil$/i]],
+    ['OGA Comercial', [/^OGA\s+Comercial$/i]],
+    ['OGA Ejecución Fiscal', [/^OGA\s+Ejecuci[oó]n\s+Fiscal$/i]],
+    ['OGA Familia', [/^OGA\s+Familia$/i]],
+    ['OGA Laboral', [/^OGA\s+Laboral$/i]]
+]);
+
 const OTROS_MAP = new Map([
     // Queda vacío u opcional para futuros mapeos
 ]);
@@ -64,6 +72,7 @@ function categorizeAndCount(rows) {
         corteYMediacion: new Map(),
         camaras: new Map(),
         juzgados: new Map(),
+        oga: new Map(),
         ministerioPublico: new Map(),
         interior: new Map(),
         provincias: new Map(),
@@ -119,6 +128,9 @@ function categorizeAndCount(rows) {
 
         category = getCategory(origen, JUZGADOS_MAP);
         if (category) { counts.juzgados.set(category, (counts.juzgados.get(category) || 0) + 1); return; }
+
+        category = getCategory(origen, OGA_MAP);
+        if (category) { counts.oga.set(category, (counts.oga.get(category) || 0) + 1); return; }
 
         category = getCategory(origen, MINISTERIO_PUBLICO_MAP);
         if (category) { counts.ministerioPublico.set(category, (counts.ministerioPublico.get(category) || 0) + 1); return; }
@@ -352,6 +364,7 @@ const reports = {
         renderTable('CORTE DE JUSTICIA Y CENTRO DE MEDIACIÓN JUDICIAL', counts.corteYMediacion);
         renderTable('CÁMARAS', counts.camaras);
         renderTable('JUZGADOS', counts.juzgados);
+        renderTable('OFICINAS DE GESTIÓN DE AUDIENCIAS (OGA)', counts.oga);
         renderTable('MINISTERIO PÚBLICO', counts.ministerioPublico);
         renderTable('JUZGADOS DEL INTERIOR', counts.interior);
         renderTable('OTRAS PROVINCIAS', counts.provincias);

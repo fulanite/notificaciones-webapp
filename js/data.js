@@ -113,6 +113,11 @@ const SGND_DATA = {
         'Juzgado Laboral 3',
         'Juzgado Laboral 4',
         'Ministerio Público',
+        'OGA Civil',
+        'OGA Comercial',
+        'OGA Ejecución Fiscal',
+        'OGA Familia',
+        'OGA Laboral',
         'Procuración',
         'Tribunal de Responsabilidad Penal Juvenil 1',
         'Tribunal de Responsabilidad Penal Juvenil 2'

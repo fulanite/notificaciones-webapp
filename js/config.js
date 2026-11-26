@@ -9,7 +9,7 @@ const CONFIG = {
 
     // App Settings
     APP_NAME: 'SGND',
-    APP_VERSION: '1.7.11',
+    APP_VERSION: '1.7.12',
 
     // Pagination
     ITEMS_PER_PAGE: 20,
